@@ -7,6 +7,7 @@
         <item quantity="other">%d persones</item>
     </plurals>
     <string name="people_empty">Encara no hi ha ningú. Afegeix una persona per començar.</string>
+    <string name="no_entries_yet">Encara no hi ha entrades</string>
     <string name="protected_hint">Protegida · toca per desbloquejar</string>
     <string name="back">Enrere</string>
     <string name="unlock_title">Desbloqueja %1$s</string>
