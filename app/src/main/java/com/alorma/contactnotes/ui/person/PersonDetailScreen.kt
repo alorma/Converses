@@ -1,6 +1,8 @@
 package com.alorma.contactnotes.ui.person
 
+import android.content.ActivityNotFoundException
 import android.content.ClipData
+import android.content.Intent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -27,11 +29,13 @@ import androidx.compose.material.icons.rounded.IosShare
 import androidx.compose.material.icons.rounded.MoreVert
 import androidx.compose.material.icons.rounded.PushPin
 import androidx.compose.material.icons.rounded.Unarchive
-import androidx.compose.material3.AssistChip
-import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -47,6 +51,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ClipEntry
 import androidx.compose.ui.platform.LocalClipboard
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -61,6 +66,7 @@ import com.alorma.contactnotes.data.db.PersonEntity
 import com.alorma.contactnotes.data.db.PinnedFactEntity
 import com.alorma.contactnotes.data.settings.SecureWindow
 import com.alorma.contactnotes.designsystem.components.Avatar
+import com.alorma.contactnotes.designsystem.components.ConversesChannelChip
 import com.alorma.contactnotes.designsystem.components.ConversesFilterChip
 import com.alorma.contactnotes.designsystem.components.ConversesMenuItem
 import com.alorma.contactnotes.designsystem.components.ConversesSplitButton
@@ -74,12 +80,14 @@ import com.alorma.contactnotes.ui.entry.NewEntrySheet
 import com.alorma.contactnotes.ui.people.initialsOf
 import com.alorma.contactnotes.ui.people.label
 import java.time.LocalDate
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 
 private val ScreenMargin = 16.dp
+private const val UndoWindowMillis = 5_000L
 
 private sealed interface TimelineItem {
   data class Day(val date: LocalDate) : TimelineItem
@@ -99,7 +107,7 @@ private fun List<EntryEntity>.toTimelineItems(): List<TimelineItem> = buildList 
 }
 
 /** Quina acció d'una entrada està oberta. */
-private enum class EntryAction { None, Menu, Edit, Move, ConfirmDelete, ConfirmDeleteDay }
+private enum class EntryAction { None, Menu, Edit, Move, ConfirmDeleteDay }
 
 @Composable
 fun PersonDetailRoute(
@@ -126,6 +134,10 @@ fun PersonDetailRoute(
   val actionEntry = state.entries.firstOrNull { it.id == actionEntryId }
   val clipboard = LocalClipboard.current
   val scope = androidx.compose.runtime.rememberCoroutineScope()
+  val context = LocalContext.current
+  val snackbarHostState = remember { SnackbarHostState() }
+  val deletedMessage = stringResource(R.string.entry_deleted)
+  val undoLabel = stringResource(R.string.undo)
   var dayCount by remember { mutableIntStateOf(0) }
   LaunchedEffect(actionEntry?.id) { actionEntry?.let { dayCount = viewModel.countDay(it) } }
 
@@ -157,6 +169,19 @@ fun PersonDetailRoute(
       menuExpanded = false
       viewModel.setArchived(!person.archived) { if (!person.archived) onBack() }
     },
+    onChannelOpen = { channel ->
+      channelLink(channel.type, channel.handle)?.let { uri ->
+        try {
+          context.startActivity(Intent(Intent.ACTION_VIEW, uri).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+        } catch (_: ActivityNotFoundException) {
+          Unit
+        }
+      }
+    },
+    onChannelCopy = { channel ->
+      scope.launch { clipboard.setClipEntry(ClipEntry(ClipData.newPlainText(person.name, channel.handle.orEmpty()))) }
+    },
+    snackbarHostState = snackbarHostState,
   )
 
   if (showNewEntry) {
@@ -183,7 +208,25 @@ fun PersonDetailRoute(
           closeAction()
         },
         onMove = { action = EntryAction.Move },
-        onDelete = { action = EntryAction.ConfirmDelete },
+        onDelete = {
+          val deleted = actionEntry
+          viewModel.deleteEntry(deleted)
+          closeAction()
+          scope.launch {
+            snackbarHostState.currentSnackbarData?.dismiss()
+            val timeout = launch {
+              delay(UndoWindowMillis)
+              snackbarHostState.currentSnackbarData?.dismiss()
+            }
+            val result = snackbarHostState.showSnackbar(
+              message = deletedMessage,
+              actionLabel = undoLabel,
+              duration = SnackbarDuration.Indefinite,
+            )
+            timeout.cancel()
+            if (result == SnackbarResult.ActionPerformed) viewModel.restoreEntry(deleted)
+          }
+        },
         onDeleteDay = { action = EntryAction.ConfirmDeleteDay },
       )
       EntryAction.Edit -> NewEntrySheet(
@@ -201,15 +244,6 @@ fun PersonDetailRoute(
         onDismiss = ::closeAction,
         onSelect = {
           viewModel.moveEntry(actionEntry, it.id)
-          closeAction()
-        },
-      )
-      EntryAction.ConfirmDelete -> ConfirmDeleteDialog(
-        title = stringResource(R.string.delete_entry_title),
-        text = stringResource(R.string.delete_entry_text),
-        onDismiss = ::closeAction,
-        onConfirm = {
-          viewModel.deleteEntry(actionEntry)
           closeAction()
         },
       )
@@ -244,6 +278,9 @@ fun PersonDetailScreen(
   onEditPerson: () -> Unit,
   onExport: () -> Unit,
   onToggleArchived: () -> Unit,
+  onChannelOpen: (ChannelEntity) -> Unit,
+  onChannelCopy: (ChannelEntity) -> Unit,
+  snackbarHostState: SnackbarHostState,
 ) {
   val person = state.person
   Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.surface) {
@@ -266,7 +303,7 @@ fun PersonDetailScreen(
         }
         item(key = "header") { Header(person, state) }
         if (state.channels.isNotEmpty()) {
-          item(key = "channels") { ChannelRow(state.channels) }
+          item(key = "channels") { ChannelRow(state.channels, onChannelOpen, onChannelCopy) }
         }
         if (state.facts.isNotEmpty()) {
           item(key = "facts") { PinnedFacts(state.facts) }
@@ -326,6 +363,14 @@ fun PersonDetailScreen(
           }
         }
       }
+
+      SnackbarHost(
+        hostState = snackbarHostState,
+        modifier = Modifier
+          .align(Alignment.BottomCenter)
+          .windowInsetsPadding(WindowInsets.navigationBars)
+          .padding(start = 16.dp, end = 16.dp, bottom = 88.dp),
+      )
 
       ConversesSplitButton(
         label = stringResource(R.string.note_button),
@@ -401,21 +446,23 @@ private fun Counter(value: Int, label: String) {
 }
 
 @Composable
-private fun ChannelRow(channels: List<ChannelEntity>) {
+private fun ChannelRow(
+  channels: List<ChannelEntity>,
+  onOpen: (ChannelEntity) -> Unit,
+  onCopy: (ChannelEntity) -> Unit,
+) {
   LazyRow(
     contentPadding = PaddingValues(vertical = 16.dp),
     horizontalArrangement = Arrangement.spacedBy(8.dp),
   ) {
     items(channels, key = { it.id }) { channel ->
-      AssistChip(
-        onClick = {},
-        label = { Text(stringResource(channel.type.label()), fontWeight = FontWeight.Bold) },
-        leadingIcon = {
-          Icon(channel.type.icon(), contentDescription = null, modifier = Modifier.width(AssistChipDefaults.IconSize))
-        },
-        shape = MaterialTheme.shapes.large,
-        colors = AssistChipDefaults.assistChipColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh),
-        border = null,
+      val hasLink = channelLink(channel.type, channel.handle) != null
+      val hasHandle = !channel.handle.isNullOrBlank()
+      ConversesChannelChip(
+        label = stringResource(channel.type.label()),
+        icon = channel.type.icon(),
+        onClick = if (hasLink) ({ onOpen(channel) }) else null,
+        onLongClick = if (hasHandle) ({ onCopy(channel) }) else null,
       )
     }
   }
