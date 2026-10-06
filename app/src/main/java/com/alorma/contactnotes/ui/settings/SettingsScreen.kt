@@ -40,7 +40,6 @@ import androidx.compose.material.icons.rounded.Timer
 import androidx.compose.material.icons.rounded.UnfoldMore
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItemDefaults
@@ -65,12 +64,13 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.alorma.compose.settings.ui.expressive.SettingsGroup
-import com.alorma.compose.settings.ui.expressive.SettingsMenuLink
-import com.alorma.compose.settings.ui.expressive.SettingsSwitch
 import com.alorma.contactnotes.R
 import com.alorma.contactnotes.data.settings.AppLockManager
 import com.alorma.contactnotes.designsystem.components.ConversesToggleGroup
 import com.alorma.contactnotes.designsystem.components.GroupedListDefaults
+import com.alorma.contactnotes.designsystem.components.SettingRow
+import com.alorma.contactnotes.designsystem.components.SettingSwitchRow
+import com.alorma.contactnotes.designsystem.components.groupedItemShape
 import com.alorma.contactnotes.designsystem.components.ToggleOption
 import com.alorma.contactnotes.designsystem.theme.ScreenTitleStyle
 import com.alorma.contactnotes.designsystem.theme.ThemeColor
@@ -83,7 +83,6 @@ import org.koin.compose.viewmodel.koinViewModel
 
 private val RelockOptions = listOf(0, 60, 300)
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun SettingsScreen(
   onBack: () -> Unit,
@@ -125,22 +124,21 @@ fun SettingsScreen(
         ThemeModeRow(
           selected = settings.themeMode,
           onSelected = viewModel::onThemeMode,
-          shape = ListItemDefaults.segmentedShapes(index = 0, count = themeCount).shape,
+          shape = groupedItemShape(0, themeCount),
         )
-        SettingsSwitch(
-          colors = settingsTileColors(),
-          state = settings.dynamicColor,
-          title = { TileTitle(stringResource(R.string.settings_dynamic_color)) },
-          subtitle = { Text(stringResource(R.string.settings_dynamic_color_summary)) },
-          icon = { Icon(Icons.Rounded.Palette, contentDescription = null) },
-          shapes = ListItemDefaults.segmentedShapes(index = 1, count = themeCount),
+        SettingSwitchRow(
+          title = stringResource(R.string.settings_dynamic_color),
+          subtitle = stringResource(R.string.settings_dynamic_color_summary),
+          icon = Icons.Rounded.Palette,
+          checked = settings.dynamicColor,
           onCheckedChange = viewModel::onDynamicColor,
+          shape = groupedItemShape(1, themeCount),
         )
         if (!settings.dynamicColor) {
           ThemeColorPicker(
             selected = settings.themeColor,
             onSelected = viewModel::onThemeColor,
-            shape = ListItemDefaults.segmentedShapes(index = 2, count = themeCount).shape,
+            shape = groupedItemShape(2, themeCount),
           )
         }
       }
@@ -149,13 +147,12 @@ fun SettingsScreen(
         title = { SectionTitle(stringResource(R.string.settings_language)) },
         verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap),
       ) {
-        SettingsMenuLink(
-          colors = settingsTileColors(),
-          title = { TileTitle(stringResource(R.string.settings_app_language)) },
-          subtitle = { Text(remember { currentLanguageName(context) }) },
-          icon = { Icon(Icons.Rounded.Language, contentDescription = null) },
-          action = { Icon(Icons.Rounded.OpenInNew, contentDescription = null) },
-          shapes = ListItemDefaults.segmentedShapes(index = 0, count = 1),
+        SettingRow(
+          title = stringResource(R.string.settings_app_language),
+          subtitle = remember { currentLanguageName(context) },
+          icon = Icons.Rounded.Language,
+          trailing = { Icon(Icons.Rounded.OpenInNew, contentDescription = null) },
+          shape = groupedItemShape(0, 1),
           onClick = {
             context.startActivity(
               Intent(Settings.ACTION_APP_LOCALE_SETTINGS).setData(Uri.fromParts("package", context.packageName, null)),
@@ -169,24 +166,22 @@ fun SettingsScreen(
         verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap),
       ) {
         if (!canUnlock) {
-          SettingsMenuLink(
-          colors = settingsTileColors(),
-            title = { TileTitle(stringResource(R.string.settings_security_setup)) },
-            subtitle = { Text(stringResource(R.string.settings_security_setup_summary)) },
-            icon = { Icon(Icons.Rounded.Fingerprint, contentDescription = null) },
-            action = { Icon(Icons.Rounded.OpenInNew, contentDescription = null) },
-            shapes = ListItemDefaults.segmentedShapes(index = 0, count = 1),
+          SettingRow(
+            title = stringResource(R.string.settings_security_setup),
+            subtitle = stringResource(R.string.settings_security_setup_summary),
+            icon = Icons.Rounded.Fingerprint,
+            trailing = { Icon(Icons.Rounded.OpenInNew, contentDescription = null) },
+            shape = groupedItemShape(0, 1),
             onClick = { openSecuritySetup(context) },
           )
         } else {
           val lockCount = if (settings.appLock) 2 else 1
-          SettingsSwitch(
-          colors = settingsTileColors(),
-            state = settings.appLock,
-            title = { TileTitle(stringResource(R.string.settings_app_lock)) },
-            subtitle = { Text(stringResource(R.string.settings_app_lock_summary)) },
-            icon = { Icon(Icons.Rounded.Fingerprint, contentDescription = null) },
-            shapes = ListItemDefaults.segmentedShapes(index = 0, count = lockCount),
+          SettingSwitchRow(
+            title = stringResource(R.string.settings_app_lock),
+            subtitle = stringResource(R.string.settings_app_lock_summary),
+            icon = Icons.Rounded.Fingerprint,
+            checked = settings.appLock,
+            shape = groupedItemShape(0, lockCount),
             onCheckedChange = { enabled ->
               activity.promptUnlock(authTitle, authSubtitle) {
                 viewModel.onAppLock(enabled)
@@ -198,7 +193,7 @@ fun SettingsScreen(
             RelockRow(
               seconds = settings.relockAfterSeconds,
               onSelected = viewModel::onRelockAfter,
-              shapes = ListItemDefaults.segmentedShapes(index = 1, count = lockCount),
+              shape = groupedItemShape(1, lockCount),
             )
           }
         }
@@ -219,22 +214,20 @@ fun SettingsScreen(
   }
 }
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun RelockRow(
   seconds: Int,
   onSelected: (Int) -> Unit,
-  shapes: androidx.compose.material3.ListItemShapes,
+  shape: androidx.compose.ui.graphics.Shape,
 ) {
   var expanded by remember { mutableStateOf(false) }
   Box {
-    SettingsMenuLink(
-      colors = settingsTileColors(),
-      title = { TileTitle(stringResource(R.string.settings_relock)) },
-      subtitle = { Text(stringResource(relockSummary(seconds))) },
-      icon = { Icon(Icons.Rounded.Timer, contentDescription = null) },
-      action = { Icon(Icons.Rounded.UnfoldMore, contentDescription = null) },
-      shapes = shapes,
+    SettingRow(
+      title = stringResource(R.string.settings_relock),
+      subtitle = stringResource(relockSummary(seconds)),
+      icon = Icons.Rounded.Timer,
+      trailing = { Icon(Icons.Rounded.UnfoldMore, contentDescription = null) },
+      shape = shape,
       onClick = { expanded = true },
     )
     DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
@@ -365,9 +358,3 @@ private fun SectionTitle(text: String) {
 private fun TileTitle(text: String) {
   Text(text = text, fontWeight = FontWeight.SemiBold)
 }
-
-@Composable
-private fun settingsTileColors() = ListItemDefaults.colors(
-  containerColor = GroupedListDefaults.containerColor,
-  selectedContainerColor = GroupedListDefaults.containerColor,
-)
