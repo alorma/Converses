@@ -46,6 +46,7 @@ import com.alorma.contactnotes.data.db.PersonListItem
 import com.alorma.contactnotes.designsystem.components.Avatar
 import com.alorma.contactnotes.designsystem.components.ConversesConnectedFilterRow
 import com.alorma.contactnotes.designsystem.components.DashedActionRow
+import com.alorma.contactnotes.designsystem.components.EmptyState
 import com.alorma.contactnotes.designsystem.components.ConversesFloatingToolbar
 import com.alorma.contactnotes.designsystem.components.GroupedListDefaults
 import com.alorma.contactnotes.designsystem.components.ToolbarDestination
@@ -113,18 +114,25 @@ fun PeopleListScreen(
         }
         if (!state.isLoading && state.people.isEmpty()) {
           item(key = "empty") {
-            Text(
-              text = stringResource(if (archived) R.string.archived_empty else R.string.people_empty),
-              style = MaterialTheme.typography.bodyLarge,
-              color = MaterialTheme.colorScheme.onSurfaceVariant,
-              modifier = Modifier.padding(24.dp),
+            val noPeopleAtAll = !archived && state.filter == ChannelFilter.All
+            EmptyState(
+              icon = if (archived) Icons.Rounded.Archive else Icons.Rounded.Groups,
+              title = stringResource(
+                when {
+                  archived -> R.string.archived_empty
+                  noPeopleAtAll -> R.string.people_empty
+                  else -> R.string.people_empty_filter
+                },
+              ),
+              actionLabel = if (noPeopleAtAll) stringResource(R.string.add_first_person) else null,
+              onAction = if (noPeopleAtAll) onNewPerson else null,
             )
           }
         }
         groupedItems(state.people, key = { it.person.id }) { item ->
           PersonRow(item, onClick = { onPersonClick(item.person) })
         }
-        if (!state.isLoading && !archived) {
+        if (!state.isLoading && !archived && state.people.isNotEmpty()) {
           item(key = "add_person") {
             DashedActionRow(
               icon = Icons.Rounded.PersonAdd,

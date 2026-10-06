@@ -24,6 +24,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.Archive
+import androidx.compose.material.icons.rounded.ChatBubbleOutline
 import androidx.compose.material.icons.rounded.Edit
 import androidx.compose.material.icons.rounded.IosShare
 import androidx.compose.material.icons.rounded.MoreVert
@@ -70,6 +71,7 @@ import com.alorma.contactnotes.designsystem.components.ConversesChannelChip
 import com.alorma.contactnotes.designsystem.components.ConversesFilterChip
 import com.alorma.contactnotes.designsystem.components.ConversesMenuItem
 import com.alorma.contactnotes.designsystem.components.ConversesSplitButton
+import com.alorma.contactnotes.designsystem.components.EmptyState
 import com.alorma.contactnotes.designsystem.components.GroupedList
 import com.alorma.contactnotes.designsystem.components.GroupedListDefaults
 import com.alorma.contactnotes.designsystem.components.TimelineMarker
@@ -327,11 +329,20 @@ fun PersonDetailScreen(
         }
         if (items.isEmpty()) {
           item(key = "empty") {
-            Text(
-              text = stringResource(R.string.timeline_empty),
-              style = MaterialTheme.typography.bodyLarge,
-              color = MaterialTheme.colorScheme.onSurfaceVariant,
-              modifier = Modifier.padding(vertical = 24.dp),
+            val noEntries = state.saidCount + state.heardCount + state.happenedCount == 0
+            val kindsLabel = EntryKind.entries
+              .filter { it in state.selectedKinds }
+              .map { stringResource(it.label()) }
+              .joinToString(" · ")
+            EmptyState(
+              icon = Icons.Rounded.ChatBubbleOutline,
+              title = if (noEntries || kindsLabel.isEmpty()) {
+                stringResource(R.string.timeline_empty)
+              } else {
+                stringResource(R.string.timeline_filtered_empty, kindsLabel)
+              },
+              actionLabel = if (noEntries) stringResource(R.string.note_button) else null,
+              onAction = if (noEntries) onNewEntry else null,
             )
           }
         }

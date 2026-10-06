@@ -6,7 +6,7 @@
         <item quantity="one">%d persona</item>
         <item quantity="other">%d persones</item>
     </plurals>
-    <string name="people_empty">Encara no hi ha ningú. Afegeix una persona per començar.</string>
+    <string name="people_empty">Encara no hi ha ningú</string>
     <string name="no_entries_yet">Encara no hi ha entrades</string>
     <string name="protected_hint">Protegida · toca per desbloquejar</string>
     <string name="back">Enrere</string>
@@ -47,7 +47,10 @@
     <string name="since">des de %1$s</string>
     <string name="pinned_facts">Dades fixades</string>
     <string name="timeline">Cronologia</string>
-    <string name="timeline_empty">Encara no hi ha entrades.</string>
+    <string name="add_first_person">Afegeix la primera persona</string>
+    <string name="people_empty_filter">Ningú en aquest canal</string>
+    <string name="timeline_filtered_empty">Cap entrada de %1$s</string>
+    <string name="timeline_empty">Encara no hi ha entrades</string>
     <plurals name="entry_count">
         <item quantity="one">%d entrada</item>
         <item quantity="other">%d entrades</item>
@@ -113,7 +116,7 @@
     <string name="menu_archive">Arxivar</string>
     <string name="menu_unarchive">Desarxivar</string>
     <string name="filter_archived">Arxivades</string>
-    <string name="archived_empty">No tens cap persona arxivada.</string>
+    <string name="archived_empty">No tens cap persona arxivada</string>
     <string name="entry_actions">Accions de l\'entrada</string>
     <string name="entry_edit">Editar</string>
     <string name="entry_copy">Copiar el text</string>
