@@ -131,6 +131,10 @@
     <string name="export_before">Exportar les notes abans</string>
     <string name="export_before_summary">Es guarda una còpia en text</string>
     <string name="export_title">Notes de %1$s</string>
+    <plurals name="entry_delete_today_summary">
+        <item quantity="one">L\'entrada d\'avui a %2$s</item>
+        <item quantity="other">Les %1$d entrades d\'avui a %2$s</item>
+    </plurals>
     <plurals name="entry_delete_day_summary">
         <item quantity="one">L\'entrada d\'aquest dia a %2$s</item>
         <item quantity="other">Les %1$d entrades d\'aquest dia a %2$s</item>

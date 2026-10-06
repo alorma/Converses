@@ -43,6 +43,7 @@ import com.alorma.contactnotes.designsystem.components.GroupedListDefaults
 import com.alorma.contactnotes.designsystem.components.groupedItemShape
 import com.alorma.contactnotes.ui.people.initialsOf
 import com.alorma.contactnotes.ui.people.label
+import java.time.LocalDate
 
 /** Full d'accions d'una entrada (PNG 5). */
 @OptIn(ExperimentalMaterial3Api::class)
@@ -73,8 +74,8 @@ fun EntryActionsSheet(
       Text(
         text = listOf(
           stringResource(entry.kind.label()),
-          stringResource(entry.channelType.label()),
           formatTime(entry.occurredAt),
+          stringResource(entry.channelType.label()),
         ).joinToString(" · ") { it.uppercase() },
         style = MaterialTheme.typography.labelMedium,
         fontWeight = FontWeight.SemiBold,
@@ -90,22 +91,34 @@ fun EntryActionsSheet(
       ActionRow(Icons.Rounded.Edit, stringResource(R.string.entry_edit), null, 0, 3, onEdit)
       ActionRow(Icons.Rounded.ContentCopy, stringResource(R.string.entry_copy), null, 1, 3, onCopy)
       ActionRow(Icons.Rounded.Logout, stringResource(R.string.entry_move), null, 2, 3, onMove)
+      val canDeleteDay = dayCount > 1
+      val isToday = entryDate(entry.occurredAt) == LocalDate.now()
       Column(modifier = Modifier.padding(top = 12.dp), verticalArrangement = Arrangement.spacedBy(2.dp)) {
-        ActionRow(Icons.Rounded.Delete, stringResource(R.string.entry_delete), null, 0, 2, onDelete, destructive = true)
         ActionRow(
-          icon = Icons.Rounded.DeleteSweep,
-          title = stringResource(R.string.entry_delete_day),
-          subtitle = pluralStringResource(
-            R.plurals.entry_delete_day_summary,
-            dayCount,
-            dayCount,
-            stringResource(entry.channelType.label()),
-          ),
-          index = 1,
-          count = 2,
-          onClick = onDeleteDay,
+          icon = Icons.Rounded.Delete,
+          title = stringResource(R.string.entry_delete),
+          subtitle = null,
+          index = 0,
+          count = if (canDeleteDay) 2 else 1,
+          onClick = onDelete,
           destructive = true,
         )
+        if (canDeleteDay) {
+          ActionRow(
+            icon = Icons.Rounded.DeleteSweep,
+            title = stringResource(R.string.entry_delete_day),
+            subtitle = pluralStringResource(
+              if (isToday) R.plurals.entry_delete_today_summary else R.plurals.entry_delete_day_summary,
+              dayCount,
+              dayCount,
+              stringResource(entry.channelType.label()),
+            ),
+            index = 1,
+            count = 2,
+            onClick = onDeleteDay,
+            destructive = true,
+          )
+        }
       }
     }
   }
