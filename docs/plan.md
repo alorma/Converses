@@ -147,14 +147,14 @@ La base funcional de la v1 ja és feta. El que queda és:
 
 **Fet quan:** una persona protegida no deixa cap rastre fora del detall desbloquejat.
 
-- [ ] **Backup (D4):** `android:dataExtractionRules` i `fullBackupContent` han d'excloure la base de dades i el DataStore. Cal provar-ho amb `adb shell bmgr backupnow`.
-- [ ] **`FLAG_SECURE` també a l'editor** d'una persona protegida i als fulls que s'obren des del seu detall: nova entrada, accions i menú.
-- [ ] **No tornar a bloquejar en passar del detall a l'editor** de la mateixa persona; sí en tornar al llistat. Cal definir-ho a nivell de ruta, no a l'`onStop` de la pantalla.
-- [ ] **Nota ràpida per a una protegida:** es pot escriure sense desbloquejar, però el full no mostra cap dada de la persona (ni canals amb l'usuari, ni l'última entrada).
-- [ ] **Exportar notes** d'una protegida: si el detall ja és desbloquejat, no cal tornar a demanar l'empremta; si no, cal demanar-la.
-- [ ] **Ordre del llistat (D6):** aplicar la decisió presa.
+- [x] **Backup (D4):** `android:dataExtractionRules` i `fullBackupContent` han d'excloure la base de dades i el DataStore. Cal provar-ho amb `adb shell bmgr backupnow`.
+- [x] **`FLAG_SECURE` també a l'editor** d'una persona protegida i als fulls que s'obren des del seu detall: nova entrada, accions i menú.
+- [x] **No tornar a bloquejar en passar del detall a l'editor** de la mateixa persona; sí en tornar al llistat. Cal definir-ho a nivell de ruta, no a l'`onStop` de la pantalla.
+- [x] **Nota ràpida per a una protegida:** es pot escriure sense desbloquejar, però el full no mostra cap dada de la persona (ni canals amb l'usuari, ni l'última entrada).
+- [x] **Exportar notes** d'una protegida: si el detall ja és desbloquejat, no cal tornar a demanar l'empremta; si no, cal demanar-la.
+- [x] **Ordre del llistat (D6):** decidit mantenir l'ordre per última activitat; no canvia res.
 - [ ] **Bloqueig desactivat sol** quan el dispositiu es queda sense bloqueig de pantalla: comprovar que les persones protegides continuen protegides i que es mostra la pantalla de M2.
-- [ ] **Notificacions i dreceres:** cap drecera dinàmica ni cap suggeriment de compartir amb el nom d'una protegida.
+- [x] **Notificacions i dreceres:** cap drecera dinàmica ni cap suggeriment de compartir amb el nom d'una protegida.
 
 ---
 
