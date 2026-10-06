@@ -67,6 +67,7 @@ data class QuickNoteUiState(
   val people: List<PersonEntity> = emptyList(),
   val selected: PersonEntity? = null,
   val channels: List<ChannelType> = emptyList(),
+  val lastChannel: ChannelType? = null,
 )
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -81,12 +82,14 @@ class QuickNoteViewModel(
   val uiState: StateFlow<QuickNoteUiState> = combine(people, selectedId) { people, id ->
     people to (people.firstOrNull { it.id == id } ?: people.firstOrNull())
   }.flatMapLatest { (people, selected) ->
-    val channels = if (selected == null || selected.isProtected) {
-      flowOf(emptyList())
+    if (selected == null || selected.isProtected) {
+      flowOf(QuickNoteUiState(people = people, selected = selected))
     } else {
-      repository.observeChannels(selected.id).map { list -> list.map { it.type } }
+      combine(
+        repository.observeChannels(selected.id).map { list -> list.map { it.type } },
+        repository.observeTimeline(selected.id).map { it.firstOrNull()?.channelType },
+      ) { channels, last -> QuickNoteUiState(people = people, selected = selected, channels = channels, lastChannel = last) }
     }
-    channels.map { QuickNoteUiState(people = people, selected = selected, channels = it) }
   }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), QuickNoteUiState())
 
   fun select(person: PersonEntity) {
@@ -119,7 +122,9 @@ fun QuickNoteScreen(
   val form = rememberEntryFormState()
   val selected = state.selected
   val available = availableChannels(state.channels, showAll = selected?.isProtected == true)
-  val channel = form.channel?.takeIf { it in available } ?: available.first()
+  val channel = form.channel?.takeIf { it in available }
+    ?: state.lastChannel?.takeIf { it in available }
+    ?: available.first()
 
   Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.surface) {
     Column(
@@ -149,23 +154,13 @@ fun QuickNoteScreen(
       if (selected != null) {
         PersonPicker(selected = selected, people = state.people, onSelect = viewModel::select)
       }
-      Text(
-        text = stringResource(R.string.quick_where),
-        style = MaterialTheme.typography.titleSmall,
-        fontWeight = FontWeight.Bold,
-        color = MaterialTheme.colorScheme.onSurfaceVariant,
-        modifier = Modifier.padding(start = 4.dp),
-      )
-      ChannelChips(channels = available, selected = channel, onSelected = { form.channel = it })
       KindSelector(form)
-      EntryTextField(form, label = stringResource(form.kind.quickLabel()))
+      EntryTextField(form, placeholder = stringResource(form.kind.promptLabel()))
+      WhereSection(channels = available, selected = channel, onSelected = { form.channel = it })
       Row { TimeChip(occurredAt = form.occurredAt, onChange = { form.occurredAt = it }) }
     }
   }
 }
-
-private fun EntryKind.quickLabel(): Int =
-  if (this == EntryKind.HAPPENED) R.string.entry_label_quick_happened else R.string.entry_label_quick_said
 
 @Composable
 private fun PersonPicker(selected: PersonEntity, people: List<PersonEntity>, onSelect: (PersonEntity) -> Unit) {

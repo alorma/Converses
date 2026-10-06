@@ -80,8 +80,8 @@ fun NewEntrySheet(
         }
       }
       KindSelector(form)
-      EntryTextField(form, label = stringResource(form.kind.promptLabel()))
-      ChannelChips(channels = available, selected = channel, onSelected = { form.channel = it })
+      EntryTextField(form, placeholder = stringResource(form.kind.promptLabel()))
+      WhereSection(channels = available, selected = channel, onSelected = { form.channel = it })
       Row { TimeChip(occurredAt = form.occurredAt, onChange = { form.occurredAt = it }) }
       Button(
         onClick = { onSave(form.kind, channel, form.text.trim(), form.occurredAt) },
