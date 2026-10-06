@@ -1,19 +1,26 @@
 <resources>
     <string name="app_name">Converses</string>
 
-    <string name="gallery_title">Converses</string>
-    <string name="gallery_theme_system">Sistema</string>
-    <string name="gallery_theme_light">Clar</string>
-    <string name="gallery_theme_dark">Fosc</string>
-    <string name="gallery_style_tinted">Tenyit</string>
-    <string name="gallery_style_pure">Pur</string>
-    <string name="gallery_section_avatars">Avatars</string>
-    <string name="gallery_section_list">Llista agrupada</string>
-    <string name="gallery_section_error">Error</string>
-    <string name="gallery_person_name">Nom</string>
-    <string name="gallery_row_one">Primera fila</string>
-    <string name="gallery_row_two">Segona fila</string>
-    <string name="gallery_row_three">Tercera fila</string>
-    <string name="gallery_error_message">No s\'ha pogut sincronitzar</string>
-    <string name="gallery_error_retry">Reintenta</string>
+    <string name="people_title">Converses</string>
+    <plurals name="people_count">
+        <item quantity="one">%d persona</item>
+        <item quantity="other">%d persones</item>
+    </plurals>
+    <string name="people_empty">Encara no hi ha ningú. Afegeix una persona per començar.</string>
+    <string name="quick_note">Nota ràpida</string>
+    <string name="yesterday">Ahir</string>
+
+    <string name="filter_all">Tots</string>
+    <string name="filter_chat">Xat</string>
+    <string name="filter_social">Xarxes</string>
+    <string name="filter_in_person">En persona</string>
+    <string name="filter_phone">Telèfon</string>
+
+    <string name="channel_discord">Discord</string>
+    <string name="channel_telegram">Telegram</string>
+    <string name="channel_whatsapp">WhatsApp</string>
+    <string name="channel_reddit">Reddit</string>
+    <string name="channel_phone">Telèfon</string>
+    <string name="channel_in_person">En persona</string>
+    <string name="channel_other">Altres</string>
 </resources>

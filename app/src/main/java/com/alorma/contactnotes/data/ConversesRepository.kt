@@ -11,12 +11,9 @@ import com.alorma.contactnotes.data.db.PersonEntity
 import com.alorma.contactnotes.data.db.PersonListItem
 import com.alorma.contactnotes.data.db.PinnedFactDao
 import com.alorma.contactnotes.data.db.PinnedFactEntity
-import javax.inject.Inject
-import javax.inject.Singleton
 import kotlinx.coroutines.flow.Flow
 
-@Singleton
-class ConversesRepository @Inject constructor(
+class ConversesRepository(
   private val personDao: PersonDao,
   private val channelDao: ChannelDao,
   private val entryDao: EntryDao,
