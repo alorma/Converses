@@ -108,4 +108,38 @@
     <string name="protected_person">Persona protegida</string>
     <string name="protected_person_summary">Demana l\'empremta per veure\'n les dades</string>
     <string name="protected_unavailable">Cal una empremta o un bloqueig de pantalla al dispositiu</string>
+
+    <string name="menu_export">Exportar notes</string>
+    <string name="menu_archive">Arxivar</string>
+    <string name="menu_unarchive">Desarxivar</string>
+    <string name="filter_archived">Arxivades</string>
+    <string name="archived_empty">No hi ha persones arxivades.</string>
+    <string name="entry_actions">Accions de l\'entrada</string>
+    <string name="entry_edit">Editar</string>
+    <string name="entry_copy">Copiar el text</string>
+    <string name="entry_move">Moure a una altra persona</string>
+    <string name="entry_delete">Esborrar aquesta entrada</string>
+    <string name="entry_delete_day">Esborrar tota la conversa</string>
+    <string name="edit_entry">Edita l\'entrada</string>
+    <string name="save_changes">Desa els canvis</string>
+    <string name="move_entry_title">Moure a…</string>
+    <string name="delete_entry_title">Esborrar l\'entrada?</string>
+    <string name="delete_entry_text">No es pot desfer.</string>
+    <string name="delete_day_title">Esborrar la conversa d\'aquest dia?</string>
+    <string name="delete_button">Esborra</string>
+    <string name="delete_person">Esborrar persona</string>
+    <string name="delete_person_title">Esborrar %1$s?</string>
+    <string name="delete_person_text">S\'esborraran %1$s i %2$s guardades. No es pot desfer.</string>
+    <string name="export_before">Exportar les notes abans</string>
+    <string name="export_before_summary">Es guarda una còpia en text</string>
+    <string name="export_title">Notes de %1$s</string>
+    <plurals name="entry_delete_day_summary">
+        <item quantity="one">L\'entrada d\'aquest dia a %2$s</item>
+        <item quantity="other">Les %1$d entrades d\'aquest dia a %2$s</item>
+    </plurals>
+
+    <plurals name="fact_count">
+        <item quantity="one">%d dada</item>
+        <item quantity="other">%d dades</item>
+    </plurals>
 </resources>

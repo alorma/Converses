@@ -2,6 +2,7 @@ package com.alorma.contactnotes.data
 
 import com.alorma.contactnotes.data.db.ChannelDao
 import com.alorma.contactnotes.data.db.ChannelEntity
+import com.alorma.contactnotes.data.db.ChannelType
 import com.alorma.contactnotes.data.db.EntryDao
 import com.alorma.contactnotes.data.db.EntryEntity
 import com.alorma.contactnotes.data.db.EntryKind
@@ -12,6 +13,7 @@ import com.alorma.contactnotes.data.db.PersonListItem
 import com.alorma.contactnotes.data.db.PinnedFactDao
 import com.alorma.contactnotes.data.db.PinnedFactEntity
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 
 class ConversesRepository(
@@ -21,7 +23,7 @@ class ConversesRepository(
   private val pinnedFactDao: PinnedFactDao,
 ) {
   /** Les persones protegides no exposen última entrada ni canals. */
-  fun observePeople(): Flow<List<PersonListItem>> = personDao.observeList().map { items ->
+  fun observePeople(archived: Boolean = false): Flow<List<PersonListItem>> = personDao.observeList(archived).map { items ->
     items.map { item ->
       if (item.person.isProtected) item.copy(lastEntry = null, channels = emptyList()) else item
     }
@@ -55,4 +57,18 @@ class ConversesRepository(
   suspend fun updateEntry(entry: EntryEntity) = entryDao.update(entry)
 
   suspend fun deleteEntry(entry: EntryEntity) = entryDao.delete(entry)
+
+  suspend fun moveEntry(entry: EntryEntity, toPersonId: Long) = entryDao.update(entry.copy(personId = toPersonId))
+
+  suspend fun setArchived(person: PersonEntity, archived: Boolean) =
+    personDao.update(person.copy(archived = archived, updatedAt = System.currentTimeMillis()))
+
+  suspend fun countEntriesInRange(personId: Long, channel: ChannelType, from: Long, to: Long): Int =
+    entryDao.countInRange(personId, channel, from, to)
+
+  suspend fun deleteEntriesInRange(personId: Long, channel: ChannelType, from: Long, to: Long): Int =
+    entryDao.deleteInRange(personId, channel, from, to)
+
+  suspend fun getEntries(personId: Long): List<EntryEntity> =
+    entryDao.observeTimeline(personId, EntryKind.entries.toSet()).first()
 }

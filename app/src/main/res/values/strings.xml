@@ -108,4 +108,38 @@
     <string name="protected_person">Protected person</string>
     <string name="protected_person_summary">Asks for your fingerprint to see their details</string>
     <string name="protected_unavailable">Needs a fingerprint or a screen lock on the device</string>
+
+    <string name="menu_export">Export notes</string>
+    <string name="menu_archive">Archive</string>
+    <string name="menu_unarchive">Unarchive</string>
+    <string name="filter_archived">Archived</string>
+    <string name="archived_empty">No archived people.</string>
+    <string name="entry_actions">Entry actions</string>
+    <string name="entry_edit">Edit</string>
+    <string name="entry_copy">Copy text</string>
+    <string name="entry_move">Move to another person</string>
+    <string name="entry_delete">Delete this entry</string>
+    <string name="entry_delete_day">Delete the whole conversation</string>
+    <string name="edit_entry">Edit entry</string>
+    <string name="save_changes">Save changes</string>
+    <string name="move_entry_title">Move to…</string>
+    <string name="delete_entry_title">Delete this entry?</string>
+    <string name="delete_entry_text">This can\'t be undone.</string>
+    <string name="delete_day_title">Delete this day\'s conversation?</string>
+    <string name="delete_button">Delete</string>
+    <string name="delete_person">Delete person</string>
+    <string name="delete_person_title">Delete %1$s?</string>
+    <string name="delete_person_text">%1$s and %2$s will be deleted. This can\'t be undone.</string>
+    <string name="export_before">Export notes first</string>
+    <string name="export_before_summary">A text copy is saved</string>
+    <string name="export_title">Notes for %1$s</string>
+    <plurals name="entry_delete_day_summary">
+        <item quantity="one">The entry from this day on %2$s</item>
+        <item quantity="other">The %1$d entries from this day on %2$s</item>
+    </plurals>
+
+    <plurals name="fact_count">
+        <item quantity="one">%d fact</item>
+        <item quantity="other">%d facts</item>
+    </plurals>
 </resources>

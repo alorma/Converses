@@ -86,6 +86,10 @@ fun AppNavigation() {
             backStack.removeLastOrNull()
             if (route.personId == 0L) backStack.add(PersonRoute(id))
           },
+          onDeleted = {
+            backStack.removeLastOrNull()
+            backStack.removeLastOrNull()
+          },
         )
       }
     },

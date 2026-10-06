@@ -31,6 +31,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.alorma.contactnotes.R
 import com.alorma.contactnotes.data.db.ChannelType
+import com.alorma.contactnotes.data.db.EntryEntity
 import com.alorma.contactnotes.data.db.EntryKind
 import com.alorma.contactnotes.data.db.PersonEntity
 import com.alorma.contactnotes.designsystem.components.Avatar
@@ -43,9 +44,10 @@ fun NewEntrySheet(
   person: PersonEntity,
   channels: List<ChannelType>,
   onDismiss: () -> Unit,
+  initial: EntryEntity? = null,
   onSave: (kind: EntryKind, channel: ChannelType, text: String, occurredAt: Long?) -> Unit,
 ) {
-  val form = rememberEntryFormState()
+  val form = rememberEntryFormState(initial)
   val available = availableChannels(channels)
   val channel = form.channel?.takeIf { it in available } ?: available.first()
 
@@ -66,7 +68,7 @@ fun NewEntrySheet(
       Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
         Avatar(initials = initialsOf(person.name), shape = person.avatarShape, color = person.avatarColor, size = 44.dp)
         Column(modifier = Modifier.weight(1f)) {
-          Text(stringResource(R.string.new_entry), style = SheetTitleStyle)
+          Text(stringResource(if (initial == null) R.string.new_entry else R.string.edit_entry), style = SheetTitleStyle)
           Text(
             text = stringResource(R.string.with_person, person.name),
             style = MaterialTheme.typography.bodyMedium,
@@ -88,7 +90,10 @@ fun NewEntrySheet(
       ) {
         Icon(Icons.Rounded.Check, contentDescription = null)
         Spacer(Modifier.padding(horizontal = 4.dp))
-        Text(stringResource(R.string.save_to_timeline), style = MaterialTheme.typography.titleMedium)
+        Text(
+          stringResource(if (initial == null) R.string.save_to_timeline else R.string.save_changes),
+          style = MaterialTheme.typography.titleMedium,
+        )
       }
       Spacer(Modifier.height(8.dp))
     }

@@ -36,6 +36,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.alorma.contactnotes.R
 import com.alorma.contactnotes.data.db.ChannelType
+import com.alorma.contactnotes.data.db.EntryEntity
 import com.alorma.contactnotes.data.db.EntryKind
 import com.alorma.contactnotes.designsystem.components.ConversesFilterChip
 import com.alorma.contactnotes.designsystem.components.ConversesToggleGroup
@@ -80,7 +81,15 @@ class EntryFormState(
 }
 
 @Composable
-fun rememberEntryFormState(): EntryFormState = rememberSaveable(saver = EntryFormState.Saver) { EntryFormState() }
+fun rememberEntryFormState(initial: EntryEntity? = null): EntryFormState =
+  rememberSaveable(initial?.id, saver = EntryFormState.Saver) {
+    EntryFormState(
+      kind = initial?.kind ?: EntryKind.SAID,
+      channel = initial?.channelType,
+      text = initial?.text.orEmpty(),
+      occurredAt = initial?.occurredAt,
+    )
+  }
 
 /** Canals que es poden triar: els de la persona (o tots si no es poden mostrar) més "Altres". */
 fun availableChannels(personChannels: List<ChannelType>, showAll: Boolean = false): List<ChannelType> =

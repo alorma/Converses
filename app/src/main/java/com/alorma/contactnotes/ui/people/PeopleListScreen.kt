@@ -98,7 +98,7 @@ fun PeopleListScreen(
         if (!state.isLoading && state.people.isEmpty()) {
           item(key = "empty") {
             Text(
-              text = stringResource(R.string.people_empty),
+              text = stringResource(if (state.filter == ChannelFilter.Archived) R.string.archived_empty else R.string.people_empty),
               style = MaterialTheme.typography.bodyLarge,
               color = MaterialTheme.colorScheme.onSurfaceVariant,
               modifier = Modifier.padding(24.dp),

@@ -17,6 +17,7 @@ import com.alorma.contactnotes.ui.entry.QuickNoteViewModel
 import com.alorma.contactnotes.ui.people.PeopleListViewModel
 import com.alorma.contactnotes.ui.settings.SettingsViewModel
 import com.alorma.contactnotes.ui.person.PersonDetailViewModel
+import com.alorma.contactnotes.ui.person.PersonExporter
 import com.alorma.contactnotes.ui.person.PersonViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -58,15 +59,16 @@ val settingsModule = module {
   single<SettingsRepository> { DataStoreSettingsRepository(androidContext()) }
   single { AppLockManager(get()) }
   single { SecureWindow() }
+  single { PersonExporter(androidContext(), get()) }
 }
 
 val viewModelModule = module {
   viewModelOf(::PeopleListViewModel)
   viewModelOf(::SettingsViewModel)
   viewModel { (personId: Long) -> PersonViewModel(personId, get()) }
-  viewModel { (personId: Long) -> PersonDetailViewModel(personId, get()) }
+  viewModel { (personId: Long) -> PersonDetailViewModel(personId, get(), get()) }
   viewModel { (personId: Long) -> QuickNoteViewModel(personId, get()) }
-  viewModel { (personId: Long) -> EditPersonViewModel(personId, get()) }
+  viewModel { (personId: Long) -> EditPersonViewModel(personId, get(), get()) }
 }
 
 val appModules = listOf(databaseModule, settingsModule, viewModelModule)

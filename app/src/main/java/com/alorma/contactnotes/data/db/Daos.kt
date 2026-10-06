@@ -67,11 +67,11 @@ abstract class PersonDao {
     LEFT JOIN entry e ON e.id = (
       SELECT id FROM entry WHERE personId = p.id ORDER BY occurredAt DESC, id DESC LIMIT 1
     )
-    WHERE p.archived = 0
+    WHERE p.archived = :archived
     ORDER BY COALESCE(e.occurredAt, p.createdAt) DESC
     """,
   )
-  abstract fun observeList(): Flow<List<PersonListItem>>
+  abstract fun observeList(archived: Boolean): Flow<List<PersonListItem>>
 
   @Query(
     """
@@ -101,6 +101,16 @@ interface EntryDao {
 
   @Query("SELECT * FROM entry WHERE id = :id")
   suspend fun get(id: Long): EntryEntity?
+
+  @Query(
+    "DELETE FROM entry WHERE personId = :personId AND channelType = :channelType AND occurredAt >= :from AND occurredAt < :to",
+  )
+  suspend fun deleteInRange(personId: Long, channelType: ChannelType, from: Long, to: Long): Int
+
+  @Query(
+    "SELECT COUNT(*) FROM entry WHERE personId = :personId AND channelType = :channelType AND occurredAt >= :from AND occurredAt < :to",
+  )
+  suspend fun countInRange(personId: Long, channelType: ChannelType, from: Long, to: Long): Int
 
   @Query(
     """

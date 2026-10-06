@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
@@ -30,11 +31,15 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.Close
+import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.DragIndicator
 import androidx.compose.material.icons.rounded.Fingerprint
 import androidx.compose.material.icons.rounded.PushPin
 import androidx.compose.material.icons.rounded.RemoveCircleOutline
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Button
 import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.Icon
@@ -62,9 +67,10 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.KeyboardCapitalization
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.fragment.app.FragmentActivity
@@ -79,6 +85,7 @@ import com.alorma.contactnotes.designsystem.components.ConversesFilterChip
 import com.alorma.contactnotes.designsystem.components.GroupedListDefaults
 import com.alorma.contactnotes.designsystem.components.asShape
 import com.alorma.contactnotes.designsystem.components.groupedItemShape
+import com.alorma.contactnotes.designsystem.theme.DialogTitleStyle
 import com.alorma.contactnotes.designsystem.theme.ScreenTitleStyle
 import com.alorma.contactnotes.ui.people.initialsOf
 import com.alorma.contactnotes.ui.people.label
@@ -93,6 +100,7 @@ fun EditPersonScreen(
   personId: Long,
   onClose: () -> Unit,
   onSaved: (Long) -> Unit,
+  onDeleted: () -> Unit,
   viewModel: EditPersonViewModel = koinViewModel(parameters = { parametersOf(personId) }),
 ) {
   val state by viewModel.state.collectAsStateWithLifecycle()
@@ -101,6 +109,7 @@ fun EditPersonScreen(
   val authTitle = stringResource(R.string.protected_person)
   val authSubtitle = stringResource(R.string.unlock_subtitle)
   var channelDialog by remember { mutableStateOf<ChannelDialogState?>(null) }
+  var showDelete by remember { mutableStateOf(false) }
 
   Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.surface) {
     if (!state.loaded) return@Surface
@@ -211,8 +220,33 @@ fun EditPersonScreen(
           )
         }
       }
+      if (!state.isNew) {
+        OutlinedButton(
+          onClick = { showDelete = true },
+          modifier = Modifier.fillMaxWidth().height(56.dp),
+          colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.error),
+          border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
+        ) {
+          Icon(Icons.Rounded.Delete, contentDescription = null)
+          Spacer(Modifier.width(8.dp))
+          Text(stringResource(R.string.delete_person), fontWeight = FontWeight.Bold)
+        }
+      }
       Spacer(Modifier.size(24.dp))
     }
+  }
+
+  if (showDelete) {
+    DeletePersonDialog(
+      name = state.name,
+      factsCount = state.facts.size,
+      entriesCount = state.entryCount,
+      onDismiss = { showDelete = false },
+      onConfirm = { exportFirst ->
+        showDelete = false
+        viewModel.delete(exportFirst, onDeleted)
+      },
+    )
   }
 
   channelDialog?.let { dialog ->
@@ -507,5 +541,74 @@ private fun ChannelDialog(
     },
     confirmButton = { TextButton(onClick = { onConfirm(type, handle) }) { Text(stringResource(android.R.string.ok)) } },
     dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(android.R.string.cancel)) } },
+  )
+}
+
+@Composable
+private fun DeletePersonDialog(
+  name: String,
+  factsCount: Int,
+  entriesCount: Int,
+  onDismiss: () -> Unit,
+  onConfirm: (exportFirst: Boolean) -> Unit,
+) {
+  var exportFirst by remember { mutableStateOf(true) }
+  AlertDialog(
+    onDismissRequest = onDismiss,
+    icon = {
+      Box(
+        modifier = Modifier.size(64.dp).clip(AvatarShape.Clover4Leaf.asShape()).background(MaterialTheme.colorScheme.errorContainer),
+        contentAlignment = Alignment.Center,
+      ) {
+        Icon(Icons.Rounded.Delete, contentDescription = null, tint = MaterialTheme.colorScheme.onErrorContainer)
+      }
+    },
+    title = { Text(stringResource(R.string.delete_person_title, name), style = DialogTitleStyle, textAlign = TextAlign.Center) },
+    text = {
+      Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+        Text(
+          text = stringResource(
+            R.string.delete_person_text,
+            pluralStringResource(R.plurals.fact_count, factsCount, factsCount),
+            pluralStringResource(R.plurals.entry_count, entriesCount, entriesCount),
+          ),
+          style = MaterialTheme.typography.bodyLarge,
+          color = MaterialTheme.colorScheme.onSurfaceVariant,
+          textAlign = TextAlign.Center,
+          modifier = Modifier.fillMaxWidth(),
+        )
+        Surface(
+          shape = MaterialTheme.shapes.large,
+          color = GroupedListDefaults.containerColor,
+          modifier = Modifier.fillMaxWidth().clickable { exportFirst = !exportFirst },
+        ) {
+          Row(
+            modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+          ) {
+            Checkbox(checked = exportFirst, onCheckedChange = { exportFirst = it })
+            Column {
+              Text(stringResource(R.string.export_before), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+              Text(
+                stringResource(R.string.export_before_summary),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+              )
+            }
+          }
+        }
+      }
+    },
+    confirmButton = {
+      Button(
+        onClick = { onConfirm(exportFirst) },
+        colors = ButtonDefaults.buttonColors(
+          containerColor = MaterialTheme.colorScheme.error,
+          contentColor = MaterialTheme.colorScheme.onError,
+        ),
+      ) { Text(stringResource(R.string.delete_button), fontWeight = FontWeight.Bold) }
+    },
+    dismissButton = { OutlinedButton(onClick = onDismiss) { Text(stringResource(android.R.string.cancel)) } },
   )
 }

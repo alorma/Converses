@@ -9,6 +9,7 @@ import com.alorma.contactnotes.data.db.PersonEntity
 import com.alorma.contactnotes.data.db.PinnedFactEntity
 import com.alorma.contactnotes.designsystem.components.AvatarColor
 import com.alorma.contactnotes.designsystem.components.AvatarShape
+import com.alorma.contactnotes.ui.person.PersonExporter
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
@@ -30,6 +31,7 @@ data class EditPersonUiState(
   val facts: List<FactDraft> = emptyList(),
   val channels: List<ChannelDraft> = emptyList(),
   val aliasTaken: Boolean = false,
+  val entryCount: Int = 0,
 ) {
   val canSave: Boolean get() = loaded && name.isNotBlank() && !aliasTaken
 }
@@ -37,6 +39,7 @@ data class EditPersonUiState(
 class EditPersonViewModel(
   private val personId: Long,
   private val repository: ConversesRepository,
+  private val exporter: PersonExporter,
 ) : ViewModel() {
   private var original: PersonEntity? = null
   private var nextKey = 1L
@@ -64,6 +67,7 @@ class EditPersonViewModel(
         isProtected = person.isProtected,
         facts = facts.map { FactDraft(nextKey++, it.label, it.value) },
         channels = channels.map { ChannelDraft(nextKey++, it.type, it.handle.orEmpty()) },
+        entryCount = repository.getEntries(personId).size,
       )
     }
   }
@@ -111,6 +115,15 @@ class EditPersonViewModel(
   }
 
   fun onRemoveChannel(key: Long) = _state.update { state -> state.copy(channels = state.channels.filterNot { it.key == key }) }
+
+  fun delete(exportFirst: Boolean, onDeleted: () -> Unit) {
+    val person = original ?: return
+    viewModelScope.launch {
+      if (exportFirst) exporter.buildText(personId)?.let { exporter.share(person.name, it) }
+      repository.deletePerson(person)
+      onDeleted()
+    }
+  }
 
   fun save(onSaved: (Long) -> Unit) {
     val current = _state.value
