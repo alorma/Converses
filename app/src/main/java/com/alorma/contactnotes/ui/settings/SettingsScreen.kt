@@ -45,7 +45,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -62,7 +61,6 @@ import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.alorma.compose.settings.ui.core.LocalSettingsTileColors
 import com.alorma.compose.settings.ui.expressive.SettingsButtonGroup
 import com.alorma.compose.settings.ui.expressive.SettingsGroup
 import com.alorma.compose.settings.ui.expressive.SettingsMenuLink
@@ -96,8 +94,6 @@ fun SettingsScreen(
   val authTitle = stringResource(R.string.app_lock_prompt_title)
   val authSubtitle = stringResource(R.string.unlock_subtitle)
 
-  val tileColors = ListItemDefaults.colors(containerColor = GroupedListDefaults.containerColor)
-  CompositionLocalProvider(LocalSettingsTileColors provides tileColors) {
   Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.surface) {
     Column(
       modifier = Modifier
@@ -123,6 +119,7 @@ fun SettingsScreen(
       ) {
         val themeCount = if (settings.dynamicColor) 2 else 3
         SettingsButtonGroup(
+          colors = settingsTileColors(),
           title = { TileTitle(stringResource(R.string.settings_theme)) },
           items = listOf(ThemeMode.Light, ThemeMode.Dark, ThemeMode.System),
           selectedItem = settings.themeMode,
@@ -139,6 +136,7 @@ fun SettingsScreen(
           shapes = ListItemDefaults.segmentedShapes(index = 0, count = themeCount),
         )
         SettingsSwitch(
+          colors = settingsTileColors(),
           state = settings.dynamicColor,
           title = { TileTitle(stringResource(R.string.settings_dynamic_color)) },
           subtitle = { Text(stringResource(R.string.settings_dynamic_color_summary)) },
@@ -160,6 +158,7 @@ fun SettingsScreen(
         verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap),
       ) {
         SettingsMenuLink(
+          colors = settingsTileColors(),
           title = { TileTitle(stringResource(R.string.settings_app_language)) },
           subtitle = { Text(remember { currentLanguageName(context) }) },
           icon = { Icon(Icons.Rounded.Language, contentDescription = null) },
@@ -179,6 +178,7 @@ fun SettingsScreen(
       ) {
         if (!canUnlock) {
           SettingsMenuLink(
+          colors = settingsTileColors(),
             title = { TileTitle(stringResource(R.string.settings_security_setup)) },
             subtitle = { Text(stringResource(R.string.settings_security_setup_summary)) },
             icon = { Icon(Icons.Rounded.Fingerprint, contentDescription = null) },
@@ -189,6 +189,7 @@ fun SettingsScreen(
         } else {
           val lockCount = if (settings.appLock) 2 else 1
           SettingsSwitch(
+          colors = settingsTileColors(),
             state = settings.appLock,
             title = { TileTitle(stringResource(R.string.settings_app_lock)) },
             subtitle = { Text(stringResource(R.string.settings_app_lock_summary)) },
@@ -224,7 +225,6 @@ fun SettingsScreen(
       )
     }
   }
-  }
 }
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
@@ -237,6 +237,7 @@ private fun RelockRow(
   var expanded by remember { mutableStateOf(false) }
   Box {
     SettingsMenuLink(
+      colors = settingsTileColors(),
       title = { TileTitle(stringResource(R.string.settings_relock)) },
       subtitle = { Text(stringResource(relockSummary(seconds))) },
       icon = { Icon(Icons.Rounded.Timer, contentDescription = null) },
@@ -276,7 +277,7 @@ private fun ThemeColorPicker(
   onSelected: (ThemeColor) -> Unit,
   shape: androidx.compose.ui.graphics.Shape,
 ) {
-  Surface(shape = shape, color = ListItemDefaults.containerColor, modifier = Modifier.fillMaxWidth()) {
+  Surface(shape = shape, color = GroupedListDefaults.containerColor, modifier = Modifier.fillMaxWidth()) {
     Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
       Text(stringResource(R.string.settings_theme_color), style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold)
       Text(
@@ -350,3 +351,6 @@ private fun SectionTitle(text: String) {
 private fun TileTitle(text: String) {
   Text(text = text, fontWeight = FontWeight.SemiBold)
 }
+
+@Composable
+private fun settingsTileColors() = ListItemDefaults.colors(containerColor = GroupedListDefaults.containerColor)

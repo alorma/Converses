@@ -9,7 +9,7 @@ App Android per recordar què he dit, què m'han dit i què ha passat amb cada p
 
 ## Stack
 
-Kotlin, Jetpack Compose, Material 3 Expressive (`material3` 1.4+), MaterialKolor, Room amb KSP, Hilt, Navigation Compose.
+Kotlin, Jetpack Compose, Material 3 Expressive (`material3` 1.4+), MaterialKolor, Room amb KSP, Koin, Navigation 3, DataStore.
 
 ## Normes
 
