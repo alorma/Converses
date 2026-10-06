@@ -1,6 +1,9 @@
+import com.android.compose.screenshot.tasks.PreviewScreenshotValidationTask
+
 plugins {
   alias(libs.plugins.android.library)
   alias(libs.plugins.kotlin.compose)
+  alias(libs.plugins.compose.screenshot)
 }
 
 android {
@@ -17,6 +20,13 @@ android {
     sourceCompatibility = JavaVersion.VERSION_11
     targetCompatibility = JavaVersion.VERSION_11
   }
+
+  experimentalProperties["android.experimental.enableScreenshotTest"] = true
+}
+
+// El plugin de captures no té DSL per al llindar des d'AGP 9; es posa a la tasca de validació
+tasks.withType<PreviewScreenshotValidationTask>().configureEach {
+  testEngineInput.threshold.set(0.01f)
 }
 
 dependencies {
@@ -29,4 +39,8 @@ dependencies {
   implementation(libs.materialkolor)
   debugImplementation(libs.androidx.compose.ui.tooling)
   implementation(libs.androidx.compose.ui.tooling.preview)
+  screenshotTestImplementation(libs.compose.screenshot.validation)
+  screenshotTestImplementation(platform(libs.androidx.compose.bom))
+  screenshotTestImplementation(libs.androidx.compose.ui)
+  screenshotTestImplementation(libs.androidx.compose.ui.tooling)
 }
