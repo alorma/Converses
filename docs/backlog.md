@@ -1,19 +1,30 @@
 # Backlog: bugs i features trobats provant l'app (2026-10-06)
 
-Alguns ja són issues a GitHub; la resta són aquí perquè l'API de GitHub fallava en crear-los.
+Aquí hi ha el detall de tots els punts. Els que també són issues a GitHub ho indiquen a la columna "Issue".
 
-| # | Tipus | Tema | On |
+| # | Tipus | Tema | Issue |
 | --- | --- | --- | --- |
 | 1 | Bug | L'àrea clicable surt fora de la superfície | [#6](https://github.com/alorma/Contacts-Notes/issues/6) |
-| 2 | Bug | La pantalla de bloqueig de persona mostra el layout | aquí |
-| 3 | Bug | Canal "Other" ha de mostrar "Other - {valor}" | aquí |
-| 4 | Bug | A "Nova entrada", "Ha passat" es talla | aquí |
+| 2 | Bug | La pantalla de bloqueig de persona mostra el layout | — |
+| 3 | Bug | Canal "Other" ha de mostrar "Other - {valor}" | — |
+| 4 | Bug | A "Nova entrada", "Ha passat" es talla | — |
 | 5 | Bug | Activar/desactivar biometria sense desar el perfil | [#4](https://github.com/alorma/Contacts-Notes/issues/4) |
 | 6 | Feature | Follow-ups / entrades pendents | [#5](https://github.com/alorma/Contacts-Notes/issues/5) |
-| 7 | Feature | Nou canal "Empresa" | aquí |
-| 8 | Feature | Gestor de canals propis | aquí |
+| 7 | Feature | Nou canal "Empresa" | — |
+| 8 | Feature | Gestor de canals propis | — |
 
 ---
+
+## 1 · Bug: l'àrea clicable surt fora de la superfície dels elements
+
+Issue: [#6](https://github.com/alorma/Contacts-Notes/issues/6)
+
+L'efecte de clic (ripple) i l'àrea clicable surten per fora de la superfície visible de l'element. S'ha vist a **Ajustos**, però cal revisar totes les pantalles.
+
+**Què cal fer**
+- Revisar `ui/settings/SettingsScreen.kt` i la resta de pantalles (llista, detall, edició, fulls inferiors).
+- Normalment passa quan `Modifier.clickable` va abans del `clip`/`background`: l'ordre ha de ser `clip(shape)`, després `clickable`, després `padding`. O fer servir les variants de `Surface`/`ListItem` amb `onClick`, que ja retallen.
+- Si hi ha un component compartit al `designsystem`, arreglar-ho allà.
 
 ## 2 · Bug: la pantalla de bloqueig d'una persona mostra el layout
 
@@ -50,6 +61,39 @@ El grup de botons de tipus (Li he dit / M'ha dit / Ha passat) es talla: amb "Ha 
 Comprovar-ho en català i castellà (textos més llargs) i amb mida de font gran.
 
 **Fitxers:** `ui/entry/EntryForm.kt`, `ui/entry/NewEntrySheet.kt`.
+
+## 5 · Bug: activar/desactivar la biometria d'una persona no hauria de requerir desar el perfil
+
+Issue: [#4](https://github.com/alorma/Contacts-Notes/issues/4)
+
+Ara mateix, per activar o desactivar el bloqueig biomètric d'una persona cal canviar l'interruptor i després **desar el perfil**.
+
+**Esperat:** el canvi s'aplica directament en canviar l'interruptor, sense haver de desar la resta del formulari.
+
+**Notes**
+- Separar aquest camp de l'estat del formulari d'edició i desar-lo amb una crida pròpia al repositori/DAO.
+- Valorar demanar la biometria abans de **desactivar**-la, perquè ningú la pugui treure sense autenticar-se.
+- Si s'està creant una persona nova (encara sense id), mantenir el comportament actual.
+
+**Fitxers:** `ui/edit/EditPersonScreen.kt`, `ui/edit/EditPersonViewModel.kt`.
+
+## 6 · Feature: follow-ups / entrades pendents a la cronologia
+
+Issue: [#5](https://github.com/alorma/Contacts-Notes/issues/5)
+
+Poder marcar coses per fer-ne seguiment amb una persona ("li he de preguntar com li ha anat l'entrevista", "m'ha de tornar el llibre"...).
+
+**Opcions a decidir**
+1. **Marcar una entrada com a pendent**: un flag `pending` (i opcionalment una data de recordatori) a les entrades existents, que es pot marcar i desmarcar des de la cronologia.
+2. **Nou tipus d'entrada "Follow-up"** al costat de Li he dit / M'ha dit / Ha passat.
+
+La 1 sembla més simple i flexible: qualsevol tipus d'entrada pot quedar pendent.
+
+**A tenir en compte**
+- Migració de Room (nova columna).
+- Indicador visual a la cronologia i potser un comptador o filtre de pendents al detall de persona i a la llista.
+- Opcional: recordatori o notificació en una data.
+- Textos a `strings.xml` (en, ca, es) i actualitzar `docs/plan.md`.
 
 ## 7 · Feature: nou canal "Empresa" (entrevistes de feina)
 
