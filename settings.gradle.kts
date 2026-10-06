@@ -24,4 +24,5 @@ dependencyResolutionManagement {
 
 rootProject.name = "Contact notes"
 include(":app")
+include(":designsystem")
  
