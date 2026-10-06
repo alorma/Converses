@@ -123,8 +123,8 @@
     <string name="edit_entry">Editar entrada</string>
     <string name="save_changes">Guardar cambios</string>
     <string name="move_entry_title">Mover a…</string>
-    <string name="delete_entry_title">¿Borrar la entrada?</string>
-    <string name="delete_entry_text">No se puede deshacer.</string>
+    <string name="entry_deleted">Entrada borrada</string>
+    <string name="undo">Deshacer</string>
     <string name="delete_day_title">¿Borrar la conversación de este día?</string>
     <string name="delete_button">Borrar</string>
     <string name="delete_person">Borrar persona</string>

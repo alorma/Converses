@@ -1,6 +1,8 @@
 package com.alorma.contactnotes.ui.person
 
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.tooling.preview.Preview
 import com.alorma.contactnotes.data.db.EntryKind
 import com.alorma.contactnotes.designsystem.preview.ConversesPreviewTheme
@@ -20,6 +22,9 @@ private fun PersonDetailScreenPreview(state: PersonDetailUiState) {
       onEditPerson = {},
       onExport = {},
       onToggleArchived = {},
+      onChannelOpen = {},
+      onChannelCopy = {},
+      snackbarHostState = remember { SnackbarHostState() },
     )
   }
 }

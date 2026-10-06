@@ -106,6 +106,10 @@ class PersonDetailViewModel(
     viewModelScope.launch { repository.deleteEntry(entry) }
   }
 
+  fun restoreEntry(entry: EntryEntity) {
+    viewModelScope.launch { repository.addEntry(entry) }
+  }
+
   suspend fun countDay(entry: EntryEntity): Int {
     val (from, to) = dayRange(entry)
     return repository.countEntriesInRange(personId, entry.channelType, from, to)

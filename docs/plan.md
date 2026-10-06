@@ -128,11 +128,11 @@ La base funcional de la v1 ja és feta. El que queda és:
     - destinació a la barra flotant, amb la mateixa llista;
     - «Desarxivar» només al menú del detall (no a les files del llistat);
     - estat buit: «No tens cap persona arxivada».
-- [ ] **Xips de canal (D3):**
+- [x] **Xips de canal (D3):**
     - obrir l'app quan hi ha enllaç directe;
-    - mantenir premut per copiar l'usuari, amb el snackbar «Copiat»;
+    - mantenir premut per copiar l'usuari (Android ja ho confirma amb la seva previsualització; sense snackbar);
     - «En persona» i els canals sense enllaç no són clicables.
-- [ ] **Desfer en esborrar una entrada:** snackbar «Entrada esborrada · Desfés» d'uns 5 s, sense diàleg. «Esborrar tota la conversa» i «Esborrar persona» mantenen el diàleg de confirmació.
+- [x] **Desfer en esborrar una entrada:** snackbar «Entrada esborrada · Desfés» d'uns 5 s, sense diàleg. «Esborrar tota la conversa» i «Esborrar persona» mantenen el diàleg de confirmació.
 - [ ] **Estats buits** (a comprovar que hi són tots):
     - llistat sense persones (disseny 1b, «Afegeix la primera persona»);
     - cronologia buida;

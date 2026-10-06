@@ -123,8 +123,8 @@
     <string name="edit_entry">Edita l\'entrada</string>
     <string name="save_changes">Desa els canvis</string>
     <string name="move_entry_title">Moure a…</string>
-    <string name="delete_entry_title">Esborrar l\'entrada?</string>
-    <string name="delete_entry_text">No es pot desfer.</string>
+    <string name="entry_deleted">Entrada esborrada</string>
+    <string name="undo">Desfés</string>
     <string name="delete_day_title">Esborrar la conversa d\'aquest dia?</string>
     <string name="delete_button">Esborra</string>
     <string name="delete_person">Esborrar persona</string>
