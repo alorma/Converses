@@ -22,8 +22,8 @@ La base funcional de la v1 ja és feta. El que queda és:
 | Fase | Objectiu | Estat |
 | --- | --- | --- |
 | 0 · Base | Projecte, dades, totes les pantalles de la v1 | Fet |
-| M1 · Polit visual | La UI coincideix amb el disseny i el design system | Per fer |
-| M2 · Fluxos que falten | Triar i crear persona, arxivades, estats buits, desfer | Per fer |
+| M1 · Polit visual | La UI coincideix amb el disseny i el design system | Fet (falta sincronitzar el design system) |
+| M2 · Fluxos que falten | Triar i crear persona, arxivades, estats buits, desfer | Fet |
 | M3 · Privacitat | Les persones protegides no es filtren enlloc | Per fer |
 | M4 · Qualitat | Tests, accessibilitat, mode fosc, dispositiu real | Per fer |
 | M5 · Publicació | minSdk, signatura, R8, mida, migracions, Play Store | Per fer |
@@ -138,8 +138,8 @@ La base funcional de la v1 ja és feta. El que queda és:
     - cronologia buida;
     - filtres sense resultats («Cap entrada de M'ha dit»);
     - arxivades buides.
-- [ ] **Persona nova → detall:** en crear-la, anar directament al seu detall i treure l'editor de la pila (com ja fa el desbloqueig).
-- [ ] **Desbloqueig sense biometria:** substituir el botó desactivat «Desbloqueja» per **«Configura la seguretat»**, que obre `Settings.ACTION_BIOMETRIC_ENROLL` (o `ACTION_SECURITY_SETTINGS`). En tornar, comprovar-ho de nou.
+- [x] **Persona nova → detall:** en crear-la, anar directament al seu detall i treure l'editor de la pila (com ja fa el desbloqueig).
+- [x] **Desbloqueig sense biometria:** substituir el botó desactivat «Desbloqueja» per **«Configura la seguretat»**, que obre `Settings.ACTION_BIOMETRIC_ENROLL` (o `ACTION_SECURITY_SETTINGS`). En tornar, comprovar-ho de nou.
 
 ---
 
