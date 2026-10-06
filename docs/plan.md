@@ -61,11 +61,11 @@ La base funcional de la v1 ja és feta. El que queda és:
 
 ### Detall
 
-- [ ] **Comptadors:** «1 · 1 · 3 Converses» no quadra, perquè el 3 és el total d'entrades. Hi ha dues opcions:
+- [x] **Comptadors:** «1 · 1 · 3 Converses» no quadra, perquè el 3 és el total d'entrades. Hi ha dues opcions:
     - **Li he dit · M'ha dit · Ha passat** (recomanada; coincideix amb els filtres);
     - **Li he dit · M'ha dit · Entrades**.
-- [ ] **Espai sota la cronologia** (a comprovar): l'última entrada no pot quedar tapada pel split button. Cal `contentPadding` inferior de 96 dp més `navigationBarsPadding`.
-- [ ] **Menú del split button:** ara és el `DropdownMenu` per defecte, amb cantonades rectes. Ha de fer servir la forma del sistema: `radius-group` (24), elements de 52 dp i icones `on-surface-variant`.
+- [x] **Espai sota la cronologia** (a comprovar): l'última entrada no pot quedar tapada pel split button. Cal `contentPadding` inferior de 96 dp més `navigationBarsPadding`.
+- [x] **Menú del split button:** ara és el `DropdownMenu` per defecte, amb cantonades rectes. Ha de fer servir la forma del sistema: `radius-group` (24), elements de 52 dp i icones `on-surface-variant`.
 
 ### Nova entrada (full) i nota ràpida
 

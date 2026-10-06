@@ -45,7 +45,6 @@
     <string name="app_lock_prompt_title">Unlock Converses</string>
     <string name="today">Today</string>
     <string name="since">since %1$s</string>
-    <string name="conversations">Conversations</string>
     <string name="pinned_facts">Pinned facts</string>
     <string name="timeline">Timeline</string>
     <string name="timeline_empty">No entries yet.</string>

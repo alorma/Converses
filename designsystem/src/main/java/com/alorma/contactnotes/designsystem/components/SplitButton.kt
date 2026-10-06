@@ -3,7 +3,11 @@ package com.alorma.contactnotes.designsystem.components
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.MenuDefaults
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.KeyboardArrowDown
@@ -57,6 +61,29 @@ fun ConversesSplitButton(
         }
       },
     )
-    DropdownMenu(expanded = menuExpanded, onDismissRequest = { onMenuExpandedChange(false) }, content = menuContent)
+    DropdownMenu(
+      expanded = menuExpanded,
+      onDismissRequest = { onMenuExpandedChange(false) },
+      shape = RoundedCornerShape(GroupedListDefaults.OuterCorner),
+      containerColor = scheme.surfaceContainerHigh,
+      content = menuContent,
+    )
   }
+}
+
+/** Element del menú del split button: 52 dp d'alçada i icona en `onSurfaceVariant`. */
+@Composable
+fun ConversesMenuItem(
+  text: String,
+  icon: ImageVector,
+  onClick: () -> Unit,
+  modifier: Modifier = Modifier,
+) {
+  DropdownMenuItem(
+    text = { Text(text) },
+    leadingIcon = { Icon(icon, contentDescription = null) },
+    onClick = onClick,
+    modifier = modifier.heightIn(min = 52.dp),
+    colors = MenuDefaults.itemColors(leadingIconColor = MaterialTheme.colorScheme.onSurfaceVariant),
+  )
 }
