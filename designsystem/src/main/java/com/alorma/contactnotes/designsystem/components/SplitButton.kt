@@ -23,6 +23,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 
 /** Split button: acció principal a l'esquerra i fletxa que desplega un menú. */
@@ -39,24 +40,35 @@ fun ConversesSplitButton(
 ) {
   val scheme = MaterialTheme.colorScheme
   val colors = ButtonDefaults.buttonColors(containerColor = scheme.primary, contentColor = scheme.onPrimary)
+  val height = SplitButtonDefaults.MediumContainerHeight
   Box(modifier = modifier) {
     SplitButtonLayout(
       leadingButton = {
-        SplitButtonDefaults.LeadingButton(onClick = onClick, colors = colors) {
-          Icon(icon, contentDescription = null, modifier = Modifier.size(SplitButtonDefaults.LeadingIconSize))
+        SplitButtonDefaults.LeadingButton(
+          onClick = onClick,
+          modifier = Modifier.heightIn(min = height),
+          shapes = SplitButtonDefaults.leadingButtonShapesFor(height),
+          colors = colors,
+          contentPadding = SplitButtonDefaults.leadingButtonContentPaddingFor(height),
+        ) {
+          Icon(icon, contentDescription = null, modifier = Modifier.size(SplitButtonDefaults.leadingButtonIconSizeFor(height)))
           Spacer(Modifier.width(8.dp))
-          Text(label)
+          Text(label, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
         }
       },
       trailingButton = {
         SplitButtonDefaults.TrailingButton(
           checked = menuExpanded,
           onCheckedChange = onMenuExpandedChange,
+          modifier = Modifier.heightIn(min = height),
+          shapes = SplitButtonDefaults.trailingButtonShapesFor(height),
           colors = colors,
+          contentPadding = SplitButtonDefaults.trailingButtonContentPaddingFor(height),
         ) {
           Icon(
             imageVector = if (menuExpanded) Icons.Rounded.KeyboardArrowUp else Icons.Rounded.KeyboardArrowDown,
             contentDescription = null,
+            modifier = Modifier.size(SplitButtonDefaults.trailingButtonIconSizeFor(height)),
           )
         }
       },
