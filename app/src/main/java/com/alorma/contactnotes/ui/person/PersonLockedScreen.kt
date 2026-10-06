@@ -39,6 +39,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.alorma.contactnotes.R
 import com.alorma.contactnotes.designsystem.components.Avatar
 import com.alorma.contactnotes.designsystem.theme.PersonNameStyle
+import com.alorma.contactnotes.designsystem.theme.PersonTheme
 import com.alorma.contactnotes.ui.people.initialsOf
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
@@ -69,41 +70,43 @@ fun PersonLockedScreen(
     }
   }
 
-  Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.surface) {
-    Column(modifier = Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.safeDrawing)) {
-      IconButton(onClick = onBack, modifier = Modifier.padding(8.dp)) {
-        Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = stringResource(R.string.back))
-      }
-      person?.let { p ->
-        Column(
-          modifier = Modifier.fillMaxSize().padding(horizontal = 32.dp),
-          horizontalAlignment = Alignment.CenterHorizontally,
-          verticalArrangement = Arrangement.Center,
-        ) {
-          Avatar(
-            initials = initialsOf(p.name),
-            shape = p.avatarShape,
-            color = p.avatarColor,
-            size = 112.dp,
-            locked = true,
-          )
-          Spacer(Modifier.height(24.dp))
-          Text(text = p.name, style = PersonNameStyle, textAlign = TextAlign.Center)
-          Spacer(Modifier.height(12.dp))
-          Text(
-            text = stringResource(if (canUnlock) R.string.locked_description else R.string.locked_unavailable),
-            style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            textAlign = TextAlign.Center,
-          )
-          Spacer(Modifier.height(32.dp))
-          Button(onClick = { if (canUnlock) unlock() else activity.openSecuritySetup() }) {
-            Icon(Icons.Rounded.Fingerprint, contentDescription = null)
-            Spacer(Modifier.padding(horizontal = 4.dp))
-            Text(stringResource(if (canUnlock) R.string.unlock_action else R.string.settings_security_setup))
+  PersonTheme(person?.avatarColor) {
+    Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.surface) {
+      Column(modifier = Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.safeDrawing)) {
+        IconButton(onClick = onBack, modifier = Modifier.padding(8.dp)) {
+          Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = stringResource(R.string.back))
+        }
+        person?.let { p ->
+          Column(
+            modifier = Modifier.fillMaxSize().padding(horizontal = 32.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
+          ) {
+            Avatar(
+              initials = initialsOf(p.name),
+              shape = p.avatarShape,
+              color = p.avatarColor,
+              size = 112.dp,
+              locked = true,
+            )
+            Spacer(Modifier.height(24.dp))
+            Text(text = p.name, style = PersonNameStyle, textAlign = TextAlign.Center)
+            Spacer(Modifier.height(12.dp))
+            Text(
+              text = stringResource(if (canUnlock) R.string.locked_description else R.string.locked_unavailable),
+              style = MaterialTheme.typography.bodyLarge,
+              color = MaterialTheme.colorScheme.onSurfaceVariant,
+              textAlign = TextAlign.Center,
+            )
+            Spacer(Modifier.height(32.dp))
+            Button(onClick = { if (canUnlock) unlock() else activity.openSecuritySetup() }) {
+              Icon(Icons.Rounded.Fingerprint, contentDescription = null)
+              Spacer(Modifier.padding(horizontal = 4.dp))
+              Text(stringResource(if (canUnlock) R.string.unlock_action else R.string.settings_security_setup))
+            }
           }
         }
       }
-    }
-  }
+    }  }
+
 }

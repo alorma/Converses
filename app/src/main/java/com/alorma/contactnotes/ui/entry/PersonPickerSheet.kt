@@ -43,6 +43,7 @@ import com.alorma.contactnotes.designsystem.components.Avatar
 import com.alorma.contactnotes.designsystem.components.DashedActionRow
 import com.alorma.contactnotes.designsystem.components.GroupedListDefaults
 import com.alorma.contactnotes.designsystem.components.groupedItemShape
+import com.alorma.contactnotes.designsystem.theme.AppColors
 import com.alorma.contactnotes.designsystem.theme.SheetTitleStyle
 import com.alorma.contactnotes.ui.people.initialsOf
 
@@ -62,76 +63,78 @@ fun PersonPickerSheet(
   val visible = remember(people, query) {
     if (query.isBlank()) people else people.filter { it.name.contains(query.trim(), ignoreCase = true) }
   }
-  ModalBottomSheet(
-    onDismissRequest = onDismiss,
-    sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
-    containerColor = MaterialTheme.colorScheme.surface,
-  ) {
-    Column(
-      modifier = Modifier
-        .fillMaxWidth()
-        .imePadding()
-        .windowInsetsPadding(WindowInsets.navigationBars)
-        .padding(horizontal = 16.dp),
-      verticalArrangement = Arrangement.spacedBy(12.dp),
+  AppColors {
+    ModalBottomSheet(
+      onDismissRequest = onDismiss,
+      sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
+      containerColor = MaterialTheme.colorScheme.surface,
     ) {
-      Text(stringResource(R.string.pick_person), style = SheetTitleStyle, modifier = Modifier.padding(start = 4.dp))
-      if (people.size > FilterThreshold) {
-        val container = MaterialTheme.colorScheme.surfaceContainerHigh
-        TextField(
-          value = query,
-          onValueChange = { query = it },
-          modifier = Modifier.fillMaxWidth(),
-          placeholder = { Text(stringResource(R.string.search_by_name)) },
-          singleLine = true,
-          shape = RoundedCornerShape(24.dp),
-          colors = TextFieldDefaults.colors(
-            focusedContainerColor = container,
-            unfocusedContainerColor = container,
-            focusedIndicatorColor = Color.Transparent,
-            unfocusedIndicatorColor = Color.Transparent,
-          ),
-        )
-      }
-      LazyColumn(
-        modifier = Modifier.weight(1f, fill = false),
-        verticalArrangement = Arrangement.spacedBy(GroupedListDefaults.ItemSpacing),
+      Column(
+        modifier = Modifier
+          .fillMaxWidth()
+          .imePadding()
+          .windowInsetsPadding(WindowInsets.navigationBars)
+          .padding(horizontal = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp),
       ) {
-        itemsIndexed(visible, key = { _, person -> person.id }) { index, person ->
-          Surface(
-            onClick = { onSelect(person) },
-            shape = groupedItemShape(index, visible.size),
-            color = GroupedListDefaults.containerColor,
+        Text(stringResource(R.string.pick_person), style = SheetTitleStyle, modifier = Modifier.padding(start = 4.dp))
+        if (people.size > FilterThreshold) {
+          val container = MaterialTheme.colorScheme.surfaceContainerHigh
+          TextField(
+            value = query,
+            onValueChange = { query = it },
             modifier = Modifier.fillMaxWidth(),
-          ) {
-            Row(
-              modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp),
-              verticalAlignment = Alignment.CenterVertically,
-              horizontalArrangement = Arrangement.spacedBy(16.dp),
+            placeholder = { Text(stringResource(R.string.search_by_name)) },
+            singleLine = true,
+            shape = RoundedCornerShape(24.dp),
+            colors = TextFieldDefaults.colors(
+              focusedContainerColor = container,
+              unfocusedContainerColor = container,
+              focusedIndicatorColor = Color.Transparent,
+              unfocusedIndicatorColor = Color.Transparent,
+            ),
+          )
+        }
+        LazyColumn(
+          modifier = Modifier.weight(1f, fill = false),
+          verticalArrangement = Arrangement.spacedBy(GroupedListDefaults.ItemSpacing),
+        ) {
+          itemsIndexed(visible, key = { _, person -> person.id }) { index, person ->
+            Surface(
+              onClick = { onSelect(person) },
+              shape = groupedItemShape(index, visible.size),
+              color = GroupedListDefaults.containerColor,
+              modifier = Modifier.fillMaxWidth(),
             ) {
-              Avatar(initialsOf(person.name), person.avatarShape, person.avatarColor, size = 44.dp, locked = person.isProtected)
-              Text(
-                text = person.name,
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.weight(1f),
-              )
-              if (person.isProtected) {
-                Icon(Icons.Rounded.Lock, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant)
-              }
-              if (person.id == selectedId) {
-                Icon(Icons.Rounded.Check, contentDescription = null)
+              Row(
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
+              ) {
+                Avatar(initialsOf(person.name), person.avatarShape, person.avatarColor, size = 44.dp, locked = person.isProtected)
+                Text(
+                  text = person.name,
+                  style = MaterialTheme.typography.titleMedium,
+                  fontWeight = FontWeight.Bold,
+                  modifier = Modifier.weight(1f),
+                )
+                if (person.isProtected) {
+                  Icon(Icons.Rounded.Lock, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+                if (person.id == selectedId) {
+                  Icon(Icons.Rounded.Check, contentDescription = null)
+                }
               }
             }
           }
         }
+        DashedActionRow(
+          icon = Icons.Rounded.PersonAdd,
+          label = stringResource(R.string.add_person),
+          onClick = onNewPerson,
+          modifier = Modifier.padding(bottom = 16.dp),
+        )
       }
-      DashedActionRow(
-        icon = Icons.Rounded.PersonAdd,
-        label = stringResource(R.string.add_person),
-        onClick = onNewPerson,
-        modifier = Modifier.padding(bottom = 16.dp),
-      )
     }
   }
 }

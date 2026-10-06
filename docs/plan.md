@@ -247,6 +247,10 @@ Una sola activitat (`MainActivity`, una `FragmentActivity` pel `BiometricPrompt`
 | Captures | Compose Preview Screenshot Testing 0.0.1-alpha16 | Experimental; als dos mòduls |
 | Altres | Kotlin 2.4.20, AGP 9.4.1, lifecycle 2.11.0, coroutines 1.11.0, serialization 1.11.0 | |
 
+### Color de la persona
+
+Detall, desbloqueig, editor (amb el color del formulari, en directe) i nota ràpida (només amb persona triada) prenen el color de l'avatar com a llavor del tema (`PersonTheme`, `TonalSpot`). El llistat, Arxivades, Ajustos i el full de triar persona es queden amb el tema de l'app (`AppColors`). Ajust a Ajustos → Aparença: «Color de la persona» (`person_color_theme`, per defecte activat). Detalls i proves a `docs/colors/color-persona.md`.
+
 ### Tema
 
 - **Color dinàmic (per defecte):** la llavor és el `primary` de `dynamicLightColorScheme`, amb l'esquema MaterialKolor `Neutral`.

@@ -21,6 +21,8 @@
     <string name="settings_theme_light">Clar</string>
     <string name="settings_theme_dark">Fosc</string>
     <string name="settings_theme_system">Sistema</string>
+    <string name="settings_person_color">Color de la persona</string>
+    <string name="settings_person_color_summary">Les pantalles de cada persona prenen el color del seu avatar</string>
     <string name="settings_dynamic_color">Color dinàmic</string>
     <string name="settings_dynamic_color_summary">Pren el to del fons de pantalla</string>
     <string name="settings_theme_color">Color del tema</string>

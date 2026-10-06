@@ -16,6 +16,7 @@ data class AppSettings(
   val themeMode: ThemeMode = ThemeMode.System,
   val dynamicColor: Boolean = true,
   val themeColor: ThemeColor = ThemeColor.Lavender,
+  val personColorTheme: Boolean = true,
   val appLock: Boolean = false,
   val relockAfterSeconds: Int = 60,
 )
@@ -28,6 +29,8 @@ interface SettingsRepository {
   suspend fun setDynamicColor(enabled: Boolean)
 
   suspend fun setThemeColor(color: ThemeColor)
+
+  suspend fun setPersonColorTheme(enabled: Boolean)
 
   suspend fun setAppLock(enabled: Boolean)
 
@@ -47,6 +50,8 @@ class DataStoreSettingsRepository(context: Context) : SettingsRepository {
 
   override suspend fun setThemeColor(color: ThemeColor) = write { it[ThemeColorKey] = color.name.uppercase() }
 
+  override suspend fun setPersonColorTheme(enabled: Boolean) = write { it[PersonColorThemeKey] = enabled }
+
   override suspend fun setAppLock(enabled: Boolean) = write { it[AppLockKey] = enabled }
 
   override suspend fun setRelockAfterSeconds(seconds: Int) = write { it[RelockAfterKey] = seconds }
@@ -61,6 +66,7 @@ class DataStoreSettingsRepository(context: Context) : SettingsRepository {
       themeMode = enumOrDefault(this[ThemeModeKey], defaults.themeMode),
       dynamicColor = this[DynamicColorKey] ?: defaults.dynamicColor,
       themeColor = enumOrDefault(this[ThemeColorKey], defaults.themeColor),
+      personColorTheme = this[PersonColorThemeKey] ?: defaults.personColorTheme,
       appLock = this[AppLockKey] ?: defaults.appLock,
       relockAfterSeconds = this[RelockAfterKey] ?: defaults.relockAfterSeconds,
     )
@@ -70,6 +76,7 @@ class DataStoreSettingsRepository(context: Context) : SettingsRepository {
     val ThemeModeKey = stringPreferencesKey("theme_mode")
     val DynamicColorKey = booleanPreferencesKey("dynamic_color")
     val ThemeColorKey = stringPreferencesKey("theme_color")
+    val PersonColorThemeKey = booleanPreferencesKey("person_color_theme")
     val AppLockKey = booleanPreferencesKey("app_lock")
     val RelockAfterKey = intPreferencesKey("relock_after")
   }

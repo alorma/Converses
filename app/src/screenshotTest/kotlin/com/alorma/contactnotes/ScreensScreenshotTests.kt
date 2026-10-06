@@ -7,7 +7,11 @@ import com.android.tools.screenshot.PreviewTest
 import com.alorma.contactnotes.ui.people.PeopleListScreenArchivedPreview
 import com.alorma.contactnotes.ui.people.PeopleListScreenEmptyPreview
 import com.alorma.contactnotes.ui.people.PeopleListScreenLoadedPreview
+import androidx.compose.ui.tooling.preview.PreviewParameter
+import com.alorma.contactnotes.designsystem.components.AvatarColor
+import com.alorma.contactnotes.ui.person.AvatarColorProvider
 import com.alorma.contactnotes.ui.person.PersonDetailScreenEmptyPreview
+import com.alorma.contactnotes.ui.person.PersonDetailScreenThemedPreview
 import com.alorma.contactnotes.ui.person.PersonDetailScreenLoadedPreview
 
 /** Pantalla d'un mòbil de mida mitjana, en clar i en fosc, amb l'idioma fixat perquè no depengui de la màquina. */
@@ -56,5 +60,12 @@ class ScreensScreenshotTests {
   @Composable
   fun personDetailEmpty() {
     PersonDetailScreenEmptyPreview()
+  }
+
+  @ScreenPreviews
+  @PreviewTest
+  @Composable
+  fun personDetailThemed(@PreviewParameter(AvatarColorProvider::class) color: AvatarColor) {
+    PersonDetailScreenThemedPreview(color)
   }
 }

@@ -28,7 +28,7 @@ enum class ThemeColor(val swatch: Color, val seed: Color) {
   Sand(Color(0xFFE8DDCB), Color(0xFF86704C)),
 }
 
-private val LocalIsDarkTheme = compositionLocalOf { false }
+internal val LocalIsDarkTheme = compositionLocalOf { false }
 
 val isDarkTheme: Boolean
   @Composable @ReadOnlyComposable get() = LocalIsDarkTheme.current
@@ -39,6 +39,7 @@ fun ConversesTheme(
   themeMode: ThemeMode = ThemeMode.System,
   dynamicColor: Boolean = true,
   themeColor: ThemeColor = ThemeColor.Lavender,
+  personColorTheme: Boolean = true,
   content: @Composable () -> Unit,
 ) {
   val isDark = when (themeMode) {
@@ -54,7 +55,7 @@ fun ConversesTheme(
     style = if (dynamicColor) PaletteStyle.Neutral else PaletteStyle.TonalSpot,
   ).withFixedError(isDark)
 
-  CompositionLocalProvider(LocalIsDarkTheme provides isDark) {
+  CompositionLocalProvider(LocalIsDarkTheme provides isDark, LocalPersonColorTheme provides personColorTheme) {
     MaterialExpressiveTheme(
       colorScheme = colorScheme,
       motionScheme = MotionScheme.expressive(),

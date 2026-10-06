@@ -37,6 +37,7 @@ dependencies {
   api(libs.androidx.compose.material.icons.extended)
   api(libs.androidx.graphics.shapes)
   implementation(libs.materialkolor)
+  testImplementation(libs.junit)
   debugImplementation(libs.androidx.compose.ui.tooling)
   implementation(libs.androidx.compose.ui.tooling.preview)
   screenshotTestImplementation(libs.compose.screenshot.validation)
