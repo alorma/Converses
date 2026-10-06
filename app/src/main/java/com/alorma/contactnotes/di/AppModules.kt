@@ -12,6 +12,7 @@ import com.alorma.contactnotes.data.settings.AppLockManager
 import com.alorma.contactnotes.data.settings.DataStoreSettingsRepository
 import com.alorma.contactnotes.data.settings.SecureWindow
 import com.alorma.contactnotes.data.settings.SettingsRepository
+import com.alorma.contactnotes.ui.entry.QuickNoteViewModel
 import com.alorma.contactnotes.ui.people.PeopleListViewModel
 import com.alorma.contactnotes.ui.settings.SettingsViewModel
 import com.alorma.contactnotes.ui.person.PersonDetailViewModel
@@ -63,6 +64,7 @@ val viewModelModule = module {
   viewModelOf(::SettingsViewModel)
   viewModel { (personId: Long) -> PersonViewModel(personId, get()) }
   viewModel { (personId: Long) -> PersonDetailViewModel(personId, get()) }
+  viewModel { (personId: Long) -> QuickNoteViewModel(personId, get()) }
 }
 
 val appModules = listOf(databaseModule, settingsModule, viewModelModule)

@@ -71,4 +71,19 @@
     <string name="channel_phone">Telèfon</string>
     <string name="channel_in_person">En persona</string>
     <string name="channel_other">Altres</string>
+
+    <string name="new_entry">Nova entrada</string>
+    <string name="with_person">amb %1$s</string>
+    <string name="note_button">Nota</string>
+    <string name="close">Tanca</string>
+    <string name="save">Desa</string>
+    <string name="save_to_timeline">Desa a la cronologia</string>
+    <string name="entry_label_said">Què li has dit?</string>
+    <string name="entry_label_heard">Què t\'ha dit?</string>
+    <string name="entry_label_happened">Què ha passat?</string>
+    <string name="entry_label_quick_said">Què s\'ha dit</string>
+    <string name="entry_label_quick_happened">Què ha passat</string>
+    <string name="quick_with_whom">Amb qui</string>
+    <string name="quick_where">On</string>
+    <string name="time_now">Ara</string>
 </resources>

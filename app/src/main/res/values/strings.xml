@@ -71,4 +71,19 @@
     <string name="channel_phone">Phone</string>
     <string name="channel_in_person">In person</string>
     <string name="channel_other">Other</string>
+
+    <string name="new_entry">New entry</string>
+    <string name="with_person">with %1$s</string>
+    <string name="note_button">Note</string>
+    <string name="close">Close</string>
+    <string name="save">Save</string>
+    <string name="save_to_timeline">Save to timeline</string>
+    <string name="entry_label_said">What did you say to them?</string>
+    <string name="entry_label_heard">What did they say to you?</string>
+    <string name="entry_label_happened">What happened?</string>
+    <string name="entry_label_quick_said">What was said</string>
+    <string name="entry_label_quick_happened">What happened</string>
+    <string name="quick_with_whom">With</string>
+    <string name="quick_where">Where</string>
+    <string name="time_now">Now</string>
 </resources>
