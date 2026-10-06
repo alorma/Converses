@@ -11,6 +11,7 @@ import com.alorma.contactnotes.data.insertSampleData
 import com.alorma.contactnotes.data.prefs.ThemePreferences
 import com.alorma.contactnotes.data.prefs.ThemePreferencesImpl
 import com.alorma.contactnotes.ui.people.PeopleListViewModel
+import com.alorma.contactnotes.ui.person.PersonViewModel
 import com.russhwolf.settings.Settings
 import com.russhwolf.settings.SharedPreferencesSettings
 import kotlinx.coroutines.CoroutineScope
@@ -20,6 +21,7 @@ import kotlinx.coroutines.launch
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.dsl.bind
 import org.koin.core.module.dsl.singleOf
+import org.koin.core.module.dsl.viewModel
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
 
@@ -39,6 +41,7 @@ val databaseModule = module {
           }
         },
       )
+      .apply { if (isDebuggable) fallbackToDestructiveMigration(dropAllTables = true) }
       .build()
   }
   single { get<ConversesDatabase>().personDao() }
@@ -57,6 +60,7 @@ val themeModule = module {
 
 val viewModelModule = module {
   viewModelOf(::PeopleListViewModel)
+  viewModel { (personId: Long) -> PersonViewModel(personId, get()) }
 }
 
 val appModules = listOf(databaseModule, themeModule, viewModelModule)

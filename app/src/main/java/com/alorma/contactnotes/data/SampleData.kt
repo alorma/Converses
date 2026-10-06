@@ -16,6 +16,15 @@ internal suspend fun ConversesDatabase.insertSampleData(now: Long = System.curre
 
   val people = listOf(
     SamplePerson(
+      name = "Luna Roja", alias = "Luna", shape = AvatarShape.Cookie9Sided, color = AvatarColor.Lavender,
+      channels = listOf(ChannelType.DISCORD to "lunaroja", ChannelType.TELEGRAM to "@luna"),
+      facts = listOf("Secret" to "Això és privat"),
+      entries = listOf(
+        Triple(EntryKind.SAID, ChannelType.DISCORD, "Li he dit que en Kael ve del nord.") to ago(0, 1),
+      ),
+      isProtected = true,
+    ),
+    SamplePerson(
       name = "Marta Soler", alias = "Marta", shape = AvatarShape.Cookie9Sided, color = AvatarColor.Lavender,
       channels = listOf(ChannelType.WHATSAPP to "+34 600 111 222", ChannelType.IN_PERSON to null),
       facts = listOf("Aniversari" to "14 de març", "Feina" to "Dissenyadora a Bcn"),
@@ -56,6 +65,7 @@ internal suspend fun ConversesDatabase.insertSampleData(now: Long = System.curre
       person = PersonEntity(
         name = sample.name,
         alias = sample.alias,
+        isProtected = sample.isProtected,
         avatarShape = sample.shape,
         avatarColor = sample.color,
         createdAt = created,
@@ -83,4 +93,5 @@ private class SamplePerson(
   val channels: List<Pair<ChannelType, String?>>,
   val facts: List<Pair<String, String>>,
   val entries: List<Pair<Triple<EntryKind, ChannelType, String>, Long>>,
+  val isProtected: Boolean = false,
 )

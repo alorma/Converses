@@ -4,6 +4,9 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Lock
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialShapes
 import androidx.compose.material3.Text
 import androidx.compose.material3.toShape
@@ -30,7 +33,7 @@ enum class AvatarColor(val color: Color) {
 
 enum class AvatarShape { Cookie9Sided, Clover4Leaf, Flower, Sunny }
 
-private val AvatarInitialsColor = Color(0xFF1D1B20)
+private val AvatarInitialsColor = Color(0xFF1E1D24)
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -49,6 +52,7 @@ fun Avatar(
   color: AvatarColor,
   modifier: Modifier = Modifier,
   size: Dp = 48.dp,
+  locked: Boolean = false,
 ) {
   Box(
     modifier = modifier
@@ -57,11 +61,20 @@ fun Avatar(
       .background(color.color),
     contentAlignment = Alignment.Center,
   ) {
-    Text(
-      text = initials,
-      color = AvatarInitialsColor,
-      fontWeight = FontWeight.Bold,
-      fontSize = (size.value * 0.36f).sp,
-    )
+    if (locked) {
+      Icon(
+        imageVector = Icons.Rounded.Lock,
+        contentDescription = null,
+        tint = AvatarInitialsColor,
+        modifier = Modifier.size(size * 0.42f),
+      )
+    } else {
+      Text(
+        text = initials,
+        color = AvatarInitialsColor,
+        fontWeight = FontWeight.Bold,
+        fontSize = (size.value * 0.36f).sp,
+      )
+    }
   }
 }

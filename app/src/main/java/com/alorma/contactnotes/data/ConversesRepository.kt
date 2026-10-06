@@ -12,6 +12,7 @@ import com.alorma.contactnotes.data.db.PersonListItem
 import com.alorma.contactnotes.data.db.PinnedFactDao
 import com.alorma.contactnotes.data.db.PinnedFactEntity
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 
 class ConversesRepository(
   private val personDao: PersonDao,
@@ -19,7 +20,12 @@ class ConversesRepository(
   private val entryDao: EntryDao,
   private val pinnedFactDao: PinnedFactDao,
 ) {
-  fun observePeople(): Flow<List<PersonListItem>> = personDao.observeList()
+  /** Les persones protegides no exposen última entrada ni canals. */
+  fun observePeople(): Flow<List<PersonListItem>> = personDao.observeList().map { items ->
+    items.map { item ->
+      if (item.person.isProtected) item.copy(lastEntry = null, channels = emptyList()) else item
+    }
+  }
 
   fun observePerson(id: Long): Flow<PersonEntity?> = personDao.observe(id)
 

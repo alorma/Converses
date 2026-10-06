@@ -10,7 +10,7 @@ import androidx.room.RoomDatabase
     EntryEntity::class,
     PinnedFactEntity::class,
   ],
-  version = 1,
+  version = 2,
 )
 abstract class ConversesDatabase : RoomDatabase() {
   abstract fun personDao(): PersonDao
