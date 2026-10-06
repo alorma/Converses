@@ -10,10 +10,14 @@ import androidx.navigation3.ui.NavDisplay
 import com.alorma.contactnotes.ui.people.PeopleListRoute
 import com.alorma.contactnotes.ui.person.PersonDetailRoute
 import com.alorma.contactnotes.ui.person.PersonLockedScreen
+import com.alorma.contactnotes.ui.settings.SettingsScreen
 import kotlinx.serialization.Serializable
 
 @Serializable
 data object PeopleRoute : NavKey
+
+@Serializable
+data object SettingsRoute : NavKey
 
 @Serializable
 data class PersonRoute(val id: Long) : NavKey
@@ -39,7 +43,11 @@ fun AppNavigation() {
             backStack.add(if (person.isProtected) PersonLockedRoute(person.id) else PersonRoute(person.id))
           },
           onQuickNote = {},
+          onOpenSettings = { backStack.add(SettingsRoute) },
         )
+      }
+      entry<SettingsRoute> {
+        SettingsScreen(onBack = { backStack.removeLastOrNull() })
       }
       entry<PersonLockedRoute> { route ->
         PersonLockedScreen(

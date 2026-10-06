@@ -1,7 +1,5 @@
 package com.alorma.contactnotes.ui.person
 
-import android.view.WindowManager
-import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -44,6 +42,7 @@ import com.alorma.contactnotes.data.db.ChannelEntity
 import com.alorma.contactnotes.data.db.EntryEntity
 import com.alorma.contactnotes.data.db.PersonEntity
 import com.alorma.contactnotes.data.db.PinnedFactEntity
+import com.alorma.contactnotes.data.settings.SecureWindow
 import com.alorma.contactnotes.designsystem.components.Avatar
 import com.alorma.contactnotes.designsystem.components.ConversesFilterChip
 import com.alorma.contactnotes.designsystem.components.GroupedList
@@ -55,6 +54,7 @@ import com.alorma.contactnotes.designsystem.theme.SectionTitleStyle
 import com.alorma.contactnotes.ui.people.initialsOf
 import com.alorma.contactnotes.ui.people.label
 import java.time.LocalDate
+import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 
@@ -85,11 +85,11 @@ fun PersonDetailRoute(
 ) {
   val state by viewModel.uiState.collectAsStateWithLifecycle()
 
-  val window = LocalActivity.current?.window
+  val secureWindow: SecureWindow = koinInject()
   val secure = state.person?.isProtected == true
-  DisposableEffect(secure, window) {
-    if (secure) window?.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
-    onDispose { window?.clearFlags(WindowManager.LayoutParams.FLAG_SECURE) }
+  DisposableEffect(secure) {
+    if (secure) secureWindow.acquire()
+    onDispose { if (secure) secureWindow.release() }
   }
 
   PersonDetailScreen(state = state, onBack = onBack, onKindToggled = viewModel::onKindToggled)
