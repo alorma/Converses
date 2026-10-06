@@ -7,6 +7,7 @@
         <item quantity="other">%d people</item>
     </plurals>
     <string name="people_empty">No one here yet. Add a person to get started.</string>
+    <string name="no_entries_yet">No entries yet</string>
     <string name="protected_hint">Protected · tap to unlock</string>
     <string name="back">Back</string>
     <string name="unlock_title">Unlock %1$s</string>

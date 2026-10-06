@@ -48,16 +48,16 @@ La base funcional de la v1 ja és feta. El que queda és:
 
 ### Llistat
 
-- [ ] **Espai entre la capçalera i els filtres:** ara hi ha uns 100 dp de buit sota «5 persones». Ha de quedar en uns 14 dp, com al disseny.
-- [ ] **Filtre de canal com a `ButtonGroup` connectat:** 2 dp entre botons. Els no seleccionats van en `surface-card-high` amb juntes de 8 dp i el seleccionat en pastilla `primary`. Ara són pastilles separades.
-- [ ] **Hora alineada a la dreta de la fila:** ara acaba abans que el text de sota («17:06», «Ds.», «16 de set.»). Ha d'anar a l'extrem de la fila, amb el mateix marge de 14 dp.
-- [ ] **Format de la data**, aplicat igual a tota l'app:
+- [x] **Espai entre la capçalera i els filtres:** ara hi ha uns 100 dp de buit sota «5 persones». Ha de quedar en uns 14 dp, com al disseny.
+- [x] **Filtre de canal com a `ButtonGroup` connectat:** 2 dp entre botons. Els no seleccionats van en `surface-card-high` amb juntes de 8 dp i el seleccionat en pastilla `primary`. Ara són pastilles separades.
+- [x] **Hora alineada a la dreta de la fila:** ara acaba abans que el text de sota («17:06», «Ds.», «16 de set.»). Ha d'anar a l'extrem de la fila, amb el mateix marge de 14 dp.
+- [x] **Format de la data**, aplicat igual a tota l'app:
     - avui → `17:06`;
     - aquesta setmana → dia abreujat en minúscula (`ds.`);
     - aquest any → `16 de set.`;
     - un altre any → `16/09/2025`.
-- [ ] **Persona sense entrades** (Pau Vidal): ara la fila queda més baixa i coixa. Ha de mostrar «Encara no hi ha entrades» a la línia de l'últim comentari.
-- [ ] **Fila «Afegeix una persona» al final de la llista** (disseny 1): vora discontínua i radi 24. És complementària al botó de la capçalera.
+- [x] **Persona sense entrades** (Pau Vidal): ara la fila queda més baixa i coixa. Ha de mostrar «Encara no hi ha entrades» a la línia de l'últim comentari.
+- [x] **Fila «Afegeix una persona» al final de la llista** (disseny 1): vora discontínua i radi 24. És complementària al botó de la capçalera.
 
 ### Detall
 

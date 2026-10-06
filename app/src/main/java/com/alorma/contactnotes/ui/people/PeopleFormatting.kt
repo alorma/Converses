@@ -1,8 +1,6 @@
 package com.alorma.contactnotes.ui.people
 
 import androidx.annotation.StringRes
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.res.stringResource
 import com.alorma.contactnotes.R
 import com.alorma.contactnotes.data.db.ChannelType
 import java.time.Instant
@@ -40,8 +38,7 @@ fun initialsOf(name: String): String =
     .joinToString("") { it.first().uppercase() }
     .ifEmpty { "?" }
 
-/** Hora si és d'avui, "Ahir", dia de la setmana els últims 6 dies i data curta a partir d'aquí. */
-@Composable
+/** Hora si és d'avui, dia abreujat en minúscula els últims 6 dies, data curta aquest any i data completa abans. */
 fun formatLastActivity(
   epochMillis: Long,
   today: LocalDate = LocalDate.now(),
@@ -52,8 +49,8 @@ fun formatLastActivity(
   val days = ChronoUnit.DAYS.between(dateTime.toLocalDate(), today)
   return when {
     days <= 0 -> dateTime.format(DateTimeFormatter.ofPattern("HH:mm", locale))
-    days == 1L -> stringResource(R.string.yesterday)
-    days < 7 -> dateTime.format(DateTimeFormatter.ofPattern("EEE", locale)).replaceFirstChar { it.titlecase(locale) }
-    else -> dateTime.format(DateTimeFormatter.ofPattern("d MMM", locale))
+    days < 7 -> dateTime.format(DateTimeFormatter.ofPattern("EEE", locale)).lowercase(locale)
+    dateTime.year == today.year -> dateTime.format(DateTimeFormatter.ofPattern("d MMM", locale))
+    else -> dateTime.format(DateTimeFormatter.ofPattern("dd/MM/yyyy", locale))
   }
 }
