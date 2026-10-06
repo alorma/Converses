@@ -249,7 +249,14 @@ Una sola activitat (`MainActivity`, una `FragmentActivity` pel `BiometricPrompt`
 
 ### Color de la persona
 
-Detall, desbloqueig, editor (amb el color del formulari, en directe) i nota ràpida (només amb persona triada) prenen el color de l'avatar com a llavor del tema (`PersonTheme`, `TonalSpot`). El llistat, Arxivades, Ajustos i el full de triar persona es queden amb el tema de l'app (`AppColors`). Ajust a Ajustos → Aparença: «Color de la persona» (`person_color_theme`, per defecte activat). Detalls i proves a `docs/colors/color-persona.md`.
+Cada persona porta el color de l'avatar com a **llavor del tema** de les seves pantalles. Els fons i les targetes queden gairebé neutres; el color fort va als accents (split button, filtres de la cronologia, marcadors, selector de tipus).
+
+- **Abast:** detall, desbloqueig, editor (amb el color del formulari, en directe i animat 300 ms), nota ràpida (només amb persona triada) i els fulls i diàlegs que s'hi obren. El llistat, Arxivades, Ajustos i el full de triar persona es queden amb el tema de l'app (`AppColors`).
+- **Generació:** `PersonTheme` al `designsystem`; MaterialKolor `TonalSpot` amb la llavor de `AvatarColor.seed` (no amb el pastel, que dona un esquema pàl·lid). L'error continua fix; l'avatar manté el pastel i les inicials en `#1E1D24`. El color dinàmic i el color del tema dels Ajustos no hi intervenen.
+- **Llavors:** Lavanda `#6B55B5`, Menta `#2F7A52`, Préssec `#B5602E`, Cel `#2D6FA3`, Rosa `#B04670`, Llimona `#8A7A12`, Sorra `#86704C` (les mateixes que `ThemeColor`).
+- **Ajust:** Ajustos → Aparença → «Color de la persona» (`person_color_theme`, per defecte activat). Apagat, `PersonTheme` no fa res.
+- **Proves:** `PersonThemeContrastTest` (contrast ≥ 4,5:1 amb els 7 colors, en clar i fosc) i el test de captures `personDetailThemed` (7 colors × clar i fosc).
+- **Fora d'abast:** tenyir les files del llistat, colors fora dels 7 pastels i canviar la intensitat des dels Ajustos.
 
 ### Tema
 
