@@ -23,6 +23,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.EditNote
 import androidx.compose.material.icons.rounded.Groups
 import androidx.compose.material.icons.rounded.Lock
+import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -55,6 +56,7 @@ private val ScreenMargin = 16.dp
 fun PeopleListRoute(
   onPersonClick: (PersonEntity) -> Unit,
   onQuickNote: () -> Unit,
+  onOpenSettings: () -> Unit,
   viewModel: PeopleListViewModel = koinViewModel(),
 ) {
   val state by viewModel.uiState.collectAsStateWithLifecycle()
@@ -63,6 +65,7 @@ fun PeopleListRoute(
     onFilterSelected = viewModel::onFilterSelected,
     onPersonClick = onPersonClick,
     onQuickNote = onQuickNote,
+    onOpenSettings = onOpenSettings,
   )
 }
 
@@ -72,6 +75,7 @@ fun PeopleListScreen(
   onFilterSelected: (ChannelFilter) -> Unit,
   onPersonClick: (PersonEntity) -> Unit,
   onQuickNote: () -> Unit,
+  onOpenSettings: () -> Unit,
 ) {
   Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.surface) {
     Box(modifier = Modifier.fillMaxSize()) {
@@ -115,6 +119,12 @@ fun PeopleListScreen(
           contentDescription = stringResource(R.string.people_title),
           selected = true,
           onClick = {},
+        )
+        ToolbarDestination(
+          icon = Icons.Rounded.Settings,
+          contentDescription = stringResource(R.string.settings_title),
+          selected = false,
+          onClick = onOpenSettings,
         )
       }
     }

@@ -16,5 +16,5 @@ Kotlin, Jetpack Compose, Material 3 Expressive (`material3` 1.4+), MaterialKolor
 - Treballar per passos seguint "Ordre d'implementació" de `docs/plan.md`. No avançar al pas següent sense que l'usuari ho validi.
 - Abans d'afegir una llibreria, comprovar a la documentació oficial la seva versió estable actual.
 - Concentrar tots els `@OptIn(ExperimentalMaterial3ExpressiveApi::class)` al mòdul `designsystem`; les pantalles no els repeteixen.
-- Textos de la UI en català, sempre a `strings.xml`.
+- Textos de la UI sempre a `strings.xml`: anglès per defecte (`values/`), amb català (`values-ca/`) i castellà (`values-es/`).
 - Gradle amb version catalog (`gradle/libs.versions.toml`).

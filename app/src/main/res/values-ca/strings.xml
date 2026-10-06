@@ -1,0 +1,74 @@
+<resources>
+    <string name="app_name">Converses</string>
+
+    <string name="people_title">Converses</string>
+    <plurals name="people_count">
+        <item quantity="one">%d persona</item>
+        <item quantity="other">%d persones</item>
+    </plurals>
+    <string name="people_empty">Encara no hi ha ningú. Afegeix una persona per començar.</string>
+    <string name="protected_hint">Protegida · toca per desbloquejar</string>
+    <string name="back">Enrere</string>
+    <string name="unlock_title">Desbloqueja %1$s</string>
+    <string name="unlock_subtitle">Fes servir l\'empremta digital per continuar</string>
+    <string name="unlock_action">Desbloqueja</string>
+    <string name="locked_description">Aquesta persona està protegida. Desbloqueja-la amb l\'empremta per veure\'n les dades i la cronologia.</string>
+    <string name="locked_unavailable">Aquest dispositiu no té empremta ni bloqueig de pantalla, així que no es pot desbloquejar aquesta persona.</string>
+    <string name="settings_title">Ajustos</string>
+    <string name="settings_appearance">Aparença</string>
+    <string name="settings_theme">Tema</string>
+    <string name="settings_theme_light">Clar</string>
+    <string name="settings_theme_dark">Fosc</string>
+    <string name="settings_theme_system">Sistema</string>
+    <string name="settings_dynamic_color">Color dinàmic</string>
+    <string name="settings_dynamic_color_summary">Pren el to del fons de pantalla</string>
+    <string name="settings_theme_color">Color del tema</string>
+    <string name="settings_theme_color_summary">Es genera un tema complet a partir del color triat</string>
+    <string name="settings_language">Idioma</string>
+    <string name="settings_app_language">Idioma de l\'app</string>
+    <string name="settings_security">Seguretat</string>
+    <string name="settings_app_lock">Bloqueig de l\'app</string>
+    <string name="settings_app_lock_summary">Demana l\'empremta en obrir Converses</string>
+    <string name="settings_security_setup">Configura la seguretat</string>
+    <string name="settings_security_setup_summary">Afegeix una empremta o un bloqueig de pantalla per poder protegir l\'app</string>
+    <string name="settings_relock">Torna a bloquejar</string>
+    <string name="relock_immediately">Immediatament</string>
+    <string name="relock_1_min">Després d\'1 minut</string>
+    <string name="relock_5_min">Després de 5 minuts</string>
+    <string name="relock_summary_immediately">Immediatament en segon pla</string>
+    <string name="relock_summary_1_min">Després d\'1 minut en segon pla</string>
+    <string name="relock_summary_5_min">Després de 5 minuts en segon pla</string>
+    <string name="settings_protected_note">Les persones protegides demanen l\'empremta igualment, encara que l\'app ja estigui desbloquejada.</string>
+    <string name="settings_footer">Converses · versió %1$s</string>
+    <string name="app_lock_title">Converses està bloquejada</string>
+    <string name="app_lock_prompt_title">Desbloqueja Converses</string>
+    <string name="today">Avui</string>
+    <string name="since">des de %1$s</string>
+    <string name="conversations">Converses</string>
+    <string name="pinned_facts">Dades fixades</string>
+    <string name="timeline">Cronologia</string>
+    <string name="timeline_empty">Encara no hi ha entrades.</string>
+    <plurals name="entry_count">
+        <item quantity="one">%d entrada</item>
+        <item quantity="other">%d entrades</item>
+    </plurals>
+    <string name="kind_said">Li he dit</string>
+    <string name="kind_heard">M\'ha dit</string>
+    <string name="kind_happened">Ha passat</string>
+    <string name="quick_note">Nota ràpida</string>
+    <string name="yesterday">Ahir</string>
+
+    <string name="filter_all">Tots</string>
+    <string name="filter_chat">Xat</string>
+    <string name="filter_social">Xarxes</string>
+    <string name="filter_in_person">En persona</string>
+    <string name="filter_phone">Telèfon</string>
+
+    <string name="channel_discord">Discord</string>
+    <string name="channel_telegram">Telegram</string>
+    <string name="channel_whatsapp">WhatsApp</string>
+    <string name="channel_reddit">Reddit</string>
+    <string name="channel_phone">Telèfon</string>
+    <string name="channel_in_person">En persona</string>
+    <string name="channel_other">Altres</string>
+</resources>

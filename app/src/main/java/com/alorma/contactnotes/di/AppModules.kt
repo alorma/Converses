@@ -8,19 +8,19 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import com.alorma.contactnotes.data.ConversesRepository
 import com.alorma.contactnotes.data.db.ConversesDatabase
 import com.alorma.contactnotes.data.insertSampleData
-import com.alorma.contactnotes.data.prefs.ThemePreferences
-import com.alorma.contactnotes.data.prefs.ThemePreferencesImpl
+import com.alorma.contactnotes.data.settings.AppLockManager
+import com.alorma.contactnotes.data.settings.DataStoreSettingsRepository
+import com.alorma.contactnotes.data.settings.SecureWindow
+import com.alorma.contactnotes.data.settings.SettingsRepository
 import com.alorma.contactnotes.ui.people.PeopleListViewModel
+import com.alorma.contactnotes.ui.settings.SettingsViewModel
 import com.alorma.contactnotes.ui.person.PersonDetailViewModel
 import com.alorma.contactnotes.ui.person.PersonViewModel
-import com.russhwolf.settings.Settings
-import com.russhwolf.settings.SharedPreferencesSettings
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import org.koin.android.ext.koin.androidContext
-import org.koin.core.module.dsl.bind
 import org.koin.core.module.dsl.singleOf
 import org.koin.core.module.dsl.viewModel
 import org.koin.core.module.dsl.viewModelOf
@@ -52,17 +52,17 @@ val databaseModule = module {
   singleOf(::ConversesRepository)
 }
 
-val themeModule = module {
-  single<Settings> {
-    SharedPreferencesSettings(androidContext().getSharedPreferences("theme_preferences", Context.MODE_PRIVATE))
-  }
-  singleOf(::ThemePreferencesImpl) { bind<ThemePreferences>() }
+val settingsModule = module {
+  single<SettingsRepository> { DataStoreSettingsRepository(androidContext()) }
+  single { AppLockManager(get()) }
+  single { SecureWindow() }
 }
 
 val viewModelModule = module {
   viewModelOf(::PeopleListViewModel)
+  viewModelOf(::SettingsViewModel)
   viewModel { (personId: Long) -> PersonViewModel(personId, get()) }
   viewModel { (personId: Long) -> PersonDetailViewModel(personId, get()) }
 }
 
-val appModules = listOf(databaseModule, themeModule, viewModelModule)
+val appModules = listOf(databaseModule, settingsModule, viewModelModule)
