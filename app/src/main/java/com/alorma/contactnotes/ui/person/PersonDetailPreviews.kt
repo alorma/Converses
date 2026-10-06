@@ -2,6 +2,7 @@ package com.alorma.contactnotes.ui.person
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
+import com.alorma.contactnotes.data.db.EntryKind
 import com.alorma.contactnotes.designsystem.preview.ConversesPreviewTheme
 import com.alorma.contactnotes.ui.preview.PreviewData
 
@@ -34,7 +35,7 @@ internal fun PersonDetailScreenLoadedPreview() {
       entries = PreviewData.martaEntries,
       saidCount = 1,
       heardCount = 1,
-      totalCount = PreviewData.martaEntries.size,
+      happenedCount = PreviewData.martaEntries.count { it.kind == EntryKind.HAPPENED },
       isLoading = false,
     ),
   )

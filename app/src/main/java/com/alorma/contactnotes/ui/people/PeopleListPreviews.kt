@@ -6,10 +6,12 @@ import com.alorma.contactnotes.designsystem.preview.ConversesPreviewTheme
 import com.alorma.contactnotes.ui.preview.PreviewData
 
 @Composable
-private fun PeopleListScreenPreview(state: PeopleListUiState) {
+private fun PeopleListScreenPreview(state: PeopleListUiState, archived: Boolean = false) {
   ConversesPreviewTheme {
     PeopleListScreen(
       state = state,
+      archived = archived,
+      onToggleArchivedList = {},
       onFilterSelected = {},
       onPersonClick = {},
       onQuickNote = {},
@@ -31,4 +33,13 @@ internal fun PeopleListScreenLoadedPreview() {
 @Composable
 internal fun PeopleListScreenEmptyPreview() {
   PeopleListScreenPreview(PeopleListUiState(isLoading = false))
+}
+
+@Preview
+@Composable
+internal fun PeopleListScreenArchivedPreview() {
+  PeopleListScreenPreview(
+    PeopleListUiState(people = PreviewData.people.take(2), total = 2, isLoading = false),
+    archived = true,
+  )
 }

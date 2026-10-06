@@ -4,6 +4,7 @@ import android.content.res.Configuration
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import com.android.tools.screenshot.PreviewTest
+import com.alorma.contactnotes.ui.people.PeopleListScreenArchivedPreview
 import com.alorma.contactnotes.ui.people.PeopleListScreenEmptyPreview
 import com.alorma.contactnotes.ui.people.PeopleListScreenLoadedPreview
 import com.alorma.contactnotes.ui.person.PersonDetailScreenEmptyPreview
@@ -34,6 +35,13 @@ class ScreensScreenshotTests {
   @Composable
   fun peopleListEmpty() {
     PeopleListScreenEmptyPreview()
+  }
+
+  @ScreenPreviews
+  @PreviewTest
+  @Composable
+  fun peopleListArchived() {
+    PeopleListScreenArchivedPreview()
   }
 
   @ScreenPreviews
