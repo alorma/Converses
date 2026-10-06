@@ -1,3 +1,19 @@
 <resources>
-    <string name="app_name">Contact notes</string>
+    <string name="app_name">Converses</string>
+
+    <string name="gallery_title">Converses</string>
+    <string name="gallery_theme_system">Sistema</string>
+    <string name="gallery_theme_light">Clar</string>
+    <string name="gallery_theme_dark">Fosc</string>
+    <string name="gallery_style_tinted">Tenyit</string>
+    <string name="gallery_style_pure">Pur</string>
+    <string name="gallery_section_avatars">Avatars</string>
+    <string name="gallery_section_list">Llista agrupada</string>
+    <string name="gallery_section_error">Error</string>
+    <string name="gallery_person_name">Nom</string>
+    <string name="gallery_row_one">Primera fila</string>
+    <string name="gallery_row_two">Segona fila</string>
+    <string name="gallery_row_three">Tercera fila</string>
+    <string name="gallery_error_message">No s\'ha pogut sincronitzar</string>
+    <string name="gallery_error_retry">Reintenta</string>
 </resources>
