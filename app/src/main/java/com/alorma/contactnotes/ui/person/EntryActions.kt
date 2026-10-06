@@ -136,9 +136,10 @@ private fun ActionRow(
 ) {
   val tint = if (destructive) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurface
   Surface(
+    onClick = onClick,
     shape = groupedItemShape(index, count),
     color = GroupedListDefaults.containerColor,
-    modifier = Modifier.fillMaxWidth().clickable(onClick = onClick),
+    modifier = Modifier.fillMaxWidth(),
   ) {
     ListItem(
       headlineContent = { Text(title, fontWeight = FontWeight.Bold, color = tint) },
