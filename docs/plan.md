@@ -84,8 +84,8 @@ La base funcional de la v1 ja és feta. El que queda és:
 
 ### Accions d'entrada
 
-- [ ] **El mateix ordre de metadades que a la cronologia:** `LI HE DIT · 17:06 · WHATSAPP`. Ara el full posa el canal abans de l'hora.
-- [ ] **«Esborrar tota la conversa»:**
+- [x] **El mateix ordre de metadades que a la cronologia:** `LI HE DIT · 17:06 · WHATSAPP`. Ara el full posa el canal abans de l'hora.
+- [x] **«Esborrar tota la conversa»:**
     - amagar-la si aquell dia i en aquell canal només hi ha una entrada;
     - el subtítol ha de dir el nombre: «Les 3 entrades d'avui a WhatsApp».
 

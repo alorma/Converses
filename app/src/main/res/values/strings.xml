@@ -131,6 +131,10 @@
     <string name="export_before">Export notes first</string>
     <string name="export_before_summary">A text copy is saved</string>
     <string name="export_title">Notes for %1$s</string>
+    <plurals name="entry_delete_today_summary">
+        <item quantity="one">The entry from today on %2$s</item>
+        <item quantity="other">The %1$d entries from today on %2$s</item>
+    </plurals>
     <plurals name="entry_delete_day_summary">
         <item quantity="one">The entry from this day on %2$s</item>
         <item quantity="other">The %1$d entries from this day on %2$s</item>
