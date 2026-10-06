@@ -6,7 +6,7 @@
         <item quantity="one">%d person</item>
         <item quantity="other">%d people</item>
     </plurals>
-    <string name="people_empty">No one here yet. Add a person to get started.</string>
+    <string name="people_empty">No one here yet</string>
     <string name="no_entries_yet">No entries yet</string>
     <string name="protected_hint">Protected · tap to unlock</string>
     <string name="back">Back</string>
@@ -47,7 +47,10 @@
     <string name="since">since %1$s</string>
     <string name="pinned_facts">Pinned facts</string>
     <string name="timeline">Timeline</string>
-    <string name="timeline_empty">No entries yet.</string>
+    <string name="add_first_person">Add the first person</string>
+    <string name="people_empty_filter">No one on this channel</string>
+    <string name="timeline_filtered_empty">No entries of %1$s</string>
+    <string name="timeline_empty">No entries yet</string>
     <plurals name="entry_count">
         <item quantity="one">%d entry</item>
         <item quantity="other">%d entries</item>
@@ -113,7 +116,7 @@
     <string name="menu_archive">Archive</string>
     <string name="menu_unarchive">Unarchive</string>
     <string name="filter_archived">Archived</string>
-    <string name="archived_empty">You have no archived people.</string>
+    <string name="archived_empty">You have no archived people</string>
     <string name="entry_actions">Entry actions</string>
     <string name="entry_edit">Edit</string>
     <string name="entry_copy">Copy text</string>

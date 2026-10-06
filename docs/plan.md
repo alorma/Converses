@@ -133,7 +133,7 @@ La base funcional de la v1 ja és feta. El que queda és:
     - mantenir premut per copiar l'usuari (Android ja ho confirma amb la seva previsualització; sense snackbar);
     - «En persona» i els canals sense enllaç no són clicables.
 - [x] **Desfer en esborrar una entrada:** snackbar «Entrada esborrada · Desfés» d'uns 5 s, sense diàleg. «Esborrar tota la conversa» i «Esborrar persona» mantenen el diàleg de confirmació.
-- [ ] **Estats buits** (a comprovar que hi són tots):
+- [x] **Estats buits** (a comprovar que hi són tots):
     - llistat sense persones (disseny 1b, «Afegeix la primera persona»);
     - cronologia buida;
     - filtres sense resultats («Cap entrada de M'ha dit»);
