@@ -12,6 +12,7 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.LaunchedEffect
 import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.alorma.contactnotes.data.settings.AppLockManager
 import com.alorma.contactnotes.data.settings.SecureWindow
@@ -23,6 +24,7 @@ import com.alorma.contactnotes.ui.lock.AppLockScreen
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.koin.android.ext.android.inject
 
@@ -74,7 +76,15 @@ class MainActivity : FragmentActivity() {
       ) {
         Box {
           AppNavigation()
-          if (showLock) AppLockScreen(onUnlocked = appLock::unlock)
+          if (showLock) {
+            AppLockScreen(
+              onUnlocked = appLock::unlock,
+              onDeviceUnprotected = {
+                lifecycleScope.launch { settingsRepository.setAppLock(false) }
+                appLock.unlock()
+              },
+            )
+          }
         }
       }
     }
