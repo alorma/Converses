@@ -19,6 +19,7 @@ fun ChannelFilter.label(): Int = when (this) {
   ChannelFilter.Social -> R.string.filter_social
   ChannelFilter.InPerson -> R.string.filter_in_person
   ChannelFilter.Phone -> R.string.filter_phone
+  ChannelFilter.Archived -> R.string.filter_archived
 }
 
 @StringRes

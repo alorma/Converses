@@ -17,6 +17,7 @@ enum class ChannelFilter(val types: Set<ChannelType>?) {
   Social(setOf(ChannelType.REDDIT, ChannelType.OTHER)),
   InPerson(setOf(ChannelType.IN_PERSON)),
   Phone(setOf(ChannelType.PHONE)),
+  Archived(null),
 }
 
 fun List<PersonListItem>.filterBy(filter: ChannelFilter): List<PersonListItem> {
@@ -37,9 +38,13 @@ class PeopleListViewModel(
   private val filter = MutableStateFlow(ChannelFilter.All)
 
   val uiState: StateFlow<PeopleListUiState> =
-    combine(repository.observePeople(), filter) { people, filter ->
+    combine(
+      repository.observePeople(archived = false),
+      repository.observePeople(archived = true),
+      filter,
+    ) { people, archived, filter ->
       PeopleListUiState(
-        people = people.filterBy(filter),
+        people = if (filter == ChannelFilter.Archived) archived else people.filterBy(filter),
         total = people.size,
         filter = filter,
         isLoading = false,

@@ -48,8 +48,12 @@ class ConversesDatabaseTest {
       updatedAt = createdAt,
     )
 
-  private fun entry(personId: Long, at: Long, kind: EntryKind = EntryKind.SAID) =
-    EntryEntity(personId = personId, kind = kind, channelType = ChannelType.WHATSAPP, text = "t$at", occurredAt = at)
+  private fun entry(
+    personId: Long,
+    at: Long,
+    kind: EntryKind = EntryKind.SAID,
+    channel: ChannelType = ChannelType.WHATSAPP,
+  ) = EntryEntity(personId = personId, kind = kind, channelType = channel, text = "t$at", occurredAt = at)
 
   @Test
   fun listIsOrderedByLastEntryAndSkipsArchived() = runTest {
@@ -61,7 +65,7 @@ class ConversesDatabaseTest {
     db.entryDao().insert(entry(a, at = 500))
     db.entryDao().insert(entry(b, at = 300))
 
-    val list = db.personDao().observeList().first()
+    val list = db.personDao().observeList(archived = false).first()
 
     assertEquals(listOf(a, b, c), list.map { it.person.id })
     assertEquals(500L, list.first().lastEntry?.occurredAt)
@@ -124,5 +128,30 @@ class ConversesDatabaseTest {
     assertEquals(0, db.personDao().countAliasConflicts("marta", excludeId = id))
     assertEquals(0, db.personDao().countAliasConflicts("arxiu", excludeId = 0))
     assertFalse(db.personDao().countAliasConflicts("altre", excludeId = 0) > 0)
+  }
+
+  @Test
+  fun archivedPeopleAreListedSeparately() = runTest {
+    db.personDao().save(person("Activa"), emptyList(), emptyList())
+    db.personDao().save(person("Arxivada", archived = true), emptyList(), emptyList())
+
+    assertEquals(listOf("Activa"), db.personDao().observeList(archived = false).first().map { it.person.name })
+    assertEquals(listOf("Arxivada"), db.personDao().observeList(archived = true).first().map { it.person.name })
+  }
+
+  @Test
+  fun deleteInRangeOnlyRemovesMatchingChannelAndRange() = runTest {
+    val id = db.personDao().save(person("A"), emptyList(), emptyList())
+    db.entryDao().insert(entry(id, at = 1000))
+    db.entryDao().insert(entry(id, at = 2000))
+    db.entryDao().insert(entry(id, at = 1500, channel = ChannelType.DISCORD))
+    db.entryDao().insert(entry(id, at = 5000))
+
+    assertEquals(2, db.entryDao().countInRange(id, ChannelType.WHATSAPP, 0, 3000))
+    val removed = db.entryDao().deleteInRange(id, ChannelType.WHATSAPP, 0, 3000)
+
+    assertEquals(2, removed)
+    val left = db.entryDao().observeTimeline(id, EntryKind.entries.toSet()).first().map { it.occurredAt }.toSet()
+    assertEquals(setOf(1500L, 5000L), left)
   }
 }

@@ -9,11 +9,14 @@ import com.alorma.contactnotes.data.db.EntryEntity
 import com.alorma.contactnotes.data.db.EntryKind
 import com.alorma.contactnotes.data.db.PersonEntity
 import com.alorma.contactnotes.data.db.PinnedFactEntity
+import java.time.Instant
+import java.time.ZoneId
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
@@ -35,6 +38,7 @@ data class PersonDetailUiState(
 class PersonDetailViewModel(
   private val personId: Long,
   private val repository: ConversesRepository,
+  private val exporter: PersonExporter,
 ) : ViewModel() {
   private val selectedKinds = MutableStateFlow(EntryKind.entries.toSet())
 
@@ -63,6 +67,15 @@ class PersonDetailViewModel(
     )
   }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), PersonDetailUiState())
 
+  /** Persones a les quals es pot moure una entrada. */
+  val otherPeople: StateFlow<List<PersonEntity>> = repository.observePeople()
+    .map { items -> items.map { it.person }.filter { it.id != personId } }
+    .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+
+  fun onKindToggled(kind: EntryKind) {
+    selectedKinds.value = selectedKinds.value.let { if (kind in it) it - kind else it + kind }
+  }
+
   fun addEntry(kind: EntryKind, channel: ChannelType, text: String, occurredAt: Long?) {
     viewModelScope.launch {
       repository.addEntry(
@@ -77,7 +90,52 @@ class PersonDetailViewModel(
     }
   }
 
-  fun onKindToggled(kind: EntryKind) {
-    selectedKinds.value = selectedKinds.value.let { if (kind in it) it - kind else it + kind }
+  fun updateEntry(entry: EntryEntity, kind: EntryKind, channel: ChannelType, text: String, occurredAt: Long?) {
+    viewModelScope.launch {
+      repository.updateEntry(
+        entry.copy(kind = kind, channelType = channel, text = text, occurredAt = occurredAt ?: entry.occurredAt),
+      )
+    }
+  }
+
+  fun moveEntry(entry: EntryEntity, toPersonId: Long) {
+    viewModelScope.launch { repository.moveEntry(entry, toPersonId) }
+  }
+
+  fun deleteEntry(entry: EntryEntity) {
+    viewModelScope.launch { repository.deleteEntry(entry) }
+  }
+
+  suspend fun countDay(entry: EntryEntity): Int {
+    val (from, to) = dayRange(entry)
+    return repository.countEntriesInRange(personId, entry.channelType, from, to)
+  }
+
+  fun deleteDay(entry: EntryEntity) {
+    viewModelScope.launch {
+      val (from, to) = dayRange(entry)
+      repository.deleteEntriesInRange(personId, entry.channelType, from, to)
+    }
+  }
+
+  fun setArchived(archived: Boolean, onDone: () -> Unit) {
+    val person = uiState.value.person ?: return
+    viewModelScope.launch {
+      repository.setArchived(person, archived)
+      onDone()
+    }
+  }
+
+  fun export() {
+    viewModelScope.launch {
+      val name = uiState.value.person?.name ?: return@launch
+      exporter.buildText(personId)?.let { exporter.share(name, it) }
+    }
+  }
+
+  private fun dayRange(entry: EntryEntity): Pair<Long, Long> {
+    val zone = ZoneId.systemDefault()
+    val day = Instant.ofEpochMilli(entry.occurredAt).atZone(zone).toLocalDate()
+    return day.atStartOfDay(zone).toInstant().toEpochMilli() to day.plusDays(1).atStartOfDay(zone).toInstant().toEpochMilli()
   }
 }
