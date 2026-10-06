@@ -1,10 +1,10 @@
 # Converses — Pla i estat (v2)
 
-Actualitzat el 6 d'oct. de 2026 · @Bernat · revisió de les captures del 6 d'oct. (llistat, detall, nova entrada, accions d'entrada, menú del split button, editar persona, nota ràpida, persona protegida, Ajustos)
+Actualitzat el 6 d'oct. de 2026 · @Bernat · M1, M2 i M3 fets, més el color de persona; queden M4, M5 i unes quantes coses soltes (vegeu «On som»)
 
 ## Resum
 
-Converses és una app Android per recordar què has dit, què t'han dit i què ha passat amb cada persona amb qui parles, sigui per xat, per xarxes o en persona. Es construeix amb Jetpack Compose i Material 3 Expressive, en monocrom amb color dinàmic. El color només apareix en tres llocs: als avatars (pastel), als errors (vermell) i, si es desactiva el color dinàmic, al tema triat.
+Converses és una app Android per recordar què has dit, què t'han dit i què ha passat amb cada persona amb qui parles, sigui per xat, per xarxes o en persona. Es construeix amb Jetpack Compose i Material 3 Expressive, en monocrom amb color dinàmic. El color apareix als avatars (pastel), als errors (vermell), al tema triat si es desactiva el color dinàmic i, dins de cada persona, com a tema pres del color del seu avatar.
 
 - **Referència visual:** el llenç de disseny «Converses» i el design system «Converses Design System» (tokens, components i pautes).
 - **Abast de la v1:** llistat, detall amb cronologia, nova entrada (full i nota ràpida), crear i editar persona, persona protegida, accions d'entrada, arxivar, esborrar i Ajustos.
@@ -12,33 +12,36 @@ Converses és una app Android per recordar què has dit, què t'han dit i què h
 
 ## On som
 
-La base funcional de la v1 ja és feta. El que queda és:
-
-- polir la interfície perquè coincideixi amb el disseny,
-- completar els fluxos que falten,
-- tancar uns quants forats de privacitat,
-- fer la feina de qualitat i de publicació.
+La v1 funcional està feta: interfície polida, fluxos complets, privacitat tancada i color de persona. El que queda és la feina de qualitat i de publicació, més unes quantes coses soltes.
 
 | Fase | Objectiu | Estat |
 | --- | --- | --- |
 | 0 · Base | Projecte, dades, totes les pantalles de la v1 | Fet |
 | M1 · Polit visual | La UI coincideix amb el disseny i el design system | Fet (falta sincronitzar el design system) |
 | M2 · Fluxos que falten | Triar i crear persona, arxivades, estats buits, desfer | Fet |
-| M3 · Privacitat | Les persones protegides no es filtren enlloc | Per fer |
+| M3 · Privacitat | Les persones protegides no es filtren enlloc | Fet (falta provar el bloqueig desactivat sol a dispositiu) |
+| Color de la persona | Les pantalles de cada persona prenen el color del seu avatar | Fet (falta provar-lo a l'emulador: animació de l'editor, fulls i interruptor apagat) |
 | M4 · Qualitat | Tests, accessibilitat, mode fosc, dispositiu real | Per fer |
 | M5 · Publicació | minSdk, signatura, R8, mida, migracions, Play Store | Per fer |
 | Després de la v1 | Cerca, còpia de seguretat, etiquetes, widget | Idees |
 
-## Decisions que cal prendre abans de començar
+**Coses soltes:**
+
+- Sincronitzar el design system a Claude Design (vegeu M1 · Design system); és feina de Bernat.
+- Provar a l'emulador el color de persona i, a dispositiu real, el bloqueig desactivat sol.
+- Afinar el snackbar de desfer (posició i marges) si no queda bé.
+- Tests de ViewModel i de pantalla: no començats (M4).
+
+## Decisions (només queda D1)
 
 | # | Decisió | Recomanació | Afecta |
 | --- | --- | --- | --- |
 | D1 | **minSdk.** Ara és 36 (només Android 16+), cosa que deixa fora la gran majoria de mòbils | Baixar-lo a **31** (Android 12, color dinàmic garantit). Si la Play Store no és un objectiu, es pot deixar a 36 | M5, Ajustos |
-| D2 | **Barra flotant del llistat.** Ara només té Persones i Ajustos | **Persones · Arxivades · Ajustos**, i treure «Arxivades» dels filtres de canal | M2 |
-| D3 | **Xips de canal del detall.** Ara no fan res | Tocar obre l'app quan hi ha enllaç directe (WhatsApp `wa.me`, Telegram `t.me`, Telèfon `tel:`); mantenir premut copia l'usuari; «En persona» no és clicable | M2 |
-| D4 | **Còpia de seguretat d'Android.** Per defecte, la base de dades amb les notes va a Google Drive | Excloure la base de dades del backup automàtic a la v1 (són notes privades) i oferir l'exportació manual | M3 |
-| D5 | **Persona per defecte a la nota ràpida** | Cap: «Tria una persona». Mai una persona protegida per defecte | M2, M3 |
-| D6 | **Ordre del llistat amb protegides.** Ordenar per l'última activitat delata quan has parlat amb una persona protegida | Opcional: ordenar les protegides per nom, al final o al principi | M3 |
+| D2 | **Barra flotant del llistat.** Ara només té Persones i Ajustos | **Persones · Arxivades · Ajustos**, i treure «Arxivades» dels filtres de canal **Decidit:** Persones · Arxivades · Ajustos (fet). | M2 |
+| D3 | **Xips de canal del detall.** Ara no fan res | Tocar obre l'app quan hi ha enllaç directe (WhatsApp `wa.me`, Telegram `t.me`, Telèfon `tel:`); mantenir premut copia l'usuari; «En persona» no és clicable **Decidit:** tocar obre l'app i mantenir premut copia, sense snackbar (fet). | M2 |
+| D4 | **Còpia de seguretat d'Android.** Per defecte, la base de dades amb les notes va a Google Drive | Excloure la base de dades del backup automàtic a la v1 (són notes privades) i oferir l'exportació manual **Decidit:** excloure la base de dades i el DataStore del backup (fet). | M3 |
+| D5 | **Persona per defecte a la nota ràpida** | Cap: «Tria una persona». Mai una persona protegida per defecte **Decidit:** cap persona per defecte (fet). | M2, M3 |
+| D6 | **Ordre del llistat amb protegides.** Ordenar per l'última activitat delata quan has parlat amb una persona protegida | Opcional: ordenar les protegides per nom, al final o al principi **Decidit:** mantenir l'ordre per última activitat (no canvia res). | M3 |
 
 ---
 
@@ -104,13 +107,18 @@ La base funcional de la v1 ja és feta. El que queda és:
 
 ### Design system
 
-- [ ] **Sincronitzar el design system amb l'app:**
+- [ ] **Sincronitzar el design system amb l'app** (feina de Bernat a Claude Design):
     - colors d'error fixos (`#BA1A1A` / `#FFDAD6`, `#FFB4AB` / `#93000A`);
-    - menú del split button;
-    - full d'accions;
-    - full de nova entrada;
-    - pantalla de desbloqueig;
-    - avatar protegit (manté el pastel i hi posa el cadenat, com a l'app).
+    - split button de 56 dp (mida mitjana) amb etiqueta en negreta, i el seu menú (forma de grup de 24 dp, elements de 52 dp, icones `on-surface-variant`);
+    - full d'accions (metadades `Tipus · hora · canal`; «Esborrar tota la conversa» amagada si només hi ha una entrada);
+    - full de nova entrada (camp sense línia amb radi 24 i placeholder; ordre Persona → Tipus → Text → On → Quan) i nota ràpida amb el mateix ordre;
+    - full de triar persona i fila discontínua «Afegeix una persona»;
+    - pantalla de desbloqueig, amb «Configura la seguretat» si no hi ha bloqueig;
+    - avatar protegit (manté el pastel i hi posa el cadenat);
+    - filtre de canal com a `ButtonGroup` connectat i tema d'Ajustos amb icones; files d'Ajustos amb radis 24/6;
+    - xip de canal (toc obre l'app, toc llarg copia), estats buits i snackbar de desfer;
+    - barra flotant amb tres destinacions (Persones · Arxivades · Ajustos);
+    - tema de color de persona (7 llavors, vegeu «Color de la persona»).
 
 ---
 
@@ -153,7 +161,7 @@ La base funcional de la v1 ja és feta. El que queda és:
 - [x] **Nota ràpida per a una protegida:** es pot escriure sense desbloquejar, però el full no mostra cap dada de la persona (ni canals amb l'usuari, ni l'última entrada).
 - [x] **Exportar notes** d'una protegida: si el detall ja és desbloquejat, no cal tornar a demanar l'empremta; si no, cal demanar-la.
 - [x] **Ordre del llistat (D6):** decidit mantenir l'ordre per última activitat; no canvia res.
-- [ ] **Bloqueig desactivat sol** quan el dispositiu es queda sense bloqueig de pantalla: comprovar que les persones protegides continuen protegides i que es mostra la pantalla de M2.
+- [ ] **Bloqueig desactivat sol** quan el dispositiu es queda sense bloqueig de pantalla: comprovar que les persones protegides continuen protegides i que es mostra la pantalla de M2. Al codi ja hi és (`AppLockScreen` → `onDeviceUnprotected` desactiva el bloqueig; les persones no es toquen i la pantalla de desbloqueig ofereix configurar la seguretat); falta provar-ho a dispositiu.
 - [x] **Notificacions i dreceres:** cap drecera dinàmica ni cap suggeriment de compartir amb el nom d'una protegida.
 
 ---
@@ -177,7 +185,7 @@ La base funcional de la v1 ja és feta. El que queda és:
 - [ ] **Àrees tàctils** de 48 dp com a mínim: ⋮ de les entrades, `−` de les dades i dels canals.
 - [ ] **Mode fosc:** revisar totes les pantalles. No hi ha captures en fosc d'aquesta ronda.
 - [ ] **Color dinàmic desactivat:** provar els 7 colors del tema i comprovar el contrast dels avatars sobre `surface`.
-- [ ] **Teclat:** al full de nova entrada, `imePadding` perquè «Desa a la cronologia» quedi visible mentre s'escriu.
+- [ ] **Teclat:** al full de nova entrada, `imePadding` perquè «Desa a la cronologia» quedi visible mentre s'escriu. Ja hi ha `imePadding` i desplaçament; falta provar-ho amb el teclat obert.
 - [ ] **Dispositiu real:**
     - empremta (a l'emulador només s'ha provat el PIN);
     - bloqueig de l'app de punta a punta;
@@ -192,7 +200,7 @@ La base funcional de la v1 ja és feta. El que queda és:
 **Fet quan:** hi ha un AAB signat i optimitzat a la pista interna de Play.
 
 - [ ] **minSdk (D1):** si es baixa a 31, cal revisar les crides que no hi són (selector d'idioma per app: `AppCompatDelegate.setApplicationLocales` a l'API 31–32) i provar-ho en un emulador amb l'API 31.
-- [ ] **material3 alpha:** fixar la versió exacta i apuntar quines API d'Expressive es fan servir, per poder actualitzar quan surti la 1.5 estable.
+- [x] **material3 alpha:** fixada a `1.5.0-alpha29` al catàleg de versions. API d'Expressive en ús (tots els `@OptIn` són al `designsystem`): `MaterialExpressiveTheme` i `MotionScheme`, `MaterialShapes`, `SplitButtonLayout` / `SplitButtonDefaults`, `ToggleButton` / `ToggleButtonDefaults` / `ButtonGroupDefaults` i `HorizontalFloatingToolbar`.
 - [ ] **Mida de la font:** Roboto Flex variable pesa ~1,7 MB. Hi ha dues opcions:
     - (a) fonts descarregables de Google Fonts (`androidx.compose.ui.text.googlefonts`), amb Roboto com a alternativa;
     - (b) un subconjunt amb `fonttools` (llatí, eixos `wght` 400–800, `wdth` 100–118 i `opsz` limitats), que deixa el fitxer en uns 300–500 KB.
@@ -212,7 +220,7 @@ La base funcional de la v1 ja és feta. El que queda és:
     - política de privacitat (les dades no surten del dispositiu);
     - formulari de seguretat de les dades;
     - pista interna.
-- [ ] **Idiomes:** revisar que no quedi cap text fix i que el castellà i l'anglès siguin complets (plurals amb `pluralStringResource`).
+- [x] **Idiomes:** no queda cap text fix a la UI (només dades de prova a les previews) i els tres idiomes tenen exactament les mateixes cadenes i plurals.
 
 ---
 
@@ -241,10 +249,9 @@ Una sola activitat (`MainActivity`, una `FragmentActivity` pel `BiometricPrompt`
 | Dades | Room 2.8.4 + KSP 2.3.12 | Base de dades versió 2, esquemes a `app/schemas` |
 | DI | Koin 4.2.2 | |
 | Preferències | DataStore Preferences 1.2.1 | `SettingsRepository` |
-| Ajustos UI | Compose-Settings `ui-tiles-expressive` 3.3.0 | Pot desaparèixer (M1) |
+| Ajustos UI | Compose-Settings `ui-tiles-expressive` 3.3.0 | Només es fa servir `SettingsGroup`; les files són pròpies (`SettingRow`) |
 | Biometria | `androidx.biometric` 1.1.0 | `BIOMETRIC_STRONG or DEVICE_CREDENTIAL` |
 | Captures | Compose Preview Screenshot Testing 0.0.1-alpha16 | Experimental; als dos mòduls (vegeu «Tests de captures») |
-| Captures | Compose Preview Screenshot Testing 0.0.1-alpha16 | Experimental; als dos mòduls |
 | Altres | Kotlin 2.4.20, AGP 9.4.1, lifecycle 2.11.0, coroutines 1.11.0, serialization 1.11.0 | |
 
 ### Color de la persona
@@ -272,19 +279,17 @@ Cada persona porta el color de l'avatar com a **llavor del tema** de les seves p
 
 ### Components propis (`designsystem`)
 
-`Avatar`, `GroupedList` / `groupedItems`, `TimelineRow` i `TimelineMarker`, `ConversesFilterChip`, `ConversesToggleGroup`, `ConversesFloatingToolbar` i `ToolbarDestination`, `ConversesSplitButton`, `ColorSwatches` i `ConversesTheme`.
-
-A afegir a M1 i M2: `GroupedMenu` (menú del split button), `SettingRow` / `SettingSwitchRow`, `PersonPickerSheet` i `EmptyState`.
+`Avatar`, `GroupedList` / `groupedItems`, `TimelineRow` i `TimelineMarker`, `ConversesFilterChip` i `ConversesConnectedFilterRow`, `ConversesChannelChip`, `ConversesToggleGroup`, `ConversesFloatingToolbar` i `ToolbarDestination`, `ConversesSplitButton` i `ConversesMenuItem`, `SettingRow` / `SettingSwitchRow`, `DashedActionRow`, `EmptyState`, `ColorSwatches`, `ConversesTheme`, `PersonTheme` i `AppColors`. A l'app: `PersonPickerSheet`.
 
 ### Pantalles i navegació
 
 | Destinació | Ruta (`NavKey`) | Notes |
 | --- | --- | --- |
 | Llistat | `PeopleRoute` | Filtres per canal, nova persona a la capçalera i fila final, barra flotant |
-| Arxivades | `ArchivedRoute` | Nova (M2) |
+| Arxivades | `ArchivedRoute` | Destinació de la barra flotant; sense filtres de canal ni fila d'afegir |
 | Detall | `PersonRoute(id)` | Split button «Nota ▾», ⋮ a cada entrada, `FLAG_SECURE` si és protegida |
 | Desbloqueig | `PersonLockedRoute(id)` | `BiometricPrompt` automàtic; si va bé, substitueix la ruta pel detall |
-| Nota ràpida | `QuickNoteRoute(personId?)` | Sense persona per defecte (M2) |
+| Nota ràpida | `QuickNoteRoute(personId?)` | Sense persona per defecte; el tema de la persona només quan n'hi ha una de triada |
 | Editar/crear | `EditPersonRoute(personId)` | `0` = persona nova; en crear, va al detall |
 | Ajustos | `SettingsRoute` | |
 | Fulls i diàlegs | Dins del detall i de l'editor | Nova entrada, accions d'entrada, menú del split button, triar persona, esborrar |
