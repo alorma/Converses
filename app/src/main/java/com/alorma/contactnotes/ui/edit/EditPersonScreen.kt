@@ -176,7 +176,7 @@ fun EditPersonScreen(
       Column(verticalArrangement = Arrangement.spacedBy(GroupedListDefaults.ItemSpacing)) {
         val count = state.channels.size + 1
         state.channels.forEachIndexed { index, channel ->
-          FieldCard(index = index, count = count, modifier = Modifier.clickable { channelDialog = ChannelDialogState(channel) }) {
+          FieldCard(index = index, count = count, onClick = { channelDialog = ChannelDialogState(channel) }) {
             Row(
               modifier = Modifier.fillMaxWidth().padding(start = 16.dp, end = 4.dp, top = 8.dp, bottom = 8.dp),
               verticalAlignment = Alignment.CenterVertically,
@@ -195,7 +195,7 @@ fun EditPersonScreen(
             }
           }
         }
-        FieldCard(index = state.channels.size, count = count, modifier = Modifier.clickable { channelDialog = ChannelDialogState(null) }) {
+        FieldCard(index = state.channels.size, count = count, onClick = { channelDialog = ChannelDialogState(null) }) {
           AddRow(stringResource(R.string.add_channel))
         }
       }
@@ -350,13 +350,16 @@ private fun FieldCard(
   count: Int,
   modifier: Modifier = Modifier,
   error: Boolean = false,
+  onClick: (() -> Unit)? = null,
   content: @Composable () -> Unit,
 ) {
-  Surface(
-    shape = groupedItemShape(index, count),
-    color = if (error) MaterialTheme.colorScheme.errorContainer else GroupedListDefaults.containerColor,
-    modifier = modifier.fillMaxWidth(),
-  ) { content() }
+  val shape = groupedItemShape(index, count)
+  val color = if (error) MaterialTheme.colorScheme.errorContainer else GroupedListDefaults.containerColor
+  if (onClick != null) {
+    Surface(onClick = onClick, shape = shape, color = color, modifier = modifier.fillMaxWidth()) { content() }
+  } else {
+    Surface(shape = shape, color = color, modifier = modifier.fillMaxWidth()) { content() }
+  }
 }
 
 private class PrefixTransformation(private val prefix: String) : VisualTransformation {
@@ -492,7 +495,7 @@ private fun FactsEditor(facts: List<FactDraft>, viewModel: EditPersonViewModel) 
       }
       }
     }
-    FieldCard(index = facts.size, count = count, modifier = Modifier.clickable { viewModel.onAddFact() }) {
+    FieldCard(index = facts.size, count = count, onClick = { viewModel.onAddFact() }) {
       AddRow(stringResource(R.string.add_fact))
     }
   }

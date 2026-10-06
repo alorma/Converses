@@ -167,9 +167,10 @@ private fun PersonPicker(selected: PersonEntity, people: List<PersonEntity>, onS
   var expanded by remember { mutableStateOf(false) }
   Box {
     Surface(
+      onClick = { expanded = true },
       shape = MaterialTheme.shapes.extraLarge,
       color = GroupedListDefaults.containerColor,
-      modifier = Modifier.fillMaxWidth().clickable { expanded = true },
+      modifier = Modifier.fillMaxWidth(),
     ) {
       Row(
         modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
