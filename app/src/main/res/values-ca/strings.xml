@@ -104,7 +104,7 @@
     <string name="edit_channel">Edita el canal</string>
     <string name="channel_handle">Usuari o número</string>
     <string name="protected_person">Persona protegida</string>
-    <string name="protected_person_summary">Demana l\'empremta per veure\'n les dades</string>
+    <string name="protected_person_summary">Cal l\'empremta per veure-la. Al llistat no es mostra l\'últim comentari.</string>
     <string name="protected_unavailable">Cal una empremta o un bloqueig de pantalla al dispositiu</string>
 
     <string name="menu_export">Exportar notes</string>

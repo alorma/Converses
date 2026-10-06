@@ -104,7 +104,7 @@
     <string name="edit_channel">Editar canal</string>
     <string name="channel_handle">Usuario o número</string>
     <string name="protected_person">Persona protegida</string>
-    <string name="protected_person_summary">Pide la huella para ver sus datos</string>
+    <string name="protected_person_summary">Hace falta la huella para verla. En el listado no se muestra el último comentario.</string>
     <string name="protected_unavailable">Hace falta una huella o un bloqueo de pantalla en el dispositivo</string>
 
     <string name="menu_export">Exportar notas</string>
