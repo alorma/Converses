@@ -23,7 +23,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.EditNote
 import androidx.compose.material.icons.rounded.Groups
 import androidx.compose.material.icons.rounded.Lock
+import androidx.compose.material.icons.rounded.PersonAdd
 import androidx.compose.material.icons.rounded.Settings
+import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -57,6 +59,7 @@ fun PeopleListRoute(
   onPersonClick: (PersonEntity) -> Unit,
   onQuickNote: () -> Unit,
   onOpenSettings: () -> Unit,
+  onNewPerson: () -> Unit,
   viewModel: PeopleListViewModel = koinViewModel(),
 ) {
   val state by viewModel.uiState.collectAsStateWithLifecycle()
@@ -66,6 +69,7 @@ fun PeopleListRoute(
     onPersonClick = onPersonClick,
     onQuickNote = onQuickNote,
     onOpenSettings = onOpenSettings,
+    onNewPerson = onNewPerson,
   )
 }
 
@@ -76,6 +80,7 @@ fun PeopleListScreen(
   onPersonClick: (PersonEntity) -> Unit,
   onQuickNote: () -> Unit,
   onOpenSettings: () -> Unit,
+  onNewPerson: () -> Unit,
 ) {
   Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.surface) {
     Box(modifier = Modifier.fillMaxSize()) {
@@ -85,7 +90,7 @@ fun PeopleListScreen(
         verticalArrangement = Arrangement.spacedBy(GroupedListDefaults.ItemSpacing),
       ) {
         item(key = "header") {
-          Header(total = state.total, isLoading = state.isLoading, modifier = Modifier.windowInsetsPadding(WindowInsets.statusBars))
+          Header(total = state.total, isLoading = state.isLoading, onNewPerson = onNewPerson, modifier = Modifier.windowInsetsPadding(WindowInsets.statusBars))
         }
         item(key = "filters") {
           FilterRow(selected = state.filter, onSelected = onFilterSelected)
@@ -132,8 +137,12 @@ fun PeopleListScreen(
 }
 
 @Composable
-private fun Header(total: Int, isLoading: Boolean, modifier: Modifier = Modifier) {
-  Column(modifier = modifier.padding(start = 4.dp, top = 16.dp, bottom = 20.dp)) {
+private fun Header(total: Int, isLoading: Boolean, onNewPerson: () -> Unit, modifier: Modifier = Modifier) {
+  Row(
+    modifier = modifier.fillMaxWidth().padding(start = 4.dp, top = 16.dp, bottom = 20.dp),
+    verticalAlignment = Alignment.Top,
+  ) {
+  Column(modifier = Modifier.weight(1f)) {
     Text(text = stringResource(R.string.people_title), style = ListTitleStyle)
     if (!isLoading) {
       Text(
@@ -142,6 +151,10 @@ private fun Header(total: Int, isLoading: Boolean, modifier: Modifier = Modifier
         color = MaterialTheme.colorScheme.onSurfaceVariant,
       )
     }
+  }
+  FilledTonalIconButton(onClick = onNewPerson) {
+    Icon(Icons.Rounded.PersonAdd, contentDescription = stringResource(R.string.add_person))
+  }
   }
 }
 

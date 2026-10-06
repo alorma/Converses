@@ -88,6 +88,7 @@ private fun List<EntryEntity>.toTimelineItems(): List<TimelineItem> = buildList 
 fun PersonDetailRoute(
   personId: Long,
   onBack: () -> Unit,
+  onEdit: () -> Unit,
   viewModel: PersonDetailViewModel = koinViewModel(parameters = { parametersOf(personId) }),
 ) {
   val state by viewModel.uiState.collectAsStateWithLifecycle()
@@ -102,6 +103,7 @@ fun PersonDetailRoute(
   PersonDetailScreen(
     state = state,
     onBack = onBack,
+    onEdit = onEdit,
     onKindToggled = viewModel::onKindToggled,
     onAddEntry = viewModel::addEntry,
   )
@@ -111,6 +113,7 @@ fun PersonDetailRoute(
 fun PersonDetailScreen(
   state: PersonDetailUiState,
   onBack: () -> Unit,
+  onEdit: () -> Unit,
   onKindToggled: (com.alorma.contactnotes.data.db.EntryKind) -> Unit,
   onAddEntry: (com.alorma.contactnotes.data.db.EntryKind, com.alorma.contactnotes.data.db.ChannelType, String, Long?) -> Unit,
 ) {
@@ -126,8 +129,16 @@ fun PersonDetailScreen(
       contentPadding = PaddingValues(start = ScreenMargin, end = ScreenMargin, bottom = 96.dp),
     ) {
       item(key = "back") {
-        IconButton(onClick = onBack, modifier = Modifier.windowInsetsPadding(WindowInsets.statusBars)) {
-          Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = stringResource(R.string.back))
+        Row(
+          modifier = Modifier.fillMaxWidth().windowInsetsPadding(WindowInsets.statusBars),
+          horizontalArrangement = Arrangement.SpaceBetween,
+        ) {
+          IconButton(onClick = onBack) {
+            Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = stringResource(R.string.back))
+          }
+          IconButton(onClick = onEdit) {
+            Icon(Icons.Rounded.Edit, contentDescription = stringResource(R.string.edit_person))
+          }
         }
       }
       item(key = "header") { Header(person, state) }
