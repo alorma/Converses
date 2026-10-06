@@ -1,10 +1,11 @@
 package com.alorma.contactnotes.ui.entry
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -16,11 +17,9 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Close
-import androidx.compose.material.icons.rounded.Lock
+import androidx.compose.material.icons.rounded.PersonOutline
 import androidx.compose.material.icons.rounded.UnfoldMore
 import androidx.compose.material3.Button
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -30,9 +29,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -74,13 +75,25 @@ data class QuickNoteUiState(
 class QuickNoteViewModel(
   initialPersonId: Long,
   private val repository: ConversesRepository,
+  private val selectionBridge: PersonSelectionBridge,
 ) : ViewModel() {
   private val selectedId = MutableStateFlow(initialPersonId.takeIf { it > 0 })
+
+  init {
+    viewModelScope.launch {
+      selectionBridge.picked.collect { id ->
+        if (id != null) {
+          selectedId.value = id
+          selectionBridge.clear()
+        }
+      }
+    }
+  }
 
   private val people = repository.observePeople().map { items -> items.map { it.person } }
 
   val uiState: StateFlow<QuickNoteUiState> = combine(people, selectedId) { people, id ->
-    people to (people.firstOrNull { it.id == id } ?: people.firstOrNull())
+    people to people.firstOrNull { it.id == id }
   }.flatMapLatest { (people, selected) ->
     if (selected == null || selected.isProtected) {
       flowOf(QuickNoteUiState(people = people, selected = selected))
@@ -116,12 +129,13 @@ class QuickNoteViewModel(
 fun QuickNoteScreen(
   personId: Long,
   onClose: () -> Unit,
+  onNewPerson: () -> Unit,
   viewModel: QuickNoteViewModel = koinViewModel(parameters = { parametersOf(personId) }),
 ) {
   val state by viewModel.uiState.collectAsStateWithLifecycle()
   val form = rememberEntryFormState()
   val selected = state.selected
-  val available = availableChannels(state.channels, showAll = selected?.isProtected == true)
+  val available = availableChannels(state.channels, showAll = selected == null || selected.isProtected)
   val channel = form.channel?.takeIf { it in available }
     ?: state.lastChannel?.takeIf { it in available }
     ?: available.first()
@@ -151,9 +165,7 @@ fun QuickNoteScreen(
       }
       Text(stringResource(R.string.quick_note), style = ScreenTitleStyle, modifier = Modifier.padding(start = 4.dp))
 
-      if (selected != null) {
-        PersonPicker(selected = selected, people = state.people, onSelect = viewModel::select)
-      }
+      PersonPicker(selected = selected, people = state.people, onSelect = viewModel::select, onNewPerson = onNewPerson)
       KindSelector(form)
       EntryTextField(form, placeholder = stringResource(form.kind.promptLabel()))
       WhereSection(channels = available, selected = channel, onSelected = { form.channel = it })
@@ -163,51 +175,63 @@ fun QuickNoteScreen(
 }
 
 @Composable
-private fun PersonPicker(selected: PersonEntity, people: List<PersonEntity>, onSelect: (PersonEntity) -> Unit) {
-  var expanded by remember { mutableStateOf(false) }
-  Box {
-    Surface(
-      onClick = { expanded = true },
-      shape = MaterialTheme.shapes.extraLarge,
-      color = GroupedListDefaults.containerColor,
-      modifier = Modifier.fillMaxWidth(),
+private fun PersonPicker(
+  selected: PersonEntity?,
+  people: List<PersonEntity>,
+  onSelect: (PersonEntity) -> Unit,
+  onNewPerson: () -> Unit,
+) {
+  var showSheet by rememberSaveable { mutableStateOf(false) }
+  Surface(
+    onClick = { showSheet = true },
+    shape = MaterialTheme.shapes.extraLarge,
+    color = GroupedListDefaults.containerColor,
+    modifier = Modifier.fillMaxWidth(),
+  ) {
+    Row(
+      modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
+      verticalAlignment = Alignment.CenterVertically,
+      horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-      Row(
-        modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
-      ) {
+      if (selected != null) {
         Avatar(initialsOf(selected.name), selected.avatarShape, selected.avatarColor, size = 44.dp, locked = selected.isProtected)
-        Column(modifier = Modifier.weight(1f)) {
-          Text(
-            text = stringResource(R.string.quick_with_whom).uppercase(),
-            style = MaterialTheme.typography.labelMedium,
-            fontWeight = FontWeight.SemiBold,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-          )
-          Text(selected.name, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+      } else {
+        Surface(shape = CircleShape, color = MaterialTheme.colorScheme.surfaceContainerHigh, modifier = Modifier.size(44.dp)) {
+          Box(contentAlignment = Alignment.Center) {
+            Icon(Icons.Rounded.PersonOutline, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant)
+          }
         }
-        Icon(Icons.Rounded.UnfoldMore, contentDescription = null)
       }
-    }
-    DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
-      people.forEach { person ->
-        DropdownMenuItem(
-          text = { Text(person.name) },
-          leadingIcon = {
-            Avatar(initialsOf(person.name), person.avatarShape, person.avatarColor, size = 32.dp, locked = person.isProtected)
-          },
-          trailingIcon = if (person.isProtected) {
-            { Icon(Icons.Rounded.Lock, contentDescription = null) }
-          } else {
-            null
-          },
-          onClick = {
-            onSelect(person)
-            expanded = false
-          },
+      Column(modifier = Modifier.weight(1f)) {
+        Text(
+          text = stringResource(R.string.quick_with_whom).uppercase(),
+          style = MaterialTheme.typography.labelMedium,
+          fontWeight = FontWeight.SemiBold,
+          color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        Text(
+          text = selected?.name ?: stringResource(R.string.pick_person),
+          style = MaterialTheme.typography.titleMedium,
+          fontWeight = FontWeight.Bold,
+          color = if (selected == null) MaterialTheme.colorScheme.onSurfaceVariant else Color.Unspecified,
         )
       }
+      Icon(Icons.Rounded.UnfoldMore, contentDescription = null)
     }
+  }
+  if (showSheet) {
+    PersonPickerSheet(
+      people = people,
+      selectedId = selected?.id,
+      onSelect = {
+        onSelect(it)
+        showSheet = false
+      },
+      onNewPerson = {
+        showSheet = false
+        onNewPerson()
+      },
+      onDismiss = { showSheet = false },
+    )
   }
 }

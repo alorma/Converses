@@ -81,6 +81,8 @@
     <string name="entry_label_said">What did you say to them?</string>
     <string name="entry_label_heard">What did they say to you?</string>
     <string name="entry_label_happened">What happened?</string>
+    <string name="pick_person">Pick a person</string>
+    <string name="search_by_name">Search by name</string>
     <string name="quick_with_whom">With</string>
     <string name="quick_where">Where</string>
     <string name="time_now">Now</string>
