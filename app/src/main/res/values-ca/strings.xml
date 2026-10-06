@@ -86,4 +86,26 @@
     <string name="quick_with_whom">Amb qui</string>
     <string name="quick_where">On</string>
     <string name="time_now">Ara</string>
+
+    <string name="edit_person">Editar persona</string>
+    <string name="new_person">Nova persona</string>
+    <string name="add_person">Afegeix una persona</string>
+    <string name="shape_label">Forma</string>
+    <string name="color_label">Color</string>
+    <string name="field_name">Nom</string>
+    <string name="field_alias">Àlies</string>
+    <string name="alias_taken">Ja tens una altra persona amb l\'àlies @%1$s</string>
+    <string name="pinned_hint">Surten a dalt del detall</string>
+    <string name="fact_label_hint">Etiqueta</string>
+    <string name="fact_value_hint">Valor</string>
+    <string name="add_fact">Afegeix una dada</string>
+    <string name="remove">Treu</string>
+    <string name="reorder">Reordena</string>
+    <string name="channels_title">On hi parles</string>
+    <string name="add_channel">Afegeix un canal</string>
+    <string name="edit_channel">Edita el canal</string>
+    <string name="channel_handle">Usuari o número</string>
+    <string name="protected_person">Persona protegida</string>
+    <string name="protected_person_summary">Demana l\'empremta per veure\'n les dades</string>
+    <string name="protected_unavailable">Cal una empremta o un bloqueig de pantalla al dispositiu</string>
 </resources>

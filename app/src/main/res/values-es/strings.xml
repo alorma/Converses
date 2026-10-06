@@ -86,4 +86,26 @@
     <string name="quick_with_whom">Con quién</string>
     <string name="quick_where">Dónde</string>
     <string name="time_now">Ahora</string>
+
+    <string name="edit_person">Editar persona</string>
+    <string name="new_person">Nueva persona</string>
+    <string name="add_person">Añade una persona</string>
+    <string name="shape_label">Forma</string>
+    <string name="color_label">Color</string>
+    <string name="field_name">Nombre</string>
+    <string name="field_alias">Alias</string>
+    <string name="alias_taken">Ya tienes otra persona con el alias @%1$s</string>
+    <string name="pinned_hint">Salen arriba del detalle</string>
+    <string name="fact_label_hint">Etiqueta</string>
+    <string name="fact_value_hint">Valor</string>
+    <string name="add_fact">Añade un dato</string>
+    <string name="remove">Quitar</string>
+    <string name="reorder">Reordenar</string>
+    <string name="channels_title">Dónde habláis</string>
+    <string name="add_channel">Añade un canal</string>
+    <string name="edit_channel">Editar canal</string>
+    <string name="channel_handle">Usuario o número</string>
+    <string name="protected_person">Persona protegida</string>
+    <string name="protected_person_summary">Pide la huella para ver sus datos</string>
+    <string name="protected_unavailable">Hace falta una huella o un bloqueo de pantalla en el dispositivo</string>
 </resources>

@@ -86,4 +86,26 @@
     <string name="quick_with_whom">With</string>
     <string name="quick_where">Where</string>
     <string name="time_now">Now</string>
+
+    <string name="edit_person">Edit person</string>
+    <string name="new_person">New person</string>
+    <string name="add_person">Add a person</string>
+    <string name="shape_label">Shape</string>
+    <string name="color_label">Color</string>
+    <string name="field_name">Name</string>
+    <string name="field_alias">Alias</string>
+    <string name="alias_taken">You already have another person with the alias @%1$s</string>
+    <string name="pinned_hint">They appear at the top of the detail</string>
+    <string name="fact_label_hint">Label</string>
+    <string name="fact_value_hint">Value</string>
+    <string name="add_fact">Add a fact</string>
+    <string name="remove">Remove</string>
+    <string name="reorder">Reorder</string>
+    <string name="channels_title">Where you talk</string>
+    <string name="add_channel">Add a channel</string>
+    <string name="edit_channel">Edit channel</string>
+    <string name="channel_handle">Username or number</string>
+    <string name="protected_person">Protected person</string>
+    <string name="protected_person_summary">Asks for your fingerprint to see their details</string>
+    <string name="protected_unavailable">Needs a fingerprint or a screen lock on the device</string>
 </resources>

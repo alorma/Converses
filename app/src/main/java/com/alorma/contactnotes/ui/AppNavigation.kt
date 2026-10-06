@@ -7,6 +7,7 @@ import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
+import com.alorma.contactnotes.ui.edit.EditPersonScreen
 import com.alorma.contactnotes.ui.entry.QuickNoteScreen
 import com.alorma.contactnotes.ui.people.PeopleListRoute
 import com.alorma.contactnotes.ui.person.PersonDetailRoute
@@ -19,6 +20,9 @@ data object PeopleRoute : NavKey
 
 @Serializable
 data object SettingsRoute : NavKey
+
+@Serializable
+data class EditPersonRoute(val personId: Long = 0L) : NavKey
 
 @Serializable
 data class QuickNoteRoute(val personId: Long = 0L) : NavKey
@@ -47,6 +51,7 @@ fun AppNavigation() {
             backStack.add(if (person.isProtected) PersonLockedRoute(person.id) else PersonRoute(person.id))
           },
           onQuickNote = { backStack.add(QuickNoteRoute()) },
+          onNewPerson = { backStack.add(EditPersonRoute()) },
           onOpenSettings = { backStack.add(SettingsRoute) },
         )
       }
@@ -70,6 +75,17 @@ fun AppNavigation() {
         PersonDetailRoute(
           personId = route.id,
           onBack = { backStack.removeLastOrNull() },
+          onEdit = { backStack.add(EditPersonRoute(route.id)) },
+        )
+      }
+      entry<EditPersonRoute> { route ->
+        EditPersonScreen(
+          personId = route.personId,
+          onClose = { backStack.removeLastOrNull() },
+          onSaved = { id ->
+            backStack.removeLastOrNull()
+            if (route.personId == 0L) backStack.add(PersonRoute(id))
+          },
         )
       }
     },
