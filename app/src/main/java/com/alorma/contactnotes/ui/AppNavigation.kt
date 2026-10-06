@@ -7,6 +7,7 @@ import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
+import com.alorma.contactnotes.ui.entry.QuickNoteScreen
 import com.alorma.contactnotes.ui.people.PeopleListRoute
 import com.alorma.contactnotes.ui.person.PersonDetailRoute
 import com.alorma.contactnotes.ui.person.PersonLockedScreen
@@ -18,6 +19,9 @@ data object PeopleRoute : NavKey
 
 @Serializable
 data object SettingsRoute : NavKey
+
+@Serializable
+data class QuickNoteRoute(val personId: Long = 0L) : NavKey
 
 @Serializable
 data class PersonRoute(val id: Long) : NavKey
@@ -42,9 +46,12 @@ fun AppNavigation() {
           onPersonClick = { person ->
             backStack.add(if (person.isProtected) PersonLockedRoute(person.id) else PersonRoute(person.id))
           },
-          onQuickNote = {},
+          onQuickNote = { backStack.add(QuickNoteRoute()) },
           onOpenSettings = { backStack.add(SettingsRoute) },
         )
+      }
+      entry<QuickNoteRoute> { route ->
+        QuickNoteScreen(personId = route.personId, onClose = { backStack.removeLastOrNull() })
       }
       entry<SettingsRoute> {
         SettingsScreen(onBack = { backStack.removeLastOrNull() })

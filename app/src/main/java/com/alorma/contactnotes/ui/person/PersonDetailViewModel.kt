@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.alorma.contactnotes.data.ConversesRepository
 import com.alorma.contactnotes.data.db.ChannelEntity
+import com.alorma.contactnotes.data.db.ChannelType
 import com.alorma.contactnotes.data.db.EntryEntity
 import com.alorma.contactnotes.data.db.EntryKind
 import com.alorma.contactnotes.data.db.PersonEntity
@@ -16,6 +17,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 
 data class PersonDetailUiState(
   val person: PersonEntity? = null,
@@ -31,8 +33,8 @@ data class PersonDetailUiState(
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class PersonDetailViewModel(
-  personId: Long,
-  repository: ConversesRepository,
+  private val personId: Long,
+  private val repository: ConversesRepository,
 ) : ViewModel() {
   private val selectedKinds = MutableStateFlow(EntryKind.entries.toSet())
 
@@ -60,6 +62,20 @@ class PersonDetailViewModel(
       isLoading = false,
     )
   }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), PersonDetailUiState())
+
+  fun addEntry(kind: EntryKind, channel: ChannelType, text: String, occurredAt: Long?) {
+    viewModelScope.launch {
+      repository.addEntry(
+        EntryEntity(
+          personId = personId,
+          kind = kind,
+          channelType = channel,
+          text = text,
+          occurredAt = occurredAt ?: System.currentTimeMillis(),
+        ),
+      )
+    }
+  }
 
   fun onKindToggled(kind: EntryKind) {
     selectedKinds.value = selectedKinds.value.let { if (kind in it) it - kind else it + kind }

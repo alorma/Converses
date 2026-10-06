@@ -1,6 +1,7 @@
 package com.alorma.contactnotes.ui.person
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -18,9 +19,11 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
+import androidx.compose.material.icons.rounded.Edit
 import androidx.compose.material.icons.rounded.PushPin
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.AssistChipDefaults
+import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -29,7 +32,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.pluralStringResource
@@ -51,6 +57,7 @@ import com.alorma.contactnotes.designsystem.components.TimelineMarker
 import com.alorma.contactnotes.designsystem.components.TimelineRow
 import com.alorma.contactnotes.designsystem.theme.PersonNameStyle
 import com.alorma.contactnotes.designsystem.theme.SectionTitleStyle
+import com.alorma.contactnotes.ui.entry.NewEntrySheet
 import com.alorma.contactnotes.ui.people.initialsOf
 import com.alorma.contactnotes.ui.people.label
 import java.time.LocalDate
@@ -92,7 +99,12 @@ fun PersonDetailRoute(
     onDispose { if (secure) secureWindow.release() }
   }
 
-  PersonDetailScreen(state = state, onBack = onBack, onKindToggled = viewModel::onKindToggled)
+  PersonDetailScreen(
+    state = state,
+    onBack = onBack,
+    onKindToggled = viewModel::onKindToggled,
+    onAddEntry = viewModel::addEntry,
+  )
 }
 
 @Composable
@@ -100,12 +112,15 @@ fun PersonDetailScreen(
   state: PersonDetailUiState,
   onBack: () -> Unit,
   onKindToggled: (com.alorma.contactnotes.data.db.EntryKind) -> Unit,
+  onAddEntry: (com.alorma.contactnotes.data.db.EntryKind, com.alorma.contactnotes.data.db.ChannelType, String, Long?) -> Unit,
 ) {
+  var showNewEntry by rememberSaveable { mutableStateOf(false) }
   val person = state.person
   Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.surface) {
     if (person == null) return@Surface
     val items = remember(state.entries) { state.entries.toTimelineItems() }
 
+    Box(modifier = Modifier.fillMaxSize()) {
     LazyColumn(
       modifier = Modifier.fillMaxSize(),
       contentPadding = PaddingValues(start = ScreenMargin, end = ScreenMargin, bottom = 96.dp),
@@ -179,6 +194,29 @@ fun PersonDetailScreen(
         }
       }
     }
+    ExtendedFloatingActionButton(
+      onClick = { showNewEntry = true },
+      modifier = Modifier
+        .align(Alignment.BottomEnd)
+        .windowInsetsPadding(WindowInsets.navigationBars)
+        .padding(16.dp),
+      containerColor = MaterialTheme.colorScheme.primary,
+      contentColor = MaterialTheme.colorScheme.onPrimary,
+      icon = { Icon(Icons.Rounded.Edit, contentDescription = null) },
+      text = { Text(stringResource(R.string.note_button), fontWeight = FontWeight.Bold) },
+    )
+    }
+  }
+  if (showNewEntry && person != null) {
+    NewEntrySheet(
+      person = person,
+      channels = state.channels.map { it.type },
+      onDismiss = { showNewEntry = false },
+      onSave = { kind, channel, text, at ->
+        onAddEntry(kind, channel, text, at)
+        showNewEntry = false
+      },
+    )
   }
 }
 
