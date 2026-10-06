@@ -69,15 +69,15 @@ La base funcional de la v1 ja és feta. El que queda és:
 
 ### Nova entrada (full) i nota ràpida
 
-- [ ] **Camp de text sense línia inferior:** fons `surface-card-high`, radi 24 a les quatre cantonades i sense indicador. Ara és un `TextField` *filled* amb línia.
-- [ ] **El mateix ordre als dos formularis:** Persona → Tipus → Text → On → Quan. Ara la nota ràpida posa «On» abans del tipus.
-- [ ] **El mateix placeholder segons el tipus:**
+- [x] **Camp de text sense línia inferior:** fons `surface-card-high`, radi 24 a les quatre cantonades i sense indicador. Ara és un `TextField` *filled* amb línia.
+- [x] **El mateix ordre als dos formularis:** Persona → Tipus → Text → On → Quan. Ara la nota ràpida posa «On» abans del tipus.
+- [x] **El mateix placeholder segons el tipus:**
     - «Què li has dit?»;
     - «Què t'ha dit?»;
     - «Què ha passat?».
 
   La nota ràpida ara diu «Què s'ha dit», sense interrogant.
-- [ ] **«On» a la nota ràpida:**
+- [x] **«On» a la nota ràpida:**
     - primer, els canals de la persona triada, i després «Altres»;
     - per defecte, el canal de la seva última entrada;
     - ara mostra tots els tipus i la fila apareix desplaçada, amb el primer xip tallat.

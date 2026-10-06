@@ -81,8 +81,6 @@
     <string name="entry_label_said">Què li has dit?</string>
     <string name="entry_label_heard">Què t\'ha dit?</string>
     <string name="entry_label_happened">Què ha passat?</string>
-    <string name="entry_label_quick_said">Què s\'ha dit</string>
-    <string name="entry_label_quick_happened">Què ha passat</string>
     <string name="quick_with_whom">Amb qui</string>
     <string name="quick_where">On</string>
     <string name="time_now">Ara</string>

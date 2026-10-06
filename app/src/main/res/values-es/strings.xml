@@ -81,8 +81,6 @@
     <string name="entry_label_said">¿Qué le has dicho?</string>
     <string name="entry_label_heard">¿Qué te ha dicho?</string>
     <string name="entry_label_happened">¿Qué ha pasado?</string>
-    <string name="entry_label_quick_said">Qué se ha dicho</string>
-    <string name="entry_label_quick_happened">Qué ha pasado</string>
     <string name="quick_with_whom">Con quién</string>
     <string name="quick_where">Dónde</string>
     <string name="time_now">Ahora</string>

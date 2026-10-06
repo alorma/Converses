@@ -1,11 +1,14 @@
 package com.alorma.contactnotes.ui.entry
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.AccessTime
@@ -32,6 +35,8 @@ import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.alorma.contactnotes.R
@@ -106,19 +111,43 @@ fun KindSelector(state: EntryFormState, modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun EntryTextField(state: EntryFormState, label: String, modifier: Modifier = Modifier) {
+fun EntryTextField(state: EntryFormState, placeholder: String, modifier: Modifier = Modifier) {
+  val container = MaterialTheme.colorScheme.surfaceContainerHigh
   TextField(
     value = state.text,
     onValueChange = { state.text = it },
     modifier = modifier.fillMaxWidth().heightIn(min = 128.dp),
-    label = { Text(label) },
-    shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
+    placeholder = { Text(placeholder) },
+    shape = RoundedCornerShape(24.dp),
     colors = TextFieldDefaults.colors(
-      focusedContainerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
-      unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
-      focusedIndicatorColor = MaterialTheme.colorScheme.primary,
+      focusedContainerColor = container,
+      unfocusedContainerColor = container,
+      focusedIndicatorColor = Color.Transparent,
+      unfocusedIndicatorColor = Color.Transparent,
+      disabledIndicatorColor = Color.Transparent,
+      errorIndicatorColor = Color.Transparent,
     ),
   )
+}
+
+/** Etiqueta «On» seguida dels xips de canal. */
+@Composable
+fun WhereSection(
+  channels: List<ChannelType>,
+  selected: ChannelType,
+  onSelected: (ChannelType) -> Unit,
+  modifier: Modifier = Modifier,
+) {
+  Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(8.dp)) {
+    Text(
+      text = stringResource(R.string.quick_where),
+      style = MaterialTheme.typography.titleSmall,
+      fontWeight = FontWeight.Bold,
+      color = MaterialTheme.colorScheme.onSurfaceVariant,
+      modifier = Modifier.padding(start = 4.dp),
+    )
+    ChannelChips(channels = channels, selected = selected, onSelected = onSelected)
+  }
 }
 
 @Composable
@@ -128,8 +157,11 @@ fun ChannelChips(
   onSelected: (ChannelType) -> Unit,
   modifier: Modifier = Modifier,
 ) {
-  LazyRow(modifier = modifier, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-    items(channels, key = { it.name }) { channel ->
+  Row(
+    modifier = modifier.horizontalScroll(rememberScrollState()),
+    horizontalArrangement = Arrangement.spacedBy(8.dp),
+  ) {
+    channels.forEach { channel ->
       ConversesFilterChip(
         label = stringResource(channel.label()),
         selected = channel == selected,
