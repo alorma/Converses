@@ -48,6 +48,7 @@ import com.alorma.contactnotes.data.db.EntryKind
 import com.alorma.contactnotes.data.db.PersonEntity
 import com.alorma.contactnotes.designsystem.components.Avatar
 import com.alorma.contactnotes.designsystem.components.GroupedListDefaults
+import com.alorma.contactnotes.designsystem.theme.PersonTheme
 import com.alorma.contactnotes.designsystem.theme.ScreenTitleStyle
 import com.alorma.contactnotes.ui.people.initialsOf
 import com.alorma.contactnotes.ui.people.label
@@ -140,36 +141,38 @@ fun QuickNoteScreen(
     ?: state.lastChannel?.takeIf { it in available }
     ?: available.first()
 
-  Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.surface) {
-    Column(
-      modifier = Modifier
-        .fillMaxSize()
-        .windowInsetsPadding(WindowInsets.statusBars)
-        .imePadding()
-        .verticalScroll(rememberScrollState())
-        .padding(horizontal = 16.dp, vertical = 8.dp),
-      verticalArrangement = Arrangement.spacedBy(16.dp),
-    ) {
-      Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-        FilledTonalIconButton(onClick = onClose) {
-          Icon(Icons.Rounded.Close, contentDescription = stringResource(R.string.close))
+  PersonTheme(selected?.avatarColor) {
+    Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.surface) {
+      Column(
+        modifier = Modifier
+          .fillMaxSize()
+          .windowInsetsPadding(WindowInsets.statusBars)
+          .imePadding()
+          .verticalScroll(rememberScrollState())
+          .padding(horizontal = 16.dp, vertical = 8.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+      ) {
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+          FilledTonalIconButton(onClick = onClose) {
+            Icon(Icons.Rounded.Close, contentDescription = stringResource(R.string.close))
+          }
+          Button(
+            onClick = {
+              if (selected != null) {
+                viewModel.save(selected.id, form.kind, channel, form.text.trim(), form.occurredAt, onClose)
+              }
+            },
+            enabled = form.canSave && selected != null,
+          ) { Text(stringResource(R.string.save), fontWeight = FontWeight.Bold) }
         }
-        Button(
-          onClick = {
-            if (selected != null) {
-              viewModel.save(selected.id, form.kind, channel, form.text.trim(), form.occurredAt, onClose)
-            }
-          },
-          enabled = form.canSave && selected != null,
-        ) { Text(stringResource(R.string.save), fontWeight = FontWeight.Bold) }
-      }
-      Text(stringResource(R.string.quick_note), style = ScreenTitleStyle, modifier = Modifier.padding(start = 4.dp))
+        Text(stringResource(R.string.quick_note), style = ScreenTitleStyle, modifier = Modifier.padding(start = 4.dp))
 
-      PersonPicker(selected = selected, people = state.people, onSelect = viewModel::select, onNewPerson = onNewPerson)
-      KindSelector(form)
-      EntryTextField(form, placeholder = stringResource(form.kind.promptLabel()))
-      WhereSection(channels = available, selected = channel, onSelected = { form.channel = it })
-      Row { TimeChip(occurredAt = form.occurredAt, onChange = { form.occurredAt = it }) }
+        PersonPicker(selected = selected, people = state.people, onSelect = viewModel::select, onNewPerson = onNewPerson)
+        KindSelector(form)
+        EntryTextField(form, placeholder = stringResource(form.kind.promptLabel()))
+        WhereSection(channels = available, selected = channel, onSelected = { form.channel = it })
+        Row { TimeChip(occurredAt = form.occurredAt, onChange = { form.occurredAt = it }) }
+      }
     }
   }
 }

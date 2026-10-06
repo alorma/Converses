@@ -73,6 +73,7 @@ class MainActivity : FragmentActivity() {
         themeMode = settings.themeMode,
         dynamicColor = settings.dynamicColor,
         themeColor = settings.themeColor,
+        personColorTheme = settings.personColorTheme,
       ) {
         Box {
           AppNavigation()

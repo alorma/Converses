@@ -21,14 +21,15 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
-enum class AvatarColor(val color: Color) {
-  Lavender(Color(0xFFDCD3F5)),
-  Mint(Color(0xFFC9EBD6)),
-  Peach(Color(0xFFFFD6BF)),
-  Sky(Color(0xFFCBE3F7)),
-  Rose(Color(0xFFF7CFDD)),
-  Lemon(Color(0xFFF1E9A8)),
-  Sand(Color(0xFFE8DDCB)),
+/** Pastel fix de l'avatar i llavor de l'esquema de color de la persona. */
+enum class AvatarColor(val color: Color, val seed: Color) {
+  Lavender(Color(0xFFDCD3F5), Color(0xFF6B55B5)),
+  Mint(Color(0xFFC9EBD6), Color(0xFF2F7A52)),
+  Peach(Color(0xFFFFD6BF), Color(0xFFB5602E)),
+  Sky(Color(0xFFCBE3F7), Color(0xFF2D6FA3)),
+  Rose(Color(0xFFF7CFDD), Color(0xFFB04670)),
+  Lemon(Color(0xFFF1E9A8), Color(0xFF8A7A12)),
+  Sand(Color(0xFFE8DDCB), Color(0xFF86704C)),
 }
 
 enum class AvatarShape { Cookie9Sided, Clover4Leaf, Flower, Sunny }

@@ -87,6 +87,7 @@ import com.alorma.contactnotes.designsystem.components.GroupedListDefaults
 import com.alorma.contactnotes.designsystem.components.asShape
 import com.alorma.contactnotes.designsystem.components.groupedItemShape
 import com.alorma.contactnotes.designsystem.theme.DialogTitleStyle
+import com.alorma.contactnotes.designsystem.theme.PersonTheme
 import com.alorma.contactnotes.designsystem.theme.ScreenTitleStyle
 import com.alorma.contactnotes.ui.people.initialsOf
 import com.alorma.contactnotes.ui.people.label
@@ -125,153 +126,155 @@ fun EditPersonScreen(
     onDispose { if (secure) secureWindow.release() }
   }
 
-  Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.surface) {
-    if (!state.loaded) return@Surface
-    Column(
-      modifier = Modifier
-        .fillMaxSize()
-        .windowInsetsPadding(WindowInsets.statusBars)
-        .windowInsetsPadding(WindowInsets.navigationBars)
-        .imePadding()
-        .verticalScroll(rememberScrollState())
-        .padding(horizontal = 16.dp, vertical = 8.dp),
-      verticalArrangement = Arrangement.spacedBy(12.dp),
-    ) {
-      Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-        FilledTonalIconButton(onClick = onClose) {
-          Icon(Icons.Rounded.Close, contentDescription = stringResource(R.string.close))
-        }
-        Button(onClick = { viewModel.save(onSaved) }, enabled = state.canSave) {
-          Text(stringResource(R.string.save), fontWeight = FontWeight.Bold)
-        }
-      }
-      Text(
-        text = stringResource(if (state.isNew) R.string.new_person else R.string.edit_person),
-        style = ScreenTitleStyle,
-        modifier = Modifier.padding(start = 4.dp),
-      )
-
-      AppearanceCard(state, viewModel)
-
-      Column(verticalArrangement = Arrangement.spacedBy(GroupedListDefaults.ItemSpacing)) {
-        FieldCard(index = 0, count = if (state.aliasTaken) 3 else 2) {
-          LabeledField(label = stringResource(R.string.field_name), value = state.name, onValueChange = viewModel::onName)
-        }
-        FieldCard(index = 1, count = if (state.aliasTaken) 3 else 2, error = state.aliasTaken) {
-          LabeledField(
-            label = stringResource(R.string.field_alias),
-            value = state.alias,
-            onValueChange = viewModel::onAlias,
-            prefix = "@",
-            isError = state.aliasTaken,
-          )
-        }
-        if (state.aliasTaken) {
-          FieldCard(index = 2, count = 3) {
-            Text(
-              text = stringResource(R.string.alias_taken, state.alias),
-              style = MaterialTheme.typography.bodyMedium,
-              fontWeight = FontWeight.SemiBold,
-              color = MaterialTheme.colorScheme.error,
-              modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
-            )
+  PersonTheme(state.color) {
+    Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.surface) {
+      if (!state.loaded) return@Surface
+      Column(
+        modifier = Modifier
+          .fillMaxSize()
+          .windowInsetsPadding(WindowInsets.statusBars)
+          .windowInsetsPadding(WindowInsets.navigationBars)
+          .imePadding()
+          .verticalScroll(rememberScrollState())
+          .padding(horizontal = 16.dp, vertical = 8.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+      ) {
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+          FilledTonalIconButton(onClick = onClose) {
+            Icon(Icons.Rounded.Close, contentDescription = stringResource(R.string.close))
+          }
+          Button(onClick = { viewModel.save(onSaved) }, enabled = state.canSave) {
+            Text(stringResource(R.string.save), fontWeight = FontWeight.Bold)
           }
         }
-      }
+        Text(
+          text = stringResource(if (state.isNew) R.string.new_person else R.string.edit_person),
+          style = ScreenTitleStyle,
+          modifier = Modifier.padding(start = 4.dp),
+        )
 
-      SectionHeader(icon = true, title = stringResource(R.string.pinned_facts), hint = stringResource(R.string.pinned_hint))
-      FactsEditor(state.facts, viewModel)
+        AppearanceCard(state, viewModel)
 
-      SectionHeader(icon = false, title = stringResource(R.string.channels_title), hint = null)
-      Column(verticalArrangement = Arrangement.spacedBy(GroupedListDefaults.ItemSpacing)) {
-        val count = state.channels.size + 1
-        state.channels.forEachIndexed { index, channel ->
-          FieldCard(index = index, count = count, onClick = { channelDialog = ChannelDialogState(channel) }) {
-            Row(
-              modifier = Modifier.fillMaxWidth().padding(start = 16.dp, end = 4.dp, top = 8.dp, bottom = 8.dp),
-              verticalAlignment = Alignment.CenterVertically,
-              horizontalArrangement = Arrangement.spacedBy(16.dp),
-            ) {
-              Icon(channel.type.icon(), contentDescription = null)
-              Column(modifier = Modifier.weight(1f)) {
-                Text(stringResource(channel.type.label()), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                if (channel.handle.isNotBlank()) {
-                  Text(channel.handle, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                }
-              }
-              IconButton(onClick = { viewModel.onRemoveChannel(channel.key) }) {
-                Icon(Icons.Rounded.RemoveCircleOutline, contentDescription = stringResource(R.string.remove))
-              }
+        Column(verticalArrangement = Arrangement.spacedBy(GroupedListDefaults.ItemSpacing)) {
+          FieldCard(index = 0, count = if (state.aliasTaken) 3 else 2) {
+            LabeledField(label = stringResource(R.string.field_name), value = state.name, onValueChange = viewModel::onName)
+          }
+          FieldCard(index = 1, count = if (state.aliasTaken) 3 else 2, error = state.aliasTaken) {
+            LabeledField(
+              label = stringResource(R.string.field_alias),
+              value = state.alias,
+              onValueChange = viewModel::onAlias,
+              prefix = "@",
+              isError = state.aliasTaken,
+            )
+          }
+          if (state.aliasTaken) {
+            FieldCard(index = 2, count = 3) {
+              Text(
+                text = stringResource(R.string.alias_taken, state.alias),
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.SemiBold,
+                color = MaterialTheme.colorScheme.error,
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
+              )
             }
           }
         }
-        FieldCard(index = state.channels.size, count = count, onClick = { channelDialog = ChannelDialogState(null) }) {
-          AddRow(stringResource(R.string.add_channel))
-        }
-      }
 
-      FieldCard(index = 0, count = 1) {
-        Row(
-          modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 12.dp),
-          verticalAlignment = Alignment.CenterVertically,
-          horizontalArrangement = Arrangement.spacedBy(16.dp),
-        ) {
-          Icon(Icons.Rounded.Fingerprint, contentDescription = null)
-          Column(modifier = Modifier.weight(1f)) {
-            Text(stringResource(R.string.protected_person), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-            Text(
-              text = stringResource(if (canAuthenticate) R.string.protected_person_summary else R.string.protected_unavailable),
-              style = MaterialTheme.typography.bodyMedium,
-              color = MaterialTheme.colorScheme.onSurfaceVariant,
+        SectionHeader(icon = true, title = stringResource(R.string.pinned_facts), hint = stringResource(R.string.pinned_hint))
+        FactsEditor(state.facts, viewModel)
+
+        SectionHeader(icon = false, title = stringResource(R.string.channels_title), hint = null)
+        Column(verticalArrangement = Arrangement.spacedBy(GroupedListDefaults.ItemSpacing)) {
+          val count = state.channels.size + 1
+          state.channels.forEachIndexed { index, channel ->
+            FieldCard(index = index, count = count, onClick = { channelDialog = ChannelDialogState(channel) }) {
+              Row(
+                modifier = Modifier.fillMaxWidth().padding(start = 16.dp, end = 4.dp, top = 8.dp, bottom = 8.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
+              ) {
+                Icon(channel.type.icon(), contentDescription = null)
+                Column(modifier = Modifier.weight(1f)) {
+                  Text(stringResource(channel.type.label()), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                  if (channel.handle.isNotBlank()) {
+                    Text(channel.handle, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                  }
+                }
+                IconButton(onClick = { viewModel.onRemoveChannel(channel.key) }) {
+                  Icon(Icons.Rounded.RemoveCircleOutline, contentDescription = stringResource(R.string.remove))
+                }
+              }
+            }
+          }
+          FieldCard(index = state.channels.size, count = count, onClick = { channelDialog = ChannelDialogState(null) }) {
+            AddRow(stringResource(R.string.add_channel))
+          }
+        }
+
+        FieldCard(index = 0, count = 1) {
+          Row(
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+          ) {
+            Icon(Icons.Rounded.Fingerprint, contentDescription = null)
+            Column(modifier = Modifier.weight(1f)) {
+              Text(stringResource(R.string.protected_person), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+              Text(
+                text = stringResource(if (canAuthenticate) R.string.protected_person_summary else R.string.protected_unavailable),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+              )
+            }
+            Switch(
+              checked = state.isProtected,
+              enabled = canAuthenticate,
+              onCheckedChange = { value ->
+                activity.promptUnlock(authTitle, authSubtitle) { viewModel.onProtected(value) }
+              },
             )
           }
-          Switch(
-            checked = state.isProtected,
-            enabled = canAuthenticate,
-            onCheckedChange = { value ->
-              activity.promptUnlock(authTitle, authSubtitle) { viewModel.onProtected(value) }
-            },
-          )
         }
-      }
-      if (!state.isNew) {
-        OutlinedButton(
-          onClick = { showDelete = true },
-          modifier = Modifier.fillMaxWidth().height(56.dp),
-          colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.error),
-          border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
-        ) {
-          Icon(Icons.Rounded.Delete, contentDescription = null)
-          Spacer(Modifier.width(8.dp))
-          Text(stringResource(R.string.delete_person), fontWeight = FontWeight.Bold)
+        if (!state.isNew) {
+          OutlinedButton(
+            onClick = { showDelete = true },
+            modifier = Modifier.fillMaxWidth().height(56.dp),
+            colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.error),
+            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
+          ) {
+            Icon(Icons.Rounded.Delete, contentDescription = null)
+            Spacer(Modifier.width(8.dp))
+            Text(stringResource(R.string.delete_person), fontWeight = FontWeight.Bold)
+          }
         }
+        Spacer(Modifier.size(24.dp))
       }
-      Spacer(Modifier.size(24.dp))
     }
-  }
 
-  if (showDelete) {
-    DeletePersonDialog(
-      name = state.name,
-      factsCount = state.facts.size,
-      entriesCount = state.entryCount,
-      onDismiss = { showDelete = false },
-      onConfirm = { exportFirst ->
-        showDelete = false
-        viewModel.delete(exportFirst, onDeleted)
-      },
-    )
-  }
+    if (showDelete) {
+      DeletePersonDialog(
+        name = state.name,
+        factsCount = state.facts.size,
+        entriesCount = state.entryCount,
+        onDismiss = { showDelete = false },
+        onConfirm = { exportFirst ->
+          showDelete = false
+          viewModel.delete(exportFirst, onDeleted)
+        },
+      )
+    }
 
-  channelDialog?.let { dialog ->
-    ChannelDialog(
-      initial = dialog.channel,
-      onDismiss = { channelDialog = null },
-      onConfirm = { type, handle ->
-        viewModel.onSaveChannel(dialog.channel?.key, type, handle)
-        channelDialog = null
-      },
-    )
+    channelDialog?.let { dialog ->
+      ChannelDialog(
+        initial = dialog.channel,
+        onDismiss = { channelDialog = null },
+        onConfirm = { type, handle ->
+          viewModel.onSaveChannel(dialog.channel?.key, type, handle)
+          channelDialog = null
+        },
+      )
+    }
   }
 }
 

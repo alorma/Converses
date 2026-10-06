@@ -77,6 +77,7 @@ import com.alorma.contactnotes.designsystem.components.GroupedListDefaults
 import com.alorma.contactnotes.designsystem.components.TimelineMarker
 import com.alorma.contactnotes.designsystem.components.TimelineRow
 import com.alorma.contactnotes.designsystem.theme.PersonNameStyle
+import com.alorma.contactnotes.designsystem.theme.PersonTheme
 import com.alorma.contactnotes.designsystem.theme.SectionTitleStyle
 import com.alorma.contactnotes.ui.entry.NewEntrySheet
 import com.alorma.contactnotes.ui.people.initialsOf
@@ -148,122 +149,124 @@ fun PersonDetailRoute(
     actionEntryId = null
   }
 
-  PersonDetailScreen(
-    state = state,
-    menuExpanded = menuExpanded,
-    onMenuExpandedChange = { menuExpanded = it },
-    onBack = onBack,
-    onKindToggled = viewModel::onKindToggled,
-    onNewEntry = { showNewEntry = true },
-    onEntryMenu = { entry ->
-      actionEntryId = entry.id
-      action = EntryAction.Menu
-    },
-    onEditPerson = {
-      menuExpanded = false
-      onEdit()
-    },
-    onExport = {
-      menuExpanded = false
-      viewModel.export()
-    },
-    onToggleArchived = {
-      menuExpanded = false
-      viewModel.setArchived(!person.archived) { if (!person.archived) onBack() }
-    },
-    onChannelOpen = { channel ->
-      channelLink(channel.type, channel.handle)?.let { uri ->
-        try {
-          context.startActivity(Intent(Intent.ACTION_VIEW, uri).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
-        } catch (_: ActivityNotFoundException) {
-          Unit
-        }
-      }
-    },
-    onChannelCopy = { channel ->
-      scope.launch { clipboard.setClipEntry(ClipEntry(ClipData.newPlainText(person.name, channel.handle.orEmpty()))) }
-    },
-    snackbarHostState = snackbarHostState,
-  )
-
-  if (showNewEntry) {
-    NewEntrySheet(
-      person = person,
-      channels = state.channels.map { it.type },
-      onDismiss = { showNewEntry = false },
-      onSave = { kind, channel, text, at ->
-        viewModel.addEntry(kind, channel, text, at)
-        showNewEntry = false
+  PersonTheme(person.avatarColor) {
+    PersonDetailScreen(
+      state = state,
+      menuExpanded = menuExpanded,
+      onMenuExpandedChange = { menuExpanded = it },
+      onBack = onBack,
+      onKindToggled = viewModel::onKindToggled,
+      onNewEntry = { showNewEntry = true },
+      onEntryMenu = { entry ->
+        actionEntryId = entry.id
+        action = EntryAction.Menu
       },
-    )
-  }
-
-  if (actionEntry != null) {
-    when (action) {
-      EntryAction.Menu -> EntryActionsSheet(
-        entry = actionEntry,
-        dayCount = dayCount,
-        onDismiss = ::closeAction,
-        onEdit = { action = EntryAction.Edit },
-        onCopy = {
-          scope.launch { clipboard.setClipEntry(ClipEntry(ClipData.newPlainText(person.name, actionEntry.text))) }
-          closeAction()
-        },
-        onMove = { action = EntryAction.Move },
-        onDelete = {
-          val deleted = actionEntry
-          viewModel.deleteEntry(deleted)
-          closeAction()
-          scope.launch {
-            snackbarHostState.currentSnackbarData?.dismiss()
-            val timeout = launch {
-              delay(UndoWindowMillis)
-              snackbarHostState.currentSnackbarData?.dismiss()
-            }
-            val result = snackbarHostState.showSnackbar(
-              message = deletedMessage,
-              actionLabel = undoLabel,
-              duration = SnackbarDuration.Indefinite,
-            )
-            timeout.cancel()
-            if (result == SnackbarResult.ActionPerformed) viewModel.restoreEntry(deleted)
+      onEditPerson = {
+        menuExpanded = false
+        onEdit()
+      },
+      onExport = {
+        menuExpanded = false
+        viewModel.export()
+      },
+      onToggleArchived = {
+        menuExpanded = false
+        viewModel.setArchived(!person.archived) { if (!person.archived) onBack() }
+      },
+      onChannelOpen = { channel ->
+        channelLink(channel.type, channel.handle)?.let { uri ->
+          try {
+            context.startActivity(Intent(Intent.ACTION_VIEW, uri).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+          } catch (_: ActivityNotFoundException) {
+            Unit
           }
-        },
-        onDeleteDay = { action = EntryAction.ConfirmDeleteDay },
-      )
-      EntryAction.Edit -> NewEntrySheet(
+        }
+      },
+      onChannelCopy = { channel ->
+        scope.launch { clipboard.setClipEntry(ClipEntry(ClipData.newPlainText(person.name, channel.handle.orEmpty()))) }
+      },
+      snackbarHostState = snackbarHostState,
+    )
+
+    if (showNewEntry) {
+      NewEntrySheet(
         person = person,
         channels = state.channels.map { it.type },
-        initial = actionEntry,
-        onDismiss = ::closeAction,
+        onDismiss = { showNewEntry = false },
         onSave = { kind, channel, text, at ->
-          viewModel.updateEntry(actionEntry, kind, channel, text, at)
-          closeAction()
+          viewModel.addEntry(kind, channel, text, at)
+          showNewEntry = false
         },
       )
-      EntryAction.Move -> MoveEntryDialog(
-        people = otherPeople,
-        onDismiss = ::closeAction,
-        onSelect = {
-          viewModel.moveEntry(actionEntry, it.id)
-          closeAction()
-        },
-      )
-      EntryAction.ConfirmDeleteDay -> ConfirmDeleteDialog(
-        title = stringResource(R.string.delete_day_title),
-        text = pluralStringResource(
-          R.plurals.entry_delete_day_summary,
-          dayCount,
-          dayCount,
-          stringResource(actionEntry.channelType.label()),
-        ),
-        onDismiss = ::closeAction,
-        onConfirm = {
-          viewModel.deleteDay(actionEntry)
-          closeAction()
-        },
-      )
-      EntryAction.None -> Unit
+    }
+
+    if (actionEntry != null) {
+      when (action) {
+        EntryAction.Menu -> EntryActionsSheet(
+          entry = actionEntry,
+          dayCount = dayCount,
+          onDismiss = ::closeAction,
+          onEdit = { action = EntryAction.Edit },
+          onCopy = {
+            scope.launch { clipboard.setClipEntry(ClipEntry(ClipData.newPlainText(person.name, actionEntry.text))) }
+            closeAction()
+          },
+          onMove = { action = EntryAction.Move },
+          onDelete = {
+            val deleted = actionEntry
+            viewModel.deleteEntry(deleted)
+            closeAction()
+            scope.launch {
+              snackbarHostState.currentSnackbarData?.dismiss()
+              val timeout = launch {
+                delay(UndoWindowMillis)
+                snackbarHostState.currentSnackbarData?.dismiss()
+              }
+              val result = snackbarHostState.showSnackbar(
+                message = deletedMessage,
+                actionLabel = undoLabel,
+                duration = SnackbarDuration.Indefinite,
+              )
+              timeout.cancel()
+              if (result == SnackbarResult.ActionPerformed) viewModel.restoreEntry(deleted)
+            }
+          },
+          onDeleteDay = { action = EntryAction.ConfirmDeleteDay },
+        )
+        EntryAction.Edit -> NewEntrySheet(
+          person = person,
+          channels = state.channels.map { it.type },
+          initial = actionEntry,
+          onDismiss = ::closeAction,
+          onSave = { kind, channel, text, at ->
+            viewModel.updateEntry(actionEntry, kind, channel, text, at)
+            closeAction()
+          },
+        )
+        EntryAction.Move -> MoveEntryDialog(
+          people = otherPeople,
+          onDismiss = ::closeAction,
+          onSelect = {
+            viewModel.moveEntry(actionEntry, it.id)
+            closeAction()
+          },
+        )
+        EntryAction.ConfirmDeleteDay -> ConfirmDeleteDialog(
+          title = stringResource(R.string.delete_day_title),
+          text = pluralStringResource(
+            R.plurals.entry_delete_day_summary,
+            dayCount,
+            dayCount,
+            stringResource(actionEntry.channelType.label()),
+          ),
+          onDismiss = ::closeAction,
+          onConfirm = {
+            viewModel.deleteDay(actionEntry)
+            closeAction()
+          },
+        )
+        EntryAction.None -> Unit
+      }
     }
   }
 }

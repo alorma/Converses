@@ -30,6 +30,7 @@ import androidx.compose.material.icons.rounded.BrightnessAuto
 import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material.icons.rounded.DarkMode
 import androidx.compose.material.icons.rounded.LightMode
+import androidx.compose.material.icons.rounded.Face
 import androidx.compose.material.icons.rounded.Fingerprint
 import androidx.compose.material.icons.rounded.Language
 import androidx.compose.material.icons.rounded.OpenInNew
@@ -119,7 +120,7 @@ fun SettingsScreen(
         title = { SectionTitle(stringResource(R.string.settings_appearance)) },
         verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap),
       ) {
-        val themeCount = if (settings.dynamicColor) 2 else 3
+        val themeCount = if (settings.dynamicColor) 3 else 4
         ThemeModeRow(
           selected = settings.themeMode,
           onSelected = viewModel::onThemeMode,
@@ -140,6 +141,14 @@ fun SettingsScreen(
             shape = groupedItemShape(2, themeCount),
           )
         }
+        SettingSwitchRow(
+          title = stringResource(R.string.settings_person_color),
+          subtitle = stringResource(R.string.settings_person_color_summary),
+          icon = Icons.Rounded.Face,
+          checked = settings.personColorTheme,
+          onCheckedChange = viewModel::onPersonColorTheme,
+          shape = groupedItemShape(themeCount - 1, themeCount),
+        )
       }
 
       SettingsGroup(

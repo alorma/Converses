@@ -23,6 +23,8 @@ class SettingsViewModel(
 
   fun onThemeColor(color: ThemeColor) = viewModelScope.launch { repository.setThemeColor(color) }
 
+  fun onPersonColorTheme(enabled: Boolean) = viewModelScope.launch { repository.setPersonColorTheme(enabled) }
+
   fun onAppLock(enabled: Boolean) = viewModelScope.launch { repository.setAppLock(enabled) }
 
   fun onRelockAfter(seconds: Int) = viewModelScope.launch { repository.setRelockAfterSeconds(seconds) }
