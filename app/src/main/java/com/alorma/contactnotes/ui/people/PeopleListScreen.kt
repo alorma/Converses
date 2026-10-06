@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Archive
 import androidx.compose.material.icons.rounded.EditNote
 import androidx.compose.material.icons.rounded.Groups
 import androidx.compose.material.icons.rounded.Lock
@@ -51,20 +52,25 @@ import com.alorma.contactnotes.designsystem.components.ToolbarDestination
 import com.alorma.contactnotes.designsystem.components.groupedItems
 import com.alorma.contactnotes.designsystem.theme.ListTitleStyle
 import org.koin.compose.viewmodel.koinViewModel
+import org.koin.core.parameter.parametersOf
 
 private val ScreenMargin = 16.dp
 
 @Composable
 fun PeopleListRoute(
+  archived: Boolean,
   onPersonClick: (PersonEntity) -> Unit,
   onQuickNote: () -> Unit,
   onOpenSettings: () -> Unit,
   onNewPerson: () -> Unit,
-  viewModel: PeopleListViewModel = koinViewModel(),
+  onToggleArchivedList: () -> Unit,
+  viewModel: PeopleListViewModel = koinViewModel(parameters = { parametersOf(archived) }),
 ) {
   val state by viewModel.uiState.collectAsStateWithLifecycle()
   PeopleListScreen(
     state = state,
+    archived = archived,
+    onToggleArchivedList = onToggleArchivedList,
     onFilterSelected = viewModel::onFilterSelected,
     onPersonClick = onPersonClick,
     onQuickNote = onQuickNote,
@@ -76,6 +82,8 @@ fun PeopleListRoute(
 @Composable
 fun PeopleListScreen(
   state: PeopleListUiState,
+  archived: Boolean,
+  onToggleArchivedList: () -> Unit,
   onFilterSelected: (ChannelFilter) -> Unit,
   onPersonClick: (PersonEntity) -> Unit,
   onQuickNote: () -> Unit,
@@ -90,15 +98,23 @@ fun PeopleListScreen(
         verticalArrangement = Arrangement.spacedBy(GroupedListDefaults.ItemSpacing),
       ) {
         item(key = "header") {
-          Header(total = state.total, isLoading = state.isLoading, onNewPerson = onNewPerson, modifier = Modifier.windowInsetsPadding(WindowInsets.statusBars))
+          Header(
+            archived = archived,
+            total = state.total,
+            isLoading = state.isLoading,
+            onNewPerson = onNewPerson,
+            modifier = Modifier.windowInsetsPadding(WindowInsets.statusBars),
+          )
         }
-        item(key = "filters") {
-          FilterRow(selected = state.filter, onSelected = onFilterSelected)
+        if (!archived) {
+          item(key = "filters") {
+            FilterRow(selected = state.filter, onSelected = onFilterSelected)
+          }
         }
         if (!state.isLoading && state.people.isEmpty()) {
           item(key = "empty") {
             Text(
-              text = stringResource(if (state.filter == ChannelFilter.Archived) R.string.archived_empty else R.string.people_empty),
+              text = stringResource(if (archived) R.string.archived_empty else R.string.people_empty),
               style = MaterialTheme.typography.bodyLarge,
               color = MaterialTheme.colorScheme.onSurfaceVariant,
               modifier = Modifier.padding(24.dp),
@@ -108,7 +124,7 @@ fun PeopleListScreen(
         groupedItems(state.people, key = { it.person.id }) { item ->
           PersonRow(item, onClick = { onPersonClick(item.person) })
         }
-        if (!state.isLoading && state.filter != ChannelFilter.Archived) {
+        if (!state.isLoading && !archived) {
           item(key = "add_person") {
             DashedActionRow(
               icon = Icons.Rounded.PersonAdd,
@@ -132,8 +148,14 @@ fun PeopleListScreen(
         ToolbarDestination(
           icon = Icons.Rounded.Groups,
           contentDescription = stringResource(R.string.people_title),
-          selected = true,
-          onClick = {},
+          selected = !archived,
+          onClick = { if (archived) onToggleArchivedList() },
+        )
+        ToolbarDestination(
+          icon = Icons.Rounded.Archive,
+          contentDescription = stringResource(R.string.filter_archived),
+          selected = archived,
+          onClick = { if (!archived) onToggleArchivedList() },
         )
         ToolbarDestination(
           icon = Icons.Rounded.Settings,
@@ -147,13 +169,13 @@ fun PeopleListScreen(
 }
 
 @Composable
-private fun Header(total: Int, isLoading: Boolean, onNewPerson: () -> Unit, modifier: Modifier = Modifier) {
+private fun Header(archived: Boolean, total: Int, isLoading: Boolean, onNewPerson: () -> Unit, modifier: Modifier = Modifier) {
   Row(
-    modifier = modifier.fillMaxWidth().padding(start = 4.dp, top = 16.dp),
+    modifier = modifier.fillMaxWidth().padding(start = 4.dp, top = 16.dp, bottom = if (archived) 14.dp else 0.dp),
     verticalAlignment = Alignment.Top,
   ) {
   Column(modifier = Modifier.weight(1f)) {
-    Text(text = stringResource(R.string.people_title), style = ListTitleStyle)
+    Text(text = stringResource(if (archived) R.string.filter_archived else R.string.people_title), style = ListTitleStyle)
     if (!isLoading) {
       Text(
         text = pluralStringResource(R.plurals.people_count, total, total),
@@ -162,8 +184,10 @@ private fun Header(total: Int, isLoading: Boolean, onNewPerson: () -> Unit, modi
       )
     }
   }
-  FilledTonalIconButton(onClick = onNewPerson) {
-    Icon(Icons.Rounded.PersonAdd, contentDescription = stringResource(R.string.add_person))
+  if (!archived) {
+    FilledTonalIconButton(onClick = onNewPerson) {
+      Icon(Icons.Rounded.PersonAdd, contentDescription = stringResource(R.string.add_person))
+    }
   }
   }
 }

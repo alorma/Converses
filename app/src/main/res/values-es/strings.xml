@@ -111,7 +111,7 @@
     <string name="menu_archive">Archivar</string>
     <string name="menu_unarchive">Desarchivar</string>
     <string name="filter_archived">Archivadas</string>
-    <string name="archived_empty">No hay personas archivadas.</string>
+    <string name="archived_empty">No tienes ninguna persona archivada.</string>
     <string name="entry_actions">Acciones de la entrada</string>
     <string name="entry_edit">Editar</string>
     <string name="entry_copy">Copiar el texto</string>

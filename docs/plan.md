@@ -126,7 +126,7 @@ La base funcional de la v1 ja és feta. El que queda és:
 - [ ] **Sense persona per defecte a la nota ràpida (D5):** la targeta diu «Tria una persona» i **Desa** queda desactivat fins que n'hi hagi una.
 - [ ] **Arxivades (D2):**
     - destinació a la barra flotant, amb la mateixa llista;
-    - «Desarxivar» a cada fila i al menú del detall;
+    - «Desarxivar» només al menú del detall (no a les files del llistat);
     - estat buit: «No tens cap persona arxivada».
 - [ ] **Xips de canal (D3):**
     - obrir l'app quan hi ha enllaç directe;

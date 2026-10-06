@@ -111,7 +111,7 @@
     <string name="menu_archive">Arxivar</string>
     <string name="menu_unarchive">Desarxivar</string>
     <string name="filter_archived">Arxivades</string>
-    <string name="archived_empty">No hi ha persones arxivades.</string>
+    <string name="archived_empty">No tens cap persona arxivada.</string>
     <string name="entry_actions">Accions de l\'entrada</string>
     <string name="entry_edit">Editar</string>
     <string name="entry_copy">Copiar el text</string>
