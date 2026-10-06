@@ -3,6 +3,7 @@ package com.alorma.contactnotes.ui.person
 import android.content.ActivityNotFoundException
 import android.content.ClipData
 import android.content.Intent
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -91,6 +92,7 @@ import org.koin.core.parameter.parametersOf
 
 private val ScreenMargin = 16.dp
 private const val UndoWindowMillis = 5_000L
+private val SnackbarLift = 64.dp
 
 private sealed interface TimelineItem {
   data class Day(val date: LocalDate) : TimelineItem
@@ -378,12 +380,16 @@ fun PersonDetailScreen(
         }
       }
 
+      val snackbarLift by animateDpAsState(
+        targetValue = if (snackbarHostState.currentSnackbarData != null) SnackbarLift else 0.dp,
+        label = "snackbarLift",
+      )
       SnackbarHost(
         hostState = snackbarHostState,
         modifier = Modifier
           .align(Alignment.BottomCenter)
           .windowInsetsPadding(WindowInsets.navigationBars)
-          .padding(start = 16.dp, end = 16.dp, bottom = 88.dp),
+          .padding(16.dp),
       )
 
       ConversesSplitButton(
@@ -395,7 +401,7 @@ fun PersonDetailScreen(
         modifier = Modifier
           .align(Alignment.BottomEnd)
           .windowInsetsPadding(WindowInsets.navigationBars)
-          .padding(16.dp),
+          .padding(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 16.dp + snackbarLift),
       ) {
         ConversesMenuItem(
           text = stringResource(R.string.edit_person),
