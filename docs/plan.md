@@ -103,7 +103,7 @@ DataStore: `theme_mode`, `dynamic_color`, `theme_color`, `app_lock`, `relock_aft
 Amb [Compose Preview Screenshot Testing](https://developer.android.com/studio/preview/compose-screenshot-testing), a `:designsystem` i a `:app`.
 
 - **Previews** a `main`, `internal` i amb dades fixes: `designsystem/.../components/ComponentPreviews.kt` i, a l'app, `PeopleListPreviews.kt` i `PersonDetailPreviews.kt` amb `ui/preview/PreviewData.kt` (dates del 2025 perquè «Avui»/«Ahir» no canviïn). Fan servir `ConversesPreviewTheme` (sense color dinàmic, Lavanda).
-- **Tests** a `src/screenshotTest`: `ComponentsScreenshotTests` (`designsystem`) i `ScreensScreenshotTests` (`app`) criden les previews amb `@PreviewTest`. Cada test es renderitza en clar i fosc, en anglès; les pantalles a 411×891 dp.
+- **Tests** a `src/screenshotTest`: `ComponentsScreenshotTests` (`designsystem`) i `ScreensScreenshotTests` (`app`) criden les previews amb `@PreviewTest`. Els noms dels mètodes de test van en camelCase sense `_` (el CI hi separa el nom de la preview). Cada test es renderitza en clar i fosc, en anglès; les pantalles a 411×891 dp.
 - **Referències** a `<mòdul>/src/screenshotTestDebug/reference/`, es versionen. Llindar de diferència: 1 %.
 - **Ordres:** `./gradlew validateDebugScreenshotTest` (validar), `./gradlew updateDebugScreenshotTest` (regenerar), i per a un sol test `./gradlew :app:updateDebugScreenshotTest --tests '*ScreensScreenshotTests.peopleListLoaded'`.
 - **Fora de moment:** Editar persona, Ajustos, desbloqueig, fulls i diàlegs (depenen del ViewModel o són finestres a part).
