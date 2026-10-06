@@ -19,6 +19,9 @@ import kotlinx.serialization.Serializable
 data object PeopleRoute : NavKey
 
 @Serializable
+data object ArchivedRoute : NavKey
+
+@Serializable
 data object SettingsRoute : NavKey
 
 @Serializable
@@ -47,6 +50,20 @@ fun AppNavigation() {
     entryProvider = entryProvider {
       entry<PeopleRoute> {
         PeopleListRoute(
+          archived = false,
+          onToggleArchivedList = { backStack.add(ArchivedRoute) },
+          onPersonClick = { person ->
+            backStack.add(if (person.isProtected) PersonLockedRoute(person.id) else PersonRoute(person.id))
+          },
+          onQuickNote = { backStack.add(QuickNoteRoute()) },
+          onNewPerson = { backStack.add(EditPersonRoute()) },
+          onOpenSettings = { backStack.add(SettingsRoute) },
+        )
+      }
+      entry<ArchivedRoute> {
+        PeopleListRoute(
+          archived = true,
+          onToggleArchivedList = { backStack.removeLastOrNull() },
           onPersonClick = { person ->
             backStack.add(if (person.isProtected) PersonLockedRoute(person.id) else PersonRoute(person.id))
           },
