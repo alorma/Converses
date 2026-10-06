@@ -1,11 +1,9 @@
 package com.alorma.contactnotes.ui.settings
 
-import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.provider.Settings
-import androidx.biometric.BiometricManager
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -76,6 +74,7 @@ import com.alorma.contactnotes.designsystem.theme.ScreenTitleStyle
 import com.alorma.contactnotes.designsystem.theme.ThemeColor
 import com.alorma.contactnotes.designsystem.theme.ThemeMode
 import com.alorma.contactnotes.ui.person.canUnlockWithDevice
+import com.alorma.contactnotes.ui.person.openSecuritySetup
 import com.alorma.contactnotes.ui.person.promptUnlock
 import java.util.Locale
 import org.koin.compose.koinInject
@@ -172,7 +171,7 @@ fun SettingsScreen(
             icon = Icons.Rounded.Fingerprint,
             trailing = { Icon(Icons.Rounded.OpenInNew, contentDescription = null) },
             shape = groupedItemShape(0, 1),
-            onClick = { openSecuritySetup(context) },
+            onClick = { context.openSecuritySetup() },
           )
         } else {
           val lockCount = if (settings.appLock) 2 else 1
@@ -317,18 +316,6 @@ private fun ThemeColorPicker(
         }
       }
     }
-  }
-}
-
-private fun openSecuritySetup(context: Context) {
-  val enroll = Intent(Settings.ACTION_BIOMETRIC_ENROLL).putExtra(
-    Settings.EXTRA_BIOMETRIC_AUTHENTICATORS_ALLOWED,
-    BiometricManager.Authenticators.BIOMETRIC_STRONG or BiometricManager.Authenticators.DEVICE_CREDENTIAL,
-  )
-  try {
-    context.startActivity(enroll)
-  } catch (_: ActivityNotFoundException) {
-    context.startActivity(Intent(Settings.ACTION_SECURITY_SETTINGS))
   }
 }
 

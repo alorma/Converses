@@ -33,6 +33,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.alorma.contactnotes.R
 import com.alorma.contactnotes.designsystem.components.Avatar
@@ -50,7 +52,8 @@ fun PersonLockedScreen(
 ) {
   val person by viewModel.person.collectAsStateWithLifecycle()
   val activity = LocalActivity.current as FragmentActivity
-  val canUnlock = remember { activity.canUnlockWithDevice() }
+  var canUnlock by remember { mutableStateOf(activity.canUnlockWithDevice()) }
+  LifecycleEventEffect(Lifecycle.Event.ON_RESUME) { canUnlock = activity.canUnlockWithDevice() }
   val currentOnUnlocked by rememberUpdatedState(onUnlocked)
   var autoLaunched by rememberSaveable { mutableStateOf(false) }
 
@@ -94,10 +97,10 @@ fun PersonLockedScreen(
             textAlign = TextAlign.Center,
           )
           Spacer(Modifier.height(32.dp))
-          Button(onClick = { unlock() }, enabled = canUnlock) {
+          Button(onClick = { if (canUnlock) unlock() else activity.openSecuritySetup() }) {
             Icon(Icons.Rounded.Fingerprint, contentDescription = null)
             Spacer(Modifier.padding(horizontal = 4.dp))
-            Text(stringResource(R.string.unlock_action))
+            Text(stringResource(if (canUnlock) R.string.unlock_action else R.string.settings_security_setup))
           }
         }
       }
