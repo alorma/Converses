@@ -52,6 +52,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableFloatStateOf
@@ -96,6 +97,8 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.input.OffsetMapping
 import androidx.compose.ui.text.input.TransformedText
 import androidx.compose.ui.text.input.VisualTransformation
+import com.alorma.contactnotes.data.settings.SecureWindow
+import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 
@@ -114,6 +117,13 @@ fun EditPersonScreen(
   val authSubtitle = stringResource(R.string.unlock_subtitle)
   var channelDialog by remember { mutableStateOf<ChannelDialogState?>(null) }
   var showDelete by remember { mutableStateOf(false) }
+
+  val secureWindow: SecureWindow = koinInject()
+  val secure = state.loaded && (state.baseline.isProtected || state.isProtected)
+  DisposableEffect(secure) {
+    if (secure) secureWindow.acquire()
+    onDispose { if (secure) secureWindow.release() }
+  }
 
   Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.surface) {
     if (!state.loaded) return@Surface
