@@ -1,0 +1,95 @@
+package com.alorma.contactnotes.data.db
+
+import androidx.room.Embedded
+import androidx.room.Entity
+import androidx.room.ForeignKey
+import androidx.room.Index
+import androidx.room.PrimaryKey
+import androidx.room.Relation
+import com.alorma.contactnotes.designsystem.components.AvatarColor
+import com.alorma.contactnotes.designsystem.components.AvatarShape
+
+enum class ChannelType { DISCORD, TELEGRAM, WHATSAPP, REDDIT, PHONE, IN_PERSON, OTHER }
+
+enum class EntryKind { SAID, HEARD, HAPPENED }
+
+@Entity(tableName = "person")
+data class PersonEntity(
+  @PrimaryKey(autoGenerate = true) val id: Long = 0,
+  val name: String,
+  val alias: String? = null,
+  val avatarShape: AvatarShape,
+  val avatarColor: AvatarColor,
+  val contactLookupKey: String? = null,
+  val archived: Boolean = false,
+  val createdAt: Long,
+  val updatedAt: Long,
+)
+
+@Entity(
+  tableName = "channel",
+  foreignKeys = [
+    ForeignKey(
+      entity = PersonEntity::class,
+      parentColumns = ["id"],
+      childColumns = ["personId"],
+      onDelete = ForeignKey.CASCADE,
+    ),
+  ],
+  indices = [Index("personId")],
+)
+data class ChannelEntity(
+  @PrimaryKey(autoGenerate = true) val id: Long = 0,
+  val personId: Long,
+  val type: ChannelType,
+  val handle: String? = null,
+)
+
+@Entity(
+  tableName = "entry",
+  foreignKeys = [
+    ForeignKey(
+      entity = PersonEntity::class,
+      parentColumns = ["id"],
+      childColumns = ["personId"],
+      onDelete = ForeignKey.CASCADE,
+    ),
+  ],
+  indices = [Index("personId", "occurredAt")],
+)
+data class EntryEntity(
+  @PrimaryKey(autoGenerate = true) val id: Long = 0,
+  val personId: Long,
+  val kind: EntryKind,
+  val channelType: ChannelType,
+  val text: String,
+  val occurredAt: Long,
+)
+
+@Entity(
+  tableName = "pinned_fact",
+  foreignKeys = [
+    ForeignKey(
+      entity = PersonEntity::class,
+      parentColumns = ["id"],
+      childColumns = ["personId"],
+      onDelete = ForeignKey.CASCADE,
+    ),
+  ],
+  indices = [Index("personId")],
+)
+data class PinnedFactEntity(
+  @PrimaryKey(autoGenerate = true) val id: Long = 0,
+  val personId: Long,
+  val label: String,
+  val value: String,
+  val position: Int,
+)
+
+data class KindCount(val kind: EntryKind, val count: Int)
+
+data class PersonListItem(
+  @Embedded val person: PersonEntity,
+  @Embedded(prefix = "last_") val lastEntry: EntryEntity?,
+  @Relation(parentColumn = "id", entityColumn = "personId") val channels: List<ChannelEntity>,
+)
