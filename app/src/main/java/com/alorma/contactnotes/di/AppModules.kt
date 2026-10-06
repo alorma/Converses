@@ -13,6 +13,7 @@ import com.alorma.contactnotes.data.settings.DataStoreSettingsRepository
 import com.alorma.contactnotes.data.settings.SecureWindow
 import com.alorma.contactnotes.data.settings.SettingsRepository
 import com.alorma.contactnotes.ui.edit.EditPersonViewModel
+import com.alorma.contactnotes.ui.entry.PersonSelectionBridge
 import com.alorma.contactnotes.ui.entry.QuickNoteViewModel
 import com.alorma.contactnotes.ui.people.PeopleListViewModel
 import com.alorma.contactnotes.ui.settings.SettingsViewModel
@@ -60,6 +61,7 @@ val settingsModule = module {
   single { AppLockManager(get()) }
   single { SecureWindow() }
   single { PersonExporter(androidContext(), get()) }
+  single { PersonSelectionBridge() }
 }
 
 val viewModelModule = module {
@@ -67,7 +69,7 @@ val viewModelModule = module {
   viewModelOf(::SettingsViewModel)
   viewModel { (personId: Long) -> PersonViewModel(personId, get()) }
   viewModel { (personId: Long) -> PersonDetailViewModel(personId, get(), get()) }
-  viewModel { (personId: Long) -> QuickNoteViewModel(personId, get()) }
+  viewModel { (personId: Long) -> QuickNoteViewModel(personId, get(), get()) }
   viewModel { (personId: Long) -> EditPersonViewModel(personId, get(), get()) }
 }
 

@@ -118,13 +118,13 @@ La base funcional de la v1 ja és feta. El que queda és:
 
 **Fet quan:** es pot arribar a qualsevol persona, crear-ne una des de qualsevol punt i recuperar el que s'ha arxivat o esborrat per error.
 
-- [ ] **Triar persona (disseny 3b):** cal substituir el `DropdownMenu` d'«Amb qui» per un `ModalBottomSheet`. Ha de tenir:
+- [x] **Triar persona (disseny 3b):** cal substituir el `DropdownMenu` d'«Amb qui» per un `ModalBottomSheet`. Ha de tenir:
     - la llista de persones amb l'avatar;
     - les protegides només amb el nom i el cadenat;
     - una fila **«Afegeix una persona»**, que obre la nova persona i, en desar-la, torna a la nota amb la persona ja triada;
     - si hi ha més de 8 persones, un camp per filtrar per nom.
-- [ ] **Sense persona per defecte a la nota ràpida (D5):** la targeta diu «Tria una persona» i **Desa** queda desactivat fins que n'hi hagi una.
-- [ ] **Arxivades (D2):**
+- [x] **Sense persona per defecte a la nota ràpida (D5):** la targeta diu «Tria una persona» i **Desa** queda desactivat fins que n'hi hagi una.
+- [x] **Arxivades (D2):**
     - destinació a la barra flotant, amb la mateixa llista;
     - «Desarxivar» només al menú del detall (no a les files del llistat);
     - estat buit: «No tens cap persona arxivada».

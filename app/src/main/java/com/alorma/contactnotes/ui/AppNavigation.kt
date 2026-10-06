@@ -8,12 +8,14 @@ import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import com.alorma.contactnotes.ui.edit.EditPersonScreen
+import com.alorma.contactnotes.ui.entry.PersonSelectionBridge
 import com.alorma.contactnotes.ui.entry.QuickNoteScreen
 import com.alorma.contactnotes.ui.people.PeopleListRoute
 import com.alorma.contactnotes.ui.person.PersonDetailRoute
 import com.alorma.contactnotes.ui.person.PersonLockedScreen
 import com.alorma.contactnotes.ui.settings.SettingsScreen
 import kotlinx.serialization.Serializable
+import org.koin.compose.koinInject
 
 @Serializable
 data object PeopleRoute : NavKey
@@ -25,7 +27,7 @@ data object ArchivedRoute : NavKey
 data object SettingsRoute : NavKey
 
 @Serializable
-data class EditPersonRoute(val personId: Long = 0L) : NavKey
+data class EditPersonRoute(val personId: Long = 0L, val returnSelection: Boolean = false) : NavKey
 
 @Serializable
 data class QuickNoteRoute(val personId: Long = 0L) : NavKey
@@ -39,6 +41,7 @@ data class PersonLockedRoute(val id: Long) : NavKey
 @Composable
 fun AppNavigation() {
   val backStack = rememberNavBackStack(PeopleRoute)
+  val selectionBridge: PersonSelectionBridge = koinInject()
 
   NavDisplay(
     backStack = backStack,
@@ -73,7 +76,11 @@ fun AppNavigation() {
         )
       }
       entry<QuickNoteRoute> { route ->
-        QuickNoteScreen(personId = route.personId, onClose = { backStack.removeLastOrNull() })
+        QuickNoteScreen(
+          personId = route.personId,
+          onClose = { backStack.removeLastOrNull() },
+          onNewPerson = { backStack.add(EditPersonRoute(returnSelection = true)) },
+        )
       }
       entry<SettingsRoute> {
         SettingsScreen(onBack = { backStack.removeLastOrNull() })
@@ -101,7 +108,11 @@ fun AppNavigation() {
           onClose = { backStack.removeLastOrNull() },
           onSaved = { id ->
             backStack.removeLastOrNull()
-            if (route.personId == 0L) backStack.add(PersonRoute(id))
+            if (route.returnSelection) {
+              selectionBridge.post(id)
+            } else if (route.personId == 0L) {
+              backStack.add(PersonRoute(id))
+            }
           },
           onDeleted = {
             backStack.removeLastOrNull()
