@@ -31,6 +31,7 @@ La v1 funcional està feta: interfície polida, fluxos complets, privacitat tanc
 - Provar a l'emulador el color de persona i, a dispositiu real, el bloqueig desactivat sol.
 - Afinar el snackbar de desfer (posició i marges) si no queda bé.
 - Tests de ViewModel i de pantalla: no començats (M4).
+- Bugs i features trobats provant l'app: vegeu `docs/backlog.md` (issues #4, #5 i #6).
 
 ## Decisions (només queda D1)
 
