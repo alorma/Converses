@@ -28,7 +28,10 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
+import androidx.compose.material.icons.rounded.BrightnessAuto
 import androidx.compose.material.icons.rounded.Check
+import androidx.compose.material.icons.rounded.DarkMode
+import androidx.compose.material.icons.rounded.LightMode
 import androidx.compose.material.icons.rounded.Fingerprint
 import androidx.compose.material.icons.rounded.Language
 import androidx.compose.material.icons.rounded.OpenInNew
@@ -61,13 +64,14 @@ import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.alorma.compose.settings.ui.expressive.SettingsButtonGroup
 import com.alorma.compose.settings.ui.expressive.SettingsGroup
 import com.alorma.compose.settings.ui.expressive.SettingsMenuLink
 import com.alorma.compose.settings.ui.expressive.SettingsSwitch
 import com.alorma.contactnotes.R
 import com.alorma.contactnotes.data.settings.AppLockManager
+import com.alorma.contactnotes.designsystem.components.ConversesToggleGroup
 import com.alorma.contactnotes.designsystem.components.GroupedListDefaults
+import com.alorma.contactnotes.designsystem.components.ToggleOption
 import com.alorma.contactnotes.designsystem.theme.ScreenTitleStyle
 import com.alorma.contactnotes.designsystem.theme.ThemeColor
 import com.alorma.contactnotes.designsystem.theme.ThemeMode
@@ -118,22 +122,10 @@ fun SettingsScreen(
         verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap),
       ) {
         val themeCount = if (settings.dynamicColor) 2 else 3
-        SettingsButtonGroup(
-          colors = settingsTileColors(),
-          title = { TileTitle(stringResource(R.string.settings_theme)) },
-          items = listOf(ThemeMode.Light, ThemeMode.Dark, ThemeMode.System),
-          selectedItem = settings.themeMode,
-          itemTitleMap = { mode ->
-            context.getString(
-              when (mode) {
-                ThemeMode.Light -> R.string.settings_theme_light
-                ThemeMode.Dark -> R.string.settings_theme_dark
-                ThemeMode.System -> R.string.settings_theme_system
-              },
-            )
-          },
-          onItemSelected = viewModel::onThemeMode,
-          shapes = ListItemDefaults.segmentedShapes(index = 0, count = themeCount),
+        ThemeModeRow(
+          selected = settings.themeMode,
+          onSelected = viewModel::onThemeMode,
+          shape = ListItemDefaults.segmentedShapes(index = 0, count = themeCount).shape,
         )
         SettingsSwitch(
           colors = settingsTileColors(),
@@ -213,7 +205,7 @@ fun SettingsScreen(
       }
       Text(
         text = stringResource(R.string.settings_protected_note),
-        style = MaterialTheme.typography.bodyLarge,
+        style = MaterialTheme.typography.bodySmall,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
         modifier = Modifier.padding(horizontal = 4.dp),
       )
@@ -269,6 +261,28 @@ private fun relockSummary(seconds: Int): Int = when (seconds) {
   0 -> R.string.relock_summary_immediately
   60 -> R.string.relock_summary_1_min
   else -> R.string.relock_summary_5_min
+}
+
+@Composable
+private fun ThemeModeRow(
+  selected: ThemeMode,
+  onSelected: (ThemeMode) -> Unit,
+  shape: androidx.compose.ui.graphics.Shape,
+) {
+  Surface(shape = shape, color = GroupedListDefaults.containerColor, modifier = Modifier.fillMaxWidth()) {
+    Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+      TileTitle(stringResource(R.string.settings_theme))
+      ConversesToggleGroup(
+        options = listOf(
+          ToggleOption(ThemeMode.Light, stringResource(R.string.settings_theme_light), Icons.Rounded.LightMode),
+          ToggleOption(ThemeMode.Dark, stringResource(R.string.settings_theme_dark), Icons.Rounded.DarkMode),
+          ToggleOption(ThemeMode.System, stringResource(R.string.settings_theme_system), Icons.Rounded.BrightnessAuto),
+        ),
+        selected = selected,
+        onSelect = onSelected,
+      )
+    }
+  }
 }
 
 @Composable
@@ -353,4 +367,7 @@ private fun TileTitle(text: String) {
 }
 
 @Composable
-private fun settingsTileColors() = ListItemDefaults.colors(containerColor = GroupedListDefaults.containerColor)
+private fun settingsTileColors() = ListItemDefaults.colors(
+  containerColor = GroupedListDefaults.containerColor,
+  selectedContainerColor = GroupedListDefaults.containerColor,
+)
