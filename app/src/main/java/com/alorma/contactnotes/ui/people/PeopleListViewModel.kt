@@ -36,14 +36,15 @@ class PeopleListViewModel(
 ) : ViewModel() {
   private val filter = MutableStateFlow(ChannelFilter.All)
 
-  val uiState: StateFlow<PeopleListUiState> = combine(repository.observePeople(), filter) { people, filter ->
-    PeopleListUiState(
-      people = people.filterBy(filter),
-      total = people.size,
-      filter = filter,
-      isLoading = false,
-    )
-  }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), PeopleListUiState())
+  val uiState: StateFlow<PeopleListUiState> =
+    combine(repository.observePeople(), filter) { people, filter ->
+      PeopleListUiState(
+        people = people.filterBy(filter),
+        total = people.size,
+        filter = filter,
+        isLoading = false,
+      )
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), PeopleListUiState())
 
   fun onFilterSelected(selected: ChannelFilter) {
     filter.value = selected

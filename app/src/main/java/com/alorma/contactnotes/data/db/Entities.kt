@@ -20,8 +20,9 @@ data class PersonEntity(
   val alias: String? = null,
   val avatarShape: AvatarShape,
   val avatarColor: AvatarColor,
-  val contactLookupKey: String? = null,
+  val isProtected: Boolean = false,
   val archived: Boolean = false,
+  val notes: String? = null,
   val createdAt: Long,
   val updatedAt: Long,
 )

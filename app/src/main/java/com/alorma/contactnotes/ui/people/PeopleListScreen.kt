@@ -1,26 +1,28 @@
 package com.alorma.contactnotes.ui.people
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.rounded.EditNote
 import androidx.compose.material.icons.rounded.Groups
-import androidx.compose.material3.FilterChip
+import androidx.compose.material.icons.rounded.Lock
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -34,19 +36,24 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import org.koin.compose.viewmodel.koinViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.alorma.contactnotes.R
+import com.alorma.contactnotes.data.db.PersonEntity
 import com.alorma.contactnotes.data.db.PersonListItem
 import com.alorma.contactnotes.designsystem.components.Avatar
+import com.alorma.contactnotes.designsystem.components.ConversesFilterChip
 import com.alorma.contactnotes.designsystem.components.ConversesFloatingToolbar
 import com.alorma.contactnotes.designsystem.components.GroupedListDefaults
 import com.alorma.contactnotes.designsystem.components.ToolbarDestination
 import com.alorma.contactnotes.designsystem.components.groupedItems
 import com.alorma.contactnotes.designsystem.theme.ListTitleStyle
+import org.koin.compose.viewmodel.koinViewModel
+
+private val ScreenMargin = 16.dp
 
 @Composable
 fun PeopleListRoute(
+  onPersonClick: (PersonEntity) -> Unit,
   onQuickNote: () -> Unit,
   viewModel: PeopleListViewModel = koinViewModel(),
 ) {
@@ -54,6 +61,7 @@ fun PeopleListRoute(
   PeopleListScreen(
     state = state,
     onFilterSelected = viewModel::onFilterSelected,
+    onPersonClick = onPersonClick,
     onQuickNote = onQuickNote,
   )
 }
@@ -62,17 +70,18 @@ fun PeopleListRoute(
 fun PeopleListScreen(
   state: PeopleListUiState,
   onFilterSelected: (ChannelFilter) -> Unit,
+  onPersonClick: (PersonEntity) -> Unit,
   onQuickNote: () -> Unit,
 ) {
   Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.surface) {
     Box(modifier = Modifier.fillMaxSize()) {
       LazyColumn(
         modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(bottom = 120.dp),
+        contentPadding = PaddingValues(start = ScreenMargin, end = ScreenMargin, bottom = 136.dp),
         verticalArrangement = Arrangement.spacedBy(GroupedListDefaults.ItemSpacing),
       ) {
         item(key = "header") {
-          Header(total = state.total, modifier = Modifier.windowInsetsPadding(WindowInsets.safeDrawing))
+          Header(total = state.total, isLoading = state.isLoading, modifier = Modifier.windowInsetsPadding(WindowInsets.statusBars))
         }
         item(key = "filters") {
           FilterRow(selected = state.filter, onSelected = onFilterSelected)
@@ -88,7 +97,7 @@ fun PeopleListScreen(
           }
         }
         groupedItems(state.people, key = { it.person.id }) { item ->
-          PersonRow(item)
+          PersonRow(item, onClick = { onPersonClick(item.person) })
         }
       }
 
@@ -99,7 +108,7 @@ fun PeopleListScreen(
         modifier = Modifier
           .align(Alignment.BottomCenter)
           .windowInsetsPadding(WindowInsets.navigationBars)
-          .padding(bottom = 16.dp),
+          .padding(horizontal = ScreenMargin, vertical = 16.dp),
       ) {
         ToolbarDestination(
           icon = Icons.Rounded.Groups,
@@ -113,44 +122,42 @@ fun PeopleListScreen(
 }
 
 @Composable
-private fun Header(total: Int, modifier: Modifier = Modifier) {
-  Column(modifier = modifier.padding(horizontal = 20.dp, vertical = 16.dp)) {
+private fun Header(total: Int, isLoading: Boolean, modifier: Modifier = Modifier) {
+  Column(modifier = modifier.padding(start = 4.dp, top = 16.dp, bottom = 20.dp)) {
     Text(text = stringResource(R.string.people_title), style = ListTitleStyle)
-    Text(
-      text = pluralStringResource(R.plurals.people_count, total, total),
-      style = MaterialTheme.typography.bodyLarge,
-      color = MaterialTheme.colorScheme.onSurfaceVariant,
-    )
-  }
-}
-
-@Composable
-private fun FilterRow(selected: ChannelFilter, onSelected: (ChannelFilter) -> Unit) {
-  LazyRow(
-    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-    horizontalArrangement = Arrangement.spacedBy(8.dp),
-  ) {
-    items(ChannelFilter.entries, key = { it.name }) { filter ->
-      FilterChip(
-        selected = filter == selected,
-        onClick = { onSelected(filter) },
-        label = { Text(stringResource(filter.label())) },
-        leadingIcon = if (filter == selected) {
-          { Icon(Icons.Filled.Check, contentDescription = null, modifier = Modifier.size(18.dp)) }
-        } else {
-          null
-        },
+    if (!isLoading) {
+      Text(
+        text = pluralStringResource(R.plurals.people_count, total, total),
+        style = MaterialTheme.typography.bodyLarge,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
       )
     }
   }
 }
 
 @Composable
-private fun PersonRow(item: PersonListItem) {
+private fun FilterRow(selected: ChannelFilter, onSelected: (ChannelFilter) -> Unit) {
+  LazyRow(
+    contentPadding = PaddingValues(vertical = 12.dp),
+    horizontalArrangement = Arrangement.spacedBy(8.dp),
+  ) {
+    items(ChannelFilter.entries, key = { it.name }) { filter ->
+      ConversesFilterChip(
+        label = stringResource(filter.label()),
+        selected = filter == selected,
+        onClick = { onSelected(filter) },
+      )
+    }
+  }
+}
+
+@Composable
+private fun PersonRow(item: PersonListItem, onClick: () -> Unit) {
   val person = item.person
   Row(
     modifier = Modifier
       .fillMaxWidth()
+      .clickable(onClick = onClick)
       .padding(horizontal = 16.dp, vertical = 14.dp),
     horizontalArrangement = Arrangement.spacedBy(16.dp),
     verticalAlignment = Alignment.CenterVertically,
@@ -160,17 +167,27 @@ private fun PersonRow(item: PersonListItem) {
       shape = person.avatarShape,
       color = person.avatarColor,
       size = 56.dp,
+      locked = person.isProtected,
     )
     Column(modifier = Modifier.weight(1f)) {
-      Row(verticalAlignment = Alignment.CenterVertically) {
+      Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
         Text(
           text = person.name,
           style = MaterialTheme.typography.titleMedium,
           fontWeight = FontWeight.Bold,
           maxLines = 1,
           overflow = TextOverflow.Ellipsis,
-          modifier = Modifier.weight(1f),
+          modifier = Modifier.weight(1f, fill = false),
         )
+        if (person.isProtected) {
+          Icon(
+            imageVector = Icons.Rounded.Lock,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(start = 6.dp).size(16.dp),
+          )
+        }
+        Spacer(Modifier.weight(1f))
         item.lastEntry?.let { entry ->
           Text(
             text = formatLastActivity(entry.occurredAt),
@@ -180,25 +197,33 @@ private fun PersonRow(item: PersonListItem) {
           )
         }
       }
-      val channels = item.channels.map { it.type }.distinct()
-      if (channels.isNotEmpty()) {
-
+      if (person.isProtected) {
+        Spacer(Modifier.height(2.dp))
         Text(
-          text = channels.map { stringResource(it.label()).uppercase() }.joinToString(" · "),
-          style = MaterialTheme.typography.labelMedium,
-          fontWeight = FontWeight.SemiBold,
-          color = MaterialTheme.colorScheme.onSurfaceVariant,
-          maxLines = 1,
-          overflow = TextOverflow.Ellipsis,
-        )
-      }
-      item.lastEntry?.let { entry ->
-        Text(
-          text = entry.text,
+          text = stringResource(R.string.protected_hint),
           style = MaterialTheme.typography.bodyLarge,
-          maxLines = 1,
-          overflow = TextOverflow.Ellipsis,
+          color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
+      } else {
+        val channels = item.channels.map { it.type }.distinct()
+        if (channels.isNotEmpty()) {
+          Text(
+            text = channels.map { stringResource(it.label()).uppercase() }.joinToString(" · "),
+            style = MaterialTheme.typography.labelMedium,
+            fontWeight = FontWeight.SemiBold,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+          )
+        }
+        item.lastEntry?.let { entry ->
+          Text(
+            text = entry.text,
+            style = MaterialTheme.typography.bodyLarge,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+          )
+        }
       }
     }
   }

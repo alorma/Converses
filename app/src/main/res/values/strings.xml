@@ -7,6 +7,14 @@
         <item quantity="other">%d persones</item>
     </plurals>
     <string name="people_empty">Encara no hi ha ningú. Afegeix una persona per començar.</string>
+    <string name="protected_hint">Protegida · toca per desbloquejar</string>
+    <string name="back">Enrere</string>
+    <string name="unlock_title">Desbloqueja %1$s</string>
+    <string name="unlock_subtitle">Fes servir l\'empremta digital per continuar</string>
+    <string name="unlock_action">Desbloqueja</string>
+    <string name="locked_description">Aquesta persona està protegida. Desbloqueja-la amb l\'empremta per veure\'n les dades i la cronologia.</string>
+    <string name="locked_unavailable">Aquest dispositiu no té empremta ni bloqueig de pantalla, així que no es pot desbloquejar aquesta persona.</string>
+    <string name="detail_pending">El detall de la persona arriba al pas 4.</string>
     <string name="quick_note">Nota ràpida</string>
     <string name="yesterday">Ahir</string>
 

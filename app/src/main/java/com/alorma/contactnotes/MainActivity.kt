@@ -2,19 +2,19 @@ package com.alorma.contactnotes
 
 import android.graphics.Color
 import android.os.Bundle
-import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.DisposableEffect
+import androidx.fragment.app.FragmentActivity
 import com.alorma.contactnotes.data.prefs.ThemePreferences
 import com.alorma.contactnotes.designsystem.theme.ConversesTheme
 import com.alorma.contactnotes.designsystem.theme.ThemeMode
-import com.alorma.contactnotes.ui.people.PeopleListRoute
+import com.alorma.contactnotes.ui.AppNavigation
 import org.koin.compose.koinInject
 
-class MainActivity : ComponentActivity() {
+class MainActivity : FragmentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     setContent {
@@ -37,7 +37,7 @@ class MainActivity : ComponentActivity() {
       }
 
       ConversesTheme(themeMode = themeMode, colorStyle = themePreferences.colorStyle.value) {
-        PeopleListRoute(onQuickNote = {})
+        AppNavigation()
       }
     }
   }
