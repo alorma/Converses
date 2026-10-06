@@ -97,10 +97,10 @@ La base funcional de la v1 ja és feta. El que queda és:
 
 ### Ajustos
 
-- [ ] **Tema com a `ButtonGroup` connectat i amb icones** (`light_mode`, `dark_mode`, `brightness_auto`), igual que el filtre del llistat. Ara són botons amb vora i sense icona.
-- [ ] **Fila «Color dinàmic»:** ara té un fons tenyit diferent (és l'estil de la llibreria de tiles) i sembla seleccionada. Ha de ser `surface-card` i formar grup amb «Tema», amb radis 24/6.
+- [x] **Tema com a `ButtonGroup` connectat i amb icones** (`light_mode`, `dark_mode`, `brightness_auto`), igual que el filtre del llistat. Ara són botons amb vora i sense icona.
+- [x] **Fila «Color dinàmic»:** ara té un fons tenyit diferent (és l'estil de la llibreria de tiles) i sembla seleccionada. Ha de ser `surface-card` i formar grup amb «Tema», amb radis 24/6.
     - Si `ui-tiles-expressive` no deixa canviar els colors i els radis, cal substituir-la per les files pròpies del `designsystem` (`GroupedList`). Així també desapareix l'excepció de l'`@OptIn`.
-- [ ] **Nota de persones protegides:** ara té mida de text de cos. Ha d'anar en `bodySmall` (13 sp) i `onSurfaceVariant`.
+- [x] **Nota de persones protegides:** ara té mida de text de cos. Ha d'anar en `bodySmall` (13 sp) i `onSurfaceVariant`.
 
 ### Design system
 
