@@ -11,6 +11,7 @@ import com.alorma.contactnotes.data.insertSampleData
 import com.alorma.contactnotes.data.prefs.ThemePreferences
 import com.alorma.contactnotes.data.prefs.ThemePreferencesImpl
 import com.alorma.contactnotes.ui.people.PeopleListViewModel
+import com.alorma.contactnotes.ui.person.PersonDetailViewModel
 import com.alorma.contactnotes.ui.person.PersonViewModel
 import com.russhwolf.settings.Settings
 import com.russhwolf.settings.SharedPreferencesSettings
@@ -61,6 +62,7 @@ val themeModule = module {
 val viewModelModule = module {
   viewModelOf(::PeopleListViewModel)
   viewModel { (personId: Long) -> PersonViewModel(personId, get()) }
+  viewModel { (personId: Long) -> PersonDetailViewModel(personId, get()) }
 }
 
 val appModules = listOf(databaseModule, themeModule, viewModelModule)

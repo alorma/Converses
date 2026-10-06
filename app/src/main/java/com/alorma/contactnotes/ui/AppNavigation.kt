@@ -8,8 +8,8 @@ import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import com.alorma.contactnotes.ui.people.PeopleListRoute
+import com.alorma.contactnotes.ui.person.PersonDetailRoute
 import com.alorma.contactnotes.ui.person.PersonLockedScreen
-import com.alorma.contactnotes.ui.person.PersonPlaceholderScreen
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -52,7 +52,7 @@ fun AppNavigation() {
         )
       }
       entry<PersonRoute> { route ->
-        PersonPlaceholderScreen(
+        PersonDetailRoute(
           personId = route.id,
           onBack = { backStack.removeLastOrNull() },
         )

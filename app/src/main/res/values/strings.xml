@@ -14,7 +14,19 @@
     <string name="unlock_action">Desbloqueja</string>
     <string name="locked_description">Aquesta persona està protegida. Desbloqueja-la amb l\'empremta per veure\'n les dades i la cronologia.</string>
     <string name="locked_unavailable">Aquest dispositiu no té empremta ni bloqueig de pantalla, així que no es pot desbloquejar aquesta persona.</string>
-    <string name="detail_pending">El detall de la persona arriba al pas 4.</string>
+    <string name="today">Avui</string>
+    <string name="since">des de %1$s</string>
+    <string name="conversations">Converses</string>
+    <string name="pinned_facts">Dades fixades</string>
+    <string name="timeline">Cronologia</string>
+    <string name="timeline_empty">Encara no hi ha entrades.</string>
+    <plurals name="entry_count">
+        <item quantity="one">%d entrada</item>
+        <item quantity="other">%d entrades</item>
+    </plurals>
+    <string name="kind_said">Li he dit</string>
+    <string name="kind_heard">M\'ha dit</string>
+    <string name="kind_happened">Ha passat</string>
     <string name="quick_note">Nota ràpida</string>
     <string name="yesterday">Ahir</string>
 
