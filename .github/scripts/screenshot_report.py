@@ -8,7 +8,8 @@ pushed to a companion branch), and writes:
   - comment.md: markdown with an image table per failing test. Image URLs use the
     {IMAGES_URL} placeholder, replaced once the images are pushed.
   - update-tasks.txt: Gradle tasks and --tests filters to regenerate only the
-    references of the failing tests, one argument per line.
+    references of the failing tests, one argument per line. Test method names
+    can't contain underscores, they separate the method from the preview name.
 """
 import argparse
 import glob
@@ -41,7 +42,8 @@ def parse_failures(results_glob):
             failure = {
                 "module": module,
                 "test_class": case.get("classname").split(".")[-1],
-                "test_name": name.split(" ")[0],
+                # Multi-preview tests are named "<method>_<preview name>_{<parameters>}"
+                "test_name": re.split(r"[_ ]", name)[0],
                 "image_name": re.sub(r"[^A-Za-z0-9_.-]+", "_", name).strip("_"),
                 "summary": message.splitlines()[0] if message else "Unknown error",
                 "reference": None,
@@ -114,7 +116,8 @@ def build_update_tasks(failures):
     args = []
     for module in sorted({failure["module"] for failure in failures}):
         args.append(f":{module}:updateDebugScreenshotTest")
-        filters = {f"*.{f['test_class']}.{f['test_name']}" for f in failures if f["module"] == module}
+        # Trailing wildcard so the filter matches every preview of the method
+        filters = {f"*.{f['test_class']}.{f['test_name']}*" for f in failures if f["module"] == module}
         for test_filter in sorted(filters):
             args.extend(["--tests", test_filter])
     return args
