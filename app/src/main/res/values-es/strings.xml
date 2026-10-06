@@ -45,7 +45,6 @@
     <string name="app_lock_prompt_title">Desbloquea Converses</string>
     <string name="today">Hoy</string>
     <string name="since">desde %1$s</string>
-    <string name="conversations">Conversaciones</string>
     <string name="pinned_facts">Datos fijados</string>
     <string name="timeline">Cronología</string>
     <string name="timeline_empty">Todavía no hay entradas.</string>

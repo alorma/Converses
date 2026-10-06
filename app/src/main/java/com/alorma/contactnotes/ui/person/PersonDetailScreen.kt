@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBars
@@ -28,7 +29,6 @@ import androidx.compose.material.icons.rounded.PushPin
 import androidx.compose.material.icons.rounded.Unarchive
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.AssistChipDefaults
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -62,6 +62,7 @@ import com.alorma.contactnotes.data.db.PinnedFactEntity
 import com.alorma.contactnotes.data.settings.SecureWindow
 import com.alorma.contactnotes.designsystem.components.Avatar
 import com.alorma.contactnotes.designsystem.components.ConversesFilterChip
+import com.alorma.contactnotes.designsystem.components.ConversesMenuItem
 import com.alorma.contactnotes.designsystem.components.ConversesSplitButton
 import com.alorma.contactnotes.designsystem.components.GroupedList
 import com.alorma.contactnotes.designsystem.components.GroupedListDefaults
@@ -252,7 +253,11 @@ fun PersonDetailScreen(
     Box(modifier = Modifier.fillMaxSize()) {
       LazyColumn(
         modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(start = ScreenMargin, end = ScreenMargin, bottom = 112.dp),
+        contentPadding = PaddingValues(
+          start = ScreenMargin,
+          end = ScreenMargin,
+          bottom = 96.dp + WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding(),
+        ),
       ) {
         item(key = "back") {
           IconButton(onClick = onBack, modifier = Modifier.windowInsetsPadding(WindowInsets.statusBars)) {
@@ -333,21 +338,19 @@ fun PersonDetailScreen(
           .windowInsetsPadding(WindowInsets.navigationBars)
           .padding(16.dp),
       ) {
-        DropdownMenuItem(
-          text = { Text(stringResource(R.string.edit_person)) },
-          leadingIcon = { Icon(Icons.Rounded.Edit, contentDescription = null) },
+        ConversesMenuItem(
+          text = stringResource(R.string.edit_person),
+          icon = Icons.Rounded.Edit,
           onClick = onEditPerson,
         )
-        DropdownMenuItem(
-          text = { Text(stringResource(R.string.menu_export)) },
-          leadingIcon = { Icon(Icons.Rounded.IosShare, contentDescription = null) },
+        ConversesMenuItem(
+          text = stringResource(R.string.menu_export),
+          icon = Icons.Rounded.IosShare,
           onClick = onExport,
         )
-        DropdownMenuItem(
-          text = { Text(stringResource(if (person.archived) R.string.menu_unarchive else R.string.menu_archive)) },
-          leadingIcon = {
-            Icon(if (person.archived) Icons.Rounded.Unarchive else Icons.Rounded.Archive, contentDescription = null)
-          },
+        ConversesMenuItem(
+          text = stringResource(if (person.archived) R.string.menu_unarchive else R.string.menu_archive),
+          icon = if (person.archived) Icons.Rounded.Unarchive else Icons.Rounded.Archive,
           onClick = onToggleArchived,
         )
       }
@@ -373,7 +376,7 @@ private fun Header(person: PersonEntity, state: PersonDetailUiState) {
       Row(horizontalArrangement = Arrangement.spacedBy(24.dp)) {
         Counter(state.saidCount, stringResource(R.string.kind_said))
         Counter(state.heardCount, stringResource(R.string.kind_heard))
-        Counter(state.totalCount, stringResource(R.string.conversations))
+        Counter(state.happenedCount, stringResource(R.string.kind_happened))
       }
     }
     Avatar(

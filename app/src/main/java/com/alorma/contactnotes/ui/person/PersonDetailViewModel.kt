@@ -30,7 +30,7 @@ data class PersonDetailUiState(
   val selectedKinds: Set<EntryKind> = EntryKind.entries.toSet(),
   val saidCount: Int = 0,
   val heardCount: Int = 0,
-  val totalCount: Int = 0,
+  val happenedCount: Int = 0,
   val isLoading: Boolean = true,
 )
 
@@ -62,7 +62,7 @@ class PersonDetailViewModel(
       selectedKinds = kinds,
       saidCount = byKind[EntryKind.SAID] ?: 0,
       heardCount = byKind[EntryKind.HEARD] ?: 0,
-      totalCount = byKind.values.sum(),
+      happenedCount = byKind[EntryKind.HAPPENED] ?: 0,
       isLoading = false,
     )
   }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), PersonDetailUiState())
