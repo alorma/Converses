@@ -1,32 +1,43 @@
 package com.alorma.contactnotes
 
+import android.graphics.Color
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
-import com.alorma.contactnotes.designsystem.theme.ColorStyle
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.runtime.DisposableEffect
+import com.alorma.contactnotes.data.prefs.ThemePreferences
 import com.alorma.contactnotes.designsystem.theme.ConversesTheme
 import com.alorma.contactnotes.designsystem.theme.ThemeMode
-import com.alorma.contactnotes.ui.gallery.ThemeGalleryScreen
+import com.alorma.contactnotes.ui.people.PeopleListRoute
+import org.koin.compose.koinInject
 
 class MainActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    enableEdgeToEdge()
     setContent {
-      var themeMode by rememberSaveable { mutableStateOf(ThemeMode.System) }
-      var colorStyle by rememberSaveable { mutableStateOf(ColorStyle.Tinted) }
-      ConversesTheme(themeMode = themeMode, colorStyle = colorStyle) {
-        ThemeGalleryScreen(
-          themeMode = themeMode,
-          onThemeModeChange = { themeMode = it },
-          colorStyle = colorStyle,
-          onColorStyleChange = { colorStyle = it },
-        )
+      val themePreferences: ThemePreferences = koinInject()
+      val themeMode = themePreferences.themeMode.value
+      val systemDark = isSystemInDarkTheme()
+      val isDark = when (themeMode) {
+        ThemeMode.System -> systemDark
+        ThemeMode.Light -> false
+        ThemeMode.Dark -> true
+      }
+      DisposableEffect(isDark) {
+        val style = if (isDark) {
+          SystemBarStyle.dark(Color.TRANSPARENT)
+        } else {
+          SystemBarStyle.light(Color.TRANSPARENT, Color.TRANSPARENT)
+        }
+        enableEdgeToEdge(statusBarStyle = style, navigationBarStyle = style)
+        onDispose {}
+      }
+
+      ConversesTheme(themeMode = themeMode, colorStyle = themePreferences.colorStyle.value) {
+        PeopleListRoute(onQuickNote = {})
       }
     }
   }

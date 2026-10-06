@@ -1,7 +1,16 @@
 package com.alorma.contactnotes
 
 import android.app.Application
-import dagger.hilt.android.HiltAndroidApp
+import com.alorma.contactnotes.di.appModules
+import org.koin.android.ext.koin.androidContext
+import org.koin.core.context.startKoin
 
-@HiltAndroidApp
-class ConversesApp : Application()
+class ConversesApp : Application() {
+  override fun onCreate() {
+    super.onCreate()
+    startKoin {
+      androidContext(this@ConversesApp)
+      modules(appModules)
+    }
+  }
+}

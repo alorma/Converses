@@ -6,18 +6,27 @@ import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontVariation
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.sp
 import com.alorma.contactnotes.designsystem.R
 
 private const val DefaultWidth = 100f
-private const val WideWidth = 118f
+private const val TitleWidth = 118f
+private val TitleOpticalSize = 72.sp
 
-private fun robotoFlex(weight: Int, width: Float = DefaultWidth) = Font(
+private fun robotoFlex(
+  weight: Int,
+  width: Float = DefaultWidth,
+  opticalSize: TextUnit? = null,
+) = Font(
   resId = R.font.roboto_flex,
   weight = FontWeight(weight),
   variationSettings = FontVariation.Settings(
-    FontVariation.weight(weight),
-    FontVariation.width(width),
+    *listOfNotNull(
+      FontVariation.weight(weight),
+      FontVariation.width(width),
+      opticalSize?.let { FontVariation.opticalSizing(it) },
+    ).toTypedArray(),
   ),
 )
 
@@ -29,7 +38,7 @@ val RobotoFlex = FontFamily(
   robotoFlex(800),
 )
 
-private val WideExtraBold = FontFamily(robotoFlex(800, WideWidth))
+private val RobotoFlexTitle = FontFamily(robotoFlex(800, TitleWidth, TitleOpticalSize))
 
 internal val ConversesTypography: Typography = Typography().let { base ->
   base.copy(
@@ -51,18 +60,17 @@ internal val ConversesTypography: Typography = Typography().let { base ->
   )
 }
 
-/** Títol de pantalla: 40 sp, pes 800, amplada 118. */
-val ScreenTitleStyle = TextStyle(
-  fontFamily = WideExtraBold,
+private fun titleStyle(size: Int, lineHeight: Int) = TextStyle(
+  fontFamily = RobotoFlexTitle,
   fontWeight = FontWeight.ExtraBold,
-  fontSize = 40.sp,
-  lineHeight = 44.sp,
+  fontSize = size.sp,
+  lineHeight = lineHeight.sp,
 )
 
-/** Nom de la persona al detall: 30 sp, pes 800, amplada 118. */
-val PersonNameStyle = TextStyle(
-  fontFamily = WideExtraBold,
-  fontWeight = FontWeight.ExtraBold,
-  fontSize = 30.sp,
-  lineHeight = 36.sp,
-)
+/** Títols del handoff: Roboto Flex, pes 800, amplada 118, mida òptica 72. */
+val ListTitleStyle = titleStyle(size = 44, lineHeight = 48)
+val ScreenTitleStyle = titleStyle(size = 40, lineHeight = 44)
+val PersonNameStyle = titleStyle(size = 30, lineHeight = 36)
+val DialogTitleStyle = titleStyle(size = 28, lineHeight = 34)
+val SheetTitleStyle = titleStyle(size = 24, lineHeight = 30)
+val SectionTitleStyle = titleStyle(size = 22, lineHeight = 28)

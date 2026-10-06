@@ -52,11 +52,12 @@ abstract class PersonDao {
   }
 
   @Query("SELECT * FROM person WHERE id = :id")
-  fun observe(id: Long): Flow<PersonEntity?>
+  abstract fun observe(id: Long): Flow<PersonEntity?>
 
   @Query("SELECT * FROM person WHERE id = :id")
-  suspend fun get(id: Long): PersonEntity?
+  abstract suspend fun get(id: Long): PersonEntity?
 
+  @Transaction
   @Query(
     """
     SELECT p.*,
