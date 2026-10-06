@@ -91,9 +91,9 @@ La base funcional de la v1 ja és feta. El que queda és:
 
 ### Editar persona
 
-- [ ] **Àlies:** el prefix `@` ha d'anar enganxat al text, sense espai.
-- [ ] **Desa** desactivat mentre no hi hagi canvis o el nom estigui buit.
-- [ ] **Subtítol de «Persona protegida» quan el dispositiu sí que té bloqueig:** «Cal l'empremta per veure-la. Al llistat no es mostra l'últim comentari.» Ara només s'ha vist el text del cas sense bloqueig.
+- [x] **Àlies:** el prefix `@` ha d'anar enganxat al text, sense espai.
+- [x] **Desa** desactivat mentre no hi hagi canvis o el nom estigui buit.
+- [x] **Subtítol de «Persona protegida» quan el dispositiu sí que té bloqueig:** «Cal l'empremta per veure-la. Al llistat no es mostra l'últim comentari.» Ara només s'ha vist el text del cas sense bloqueig.
 
 ### Ajustos
 

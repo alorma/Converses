@@ -20,6 +20,16 @@ data class FactDraft(val key: Long, val label: String, val value: String)
 
 data class ChannelDraft(val key: Long, val type: ChannelType, val handle: String)
 
+data class EditSnapshot(
+  val name: String = "",
+  val alias: String = "",
+  val shape: AvatarShape = AvatarShape.Cookie9Sided,
+  val color: AvatarColor = AvatarColor.Lavender,
+  val isProtected: Boolean = false,
+  val facts: List<FactDraft> = emptyList(),
+  val channels: List<ChannelDraft> = emptyList(),
+)
+
 data class EditPersonUiState(
   val isNew: Boolean,
   val loaded: Boolean,
@@ -32,8 +42,12 @@ data class EditPersonUiState(
   val channels: List<ChannelDraft> = emptyList(),
   val aliasTaken: Boolean = false,
   val entryCount: Int = 0,
+  val baseline: EditSnapshot = EditSnapshot(),
 ) {
-  val canSave: Boolean get() = loaded && name.isNotBlank() && !aliasTaken
+  private val snapshot: EditSnapshot
+    get() = EditSnapshot(name, alias, shape, color, isProtected, facts, channels)
+
+  val canSave: Boolean get() = loaded && name.isNotBlank() && !aliasTaken && (isNew || snapshot != baseline)
 }
 
 class EditPersonViewModel(
@@ -57,6 +71,8 @@ class EditPersonViewModel(
       val channels = repository.observeChannels(personId).first()
       val facts = repository.observePinnedFacts(personId).first()
       original = person
+      val loadedFacts = facts.map { FactDraft(nextKey++, it.label, it.value) }
+      val loadedChannels = channels.map { ChannelDraft(nextKey++, it.type, it.handle.orEmpty()) }
       _state.value = EditPersonUiState(
         isNew = false,
         loaded = true,
@@ -65,9 +81,18 @@ class EditPersonViewModel(
         shape = person.avatarShape,
         color = person.avatarColor,
         isProtected = person.isProtected,
-        facts = facts.map { FactDraft(nextKey++, it.label, it.value) },
-        channels = channels.map { ChannelDraft(nextKey++, it.type, it.handle.orEmpty()) },
+        facts = loadedFacts,
+        channels = loadedChannels,
         entryCount = repository.getEntries(personId).size,
+        baseline = EditSnapshot(
+          name = person.name,
+          alias = person.alias.orEmpty(),
+          shape = person.avatarShape,
+          color = person.avatarColor,
+          isProtected = person.isProtected,
+          facts = loadedFacts,
+          channels = loadedChannels,
+        ),
       )
     }
   }

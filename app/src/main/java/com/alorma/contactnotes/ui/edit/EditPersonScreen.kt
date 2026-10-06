@@ -92,6 +92,10 @@ import com.alorma.contactnotes.ui.people.label
 import com.alorma.contactnotes.ui.person.canUnlockWithDevice
 import com.alorma.contactnotes.ui.person.icon
 import com.alorma.contactnotes.ui.person.promptUnlock
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.input.OffsetMapping
+import androidx.compose.ui.text.input.TransformedText
+import androidx.compose.ui.text.input.VisualTransformation
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 
@@ -355,6 +359,17 @@ private fun FieldCard(
   ) { content() }
 }
 
+private class PrefixTransformation(private val prefix: String) : VisualTransformation {
+  override fun filter(text: AnnotatedString): TransformedText = TransformedText(
+    AnnotatedString(prefix) + text,
+    object : OffsetMapping {
+      override fun originalToTransformed(offset: Int) = offset + prefix.length
+      override fun transformedToOriginal(offset: Int) = (offset - prefix.length).coerceAtLeast(0)
+    },
+  )
+}
+
+
 @Composable
 private fun LabeledField(
   label: String,
@@ -369,7 +384,7 @@ private fun LabeledField(
     onValueChange = onValueChange,
     modifier = modifier.fillMaxWidth(),
     label = { Text(label) },
-    prefix = prefix?.let { { Text(it) } },
+    visualTransformation = if (prefix != null && value.isNotEmpty()) PrefixTransformation(prefix) else VisualTransformation.None,
     singleLine = true,
     isError = isError,
     colors = TextFieldDefaults.colors(

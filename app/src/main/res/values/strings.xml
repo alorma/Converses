@@ -104,7 +104,7 @@
     <string name="edit_channel">Edit channel</string>
     <string name="channel_handle">Username or number</string>
     <string name="protected_person">Protected person</string>
-    <string name="protected_person_summary">Asks for your fingerprint to see their details</string>
+    <string name="protected_person_summary">Needs your fingerprint to be viewed. The last comment isn\'t shown in the list.</string>
     <string name="protected_unavailable">Needs a fingerprint or a screen lock on the device</string>
 
     <string name="menu_export">Export notes</string>
