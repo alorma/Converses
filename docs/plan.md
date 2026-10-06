@@ -6,7 +6,7 @@ Actualitzat el 6 d'oct. de 2026 · @Bernat
 
 Converses és una app Android per recordar què has dit, què t'han dit i què ha passat amb cada persona amb qui parles, sigui per xat, xarxes o en persona. Es construeix amb Jetpack Compose i Material 3 Expressive, en monocrom amb color dinàmic; el color només apareix als avatars (pastel), als errors (vermell) i, si es desactiva el color dinàmic, al tema triat.
 
-- **Referència visual:** les captures `docs/*.png` (Material 3 Expressive, clar i fosc).
+- **Referència visual:** el llenç de disseny «Converses» (Material 3 Expressive, clar i fosc); les captures ja no són al repositori.
 - **Abast v1:** llistat, detall amb cronologia, nova entrada (full i nota ràpida), editar/crear persona, persona protegida, accions d'entrada, arxivar, esborrar persona i Ajustos.
 - **Fora de la v1:** vincle amb l'agenda (descartat), cerca (treta de moment), cerca dins el text de les entrades, còpies de seguretat i widgets.
 
