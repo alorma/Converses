@@ -1,9 +1,9 @@
 name: Build APK
 
+# Builds the debug APK and uploads it as an artifact. Pull requests only build it (pr-build.yml)
 on:
   push:
-    branches: ["**"]
-  pull_request:
+    branches: ["main"]
   workflow_dispatch:
 
 concurrency:

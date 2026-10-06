@@ -131,6 +131,6 @@ Amb [Compose Preview Screenshot Testing](https://developer.android.com/studio/pr
 - **Cerca:** treta del llistat de moment; si torna, cal respectar que les protegides només es troben pel nom.
 - **Tests:** hi ha tests instrumentats del DAO (7) i tests de captures de components i de dues pantalles. Falten tests de ViewModel.
 - **Referències de captures:** encara no n'hi ha (aquí no hi ha SDK d'Android). Es generen la primera vegada amb l'etiqueta `update-screenshots` a la PR; després cal revisar-les.
-- **Release:** falten la signatura, les regles R8 i l'optimització del paquet; hi ha un workflow de GitHub Actions que construeix l'APK de debug.
+- **Release:** falten la signatura, les regles R8 i l'optimització del paquet; a cada PR un workflow comprova que l'APK de debug compila (`pr-build.yml`), i a cada push a `main` es construeix i es puja com a artefacte (`build-apk.yml`).
 - **Mida de l'APK:** Roboto Flex variable pesa ~1,7 MB.
 - **Comprovacions pendents a dispositiu real:** empremta (a l'emulador només s'ha provat el PIN) i el bloqueig de l'app de punta a punta.
