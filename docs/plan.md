@@ -311,27 +311,27 @@ El detall és a `docs/pro.md` (document de treball, es continuarà). **La v1 no 
 
 - **Model:** Pro de pagament únic, sense subscripció ni anuncis. Play Billing no entra encara. Regla: mai es cobra per accedir, protegir o treure les dades pròpies.
 - **Pro:** avatar personalitzat (color i forma), canals propis (backlog 8), follow-ups (backlog 6) i integració amb contactes (vincle, Connected apps, avís de trucada, importació múltiple).
-- **No s'esborra codi:** tot el que és Pro queda amagat darrere d'un `FeatureGate.proEnabled` (sempre `false` a la v1).
+- **No s'esborra codi:** tot el que és Pro queda amagat darrere d'un els feature flags (sempre `false` a la v1).
 - **A la primera release no es mostra res de Pro.**
 - **Pendent de decidir:** canal «Empresa» (backlog 7), gratuït o Pro segons si es fa abans dels canals propis.
 
 **Feina abans de la release 1** (en aquest ordre, un commit per pas):
 
-- [x] **1 · `FeatureGate`** (`data/FeatureGate.kt`, singleton de Koin): `proEnabled: StateFlow<Boolean>`, sempre `false` a la v1 i **sense cap comprovació de pagament** (el Pro encara no existeix). Les funcions Pro queden amagades i l'app es comporta com la gratuïta, sense mostrar enlloc «gratuït» ni «Pro». Més endavant, aquest és el punt on es mirarà si s'ha pagat. `setProEnabled(value)` només el crida el menú de debug. Test: `FeatureGateTest`.
+- [x] **1 · Feature flags** (`data/flags/`), copiats de l'estil de [Caducity](https://github.com/alorma/Caducity) (`config/remoteconfig`) i de FireAndForget: una classe per flag amb `key` i `defaultValue` (`CustomAvatarFeature`, `CustomChannelsFeature`, `FollowUpsFeature`, `ContactIntegrationFeature`), un `FeatureFlagRunner` abstracte i `LocalFeatureFlagRunner` (només local, sense Firebase), que admet *overrides* per flag en memòria (`setOverride`, `clearOverride`, `hasOverride`, `clearAllOverrides`). Tots els flags són **apagats** a la v1 i **no hi ha cap comprovació de pagament** (el Pro encara no existeix): una funció apagada simplement no hi és i l'app no mostra enlloc «gratuït» ni «Pro». A Compose, `rememberFeatureEnabled<CustomAvatarFeature>()` es recalcula quan canvia un override. Cada flag es registra a Koin amb `bind FeatureFlag::class`, així el menú de debug pot llistar-los amb `getAll<FeatureFlag>()`. Els overrides només els posa el menú de debug, que també els desa i els torna a aplicar en arrencar. Test: `FeatureFlagTest`.
 - [ ] **2 · Avatar estàndard:**
     - `AvatarColor.forName(name)` al `designsystem`, amb hash estable del nom normalitzat (minúscules, sense accents ni espais als extrems), i test amb una llista de 20 noms que repartixi els 7 colors;
     - `avatarShape` i `avatarColor` nul·lables a `PersonEntity` (`null` = estàndard: Galeta + color automàtic) i resolució en un sol lloc (`resolvedShape` / `resolvedColor`) usat per llistat, detall, selector «Qui», selector de persona, onboarding i `PersonTheme`;
     - **Room:** l'esquema canvia però **no s'hi afegeix migració**, perquè l'app encara no és publicada (decidit a `docs/pro.md`). Cal regenerar `app/schemas/.../2.json` i que no es faci cap altra publicació abans d'això; un cop publicada, qualsevol canvi ja serà v2 → v3 amb migració i test;
-    - Editar persona / Nova persona: amagar la targeta de forma i color quan `proEnabled` és `false`; es manté l'avatar de previsualització;
+    - Editar persona / Nova persona: amagar la targeta de forma i color quan `CustomAvatarFeature` està apagada; es manté l'avatar de previsualització;
     - captures: actualitzar les de l'editor i les del detall amb els 7 colors (el color del tema de persona ve ara del color automàtic).
 - [ ] **3 · Importar una persona des dels contactes** (`ACTION_PICK` amb el selector del sistema, sense `READ_CONTACTS`): fila «Omple des d'un contacte» a Nova persona i segon botó «Importa dels contactes» al llistat buit; pre-omple el nom i el telèfon com a canal «Telèfon» (i «WhatsApp» si es marca); avís de duplicats per número («Ja tens en {nom} · Obre-la»), sense filtrar res de les persones protegides. Textos en/ca/es.
-- [ ] **4 · Comprovar que res de Pro és visible** amb `proEnabled = false` (llista de `docs/pro.md` → «Proves») i, amb l'interruptor del menú de debug, que els dos modes funcionen.
+- [ ] **4 · Comprovar que res de Pro és visible** amb totes les funcions apagades (llista de `docs/pro.md` → «Proves») i, amb l'interruptor del menú de debug, que els dos modes funcionen.
 
-**Relació amb altres fases:** el pas 4 i la prova «amb `proEnabled = true`» depenen del mòdul **Pro** del menú de debug (vegeu «Menú de debug»), que es fa en paral·lel. M5 no pot començar a signar ni a omplir la fitxa de Play fins que 1–3 estiguin fets: la fitxa i el formulari de seguretat de les dades han de reflectir la importació de contactes (selector del sistema, sense permís).
+**Relació amb altres fases:** el pas 4 i la prova «amb `CustomAvatar` activada» depenen del mòdul **Pro** del menú de debug (vegeu «Menú de debug»), que es fa en paral·lel. M5 no pot començar a signar ni a omplir la fitxa de Play fins que 1–3 estiguin fets: la fitxa i el formulari de seguretat de les dades han de reflectir la importació de contactes (selector del sistema, sense permís).
 
 ## Menú de debug
 
-Esquelet implementat (passos 1, 3 i 4); falta el mòdul Pro. Inspirat en el debug menu de [sevibus-android](https://github.com/Sloy/sevibus-android) (mòduls `debug-menu` i `debug-menu-noop`). Serveix, entre altres coses, per provar els dos modes del `FeatureGate` (vegeu «Versió gratuïta i Pro»).
+Esquelet implementat (passos 1, 3 i 4); falta el mòdul Pro. Inspirat en el debug menu de [sevibus-android](https://github.com/Sloy/sevibus-android) (mòduls `debug-menu` i `debug-menu-noop`). Serveix, entre altres coses, per provar els dos modes del els feature flags (vegeu «Versió gratuïta i Pro»).
 
 **Com és a SeviBus:**
 
@@ -346,7 +346,7 @@ Esquelet implementat (passos 1, 3 i 4); falta el mòdul Pro. Inspirat en el debu
 - **Botó flotant sempre visible en debug** (decidit). Té l'inconvenient que sortirà a les captures: les captures de pantalles no passen per `MainActivity`, així que no s'hi veurà; s'ha de comprovar quan s'implementi.
 - **On es col·loca:** a `MainActivity`, embolcallant `AppNavigation` (i el bloqueig de l'app) amb `DebugMenuHost`.
 - **El menú no pot filtrar dades de persones protegides:** cap mòdul no mostra noms ni contingut d'entrades, i el full ha d'heretar `FLAG_SECURE` quan la finestra el tingui actiu.
-- **L'interruptor Pro passa del menú d'Ajustos al menú de debug:** substitueix «un interruptor a Ajustos (només en builds de debug)» de `docs/pro.md`, perquè Ajustos no tingui res de debug. El mòdul Pro crida `FeatureGate.setProEnabled(...)` i desa l'estat; com que el menú es fa en un worktree apart, el contracte entre els dos és aquesta API (vegeu «Versió gratuïta i Pro», pas 1).
+- **L'interruptor Pro passa del menú d'Ajustos al menú de debug:** substitueix «un interruptor a Ajustos (només en builds de debug)» de `docs/pro.md`, perquè Ajustos no tingui res de debug. El mòdul Pro crida `LocalFeatureFlagRunner.setOverride(key, value)` (un interruptor per flag, llistats amb `getAll<FeatureFlag>()`) i desa l'estat; com que el menú es fa en un worktree apart, el contracte entre els dos és aquesta API (vegeu «Versió gratuïta i Pro», pas 1).
 
 **Estat:** en curs en un worktree apart. Els passos 1 i 4 no depenen de la feina de Pro; el 2 depèn del pas 1 de Pro.
 
@@ -355,7 +355,7 @@ Esquelet implementat (passos 1, 3 i 4); falta el mòdul Pro. Inspirat en el debu
 **Passos:**
 
 1. Esquelet: `DebugMenuHost` (botó flotant + full), `DebugModule` i `DebugCell`, amb la variant `release` buida.
-2. Mòdul **Pro**: interruptor de `FeatureGate.proEnabled` (depèn del primer pas de `docs/pro.md`).
+2. Mòdul **Pro**: interruptor de els feature flags (depèn del primer pas de `docs/pro.md`).
 3. Mòduls petits segons faci falta: tornar a sembrar les dades d'exemple, tornar a mostrar l'onboarding (`OnboardingFlag.reset()`), esborrar el DataStore.
 4. Comprovar que l'APK de release no conté cap classe del menú.
 
