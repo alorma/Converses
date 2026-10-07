@@ -1,6 +1,6 @@
 # Converses — Pla i estat (v2)
 
-Actualitzat el 7 d'oct. de 2026 · @Bernat · fets M1 a M4, el color de persona, el backlog de disseny, el backlog de bugs i l'onboarding (implementat). **La v1 no té Pro.** Abans de la release 1 queden els canvis de la versió gratuïta (avatar estàndard i importar un contacte; vegeu «Versió gratuïta i Pro») i **M5**; el menú de debug es fa en paral·lel en un worktree apart. Follow-ups i gestor de canals passen a l'Iteració 2, després de la publicació (vegeu «On som»)
+Actualitzat el 7 d'oct. de 2026 · @Bernat · fets M1 a M4, el color de persona, el backlog de disseny, el backlog de bugs i l'onboarding (implementat). **La v1 no té Pro.** Abans de la release 1 queden els canvis de la versió gratuïta (avatar estàndard; vegeu «Versió gratuïta i Pro») i **M5**; el menú de debug es fa en paral·lel en un worktree apart. Follow-ups i gestor de canals passen a l'Iteració 2, després de la publicació (vegeu «On som»)
 
 ## Resum
 
@@ -12,7 +12,7 @@ Converses és una app Android per recordar què has dit, què t'han dit i què h
 
 ## On som
 
-La v1 funcional està feta: interfície polida, fluxos complets, privacitat tancada, color de persona i onboarding. Abans de publicar queden els canvis de la versió gratuïta (avatar estàndard i importació de contactes; a la v1 no hi ha Pro) i la feina de publicació (M5), més unes quantes coses soltes.
+La v1 funcional està feta: interfície polida, fluxos complets, privacitat tancada, color de persona i onboarding. Abans de publicar queden els canvis de la versió gratuïta (avatar estàndard; a la v1 no hi ha Pro) i la feina de publicació (M5), més unes quantes coses soltes.
 
 | Fase | Objectiu | Estat |
 | --- | --- | --- |
@@ -26,7 +26,7 @@ La v1 funcional està feta: interfície polida, fluxos complets, privacitat tanc
 | Backlog de bugs | Àrea clicable, etiqueta «Other», biometria sense desar | Fet (`docs/backlog.md`) |
 | M4 · Qualitat | Tests, accessibilitat, mode fosc, dispositiu real | Fet (amb excepcions acceptades) |
 | M5 · Publicació | minSdk, signatura, R8, mida, migracions, Play Store | Per fer |
-| Versió gratuïta (v1 sense Pro) | Avatar estàndard i importar un contacte; el Pro queda per després de la v1 (vegeu «Versió gratuïta i Pro») | **Per fer abans de la release 1**; va abans de M5 (`docs/pro.md`) |
+| Versió gratuïta (v1 sense Pro) | Avatar estàndard; el Pro queda per després de la v1 (vegeu «Versió gratuïta i Pro») | **Per fer abans de la release 1**; va abans de M5 (`docs/pro.md`) |
 | Menú de debug | Botó flotant i full amb mòduls, només en builds de debug (vegeu «Menú de debug») | Esquelet i mòduls Dades i Onboarding fets; falta el mòdul Pro (interruptor gratuït/Pro) i provar-lo a l'emulador |
 | Iteració 2 | Follow-ups i gestor de canals | Després de la publicació (vegeu «Iteració 2») |
 | Després de la v1 | Cerca, còpia de seguretat, etiquetes, widget | Idees |
@@ -325,10 +325,9 @@ El detall és a `docs/pro.md` (document de treball, es continuarà). **La v1 no 
     - **Room:** l'esquema canvia però **no s'hi afegeix migració**, perquè l'app encara no és publicada (decidit a `docs/pro.md`). Cal regenerar `app/schemas/.../2.json` i que no es faci cap altra publicació abans d'això; un cop publicada, qualsevol canvi ja serà v2 → v3 amb migració i test;
     - Editar persona / Nova persona: amagar la targeta de forma i color quan `CustomAvatarFeature` està apagada (encesa, es pot triar color i forma propis); es manté l'avatar de previsualització;
     - captures: actualitzar les de l'editor i les del detall amb els 7 colors (el color del tema de persona ve ara del color automàtic).
-- [ ] **3 · Importar una persona des dels contactes** (`ACTION_PICK` amb el selector del sistema, sense `READ_CONTACTS`): fila «Omple des d'un contacte» a Nova persona i segon botó «Importa dels contactes» al llistat buit; pre-omple el nom i el telèfon com a canal «Telèfon» (i «WhatsApp» si es marca); avís de duplicats per número («Ja tens en {nom} · Obre-la»), sense filtrar res de les persones protegides. Textos en/ca/es.
-- [ ] **4 · Comprovar que res de Pro és visible** amb totes les funcions apagades (llista de `docs/pro.md` → «Proves») i, amb l'interruptor del menú de debug, que els dos modes funcionen.
+- [ ] **3 · Comprovar que res de Pro és visible** amb totes les funcions apagades (llista de `docs/pro.md` → «Proves») i, amb l'interruptor del menú de debug, que els dos modes funcionen.
 
-**Relació amb altres fases:** el pas 4 i la prova «amb `CustomAvatar` activada» depenen del mòdul **Pro** del menú de debug (vegeu «Menú de debug»), que es fa en paral·lel. M5 no pot començar a signar ni a omplir la fitxa de Play fins que 1–3 estiguin fets: la fitxa i el formulari de seguretat de les dades han de reflectir la importació de contactes (selector del sistema, sense permís).
+**Relació amb altres fases:** el pas 3 i la prova «amb `CustomAvatar` activada» depenen del mòdul **Pro** del menú de debug (vegeu «Menú de debug»), que es fa en paral·lel. M5 no pot començar a signar ni a omplir la fitxa de Play fins que 1–2 estiguin fets.
 
 ## Menú de debug
 
