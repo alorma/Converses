@@ -25,6 +25,8 @@ fun ChannelType.label(): Int = when (this) {
   ChannelType.TELEGRAM -> R.string.channel_telegram
   ChannelType.WHATSAPP -> R.string.channel_whatsapp
   ChannelType.REDDIT -> R.string.channel_reddit
+  ChannelType.X -> R.string.channel_x
+  ChannelType.INSTAGRAM -> R.string.channel_instagram
   ChannelType.PHONE -> R.string.channel_phone
   ChannelType.IN_PERSON -> R.string.channel_in_person
   ChannelType.OTHER -> R.string.channel_other

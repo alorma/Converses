@@ -42,6 +42,19 @@ class PeopleListViewModelTest {
   }
 
   @Test
+  fun xAndInstagramBelongToTheSocialFilter() = runTest {
+    val onX = db.addPerson("OnX", createdAt = 2)
+    val onInstagram = db.addPerson("OnInstagram", createdAt = 1)
+    db.addChannel(onX.id, ChannelType.X)
+    db.addChannel(onInstagram.id, ChannelType.INSTAGRAM)
+    val vm = PeopleListViewModel(archived = false, repository = db.repository)
+    backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { vm.uiState.collect {} }
+
+    vm.onFilterSelected(ChannelFilter.Social)
+    assertEquals(listOf("OnX", "OnInstagram"), names(vm))
+  }
+
+  @Test
   fun protectedPeopleOnlyShowUpInAllBecauseTheirChannelsAreHidden() = runTest {
     val secret = db.addPerson("Luna", isProtected = true)
     db.addChannel(secret.id, ChannelType.WHATSAPP)

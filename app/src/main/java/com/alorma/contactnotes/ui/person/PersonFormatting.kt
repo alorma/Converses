@@ -1,11 +1,13 @@
 package com.alorma.contactnotes.ui.person
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.AlternateEmail
 import androidx.compose.material.icons.rounded.Call
 import androidx.compose.material.icons.rounded.Chat
 import androidx.compose.material.icons.rounded.Forum
 import androidx.compose.material.icons.rounded.MoreHoriz
 import androidx.compose.material.icons.rounded.People
+import androidx.compose.material.icons.rounded.PhotoCamera
 import androidx.compose.material.icons.rounded.Public
 import androidx.compose.material.icons.rounded.Send
 import androidx.compose.runtime.Composable
@@ -28,6 +30,8 @@ fun ChannelType.icon(): ImageVector = when (this) {
   ChannelType.TELEGRAM -> Icons.Rounded.Send
   ChannelType.WHATSAPP -> Icons.Rounded.Chat
   ChannelType.REDDIT -> Icons.Rounded.Public
+  ChannelType.X -> Icons.Rounded.AlternateEmail
+  ChannelType.INSTAGRAM -> Icons.Rounded.PhotoCamera
   ChannelType.PHONE -> Icons.Rounded.Call
   ChannelType.IN_PERSON -> Icons.Rounded.People
   ChannelType.OTHER -> Icons.Rounded.MoreHoriz
@@ -58,22 +62,10 @@ fun dayLabel(date: LocalDate, today: LocalDate = LocalDate.now(), locale: Locale
 fun List<ChannelEntity>.otherHandle(): String? =
   firstOrNull { it.type == ChannelType.OTHER && !it.handle.isNullOrBlank() }?.handle
 
-/** Nom del canal; «Other» porta el valor que s'hi ha escrit: «Other - Signal». */
+/** Nom del canal; «Other» mostra només el valor que s'hi ha escrit («Signal»). */
 @Composable
-fun channelName(type: ChannelType, otherHandle: String?): String {
-  val label = stringResource(type.label())
-  return if (type == ChannelType.OTHER && !otherHandle.isNullOrBlank()) {
-    stringResource(R.string.channel_with_value, label, otherHandle)
-  } else {
-    label
-  }
-}
+fun channelName(type: ChannelType, otherHandle: String?): String =
+  if (type == ChannelType.OTHER && !otherHandle.isNullOrBlank()) otherHandle else stringResource(type.label())
 
-fun channelName(context: Context, type: ChannelType, otherHandle: String?): String {
-  val label = context.getString(type.label())
-  return if (type == ChannelType.OTHER && !otherHandle.isNullOrBlank()) {
-    context.getString(R.string.channel_with_value, label, otherHandle)
-  } else {
-    label
-  }
-}
+fun channelName(context: Context, type: ChannelType, otherHandle: String?): String =
+  if (type == ChannelType.OTHER && !otherHandle.isNullOrBlank()) otherHandle else context.getString(type.label())
