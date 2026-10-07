@@ -9,4 +9,11 @@
   <string name="debug_onboarding_title">Onboarding</string>
   <string name="debug_onboarding_show">Show onboarding again</string>
   <string name="debug_onboarding_show_summary">Clears the flag and restarts the screen</string>
+  <string name="debug_flags_title">Feature flags</string>
+  <string name="debug_flags_pro_mode">Pro mode</string>
+  <string name="debug_flags_pro_mode_summary">On turns every Pro flag on, off turns them all off</string>
+  <string name="debug_flags_overridden">Overridden</string>
+  <string name="debug_flags_default">Default value</string>
+  <string name="debug_flags_reset">Reset flags</string>
+  <string name="debug_flags_reset_summary">Removes every override and goes back to the default values</string>
 </resources>
