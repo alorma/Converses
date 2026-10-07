@@ -331,7 +331,7 @@ El detall és a `docs/pro.md` (document de treball, es continuarà). **La v1 no 
 
 ## Menú de debug
 
-Esquelet implementat (passos 1, 3 i 4); falta el mòdul Pro. Inspirat en el debug menu de [sevibus-android](https://github.com/Sloy/sevibus-android) (mòduls `debug-menu` i `debug-menu-noop`). Serveix, entre altres coses, per provar els dos modes del els feature flags (vegeu «Versió gratuïta i Pro»).
+Esquelet i mòduls implementats (passos 1 a 4), inclòs el mòdul de flags. Inspirat en el debug menu de [sevibus-android](https://github.com/Sloy/sevibus-android) (mòduls `debug-menu` i `debug-menu-noop`). Serveix, entre altres coses, per provar els dos modes del els feature flags (vegeu «Versió gratuïta i Pro»).
 
 **Com és a SeviBus:**
 
@@ -348,14 +348,12 @@ Esquelet implementat (passos 1, 3 i 4); falta el mòdul Pro. Inspirat en el debu
 - **El menú no pot filtrar dades de persones protegides:** cap mòdul no mostra noms ni contingut d'entrades, i el full ha d'heretar `FLAG_SECURE` quan la finestra el tingui actiu.
 - **L'interruptor Pro passa del menú d'Ajustos al menú de debug:** substitueix «un interruptor a Ajustos (només en builds de debug)» de `docs/pro.md`, perquè Ajustos no tingui res de debug. El mòdul Pro crida `LocalFeatureFlagRunner.setOverride(key, value)` (un interruptor per flag, llistats amb `getAll<FeatureFlag>()`) i desa l'estat; com que el menú es fa en un worktree apart, el contracte entre els dos és aquesta API (vegeu «Versió gratuïta i Pro», pas 1).
 
-**Estat:** en curs en un worktree apart. Els passos 1 i 4 no depenen de la feina de Pro; el 2 depèn del pas 1 de Pro.
-
 **Fet:** `app/src/debug/.../debug/` té `DebugMenuHost` (botó flotant arrossegable i `ModalBottomSheet`), `DebugModule` (acordió), `DebugCell` i `ConversesDebugMenu` amb els mòduls **Dades** (tornar a sembrar les dades d'exemple) i **Onboarding** (tornar-lo a mostrar i recrear l'activitat); `app/src/release/` només té un `DebugMenuHost` que crida el contingut. `MainActivity` embolcalla `AppNavigation` i el bloqueig amb `DebugMenuHost`. Els textos són només en anglès a `src/debug/res` (no arriben a release). El full hereta `FLAG_SECURE` per defecte (`securePolicy = Inherit`). L'APK de release no conté cap classe, cadena ni recurs del menú. No hi ha mòdul per esborrar el DataStore: `SettingsRepository` no té cap «esborrar tot» i no valia la pena afegir-lo només per al debug. Pendent: provar-lo a l'emulador (arrossegar el botó, recrear l'onboarding, FLAG_SECURE) i comprovar que el botó no surt a les captures.
 
 **Passos:**
 
 1. Esquelet: `DebugMenuHost` (botó flotant + full), `DebugModule` i `DebugCell`, amb la variant `release` buida.
-2. Mòdul **Pro**: interruptor de els feature flags (depèn del primer pas de `docs/pro.md`).
+2. ✔ Mòdul **Feature flags**: interruptor «Pro mode» (posa tots els flags amb `pro = true` a ON o OFF), un interruptor per flag (títol = clau, subtítol «Overridden» / «Default value») i «Reset flags» (`clearAllOverrides`). Els flags es llisten amb `getKoin().getAll<FeatureFlag>()`, així un flag nou apareix sol; els overrides es conserven al `feature_flags` DataStore.
 3. Mòduls petits segons faci falta: tornar a sembrar les dades d'exemple, tornar a mostrar l'onboarding (`OnboardingFlag.reset()`), esborrar el DataStore.
 4. Comprovar que l'APK de release no conté cap classe del menú.
 
