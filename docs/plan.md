@@ -21,7 +21,7 @@ La v1 funcional està feta: interfície polida, fluxos complets, privacitat tanc
 | M2 · Fluxos que falten | Triar i crear persona, arxivades, estats buits, desfer | Fet |
 | M3 · Privacitat | Les persones protegides no es filtren enlloc | Fet (falta provar el bloqueig desactivat sol a dispositiu) |
 | Color de la persona | Les pantalles de cada persona prenen el color del seu avatar | Fet (falta provar-lo a l'emulador: animació de l'editor, fulls i interruptor apagat) |
-| Backlog de disseny | Tanda 1 «Quan» (fet), tanda 2 «Qui» (`docs/qui`), tanda 3 bloqueig (`docs/bloqueig`) | En curs: queda la 2 i la 3 |
+| Backlog de disseny | Tanda 1 «Quan» (fet), tanda 2 «Qui» (fet), tanda 3 bloqueig (`docs/bloqueig`) | En curs: queda la 3 |
 | M4 · Qualitat | Tests, accessibilitat, mode fosc, dispositiu real | Per fer |
 | M5 · Publicació | minSdk, signatura, R8, mida, migracions, Play Store | Per fer |
 | Després de la v1 | Cerca, còpia de seguretat, etiquetes, widget | Idees |
@@ -120,7 +120,8 @@ La v1 funcional està feta: interfície polida, fluxos complets, privacitat tanc
     - xip de canal (toc obre l'app, toc llarg copia), estats buits i snackbar de desfer;
     - barra flotant amb tres destinacions (Persones · Arxivades · Ajustos);
     - tema de color de persona (7 llavors, vegeu «Color de la persona»);
-    - fila «Quan» i full «Quan va ser?» (vegeu «Formulari d'entrada i "Quan"»).
+    - fila «Quan» i full «Quan va ser?» (vegeu «Formulari d'entrada i "Quan"»);
+    - selector «Qui», marcadors de 32 dp i filtres amb avatar (vegeu «Qui»).
 
 ---
 
@@ -286,6 +287,15 @@ Cada persona porta el color de l'avatar com a **llavor del tema** de les seves p
 - «Quan»: fila de 72 dp (`WhenRow`) que obre `WhenSheet` («Quan va ser?»): Ara, Fa una hora, Ahir a aquesta hora i Tria dia i hora… (`DatePickerDialog` fins a avui i `TimePicker` en 24 h).
 - `WhenChoice` (`Now`, `HourAgo`, `Yesterday`, `Custom`, `Stored`) és a l'estat i al `Saver`. «Ara» es resol en desar; les altres opcions fixen l'hora en triar-les. `Stored` és la data d'una entrada que s'edita i no marca cap opció. Un `Custom` en el futur es retalla a l'hora actual.
 - El subtítol d'«Ara» es refresca cada minut (`rememberMinuteClock`). Format de data: `EEEE d MMM`, amb la primera lletra en majúscula.
+
+### «Qui» (tipus d'entrada)
+
+- `EntryKind` es manté (`SAID`, `HEARD`, `HAPPENED`) i no hi ha migració; només canvia com es mostra: **Jo**, **{primer nom}** i **Apunt** (**Apunts** als filtres i comptadors). `firstName()` agafa el primer mot i el talla a 12 caràcters amb «…».
+- `whoLabel(kind, firstName, …)` és l'única funció d'etiquetes (cronologia, full d'accions i exportació); `WhoLabels.kt` també té `EntryMarker` i `PersonInitialAvatar`.
+- Selector «Qui» a `EntryForm` (`WhoSelector`): `ConversesToggleGroup` en mode `prominent` (52 dp, icona sempre visible, avatar de 26 dp per a la persona). A la nota ràpida sense persona, el botó del mig diu «Persona» i està desactivat.
+- Cronologia: marcadors de 32 dp (cercle amb `person`, avatar de la persona sense fons i quadrat amb `edit_note`). Filtres de multiselecció amb els tipus sense entrades amagats.
+- Exportació: `[data · canal] Jo: text`.
+- Pendent: el canal `OTHER - SIGNAL` a l'etiqueta (bug 3), previews i regenerar les captures de referència amb l'etiqueta `update-screenshots`.
 
 ### Components propis (`designsystem`)
 

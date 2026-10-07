@@ -71,6 +71,7 @@ fun ConversesFilterChip(
   modifier: Modifier = Modifier,
   icon: ImageVector? = null,
   tonal: Boolean = false,
+  leadingContent: (@Composable () -> Unit)? = null,
 ) {
   val scheme = MaterialTheme.colorScheme
   val selectedContainer = if (tonal) scheme.primaryContainer else scheme.primary
@@ -81,7 +82,7 @@ fun ConversesFilterChip(
     onClick = onClick,
     modifier = modifier,
     label = { Text(label) },
-    leadingIcon = leading?.let { vector ->
+    leadingIcon = leadingContent ?: leading?.let { vector ->
       { Icon(vector, contentDescription = null, modifier = Modifier.size(FilterChipDefaults.IconSize)) }
     },
     shape = MaterialTheme.shapes.large,

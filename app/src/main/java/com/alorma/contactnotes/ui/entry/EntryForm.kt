@@ -14,6 +14,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Check
+import androidx.compose.material.icons.rounded.PersonOutline
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
@@ -38,11 +39,14 @@ import com.alorma.contactnotes.R
 import com.alorma.contactnotes.data.db.ChannelType
 import com.alorma.contactnotes.data.db.EntryEntity
 import com.alorma.contactnotes.data.db.EntryKind
+import com.alorma.contactnotes.data.db.PersonEntity
 import com.alorma.contactnotes.designsystem.components.ConversesToggleGroup
 import com.alorma.contactnotes.designsystem.components.ToggleOption
 import com.alorma.contactnotes.ui.people.label
-import com.alorma.contactnotes.ui.person.icon
-import com.alorma.contactnotes.ui.person.label
+import com.alorma.contactnotes.ui.person.PersonInitialAvatar
+import com.alorma.contactnotes.ui.person.firstName
+import com.alorma.contactnotes.ui.person.whoIcon
+import com.alorma.contactnotes.ui.person.whoLabel
 
 /** Estat editable d'una entrada. `whenChoice == Now` vol dir «ara» en desar. */
 class EntryFormState(
@@ -91,12 +95,13 @@ fun availableChannels(personChannels: List<ChannelType>, showAll: Boolean = fals
   if (showAll) ChannelType.entries else (personChannels.distinct() + ChannelType.OTHER).distinct()
 
 /**
- * Formulari d'entrada comú: Tipus, text, On i Quan.
+ * Formulari d'entrada comú: Qui, text, On i Quan.
  * `header` va a dalt de tot (la targeta «Amb qui» de la nota ràpida) i `saveButton` a baix.
  */
 @Composable
 fun EntryForm(
   state: EntryFormState,
+  person: PersonEntity?,
   channels: List<ChannelType>,
   channel: ChannelType,
   onChannelChange: (ChannelType) -> Unit,
@@ -106,8 +111,8 @@ fun EntryForm(
 ) {
   Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(14.dp)) {
     header()
-    KindSelector(state)
-    EntryTextField(state, placeholder = stringResource(state.kind.promptLabel()))
+    FormSection(title = stringResource(R.string.entry_who_title)) { WhoSelector(state, person) }
+    EntryTextField(state, placeholder = entryHint(state.kind, person?.name?.let(::firstName).orEmpty()))
     FormSection(title = stringResource(R.string.entry_where_title)) {
       ChannelChips(channels = channels, selected = channel, onSelected = onChannelChange)
     }
@@ -134,12 +139,39 @@ private fun FormSection(title: String, modifier: Modifier = Modifier, content: @
 }
 
 @Composable
-fun KindSelector(state: EntryFormState, modifier: Modifier = Modifier) {
+fun entryHint(kind: EntryKind, firstName: String): String = when (kind) {
+  EntryKind.SAID -> stringResource(R.string.entry_hint_me)
+  EntryKind.HEARD -> stringResource(R.string.entry_hint_person, firstName)
+  EntryKind.HAPPENED -> stringResource(R.string.entry_hint_note)
+}
+
+/** Selector «Qui»: Jo, la persona (amb el seu avatar) o un apunt. */
+@Composable
+fun WhoSelector(state: EntryFormState, person: PersonEntity?, modifier: Modifier = Modifier) {
+  val name = person?.let { firstName(it.name) }
   ConversesToggleGroup(
-    options = EntryKind.entries.map { ToggleOption(it, stringResource(it.label()), it.icon()) },
+    options = EntryKind.entries.map { kind ->
+      when (kind) {
+        EntryKind.HEARD -> ToggleOption(
+          value = kind,
+          label = name ?: stringResource(R.string.entry_who_person),
+          icon = if (person == null) Icons.Rounded.PersonOutline else null,
+          leading = if (person != null) ({ PersonInitialAvatar(person, size = 26.dp) }) else null,
+          enabled = person != null,
+          contentDescription = person?.name,
+        )
+        else -> ToggleOption(
+          value = kind,
+          label = whoLabel(kind, name.orEmpty()),
+          icon = kind.whoIcon(selected = false),
+          selectedIcon = kind.whoIcon(selected = true),
+        )
+      }
+    },
     selected = state.kind,
     onSelect = { state.kind = it },
     modifier = modifier,
+    prominent = true,
   )
 }
 
