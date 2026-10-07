@@ -16,9 +16,20 @@ private const val Authenticators = BIOMETRIC_STRONG or DEVICE_CREDENTIAL
 fun FragmentActivity.canUnlockWithDevice(): Boolean =
   BiometricManager.from(this).canAuthenticate(Authenticators) == BiometricManager.BIOMETRIC_SUCCESS
 
-fun FragmentActivity.promptUnlock(title: String, subtitle: String, onSuccess: () -> Unit) {
+/** Codi de `BiometricManager.canAuthenticate` per a biometria forta o credencial del dispositiu. */
+fun FragmentActivity.unlockAvailability(): Int = BiometricManager.from(this).canAuthenticate(Authenticators)
+
+/** `onError` rep el codi d'`onAuthenticationError`; un dit que no coincideix no fa res i el prompt continua obert. */
+fun FragmentActivity.promptUnlock(
+  title: String,
+  subtitle: String,
+  onError: (code: Int) -> Unit = {},
+  onSuccess: () -> Unit,
+) {
   val callback = object : BiometricPrompt.AuthenticationCallback() {
     override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) = onSuccess()
+
+    override fun onAuthenticationError(errorCode: Int, errString: CharSequence) = onError(errorCode)
   }
   val info = BiometricPrompt.PromptInfo.Builder()
     .setTitle(title)

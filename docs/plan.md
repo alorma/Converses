@@ -21,7 +21,7 @@ La v1 funcional està feta: interfície polida, fluxos complets, privacitat tanc
 | M2 · Fluxos que falten | Triar i crear persona, arxivades, estats buits, desfer | Fet |
 | M3 · Privacitat | Les persones protegides no es filtren enlloc | Fet (falta provar el bloqueig desactivat sol a dispositiu) |
 | Color de la persona | Les pantalles de cada persona prenen el color del seu avatar | Fet (falta provar-lo a l'emulador: animació de l'editor, fulls i interruptor apagat) |
-| Backlog de disseny | Tanda 1 «Quan» (fet), tanda 2 «Qui» (fet), tanda 3 bloqueig (`docs/bloqueig`) | En curs: queda la 3 |
+| Backlog de disseny | Tanda 1 «Quan», tanda 2 «Qui» i tanda 3 bloqueig | Fet (falta provar el bloqueig a dispositiu real: massa intents i empremta) |
 | M4 · Qualitat | Tests, accessibilitat, mode fosc, dispositiu real | Per fer |
 | M5 · Publicació | minSdk, signatura, R8, mida, migracions, Play Store | Per fer |
 | Després de la v1 | Cerca, còpia de seguretat, etiquetes, widget | Idees |
@@ -121,7 +121,8 @@ La v1 funcional està feta: interfície polida, fluxos complets, privacitat tanc
     - barra flotant amb tres destinacions (Persones · Arxivades · Ajustos);
     - tema de color de persona (7 llavors, vegeu «Color de la persona»);
     - fila «Quan» i full «Quan va ser?» (vegeu «Formulari d'entrada i "Quan"»);
-    - selector «Qui», marcadors de 32 dp i filtres amb avatar (vegeu «Qui»).
+    - selector «Qui», marcadors de 32 dp i filtres amb avatar (vegeu «Qui»);
+    - pantalla de bloqueig amb els quatre estats (vegeu «Bloqueig d'una persona protegida»).
 
 ---
 
@@ -296,6 +297,14 @@ Cada persona porta el color de l'avatar com a **llavor del tema** de les seves p
 - Cronologia: marcadors de 32 dp (cercle amb `person`, avatar de la persona sense fons i quadrat amb `edit_note`). Filtres de multiselecció amb els tipus sense entrades amagats.
 - Exportació: `[data · canal] Jo: text`.
 - Pendent: el canal `OTHER - SIGNAL` a l'etiqueta (bug 3), previews i regenerar les captures de referència amb l'etiqueta `update-screenshots`.
+
+### Bloqueig d'una persona protegida
+
+- `PersonLockedScreen` només rep el nom, la forma i el color de l'avatar; res de la persona es carrega fins que el desbloqueig va bé i la ruta passa a `PersonRoute`. Té `FLAG_SECURE` (`SecureWindow`).
+- `LockState`: `Waiting`, `Canceled(permanentLockout)`, `LockedOut(seconds)` i `NoCredentials`. `PersonLockViewModel` guarda l'estat i el compte enrere de 30 s; `lockStateForAvailability` i `lockStateForError` fan el mapeig d'errors de `BiometricPrompt`.
+- Flux: en entrar es comprova `canAuthenticate` i, si va bé, s'obre el prompt sol. Cancel·lar porta a `Canceled`; un `ERROR_LOCKOUT` a `LockedOut`; sense biometria ni PIN, a `NoCredentials`. Només en aquest últim estat `ON_RESUME` torna a comprovar-ho (en tornar de la configuració de seguretat); passar a segon pla no reobre el prompt.
+- Avatar i nom sempre al mateix lloc: l'àrea de l'estat reserva l'alçada de l'estat més alt. L'indicador de càrrega (`ConversesLoadingIndicator`) és al `designsystem`.
+- Pendent: captures de referència del bloqueig (etiqueta `update-screenshots`) i provar-ho amb empremta real.
 
 ### Components propis (`designsystem`)
 
