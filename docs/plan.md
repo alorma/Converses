@@ -270,6 +270,7 @@ La v1 funcional està feta: interfície polida, fluxos complets, privacitat tanc
     - la recreació automàtica només és en debug (a release no n'hi ha); la base de dades és la v1 neta, sense migracions;
     - afegir `MigrationTestHelper` quan hi hagi el primer canvi d'esquema, ja després de publicar.
 - [x] **Dues apps a la vegada:** el build de debug té `applicationIdSuffix = ".debug"` (`com.alorma.contactnotes.debug`) i el nom «Converses Debug» (`src/debug/AndroidManifest.xml`), així es pot tenir instal·lada a la vegada amb la de release.
+- [x] **Icona vermella en debug:** els colors del primer pla de la icona són recursos (`ic_launcher_extrusion`, `ic_launcher_front`, `ic_launcher_highlight`, `ic_launcher_lines` a `values/colors.xml`, lila) i `src/debug/res/values/colors.xml` els sobreescriu en vermell, així la build de debug es distingeix d'un cop d'ull. El fons i la silueta monocroma no canvien.
 - [x] **Signatura de debug:** `app/debug.keystore` al repo (contrasenyes estàndard `android`, àlies `androiddebugkey`), perquè l'APK de debug de la CI i de qualsevol màquina tingui la mateixa signatura i s'instal·li a sobre sense esborrar l'app.
 - [ ] **Signatura i R8:**
     - R8 ja és actiu a release (AGP 9: `optimization { enable = true }`). Havia un bug: amb `packageScope = androidx/kotlin/kotlinx` l'APK de release **petava en arrencar** (`IllegalAccessError` a `kotlin.text`); s'ha tret l'opció i l'APK passa de 9,2 a 5,7 MB;
