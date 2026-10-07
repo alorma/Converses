@@ -22,11 +22,12 @@ La v1 funcional està feta: interfície polida, fluxos complets, privacitat tanc
 | M3 · Privacitat | Les persones protegides no es filtren enlloc | Fet (falta provar el bloqueig desactivat sol a dispositiu) |
 | Color de la persona | Les pantalles de cada persona prenen el color del seu avatar | Fet (falta provar-lo a l'emulador: animació de l'editor, fulls i interruptor apagat) |
 | Backlog de disseny | Tanda 1 «Quan», tanda 2 «Qui» i tanda 3 bloqueig | Fet (falta provar el bloqueig a dispositiu real: massa intents i empremta) |
-| Onboarding · tanda 4 | Benvinguda animada de 3 passos, només el primer cop (vegeu «Onboarding») | En curs: flag, ruta i esquelet de la pantalla fets; falten il·lustracions i animacions (`docs/onboarding/`) |
+| Onboarding · tanda 4 | Benvinguda animada de 3 passos, només el primer cop (vegeu «Onboarding») | Implementat; falten les proves manuals i les referències de captures (`docs/onboarding/`) |
 | Backlog de bugs | Àrea clicable, etiqueta «Other», biometria sense desar | Fet (`docs/backlog.md`) |
 | M4 · Qualitat | Tests, accessibilitat, mode fosc, dispositiu real | Fet (amb excepcions acceptades) |
 | M5 · Publicació | minSdk, signatura, R8, mida, migracions, Play Store | Per fer |
 | Pro i versió gratuïta | `FeatureGate`, avatar estàndard, importar un contacte; res de Pro visible a la v1 (vegeu «Pro i versió gratuïta») | Per fer (`docs/pro.md`) |
+| Menú de debug | Botó flotant i full amb mòduls, només en builds de debug (vegeu «Menú de debug») | Per fer (planificat, sense codi) |
 | Iteració 2 | Follow-ups i gestor de canals | Després de la publicació (vegeu «Iteració 2») |
 | Després de la v1 | Cerca, còpia de seguretat, etiquetes, widget | Idees |
 
@@ -38,6 +39,7 @@ La v1 funcional està feta: interfície polida, fluxos complets, privacitat tanc
 - Bugs i features pendents: vegeu `docs/backlog.md` (issues #4, #5 i #6).
 - Onboarding animat (tanda 4): especificació i disseny a `docs/onboarding/` (vegeu «Onboarding»).
 - Pro i versió gratuïta: document de treball a `docs/pro.md` (vegeu «Pro i versió gratuïta»).
+- Menú de debug: pendent d'implementar (vegeu «Menú de debug»).
 
 ## Decisions (només queda D1)
 
@@ -194,19 +196,18 @@ La v1 funcional està feta: interfície polida, fluxos complets, privacitat tanc
 - **Comença (pas 3) actiu des del principi** (decidit): es pot prémer en qualsevol moment i salta l'animació que quedi; no cal esperar els 3,7 s.
 - **Textos de mostra de les il·lustracions traduïts** (decidit): les etiquetes, els textos de les entrades del pas 2 («La Nyra deu diners al gremi.»…) i les inicials/noms d'exemple van a `strings.xml` en en/ca/es, amb claus pròpies (p. ex. `onb_sample_*`), a més de les `onb_*` de l'spec. L'spec només dona el text en català: cal escriure'n l'anglès i el castellà.
 - **Omet** (passos 1 i 2) i **Comença** (pas 3) desen la clau i substitueixen la ruta per `PeopleRoute`. Enrere al pas 1 surt de l'app sense marcar-lo.
-- `ui/onboarding/OnboardingScreen.kt` (`HorizontalPager` de 3 pàgines, punts, botons) i `OnboardingIllustrations.kt` (una il·lustració animada per pas, que es repeteix en tornar-hi i en tocar-la; amb moviment reduït mostra l'estat final).
+- `ui/onboarding/OnboardingScreen.kt` (`HorizontalPager` de 3 pàgines, punts, botons) i `OnboardingIllustrations.kt` (una il·lustració animada per pas, que es repeteix en tornar-hi (tocar-la no la repeteix: decidit); amb moviment reduït mostra l'estat final).
 - Colors d'èxit nous al `designsystem` (`success`, `onSuccess`, `successContainer`), fixos i només per a aquesta pantalla.
 - Textos `onb_*` a `strings.xml` (en, ca, es).
 
 **Commits previstos:**
 
 - [x] FireAndForget 1.3.0 al catàleg, `OnboardingFlag` amb el runner sobre DataStore (`data/settings/OnboardingFlag.kt`), `onboarding_done` a `SettingsRepository` i ruta inicial condicional a `MainActivity` (`shouldShowOnboarding`, amb la regla de les persones només en builds no debuggables).
-- [ ] `OnboardingScreen`: pager, textos `onb_*`, punts, botons, Omet/Comença i enrere (fet); falten les il·lustracions estàtiques en l'estat final (ara hi ha un contenidor buit), les claus `onb_sample_*` i l'entrada de títol/cos.
-- [ ] Tokens `success*` al `designsystem`.
-- [ ] Animació del pas 1 (bafarada i 5 avatars).
-- [ ] Animació del pas 2 (cronologia amb `TimelineRow`).
-- [ ] Animació del pas 3 (empremta, verd d'èxit, cadenat).
-- [ ] Repetició en tocar, moviment reduït, previews (estat final de cada pas, en clar i en fosc) i tests.
+- [x] `OnboardingScreen`: pager, textos `onb_*` i `onb_sample_*` (en/ca/es), punts, botons, Omet/Comença i enrere.
+- [x] Tokens `success*` al `designsystem` (`SuccessColors`, fixos clar/fosc) i `OnboardingTitleStyle`.
+- [x] Animacions dels tres passos a `OnboardingIllustrations.kt` (`rememberSequence` amb `Animatable` per element). `TimelineRow` té ara `lineProgress` per animar la línia del pas 2.
+- [x] Moviment reduït (tocar la il·lustració NO la repeteix: decidit) (`ANIMATOR_DURATION_SCALE == 0`: els `Animatable` neixen a l'estat final), entrada de títol i cos, i previews dels tres passos (`OnboardingPreviews.kt`) amb tests de captures `onboardingStep1..3`; **falta generar les referències amb l'etiqueta `update-screenshots`**.
+- [ ] Pendent: pop del botó «Comença» al pas 3, test del runner del flag, i les proves manuals de la llista de sota (emulador/dispositiu).
 
 **Proves** (llista completa al document): primera obertura i no tornar a sortir; enrere al pas 1; animació de la pàgina d'arribada; repetir en tocar; moviment reduït; clar i fosc; ca/es/en amb font gran; rendiment de les animacions infinites.
 
@@ -313,6 +314,32 @@ El detall és a `docs/pro.md` (document de treball, es continuarà). Resum:
 - **A la primera release no es mostra res de Pro.**
 - **Per a la v1 gratuïta:** avatar estàndard (forma Galeta i color automàtic per hash del nom; `avatarShape` i `avatarColor` nul·lables, sense migració perquè l'app encara no és publicada) i importar una persona des del selector de contactes del sistema.
 - **Pendent de decidir:** canal «Empresa» (backlog 7), gratuït o Pro segons si es fa abans dels canals propis.
+
+## Menú de debug
+
+Pendent d'implementar. Inspirat en el debug menu de [sevibus-android](https://github.com/Sloy/sevibus-android) (mòduls `debug-menu` i `debug-menu-noop`). Serveix, entre altres coses, per provar els dos modes del `FeatureGate` (vegeu «Pro i versió gratuïta»).
+
+**Com és a SeviBus:**
+
+- `DebugMenuHost(overlayLogger, menu = { ... }) { app }` embolcalla l'arrel de l'app: afegeix un botó flotant arrossegable i un `ModalBottomSheet` amb els mòduls.
+- Cada mòdul és un `DebugModule(title, icon) { DebugCell(...) }` (acordió amb files estàndard: títol, subtítol i un slot a cada banda). Un mòdul també pot obrir una pantalla completa.
+- `DebugModuleDataSource<T>` desa l'estat de cada mòdul en JSON a SharedPreferences i l'exposa com a `StateFlow`.
+- Dos mòduls Gradle amb el mateix namespace: la implementació real a `debugImplementation` i una versió buida a `releaseImplementation`. L'app té una carpeta `src/debug/` amb els mòduls reals i una `src/release/` amb funcions buides.
+
+**Decisions per a Converses:**
+
+- **Dins de `:app`, sense mòduls Gradle nous.** Carpetes `src/debug/` (`DebugMenuHost`, `ConversesDebugMenu`, `DebugModule`, `DebugCell`, mòduls) i `src/release/` (un `DebugMenuHost` que només crida el contingut i un `ConversesDebugMenu` buit). A release no hi arriba cap codi del menú. Així `@OptIn(ExperimentalMaterial3ExpressiveApi)` continua només a `designsystem` i el CI no canvia.
+- **Botó flotant sempre visible en debug** (decidit). Té l'inconvenient que sortirà a les captures: les captures de pantalles no passen per `MainActivity`, així que no s'hi veurà; s'ha de comprovar quan s'implementi.
+- **On es col·loca:** a `MainActivity`, embolcallant `AppNavigation` (i el bloqueig de l'app) amb `DebugMenuHost`.
+- **El menú no pot filtrar dades de persones protegides:** cap mòdul no mostra noms ni contingut d'entrades, i el full ha d'heretar `FLAG_SECURE` quan la finestra el tingui actiu.
+- **L'interruptor Pro passa del menú d'Ajustos al menú de debug:** substitueix «un interruptor a Ajustos (només en builds de debug)» de `docs/pro.md`, perquè Ajustos no tingui res de debug.
+
+**Passos:**
+
+1. Esquelet: `DebugMenuHost` (botó flotant + full), `DebugModule` i `DebugCell`, amb la variant `release` buida.
+2. Mòdul **Pro**: interruptor de `FeatureGate.isPro` (depèn del primer pas de `docs/pro.md`).
+3. Mòduls petits segons faci falta: tornar a sembrar les dades d'exemple, tornar a mostrar l'onboarding (`OnboardingFlag.reset()`), esborrar el DataStore.
+4. Comprovar que l'APK de release no conté cap classe del menú.
 
 ## Després de la v1
 
