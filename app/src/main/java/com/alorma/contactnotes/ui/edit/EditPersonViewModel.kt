@@ -50,11 +50,28 @@ data class EditPersonUiState(
   val canSave: Boolean get() = loaded && name.isNotBlank() && !aliasTaken && (isNew || snapshot != baseline)
 }
 
+/** Accions de l'editor; les implementa el `ViewModel` i les previews les deixen buides. */
+interface EditPersonActions {
+  fun onName(value: String)
+  fun onAlias(value: String)
+  fun onShape(shape: AvatarShape)
+  fun onColor(color: AvatarColor)
+  fun onProtected(value: Boolean)
+  fun onAddFact()
+  fun onFactChange(key: Long, label: String, value: String)
+  fun onRemoveFact(key: Long)
+  fun onMoveFact(from: Int, to: Int)
+  fun onSaveChannel(key: Long?, type: ChannelType, handle: String)
+  fun onRemoveChannel(key: Long)
+  fun delete(exportFirst: Boolean, onDeleted: () -> Unit)
+  fun save(onSaved: (Long) -> Unit)
+}
+
 class EditPersonViewModel(
   private val personId: Long,
   private val repository: ConversesRepository,
   private val exporter: PersonExporter,
-) : ViewModel() {
+) : ViewModel(), EditPersonActions {
   private var original: PersonEntity? = null
   private var nextKey = 1L
 
@@ -97,9 +114,9 @@ class EditPersonViewModel(
     }
   }
 
-  fun onName(value: String) = _state.update { it.copy(name = value) }
+  override fun onName(value: String) = _state.update { it.copy(name = value) }
 
-  fun onAlias(value: String) {
+  override fun onAlias(value: String) {
     val alias = value.removePrefix("@")
     _state.update { it.copy(alias = alias) }
     viewModelScope.launch {
@@ -108,21 +125,21 @@ class EditPersonViewModel(
     }
   }
 
-  fun onShape(shape: AvatarShape) = _state.update { it.copy(shape = shape) }
+  override fun onShape(shape: AvatarShape) = _state.update { it.copy(shape = shape) }
 
-  fun onColor(color: AvatarColor) = _state.update { it.copy(color = color) }
+  override fun onColor(color: AvatarColor) = _state.update { it.copy(color = color) }
 
-  fun onProtected(value: Boolean) = _state.update { it.copy(isProtected = value) }
+  override fun onProtected(value: Boolean) = _state.update { it.copy(isProtected = value) }
 
-  fun onAddFact() = _state.update { it.copy(facts = it.facts + FactDraft(nextKey++, "", "")) }
+  override fun onAddFact() = _state.update { it.copy(facts = it.facts + FactDraft(nextKey++, "", "")) }
 
-  fun onFactChange(key: Long, label: String, value: String) = _state.update { state ->
+  override fun onFactChange(key: Long, label: String, value: String) = _state.update { state ->
     state.copy(facts = state.facts.map { if (it.key == key) it.copy(label = label, value = value) else it })
   }
 
-  fun onRemoveFact(key: Long) = _state.update { state -> state.copy(facts = state.facts.filterNot { it.key == key }) }
+  override fun onRemoveFact(key: Long) = _state.update { state -> state.copy(facts = state.facts.filterNot { it.key == key }) }
 
-  fun onMoveFact(from: Int, to: Int) = _state.update { state ->
+  override fun onMoveFact(from: Int, to: Int) = _state.update { state ->
     if (from !in state.facts.indices || to !in state.facts.indices) {
       state
     } else {
@@ -130,7 +147,7 @@ class EditPersonViewModel(
     }
   }
 
-  fun onSaveChannel(key: Long?, type: ChannelType, handle: String) = _state.update { state ->
+  override fun onSaveChannel(key: Long?, type: ChannelType, handle: String) = _state.update { state ->
     val cleanHandle = if (type == ChannelType.IN_PERSON) "" else handle.trim()
     if (key == null) {
       state.copy(channels = state.channels + ChannelDraft(nextKey++, type, cleanHandle))
@@ -139,9 +156,9 @@ class EditPersonViewModel(
     }
   }
 
-  fun onRemoveChannel(key: Long) = _state.update { state -> state.copy(channels = state.channels.filterNot { it.key == key }) }
+  override fun onRemoveChannel(key: Long) = _state.update { state -> state.copy(channels = state.channels.filterNot { it.key == key }) }
 
-  fun delete(exportFirst: Boolean, onDeleted: () -> Unit) {
+  override fun delete(exportFirst: Boolean, onDeleted: () -> Unit) {
     val person = original ?: return
     viewModelScope.launch {
       if (exportFirst) exporter.buildText(personId)?.let { exporter.share(person.name, it) }
@@ -150,7 +167,7 @@ class EditPersonViewModel(
     }
   }
 
-  fun save(onSaved: (Long) -> Unit) {
+  override fun save(onSaved: (Long) -> Unit) {
     val current = _state.value
     if (!current.canSave) return
     viewModelScope.launch {
