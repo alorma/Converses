@@ -158,6 +158,23 @@ private fun WhenSheet(
   onChoice: (WhenChoice) -> Unit,
   onPick: () -> Unit,
 ) {
+  ModalBottomSheet(
+    onDismissRequest = onDismiss,
+    sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
+    containerColor = MaterialTheme.colorScheme.surface,
+  ) {
+    WhenSheetContent(choice = choice, now = now, onChoice = onChoice, onPick = onPick)
+  }
+}
+
+/** Contingut del full «Quan va ser?»; el `ModalBottomSheet` és una finestra a part. */
+@Composable
+internal fun WhenSheetContent(
+  choice: WhenChoice,
+  now: Long,
+  onChoice: (WhenChoice) -> Unit,
+  onPick: () -> Unit,
+) {
   val options = listOf(
     SheetOption(WhenChoice.Now.display(now), choice is WhenChoice.Now) { onChoice(WhenChoice.Now) },
     SheetOption(WhenChoice.hourAgo(now).display(now), choice is WhenChoice.HourAgo) {
@@ -177,26 +194,20 @@ private fun WhenSheet(
       onClick = onPick,
     ),
   )
-  ModalBottomSheet(
-    onDismissRequest = onDismiss,
-    sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
-    containerColor = MaterialTheme.colorScheme.surface,
+  Column(
+    modifier = Modifier
+      .fillMaxWidth()
+      .windowInsetsPadding(WindowInsets.navigationBars)
+      .padding(start = 16.dp, end = 16.dp, bottom = 16.dp),
+    verticalArrangement = Arrangement.spacedBy(GroupedListDefaults.ItemSpacing),
   ) {
-    Column(
-      modifier = Modifier
-        .fillMaxWidth()
-        .windowInsetsPadding(WindowInsets.navigationBars)
-        .padding(start = 16.dp, end = 16.dp, bottom = 16.dp),
-      verticalArrangement = Arrangement.spacedBy(GroupedListDefaults.ItemSpacing),
-    ) {
-      Text(
-        text = stringResource(R.string.when_sheet_title),
-        style = SheetTitleStyle,
-        modifier = Modifier.padding(start = 6.dp, bottom = 14.dp),
-      )
-      options.forEachIndexed { index, option ->
-        WhenOptionRow(option, groupedItemShape(index, options.size))
-      }
+    Text(
+      text = stringResource(R.string.when_sheet_title),
+      style = SheetTitleStyle,
+      modifier = Modifier.padding(start = 6.dp, bottom = 14.dp),
+    )
+    options.forEachIndexed { index, option ->
+      WhenOptionRow(option, groupedItemShape(index, options.size))
     }
   }
 }

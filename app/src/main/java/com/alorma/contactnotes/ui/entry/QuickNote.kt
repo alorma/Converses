@@ -135,6 +135,27 @@ fun QuickNoteScreen(
 ) {
   val state by viewModel.uiState.collectAsStateWithLifecycle()
   val form = rememberEntryFormState()
+  QuickNoteContent(
+    state = state,
+    form = form,
+    onClose = onClose,
+    onSelectPerson = viewModel::select,
+    onNewPerson = onNewPerson,
+    onSave = { person, channel ->
+      viewModel.save(person.id, form.kind, channel, form.text.trim(), form.occurredAt, onClose)
+    },
+  )
+}
+
+@Composable
+fun QuickNoteContent(
+  state: QuickNoteUiState,
+  form: EntryFormState,
+  onClose: () -> Unit,
+  onSelectPerson: (PersonEntity) -> Unit,
+  onNewPerson: () -> Unit,
+  onSave: (person: PersonEntity, channel: ChannelType) -> Unit,
+) {
   val selected = state.selected
   val available = availableChannels(state.channels, showAll = selected == null || selected.isProtected)
   val channel = form.channel?.takeIf { it in available }
@@ -157,11 +178,7 @@ fun QuickNoteScreen(
             Icon(Icons.Rounded.Close, contentDescription = stringResource(R.string.close))
           }
           Button(
-            onClick = {
-              if (selected != null) {
-                viewModel.save(selected.id, form.kind, channel, form.text.trim(), form.occurredAt, onClose)
-              }
-            },
+            onClick = { if (selected != null) onSave(selected, channel) },
             enabled = form.canSave && selected != null,
           ) { Text(stringResource(R.string.save), fontWeight = FontWeight.Bold) }
         }
@@ -174,7 +191,7 @@ fun QuickNoteScreen(
           channel = channel,
           onChannelChange = { form.channel = it },
           header = {
-            PersonPicker(selected = selected, people = state.people, onSelect = viewModel::select, onNewPerson = onNewPerson)
+            PersonPicker(selected = selected, people = state.people, onSelect = onSelectPerson, onNewPerson = onNewPerson)
           },
         )
       }

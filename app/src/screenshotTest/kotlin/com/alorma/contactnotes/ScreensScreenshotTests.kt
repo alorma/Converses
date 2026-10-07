@@ -4,6 +4,11 @@ import android.content.res.Configuration
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import com.android.tools.screenshot.PreviewTest
+import com.alorma.contactnotes.ui.entry.NewEntrySheetPreview
+import com.alorma.contactnotes.ui.entry.QuickNoteFilledPreview
+import com.alorma.contactnotes.ui.entry.QuickNoteNoPersonPreview
+import com.alorma.contactnotes.ui.entry.WhenSheetCustomPreview
+import com.alorma.contactnotes.ui.entry.WhenSheetNowPreview
 import com.alorma.contactnotes.ui.people.PeopleListScreenArchivedPreview
 import com.alorma.contactnotes.ui.people.PeopleListScreenEmptyPreview
 import com.alorma.contactnotes.ui.people.PeopleListScreenLoadedPreview
@@ -99,5 +104,40 @@ class ScreensScreenshotTests {
   @Composable
   fun personLockedNoCredentials() {
     PersonLockedNoCredentialsPreview()
+  }
+
+  @ScreenPreviews
+  @PreviewTest
+  @Composable
+  fun quickNoteNoPerson() {
+    QuickNoteNoPersonPreview()
+  }
+
+  @ScreenPreviews
+  @PreviewTest
+  @Composable
+  fun quickNoteFilled() {
+    QuickNoteFilledPreview()
+  }
+
+  @ScreenPreviews
+  @PreviewTest
+  @Composable
+  fun newEntrySheet() {
+    NewEntrySheetPreview()
+  }
+
+  @ScreenPreviews
+  @PreviewTest
+  @Composable
+  fun whenSheetNow() {
+    WhenSheetNowPreview()
+  }
+
+  @ScreenPreviews
+  @PreviewTest
+  @Composable
+  fun whenSheetCustom() {
+    WhenSheetCustomPreview()
   }
 }
