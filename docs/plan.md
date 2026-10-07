@@ -25,7 +25,7 @@ La v1 funcional està feta: interfície polida, fluxos complets, privacitat tanc
 | Onboarding · tanda 4 | Benvinguda animada de 3 passos, només el primer cop (vegeu «Onboarding») | Implementat; falten les proves manuals i les referències de captures (`docs/onboarding/`) |
 | Backlog de bugs | Àrea clicable, etiqueta «Other», biometria sense desar | Fet (`docs/backlog.md`) |
 | M4 · Qualitat | Tests, accessibilitat, mode fosc, dispositiu real | Fet (amb excepcions acceptades) |
-| M5 · Publicació | minSdk, signatura, R8, mida, migracions, Play Store | Per fer |
+| M5 · Publicació | minSdk (fet), R8 (arrencada arreglada), signatura, mida de la font, CI de release, Play Store | En curs |
 | Versió gratuïta (v1 sense Pro) | Avatar estàndard; el Pro queda per després de la v1 (vegeu «Versió gratuïta i Pro») | **Per fer abans de la release 1**; va abans de M5 (`docs/pro.md`) |
 | Menú de debug | Botó flotant i full amb mòduls, només en builds de debug (vegeu «Menú de debug») | Esquelet i mòduls Dades i Onboarding fets; falta el mòdul Pro (interruptor gratuït/Pro) i provar-lo a l'emulador |
 | Iteració 2 | Follow-ups i gestor de canals | Després de la publicació (vegeu «Iteració 2») |
@@ -39,14 +39,15 @@ La v1 funcional està feta: interfície polida, fluxos complets, privacitat tanc
 - Features pendents: vegeu `docs/backlog.md`; només queden les de l'Iteració 2 (issue #5).
 - Onboarding: proves manuals, pop del botó «Comença» al pas 3, test del runner del flag i referències de captures (etiqueta `update-screenshots`); vegeu «Onboarding».
 - Canvis de la versió gratuïta: vegeu «Versió gratuïta i Pro»; són obligatoris abans de la release.
+- Redisseny de Nova persona / Editar persona: pas 3 de «Versió gratuïta i Pro»; especificació a `docs/nova-persona/`.
 - Versió gratuïta i Pro: document de treball a `docs/pro.md` (vegeu «Versió gratuïta i Pro»).
 - Menú de debug: esquelet fet; falta el mòdul Pro (vegeu «Menú de debug»).
 
-## Decisions (només queda D1)
+## Decisions (totes preses)
 
 | # | Decisió | Recomanació | Afecta |
 | --- | --- | --- | --- |
-| D1 | **minSdk.** Ara és 36 (només Android 16+), cosa que deixa fora la gran majoria de mòbils | Baixar-lo a **31** (Android 12, color dinàmic garantit). Si la Play Store no és un objectiu, es pot deixar a 36 | M5, Ajustos |
+| D1 | **minSdk.** Era 36 (només Android 16+) | **Decidit: 31** (Android 12, color dinàmic garantit). Fet | M5, Ajustos |
 | D2 | **Barra flotant del llistat.** Ara només té Persones i Ajustos | **Persones · Arxivades · Ajustos**, i treure «Arxivades» dels filtres de canal **Decidit:** Persones · Arxivades · Ajustos (fet). | M2 |
 | D3 | **Xips de canal del detall.** Ara no fan res | Tocar obre l'app quan hi ha enllaç directe (WhatsApp `wa.me`, Telegram `t.me`, Telèfon `tel:`); mantenir premut copia l'usuari; «En persona» no és clicable **Decidit:** tocar obre l'app i mantenir premut copia, sense snackbar (fet). | M2 |
 | D4 | **Còpia de seguretat d'Android.** Per defecte, la base de dades amb les notes va a Google Drive | Excloure la base de dades del backup automàtic a la v1 (són notes privades) i oferir l'exportació manual **Decidit:** excloure la base de dades i el DataStore del backup (fet). | M3 |
@@ -258,7 +259,7 @@ La v1 funcional està feta: interfície polida, fluxos complets, privacitat tanc
 
 **Fet quan:** hi ha un AAB signat i optimitzat a la pista interna de Play.
 
-- [ ] **minSdk (D1):** si es baixa a 31, cal revisar les crides que no hi són (selector d'idioma per app: `AppCompatDelegate.setApplicationLocales` a l'API 31–32) i provar-ho en un emulador amb l'API 31.
+- [x] **minSdk (D1):** baixat a **31** (`app` i `designsystem`). El lint no troba cap crida que no hi sigui; l'únic cas era l'idioma per app (`Settings.ACTION_APP_LOCALE_SETTINGS`, API 33, constant inlinada que el lint no avisa): a l'API 31–32 s'obre l'idioma del sistema (`Settings.ACTION_LOCALE_SETTINGS`), que l'app ja segueix. Provat en un emulador amb l'API 31 amb l'APK de release: onboarding, color dinàmic i Ajustos → Idioma funcionen.
 - [x] **material3 alpha:** fixada a `1.5.0-alpha29` al catàleg de versions. API d'Expressive en ús (tots els `@OptIn` són al `designsystem`): `MaterialExpressiveTheme` i `MotionScheme`, `MaterialShapes`, `SplitButtonLayout` / `SplitButtonDefaults`, `ToggleButton` / `ToggleButtonDefaults` / `ButtonGroupDefaults` i `HorizontalFloatingToolbar`.
 - [ ] **Mida de la font:** Roboto Flex variable pesa ~1,7 MB. Hi ha dues opcions:
     - (a) fonts descarregables de Google Fonts (`androidx.compose.ui.text.googlefonts`), amb Roboto com a alternativa;
@@ -326,9 +327,15 @@ El detall és a `docs/pro.md` (document de treball, es continuarà). **La v1 no 
     - **Room:** la base de dades és la **versió 1** de la v1, neta i **sense cap migració**: l'esquema (`1.json`) s'ha regenerat des de zero i les dues columnes d'avatar són nul·lables. Com que l'app no és publicada, no hi ha cap instal·lació a conservar; en debug la base de dades es recrea sola si canvia l'esquema. A partir de la publicació, qualsevol canvi serà v1 → v2 amb migració i test (`MigrationTestHelper`);
     - editor: l'estat guarda `null` mentre no es tria res i l'avatar de previsualització segueix el nom mentre s'escriu; amb `CustomAvatarFeature` apagada s'amaguen la forma i el color i només queda l'avatar (`customAvatar` a `EditPersonContent`); una persona nova es desa amb `null` (test a `EditPersonViewModelTest`);
     - pendent al CI: etiqueta `update-screenshots` (canvia `editPersonNew`; les captures de l'onboarding són noves).
-- [ ] **3 · Comprovar que res de Pro és visible** amb totes les funcions apagades (llista de `docs/pro.md` → «Proves») i, amb l'interruptor del menú de debug, que els dos modes funcionen.
+- [ ] **3 · Redisseny de Nova persona / Editar persona** (especificació a `docs/nova-persona/redisseny-nova-persona.md`, captures a `docs/nova-persona/img/`; si hi ha cap diferència amb el pla, mana aquest document). Es fa abans del pas 4 perquè canvia el formulari que s'hi ha de comprovar. Resum:
+    - s'elimina la targeta d'avatar: l'avatar (56 dp, Galeta amb color automàtic, no clicable) passa a la primera fila del grup «Nom» i s'actualitza mentre s'escriu;
+    - amb `CustomAvatarFeature` encesa, l'avatar és un botó amb insígnia d'edició que obre el full «Avatar» (forma, color i «Automàtic»; es desa amb la persona; `avatarColor = null` = automàtic);
+    - fila «Omple des d'un contacte» a Nova persona (selector de contactes del sistema). **Cal revisar-ho:** a «Fora de la v1» el vincle amb l'agenda està descartat i `docs/pro.md` situa la integració amb contactes al Pro; cal decidir si aquesta fila entra a la v1 (sense permisos) o va darrere d'un flag;
+    - «Dades fixades» passa a ser «Dades» (es «Datos», en «Info») a tota l'app, sense la icona `push_pin`; només textos, la taula `pinned_fact` no canvia;
+    - una sola `resolveAvatar(person)`; textos nous a `strings.xml` (en/ca/es); previews i captures (etiqueta `update-screenshots`).
+- [ ] **4 · Comprovar que res de Pro és visible** amb totes les funcions apagades (llista de `docs/pro.md` → «Proves») i, amb l'interruptor del menú de debug, que els dos modes funcionen.
 
-**Relació amb altres fases:** el pas 3 i la prova «amb `CustomAvatar` activada» depenen del mòdul **Pro** del menú de debug (vegeu «Menú de debug»), que es fa en paral·lel. M5 no pot començar a signar ni a omplir la fitxa de Play fins que 1–2 estiguin fets.
+**Relació amb altres fases:** el pas 4 i la prova «amb `CustomAvatar` activada» depenen del mòdul **Pro** del menú de debug (vegeu «Menú de debug»), que es fa en paral·lel. M5 no pot començar a signar ni a omplir la fitxa de Play fins que 1–3 estiguin fets.
 
 ## Menú de debug
 
@@ -372,7 +379,7 @@ Esquelet i mòduls implementats (passos 1 a 4), inclòs el mòdul de flags. Insp
 
 ### Stack
 
-Una sola activitat (`MainActivity`, una `FragmentActivity` pel `BiometricPrompt`) i dos mòduls: `:app` i `:designsystem`. Ara `minSdk = 36` (vegeu D1) i `compileSdk = 37`.
+Una sola activitat (`MainActivity`, una `FragmentActivity` pel `BiometricPrompt`) i dos mòduls: `:app` i `:designsystem`. `minSdk = 31` (vegeu D1) i `compileSdk = 37`.
 
 | Peça | Llibreria i versió | Notes |
 | --- | --- | --- |
