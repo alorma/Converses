@@ -65,6 +65,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.alorma.compose.settings.ui.expressive.SettingsGroup
 import com.alorma.contactnotes.R
 import com.alorma.contactnotes.data.settings.AppLockManager
+import com.alorma.contactnotes.data.settings.AppSettings
 import com.alorma.contactnotes.designsystem.components.ConversesToggleGroup
 import com.alorma.contactnotes.designsystem.components.GroupedListDefaults
 import com.alorma.contactnotes.designsystem.components.SettingRow
@@ -97,6 +98,48 @@ fun SettingsScreen(
   val authTitle = stringResource(R.string.app_lock_prompt_title)
   val authSubtitle = stringResource(R.string.unlock_subtitle)
 
+  SettingsContent(
+    settings = settings,
+    canUnlock = canUnlock,
+    languageName = remember { currentLanguageName(context) },
+    versionName = remember { versionName(context) },
+    onBack = onBack,
+    onThemeMode = viewModel::onThemeMode,
+    onDynamicColor = viewModel::onDynamicColor,
+    onThemeColor = viewModel::onThemeColor,
+    onPersonColorTheme = viewModel::onPersonColorTheme,
+    onAppLockChange = { enabled ->
+      activity.promptUnlock(authTitle, authSubtitle) {
+        viewModel.onAppLock(enabled)
+        if (enabled) appLock.unlock()
+      }
+    },
+    onRelockAfter = viewModel::onRelockAfter,
+    onOpenLanguage = {
+      context.startActivity(
+        Intent(Settings.ACTION_APP_LOCALE_SETTINGS).setData(Uri.fromParts("package", context.packageName, null)),
+      )
+    },
+    onOpenSecuritySetup = { context.openSecuritySetup() },
+  )
+}
+
+@Composable
+fun SettingsContent(
+  settings: AppSettings,
+  canUnlock: Boolean,
+  languageName: String,
+  versionName: String,
+  onBack: () -> Unit,
+  onThemeMode: (ThemeMode) -> Unit,
+  onDynamicColor: (Boolean) -> Unit,
+  onThemeColor: (ThemeColor) -> Unit,
+  onPersonColorTheme: (Boolean) -> Unit,
+  onAppLockChange: (Boolean) -> Unit,
+  onRelockAfter: (Int) -> Unit,
+  onOpenLanguage: () -> Unit,
+  onOpenSecuritySetup: () -> Unit,
+) {
   Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.surface) {
     Column(
       modifier = Modifier
@@ -123,7 +166,7 @@ fun SettingsScreen(
         val themeCount = if (settings.dynamicColor) 3 else 4
         ThemeModeRow(
           selected = settings.themeMode,
-          onSelected = viewModel::onThemeMode,
+          onSelected = onThemeMode,
           shape = groupedItemShape(0, themeCount),
         )
         SettingSwitchRow(
@@ -131,13 +174,13 @@ fun SettingsScreen(
           subtitle = stringResource(R.string.settings_dynamic_color_summary),
           icon = Icons.Rounded.Palette,
           checked = settings.dynamicColor,
-          onCheckedChange = viewModel::onDynamicColor,
+          onCheckedChange = onDynamicColor,
           shape = groupedItemShape(1, themeCount),
         )
         if (!settings.dynamicColor) {
           ThemeColorPicker(
             selected = settings.themeColor,
-            onSelected = viewModel::onThemeColor,
+            onSelected = onThemeColor,
             shape = groupedItemShape(2, themeCount),
           )
         }
@@ -146,7 +189,7 @@ fun SettingsScreen(
           subtitle = stringResource(R.string.settings_person_color_summary),
           icon = Icons.Rounded.Face,
           checked = settings.personColorTheme,
-          onCheckedChange = viewModel::onPersonColorTheme,
+          onCheckedChange = onPersonColorTheme,
           shape = groupedItemShape(themeCount - 1, themeCount),
         )
       }
@@ -157,15 +200,11 @@ fun SettingsScreen(
       ) {
         SettingRow(
           title = stringResource(R.string.settings_app_language),
-          subtitle = remember { currentLanguageName(context) },
+          subtitle = languageName,
           icon = Icons.Rounded.Language,
           trailing = { Icon(Icons.Rounded.OpenInNew, contentDescription = null) },
           shape = groupedItemShape(0, 1),
-          onClick = {
-            context.startActivity(
-              Intent(Settings.ACTION_APP_LOCALE_SETTINGS).setData(Uri.fromParts("package", context.packageName, null)),
-            )
-          },
+          onClick = onOpenLanguage,
         )
       }
 
@@ -180,7 +219,7 @@ fun SettingsScreen(
             icon = Icons.Rounded.Fingerprint,
             trailing = { Icon(Icons.Rounded.OpenInNew, contentDescription = null) },
             shape = groupedItemShape(0, 1),
-            onClick = { context.openSecuritySetup() },
+            onClick = { onOpenSecuritySetup() },
           )
         } else {
           val lockCount = if (settings.appLock) 2 else 1
@@ -190,17 +229,12 @@ fun SettingsScreen(
             icon = Icons.Rounded.Fingerprint,
             checked = settings.appLock,
             shape = groupedItemShape(0, lockCount),
-            onCheckedChange = { enabled ->
-              activity.promptUnlock(authTitle, authSubtitle) {
-                viewModel.onAppLock(enabled)
-                if (enabled) appLock.unlock()
-              }
-            },
+            onCheckedChange = onAppLockChange,
           )
           if (settings.appLock) {
             RelockRow(
               seconds = settings.relockAfterSeconds,
-              onSelected = viewModel::onRelockAfter,
+              onSelected = onRelockAfter,
               shape = groupedItemShape(1, lockCount),
             )
           }
@@ -213,7 +247,7 @@ fun SettingsScreen(
         modifier = Modifier.padding(horizontal = 4.dp),
       )
       Text(
-        text = stringResource(R.string.settings_footer, versionName(context)),
+        text = stringResource(R.string.settings_footer, versionName),
         style = MaterialTheme.typography.bodyMedium,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
         modifier = Modifier.padding(start = 4.dp, top = 12.dp, bottom = 32.dp),
