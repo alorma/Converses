@@ -109,6 +109,7 @@ internal fun TimelinePreview() {
 internal fun SplitButtonPreview() {
   ConversesPreviewSurface {
     ConversesSplitButton(
+      menuContentDescription = "More options",
       label = "Note",
       icon = Icons.Rounded.Edit,
       onClick = {},
@@ -128,6 +129,7 @@ internal fun ColorSwatchesPreview() {
       selected = AvatarColor.Mint,
       colorOf = { it.color },
       onSelect = {},
+      labelOf = { it.name },
       modifier = Modifier.width(360.dp),
     )
   }

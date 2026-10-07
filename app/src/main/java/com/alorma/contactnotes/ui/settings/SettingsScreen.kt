@@ -66,6 +66,7 @@ import com.alorma.compose.settings.ui.expressive.SettingsGroup
 import com.alorma.contactnotes.R
 import com.alorma.contactnotes.data.settings.AppLockManager
 import com.alorma.contactnotes.data.settings.AppSettings
+import com.alorma.contactnotes.designsystem.components.ColorSwatches
 import com.alorma.contactnotes.designsystem.components.ConversesToggleGroup
 import com.alorma.contactnotes.designsystem.components.GroupedListDefaults
 import com.alorma.contactnotes.designsystem.components.SettingRow
@@ -75,6 +76,7 @@ import com.alorma.contactnotes.designsystem.components.ToggleOption
 import com.alorma.contactnotes.designsystem.theme.ScreenTitleStyle
 import com.alorma.contactnotes.designsystem.theme.ThemeColor
 import com.alorma.contactnotes.designsystem.theme.ThemeMode
+import com.alorma.contactnotes.ui.people.colorNameRes
 import com.alorma.contactnotes.ui.person.canUnlockWithDevice
 import com.alorma.contactnotes.ui.person.openSecuritySetup
 import com.alorma.contactnotes.ui.person.promptUnlock
@@ -334,30 +336,14 @@ private fun ThemeColorPicker(
         style = MaterialTheme.typography.bodyMedium,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
       )
-      Row(
-        modifier = Modifier.fillMaxWidth().padding(top = 12.dp).selectableGroup(),
-        horizontalArrangement = Arrangement.SpaceBetween,
-      ) {
-        ThemeColor.entries.forEach { color ->
-          val isSelected = color == selected
-          Box(
-            modifier = Modifier
-              .size(44.dp)
-              .then(
-                if (isSelected) Modifier.border(BorderStroke(2.dp, MaterialTheme.colorScheme.primary), CircleShape) else Modifier,
-              )
-              .padding(5.dp)
-              .clip(CircleShape)
-              .background(color.swatch)
-              .clickable(role = Role.RadioButton) { onSelected(color) },
-            contentAlignment = Alignment.Center,
-          ) {
-            if (isSelected) {
-              Icon(Icons.Rounded.Check, contentDescription = null, tint = MaterialTheme.colorScheme.onSurface, modifier = Modifier.size(20.dp))
-            }
-          }
-        }
-      }
+      ColorSwatches(
+        entries = ThemeColor.entries,
+        selected = selected,
+        colorOf = { it.swatch },
+        onSelect = onSelected,
+        labelOf = { stringResource(colorNameRes(it.name)) },
+        modifier = Modifier.padding(top = 12.dp),
+      )
     }
   }
 }

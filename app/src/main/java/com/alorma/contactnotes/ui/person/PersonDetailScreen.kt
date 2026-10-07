@@ -57,6 +57,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -405,6 +408,7 @@ fun PersonDetailScreen(
         onClick = onNewEntry,
         menuExpanded = menuExpanded,
         onMenuExpandedChange = onMenuExpandedChange,
+        menuContentDescription = stringResource(R.string.more_options),
         modifier = Modifier
           .align(Alignment.BottomEnd)
           .windowInsetsPadding(WindowInsets.navigationBars)
@@ -461,7 +465,7 @@ private fun Header(person: PersonEntity, state: PersonDetailUiState) {
 
 @Composable
 private fun Counter(value: Int, label: String) {
-  Column {
+  Column(modifier = Modifier.semantics(mergeDescendants = true) {}) {
     Text(text = value.toString(), style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.ExtraBold)
     Text(
       text = label,
@@ -562,8 +566,21 @@ private fun EntryCard(entry: EntryEntity, firstName: String, otherHandle: String
     color = GroupedListDefaults.containerColor,
     modifier = Modifier.fillMaxWidth(),
   ) {
+    val description = stringResource(
+      R.string.entry_description,
+      whoLabel(entry.kind, firstName),
+      dayLabel(entryDate(entry.occurredAt)),
+      formatTime(entry.occurredAt),
+      channelName(entry.channelType, otherHandle),
+      entry.text,
+    )
     Row(verticalAlignment = Alignment.Top) {
-      Column(modifier = Modifier.weight(1f).padding(start = 16.dp, top = 14.dp, bottom = 14.dp)) {
+      Column(
+        modifier = Modifier
+          .weight(1f)
+          .padding(start = 16.dp, top = 14.dp, bottom = 14.dp)
+          .clearAndSetSemantics { contentDescription = description },
+      ) {
         Text(
           text = listOf(
             whoLabel(entry.kind, firstName),

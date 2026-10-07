@@ -83,6 +83,16 @@
     <string name="channel_phone">Teléfono</string>
     <string name="channel_in_person">En persona</string>
     <string name="channel_with_value">%1$s - %2$s</string>
+    <string name="more_options">Más opciones</string>
+    <string name="shape_option">Forma %1$d</string>
+    <string name="entry_description">%1$s, %2$s a las %3$s, por %4$s: %5$s</string>
+    <string name="color_lavender">Lavanda</string>
+    <string name="color_mint">Menta</string>
+    <string name="color_peach">Melocotón</string>
+    <string name="color_sky">Cielo</string>
+    <string name="color_rose">Rosa</string>
+    <string name="color_lemon">Limón</string>
+    <string name="color_sand">Arena</string>
     <string name="channel_other">Otros</string>
 
     <string name="new_entry">Nueva entrada</string>

@@ -53,3 +53,15 @@ fun formatLastActivity(
     else -> dateTime.format(DateTimeFormatter.ofPattern("dd/MM/yyyy", locale))
   }
 }
+
+/** Nom del color d'un `AvatarColor` o d'un `ThemeColor` (comparteixen els noms). */
+@StringRes
+fun colorNameRes(name: String): Int = when (name) {
+  "Lavender" -> R.string.color_lavender
+  "Mint" -> R.string.color_mint
+  "Peach" -> R.string.color_peach
+  "Sky" -> R.string.color_sky
+  "Rose" -> R.string.color_rose
+  "Lemon" -> R.string.color_lemon
+  else -> R.string.color_sand
+}
