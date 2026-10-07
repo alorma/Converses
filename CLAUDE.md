@@ -36,7 +36,7 @@ No linter (ktlint/detekt) is configured.
 - **Protected people:** a cross-cutting concern. `PersonLockedScreen` only receives name, shape and color and loads nothing until `BiometricPrompt` succeeds; `FLAG_SECURE` (`SecureWindow`) is set on screens that show a protected person's data; the database and DataStore are excluded from Android backup. Any new feature (list, shortcuts, export, quick note) must not leak a protected person's data before unlocking.
 - **Person color:** a person's screens (detail, editor, quick note with a person) take the color of their avatar via `PersonTheme`; the list, Archived and Settings use the app theme.
 - **`EntryForm`** is the only entry form (quick note, new entry and edit). `whoLabel(...)` is the only function producing the labels Me / {first name} / Note; `EntryKind` (`SAID`, `HEARD`, `HAPPENED`) does not change.
-- **Room:** version 2, schemas in `app/schemas`. A schema change requires a migration and a test (`MigrationTestHelper`). In debug the database is recreated and sample data is seeded (`insertSampleData`).
+- **Room:** version 2, schemas in `app/schemas`. A schema change requires a migration and a test (`MigrationTestHelper`). In debug the database is recreated on schema changes; sample data is not seeded by default, only from the debug menu (`insertSampleData`).
 - **Tests:** `FakeDb` (in-memory DAOs) and `MainDispatcherRule` in `app/src/test/.../testing`. Screenshot test method names use camelCase with no `_`; references are versioned in `<module>/src/screenshotTestDebug/reference/`.
 - **CI** (`.github/workflows`): `pr-build.yml` (tests + debug APK), `build-apk.yml` and `screenshot-tests.yml`. The `update-screenshots` label on a PR regenerates the references; there is no need to generate them locally.
 
