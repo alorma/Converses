@@ -50,6 +50,7 @@ import java.time.LocalDate
 @Composable
 fun EntryActionsSheet(
   entry: EntryEntity,
+  firstName: String,
   dayCount: Int,
   onDismiss: () -> Unit,
   onEdit: () -> Unit,
@@ -73,7 +74,7 @@ fun EntryActionsSheet(
     ) {
       Text(
         text = listOf(
-          stringResource(entry.kind.label()),
+          whoLabel(entry.kind, firstName),
           formatTime(entry.occurredAt),
           stringResource(entry.channelType.label()),
         ).joinToString(" · ") { it.uppercase() },

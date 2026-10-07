@@ -57,9 +57,6 @@
         <item quantity="one">%d entrada</item>
         <item quantity="other">%d entradas</item>
     </plurals>
-    <string name="kind_said">Le he dicho</string>
-    <string name="kind_heard">Me ha dicho</string>
-    <string name="kind_happened">Ha pasado</string>
     <string name="quick_note">Nota rápida</string>
     <string name="yesterday">Ayer</string>
 
@@ -83,9 +80,14 @@
     <string name="close">Cerrar</string>
     <string name="save">Guardar</string>
     <string name="save_to_timeline">Guardar en la cronología</string>
-    <string name="entry_label_said">¿Qué le has dicho?</string>
-    <string name="entry_label_heard">¿Qué te ha dicho?</string>
-    <string name="entry_label_happened">¿Qué ha pasado?</string>
+    <string name="entry_who_title">Quién</string>
+    <string name="entry_who_me">Yo</string>
+    <string name="entry_who_person">Persona</string>
+    <string name="entry_who_note">Apunte</string>
+    <string name="entry_who_notes">Apuntes</string>
+    <string name="entry_hint_me">¿Qué has dicho?</string>
+    <string name="entry_hint_person">¿Qué ha dicho %1$s?</string>
+    <string name="entry_hint_note">¿Qué quieres apuntar?</string>
     <string name="pick_person">Elige una persona</string>
     <string name="search_by_name">Busca por nombre</string>
     <string name="quick_with_whom">Con quién</string>

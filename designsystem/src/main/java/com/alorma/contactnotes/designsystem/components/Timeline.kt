@@ -24,7 +24,9 @@ import androidx.compose.ui.unit.dp
 
 enum class TimelineMarkerStyle { Filled, Tonal, Outlined }
 
-private val MarkerSize = 40.dp
+/** Mida del marcador i de la columna de la línia. */
+val TimelineMarkerSize = 32.dp
+private val MarkerSize = TimelineMarkerSize
 private val LineWidth = 2.dp
 private val RowGap = 8.dp
 
@@ -36,7 +38,7 @@ fun TimelineMarker(icon: ImageVector, style: TimelineMarkerStyle, modifier: Modi
     TimelineMarkerStyle.Filled -> MarkerColors(CircleShape, scheme.primary, scheme.onPrimary, null)
     TimelineMarkerStyle.Tonal -> MarkerColors(CircleShape, scheme.primaryContainer, scheme.onPrimaryContainer, null)
     TimelineMarkerStyle.Outlined ->
-      MarkerColors(RoundedCornerShape(12.dp), scheme.surface, scheme.onSurface, BorderStroke(LineWidth, scheme.outline))
+      MarkerColors(RoundedCornerShape(10.dp), scheme.surface, scheme.onSurface, BorderStroke(LineWidth, scheme.outline))
   }
   Surface(
     modifier = modifier.size(MarkerSize),
@@ -46,9 +48,15 @@ fun TimelineMarker(icon: ImageVector, style: TimelineMarkerStyle, modifier: Modi
     border = border,
   ) {
     Box(contentAlignment = Alignment.Center) {
-      Icon(imageVector = icon, contentDescription = null, modifier = Modifier.size(20.dp))
+      Icon(imageVector = icon, contentDescription = null, modifier = Modifier.size(18.dp))
     }
   }
+}
+
+/** Marcador amb contingut propi (per exemple, l'avatar de la persona), sense fons. */
+@Composable
+fun TimelineMarker(modifier: Modifier = Modifier, content: @Composable () -> Unit) {
+  Box(modifier = modifier.size(MarkerSize), contentAlignment = Alignment.Center) { content() }
 }
 
 private data class MarkerColors(

@@ -32,7 +32,13 @@ data class PersonDetailUiState(
   val heardCount: Int = 0,
   val happenedCount: Int = 0,
   val isLoading: Boolean = true,
-)
+) {
+  fun countOf(kind: EntryKind): Int = when (kind) {
+    EntryKind.SAID -> saidCount
+    EntryKind.HEARD -> heardCount
+    EntryKind.HAPPENED -> happenedCount
+  }
+}
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class PersonDetailViewModel(

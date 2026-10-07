@@ -1,49 +1,24 @@
 package com.alorma.contactnotes.ui.person
 
-import androidx.annotation.StringRes
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Call
 import androidx.compose.material.icons.rounded.Chat
-import androidx.compose.material.icons.rounded.Event
 import androidx.compose.material.icons.rounded.Forum
 import androidx.compose.material.icons.rounded.MoreHoriz
-import androidx.compose.material.icons.rounded.NorthEast
 import androidx.compose.material.icons.rounded.People
 import androidx.compose.material.icons.rounded.Public
 import androidx.compose.material.icons.rounded.Send
-import androidx.compose.material.icons.rounded.SouthWest
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import com.alorma.contactnotes.R
 import com.alorma.contactnotes.data.db.ChannelType
-import com.alorma.contactnotes.data.db.EntryKind
-import com.alorma.contactnotes.designsystem.components.TimelineMarkerStyle
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 import java.util.Locale
-
-@StringRes
-fun EntryKind.label(): Int = when (this) {
-  EntryKind.SAID -> R.string.kind_said
-  EntryKind.HEARD -> R.string.kind_heard
-  EntryKind.HAPPENED -> R.string.kind_happened
-}
-
-fun EntryKind.icon(): ImageVector = when (this) {
-  EntryKind.SAID -> Icons.Rounded.NorthEast
-  EntryKind.HEARD -> Icons.Rounded.SouthWest
-  EntryKind.HAPPENED -> Icons.Rounded.Event
-}
-
-fun EntryKind.markerStyle(): TimelineMarkerStyle = when (this) {
-  EntryKind.SAID -> TimelineMarkerStyle.Filled
-  EntryKind.HEARD -> TimelineMarkerStyle.Tonal
-  EntryKind.HAPPENED -> TimelineMarkerStyle.Outlined
-}
 
 fun ChannelType.icon(): ImageVector = when (this) {
   ChannelType.DISCORD -> Icons.Rounded.Forum

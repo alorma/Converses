@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.selection.selectableGroup
@@ -17,10 +18,31 @@ import androidx.compose.material3.ToggleButtonDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
 
-data class ToggleOption<T>(val value: T, val label: String, val icon: ImageVector)
+/**
+ * Una opció del grup. `leading` substitueix la icona (per exemple, un avatar) i `selectedIcon` és la
+ * variant farcida que es mostra quan l'opció està seleccionada.
+ */
+data class ToggleOption<T>(
+  val value: T,
+  val label: String,
+  val icon: ImageVector? = null,
+  val selectedIcon: ImageVector? = icon,
+  val leading: (@Composable () -> Unit)? = null,
+  val enabled: Boolean = true,
+  val contentDescription: String? = null,
+)
 
-/** Grup connectat de botons amb selecció única; la icona només es mostra a l'opció seleccionada. */
+/**
+ * Grup connectat de botons amb selecció única. Per defecte la icona només es mostra a l'opció seleccionada;
+ * amb `prominent` els botons fan 52 dp, la icona (o el `leading`) sempre és visible i el seleccionat va en negreta.
+ */
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun <T> ConversesToggleGroup(
@@ -28,6 +50,7 @@ fun <T> ConversesToggleGroup(
   selected: T,
   onSelect: (T) -> Unit,
   modifier: Modifier = Modifier,
+  prominent: Boolean = false,
 ) {
   val scheme = MaterialTheme.colorScheme
   Row(
@@ -44,7 +67,14 @@ fun <T> ConversesToggleGroup(
       ToggleButton(
         checked = checked,
         onCheckedChange = { onSelect(option.value) },
-        modifier = Modifier.weight(1f),
+        enabled = option.enabled,
+        modifier = Modifier
+          .weight(1f)
+          .then(if (prominent) Modifier.height(52.dp) else Modifier)
+          .semantics {
+            role = Role.RadioButton
+            option.contentDescription?.let { contentDescription = it }
+          },
         shapes = shapes,
         colors = ToggleButtonDefaults.colors(
           containerColor = scheme.surfaceContainerHigh,
@@ -53,11 +83,20 @@ fun <T> ConversesToggleGroup(
           checkedContentColor = scheme.onPrimary,
         ),
       ) {
-        if (checked) {
-          Icon(option.icon, contentDescription = null, modifier = Modifier.size(ToggleButtonDefaults.IconSize))
+        val vector = if (checked) option.selectedIcon else option.icon
+        if ((prominent || checked) && (option.leading != null || vector != null)) {
+          if (option.leading != null) {
+            option.leading.invoke()
+          } else if (vector != null) {
+            Icon(vector, contentDescription = null, modifier = Modifier.size(ToggleButtonDefaults.IconSize))
+          }
           Spacer(Modifier.width(ToggleButtonDefaults.IconSpacing))
         }
-        Text(option.label, maxLines = 1)
+        Text(
+          text = option.label,
+          maxLines = 1,
+          fontWeight = if (prominent) (if (checked) FontWeight.Bold else FontWeight.Medium) else null,
+        )
       }
     }
   }

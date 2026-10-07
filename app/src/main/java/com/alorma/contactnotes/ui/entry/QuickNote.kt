@@ -169,6 +169,7 @@ fun QuickNoteScreen(
 
         EntryForm(
           state = form,
+          person = selected,
           channels = available,
           channel = channel,
           onChannelChange = { form.channel = it },

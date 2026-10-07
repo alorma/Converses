@@ -75,7 +75,6 @@ import com.alorma.contactnotes.designsystem.components.ConversesSplitButton
 import com.alorma.contactnotes.designsystem.components.EmptyState
 import com.alorma.contactnotes.designsystem.components.GroupedList
 import com.alorma.contactnotes.designsystem.components.GroupedListDefaults
-import com.alorma.contactnotes.designsystem.components.TimelineMarker
 import com.alorma.contactnotes.designsystem.components.TimelineRow
 import com.alorma.contactnotes.designsystem.theme.PersonNameStyle
 import com.alorma.contactnotes.designsystem.theme.PersonTheme
@@ -206,6 +205,7 @@ fun PersonDetailRoute(
       when (action) {
         EntryAction.Menu -> EntryActionsSheet(
           entry = actionEntry,
+          firstName = firstName(person.name),
           dayCount = dayCount,
           onDismiss = ::closeAction,
           onEdit = { action = EntryAction.Edit },
@@ -293,6 +293,7 @@ fun PersonDetailScreen(
   Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.surface) {
     if (person == null) return@Surface
     val items = remember(state.entries) { state.entries.toTimelineItems() }
+    val firstName = remember(person.name) { firstName(person.name) }
 
     Box(modifier = Modifier.fillMaxSize()) {
       LazyColumn(
@@ -321,23 +322,24 @@ fun PersonDetailScreen(
             contentPadding = PaddingValues(vertical = 8.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp),
           ) {
-            items(EntryKind.entries, key = { it.name }) { kind ->
+            items(EntryKind.entries.filter { state.countOf(it) > 0 }, key = { it.name }) { kind ->
               ConversesFilterChip(
-                label = stringResource(kind.label()),
+                label = whoFilterLabel(kind, firstName),
                 selected = kind in state.selectedKinds,
                 onClick = { onKindToggled(kind) },
-                icon = kind.icon(),
+                icon = kind.whoIcon(),
                 tonal = true,
+                leadingContent = if (kind == EntryKind.HEARD) ({ PersonInitialAvatar(person, size = 22.dp) }) else null,
               )
             }
           }
         }
         if (items.isEmpty()) {
           item(key = "empty") {
-            val noEntries = state.saidCount + state.heardCount + state.happenedCount == 0
+            val noEntries = EntryKind.entries.sumOf { state.countOf(it) } == 0
             val kindsLabel = EntryKind.entries
               .filter { it in state.selectedKinds }
-              .map { stringResource(it.label()) }
+              .map { whoFilterLabel(it, firstName) }
               .joinToString(" · ")
             EmptyState(
               icon = Icons.Rounded.ChatBubbleOutline,
@@ -372,9 +374,9 @@ fun PersonDetailScreen(
             is TimelineItem.Entry -> TimelineRow(
               isFirst = isFirst,
               isLast = isLast,
-              marker = { TimelineMarker(icon = item.entry.kind.icon(), style = item.entry.kind.markerStyle()) },
+              marker = { EntryMarker(item.entry.kind, person) },
             ) {
-              EntryCard(item.entry, onMenu = { onEntryMenu(item.entry) })
+              EntryCard(item.entry, firstName, onMenu = { onEntryMenu(item.entry) })
             }
           }
         }
@@ -439,9 +441,8 @@ private fun Header(person: PersonEntity, state: PersonDetailUiState) {
       )
       Spacer(Modifier.padding(top = 12.dp))
       Row(horizontalArrangement = Arrangement.spacedBy(24.dp)) {
-        Counter(state.saidCount, stringResource(R.string.kind_said))
-        Counter(state.heardCount, stringResource(R.string.kind_heard))
-        Counter(state.happenedCount, stringResource(R.string.kind_happened))
+        val firstName = firstName(person.name)
+        EntryKind.entries.forEach { kind -> Counter(state.countOf(kind), whoFilterLabel(kind, firstName)) }
       }
     }
     Avatar(
@@ -539,7 +540,7 @@ private fun TimelineHeader(count: Int) {
 }
 
 @Composable
-private fun EntryCard(entry: EntryEntity, onMenu: () -> Unit) {
+private fun EntryCard(entry: EntryEntity, firstName: String, onMenu: () -> Unit) {
   Surface(
     shape = MaterialTheme.shapes.extraLarge,
     color = GroupedListDefaults.containerColor,
@@ -549,7 +550,7 @@ private fun EntryCard(entry: EntryEntity, onMenu: () -> Unit) {
       Column(modifier = Modifier.weight(1f).padding(start = 16.dp, top = 14.dp, bottom = 14.dp)) {
         Text(
           text = listOf(
-            stringResource(entry.kind.label()),
+            whoLabel(entry.kind, firstName),
             formatTime(entry.occurredAt),
             stringResource(entry.channelType.label()),
           ).joinToString(" · ") { it.uppercase() },

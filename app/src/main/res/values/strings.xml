@@ -57,9 +57,6 @@
         <item quantity="one">%d entry</item>
         <item quantity="other">%d entries</item>
     </plurals>
-    <string name="kind_said">I said</string>
-    <string name="kind_heard">They said</string>
-    <string name="kind_happened">It happened</string>
     <string name="quick_note">Quick note</string>
     <string name="yesterday">Yesterday</string>
 
@@ -83,9 +80,14 @@
     <string name="close">Close</string>
     <string name="save">Save</string>
     <string name="save_to_timeline">Save to timeline</string>
-    <string name="entry_label_said">What did you say to them?</string>
-    <string name="entry_label_heard">What did they say to you?</string>
-    <string name="entry_label_happened">What happened?</string>
+    <string name="entry_who_title">Who</string>
+    <string name="entry_who_me">Me</string>
+    <string name="entry_who_person">Person</string>
+    <string name="entry_who_note">Note</string>
+    <string name="entry_who_notes">Notes</string>
+    <string name="entry_hint_me">What did you say?</string>
+    <string name="entry_hint_person">What did %1$s say?</string>
+    <string name="entry_hint_note">What do you want to note?</string>
     <string name="pick_person">Pick a person</string>
     <string name="search_by_name">Search by name</string>
     <string name="quick_with_whom">With</string>

@@ -41,14 +41,15 @@ class PersonExporter(
       }
       if (entries.isNotEmpty()) {
         appendLine()
-        entries.asReversed().forEach { entry -> appendLine(entry.line(formatter, zone)) }
+        val name = firstName(person.name)
+        entries.asReversed().forEach { entry -> appendLine(entry.line(name, formatter, zone)) }
       }
     }.trimEnd()
   }
 
-  private fun EntryEntity.line(formatter: DateTimeFormatter, zone: ZoneId): String {
+  private fun EntryEntity.line(firstName: String, formatter: DateTimeFormatter, zone: ZoneId): String {
     val whenText = Instant.ofEpochMilli(occurredAt).atZone(zone).format(formatter)
-    return "[$whenText · ${context.getString(kind.label())} · ${context.getString(channelType.label())}] $text"
+    return "[$whenText · ${context.getString(channelType.label())}] ${whoLabel(context, kind, firstName)}: $text"
   }
 
   fun share(name: String, text: String) {

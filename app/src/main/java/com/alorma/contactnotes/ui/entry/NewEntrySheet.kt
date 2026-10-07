@@ -81,6 +81,7 @@ fun NewEntrySheet(
       }
       EntryForm(
         state = form,
+        person = person,
         channels = available,
         channel = channel,
         onChannelChange = { form.channel = it },
@@ -102,10 +103,4 @@ fun NewEntrySheet(
       Spacer(Modifier.height(8.dp))
     }
   }
-}
-
-fun EntryKind.promptLabel(): Int = when (this) {
-  EntryKind.SAID -> R.string.entry_label_said
-  EntryKind.HEARD -> R.string.entry_label_heard
-  EntryKind.HAPPENED -> R.string.entry_label_happened
 }
