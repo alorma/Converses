@@ -236,12 +236,13 @@ La v1 funcional està feta: interfície polida, fluxos complets, privacitat tanc
     - arxivar → desarxivar;
     - esborrar entrada → desfer.
 - [ ] **Escala de text al 200 %:** les captures amb font 2× ja han trobat i corregit tres talls (inicials de l'avatar, etiqueta de les dades fixades i nom del selector «Qui», que ara acaba en «…»). Pendent: l'avatar petit del xip de filtre de la cronologia a font 2× (la inicial es veu mal alineada). Resta: els títols grans (44/40 sp, amplada 118) no poden tallar-se ni sortir de la pantalla. Cal fer servir `autoSize` de `BasicText` amb un mínim de 28 sp, o bé `maxLines = 2`.
-- [ ] **TalkBack:**
-    - etiquetes de les icones (enrere, ⋮, chevron del split button, «Nota ràpida»);
-    - avatar amb el nom;
-    - estat dels interruptors i dels filtres;
-    - entrades de la cronologia llegides com «Jo, avui a les 17:06, per WhatsApp: …» (o amb el nom de la persona, o «Apunt»).
-- [ ] **Àrees tàctils** de 48 dp com a mínim: ⋮ de les entrades, `−` de les dades i dels canals.
+- [x] **TalkBack:** fet i comprovat amb `uiautomator`.
+    - botó desplegable del split button («Més opcions»), formes («Forma 1…4») i colors amb nom (editor i Ajustos), amb estat de selecció (`selectable` + `RadioButton`);
+    - cada entrada es llegeix sencera: «Jo, Avui a les 11:00, per WhatsApp: …» (`entry_description`), amb el menú ⋮ a part;
+    - els comptadors de la capçalera es llegeixen units («1 Jo»);
+    - ja eren correctes: icones d'enrere i ⋮, interruptors (`Role.Switch`), filtres, la fila «Quan», el botó de la persona al selector «Qui» (nom complet) i els marcadors, que són decoratius.
+    - Pendent de provar amb TalkBack real: l'ordre de lectura i els fulls.
+- [x] **Àrees tàctils** de 48 dp com a mínim: auditades a l'emulador (llistat, detall, editor, Ajustos i nota ràpida). Tots els botons, xips i interruptors arriben a 48 dp; només els camps de text inline de les dades fixades són més baixos (són camps, no botons).
 - [ ] **Mode fosc:** revisar totes les pantalles. No hi ha captures en fosc d'aquesta ronda.
 - [ ] **Color dinàmic desactivat:** provar els 7 colors del tema i comprovar el contrast dels avatars sobre `surface`.
 - [ ] **Teclat:** al full de nova entrada, `imePadding` perquè «Desa a la cronologia» quedi visible mentre s'escriu. Ja hi ha `imePadding` i desplaçament; falta provar-ho amb el teclat obert.

@@ -35,6 +35,7 @@ fun ConversesSplitButton(
   onClick: () -> Unit,
   menuExpanded: Boolean,
   onMenuExpandedChange: (Boolean) -> Unit,
+  menuContentDescription: String,
   modifier: Modifier = Modifier,
   menuContent: @Composable ColumnScope.() -> Unit,
 ) {
@@ -67,7 +68,7 @@ fun ConversesSplitButton(
         ) {
           Icon(
             imageVector = if (menuExpanded) Icons.Rounded.KeyboardArrowUp else Icons.Rounded.KeyboardArrowDown,
-            contentDescription = null,
+            contentDescription = menuContentDescription,
             modifier = Modifier.size(SplitButtonDefaults.trailingButtonIconSizeFor(height)),
           )
         }

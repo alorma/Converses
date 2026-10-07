@@ -4,6 +4,11 @@ import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
+import com.alorma.contactnotes.ui.people.colorNameRes
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Arrangement
@@ -313,27 +318,35 @@ private fun AppearanceCard(state: EditPersonUiState, actions: EditPersonActions)
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
           SmallLabel(stringResource(R.string.shape_label))
           Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            AvatarShape.entries.forEach { shape ->
-              ShapeOption(shape = shape, selected = shape == state.shape, onClick = { actions.onShape(shape) })
+            AvatarShape.entries.forEachIndexed { index, shape ->
+              ShapeOption(shape = shape, number = index + 1, selected = shape == state.shape, onClick = { actions.onShape(shape) })
             }
           }
         }
       }
       SmallLabel(stringResource(R.string.color_label))
-      ColorSwatches(entries = AvatarColor.entries, selected = state.color, colorOf = { it.color }, onSelect = actions::onColor)
+      ColorSwatches(
+        entries = AvatarColor.entries,
+        selected = state.color,
+        colorOf = { it.color },
+        onSelect = actions::onColor,
+        labelOf = { stringResource(colorNameRes(it.name)) },
+      )
     }
   }
 }
 
 @Composable
-private fun ShapeOption(shape: AvatarShape, selected: Boolean, onClick: () -> Unit) {
+private fun ShapeOption(shape: AvatarShape, number: Int, selected: Boolean, onClick: () -> Unit) {
   val scheme = MaterialTheme.colorScheme
+  val description = stringResource(R.string.shape_option, number)
   Box(
     modifier = Modifier
       .size(52.dp)
       .then(if (selected) Modifier.border(BorderStroke(2.dp, scheme.primary), RoundedCornerShape(16.dp)) else Modifier)
       .clip(RoundedCornerShape(16.dp))
-      .clickable(onClick = onClick),
+      .selectable(selected = selected, role = Role.RadioButton, onClick = onClick)
+      .semantics { contentDescription = description },
     contentAlignment = Alignment.Center,
   ) {
     Box(
