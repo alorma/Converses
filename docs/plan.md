@@ -266,12 +266,13 @@ La v1 funcional està feta: interfície polida, fluxos complets, privacitat tanc
 - [ ] **Migracions de Room:**
     - la recreació automàtica només és en debug (a release no n'hi ha); la base de dades és la v1 neta, sense migracions;
     - afegir `MigrationTestHelper` quan hi hagi el primer canvi d'esquema, ja després de publicar.
+- [x] **Dues apps a la vegada:** el build de debug té `applicationIdSuffix = ".debug"` (`com.alorma.contactnotes.debug`) i el nom «Converses Debug» (`src/debug/AndroidManifest.xml`), així es pot tenir instal·lada a la vegada amb la de release.
 - [x] **Signatura de debug:** `app/debug.keystore` al repo (contrasenyes estàndard `android`, àlies `androiddebugkey`), perquè l'APK de debug de la CI i de qualsevol màquina tingui la mateixa signatura i s'instal·li a sobre sense esborrar l'app.
 - [ ] **Signatura i R8:**
+    - R8 ja és actiu a release (AGP 9: `optimization { enable = true }`). Havia un bug: amb `packageScope = androidx/kotlin/kotlinx` l'APK de release **petava en arrencar** (`IllegalAccessError` a `kotlin.text`); s'ha tret l'opció i l'APK passa de 9,2 a 5,7 MB;
+    - provat a l'emulador (APK de release signat amb la keystore de debug només en local): onboarding, llistat, crear persona i detall funcionen, sense excepcions; falta provar la resta de pantalles (nota ràpida, persones protegides, Ajustos, exportar) i les regles explícites de Koin, `NavKey` i Room si en calen;
     - signatura de release (aquesta keystore **no** va al repo);
-    - `isMinifyEnabled` i `isShrinkResources`;
-    - regles de Koin, de kotlinx.serialization (rutes `NavKey`) i de Room;
-    - provar l'APK de release de punta a punta.
+    - `isShrinkResources` (comprovar si l'equivalent és ja actiu).
 - [ ] **CI:** `PR Build` i `Build APK` ja executen els tests unitaris (`testDebugUnitTest`, tots els mòduls) abans de construir i publiquen el resultat a GitHub (`mikepenz/action-junit-report`) i pugen l'informe si fallen. Falta construir també el release (sense signar).
 - [ ] **Play Store:**
     - fitxa en català, castellà i anglès;
