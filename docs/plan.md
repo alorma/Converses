@@ -246,7 +246,7 @@ La v1 funcional està feta: interfície polida, fluxos complets, privacitat tanc
 - [x] **Àrees tàctils** de 48 dp com a mínim: auditades a l'emulador (llistat, detall, editor, Ajustos i nota ràpida). Tots els botons, xips i interruptors arriben a 48 dp; només els camps de text inline de les dades fixades són més baixos (són camps, no botons).
 - [ ] **Mode fosc:** revisar totes les pantalles. No hi ha captures en fosc d'aquesta ronda.
 - [ ] **Color dinàmic desactivat:** provar els 7 colors del tema i comprovar el contrast dels avatars sobre `surface`.
-- [ ] **Teclat:** al full de nova entrada, `imePadding` perquè «Desa a la cronologia» quedi visible mentre s'escriu. Ja hi ha `imePadding` i desplaçament; falta provar-ho amb el teclat obert.
+- [x] **Teclat:** al full de nova entrada el botó «Desa a la cronologia» és fix a baix, fora de la part que es desplaça, i queda sempre visible sobre el teclat (comprovat a l'emulador escrivint i desant amb el teclat obert). A la nota ràpida Desa és a dalt.
 - [ ] **Dispositiu real:**
     - empremta (a l'emulador només s'ha provat el PIN);
     - bloqueig de l'app de punta a punta;
@@ -274,7 +274,7 @@ La v1 funcional està feta: interfície polida, fluxos complets, privacitat tanc
     - `isMinifyEnabled` i `isShrinkResources`;
     - regles de Koin, de kotlinx.serialization (rutes `NavKey`) i de Room;
     - provar l'APK de release de punta a punta.
-- [ ] **CI:** el workflow també ha de construir el release (sense signar) i passar els tests JVM.
+- [ ] **CI:** `PR Build` i `Build APK` ja executen els tests unitaris (`testDebugUnitTest`, tots els mòduls) abans de construir i pugen l'informe si fallen. Falta construir també el release (sense signar).
 - [ ] **Play Store:**
     - fitxa en català, castellà i anglès;
     - captures en clar i en fosc;
