@@ -21,15 +21,17 @@ fun ChannelFilter.label(): Int = when (this) {
 
 @StringRes
 fun ChannelType.label(): Int = when (this) {
-  ChannelType.DISCORD -> R.string.channel_discord
-  ChannelType.TELEGRAM -> R.string.channel_telegram
+  ChannelType.IN_PERSON -> R.string.channel_in_person
   ChannelType.WHATSAPP -> R.string.channel_whatsapp
-  ChannelType.REDDIT -> R.string.channel_reddit
+  ChannelType.TELEGRAM -> R.string.channel_telegram
   ChannelType.X -> R.string.channel_x
   ChannelType.INSTAGRAM -> R.string.channel_instagram
   ChannelType.PHONE -> R.string.channel_phone
-  ChannelType.IN_PERSON -> R.string.channel_in_person
-  ChannelType.OTHER -> R.string.channel_other
+  ChannelType.EMAIL -> R.string.channel_email
+  ChannelType.DISCORD -> R.string.channel_discord
+  ChannelType.SIGNAL -> R.string.channel_signal
+  ChannelType.LINKEDIN -> R.string.channel_linkedin
+  ChannelType.REDDIT -> R.string.channel_reddit
 }
 
 fun initialsOf(name: String): String {

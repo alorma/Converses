@@ -5,7 +5,6 @@ import android.content.Intent
 import com.alorma.contactnotes.R
 import com.alorma.contactnotes.data.ConversesRepository
 import com.alorma.contactnotes.data.db.EntryEntity
-import com.alorma.contactnotes.ui.people.label
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -30,9 +29,7 @@ class PersonExporter(
       appendLine(person.name + person.alias?.let { " (@$it)" }.orEmpty())
       if (channels.isNotEmpty()) {
         appendLine(
-          channels.joinToString(" · ") { channel ->
-            context.getString(channel.type.label()) + channel.handle?.let { ": $it" }.orEmpty()
-          },
+          channels.map { it.type }.sorted().joinToString(" · ") { channelName(context, it) },
         )
       }
       if (facts.isNotEmpty()) {
@@ -42,15 +39,14 @@ class PersonExporter(
       if (entries.isNotEmpty()) {
         appendLine()
         val name = firstName(person.name)
-        val otherHandle = channels.otherHandle()
-        entries.asReversed().forEach { entry -> appendLine(entry.line(name, otherHandle, formatter, zone)) }
+        entries.asReversed().forEach { entry -> appendLine(entry.line(name, formatter, zone)) }
       }
     }.trimEnd()
   }
 
-  private fun EntryEntity.line(firstName: String, otherHandle: String?, formatter: DateTimeFormatter, zone: ZoneId): String {
+  private fun EntryEntity.line(firstName: String, formatter: DateTimeFormatter, zone: ZoneId): String {
     val whenText = Instant.ofEpochMilli(occurredAt).atZone(zone).format(formatter)
-    return "[$whenText · ${channelName(context, channelType, otherHandle)}] ${whoLabel(context, kind, firstName)}: $text"
+    return "[$whenText · ${channelName(context, channelType)}] ${whoLabel(context, kind, firstName)}: $text"
   }
 
   fun share(name: String, text: String) {

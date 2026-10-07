@@ -13,8 +13,8 @@ import kotlinx.coroutines.flow.stateIn
 
 enum class ChannelFilter(val types: Set<ChannelType>?) {
   All(null),
-  Chat(setOf(ChannelType.DISCORD, ChannelType.TELEGRAM, ChannelType.WHATSAPP)),
-  Social(setOf(ChannelType.REDDIT, ChannelType.X, ChannelType.INSTAGRAM, ChannelType.OTHER)),
+  Chat(setOf(ChannelType.WHATSAPP, ChannelType.TELEGRAM, ChannelType.SIGNAL, ChannelType.DISCORD, ChannelType.EMAIL)),
+  Social(setOf(ChannelType.X, ChannelType.INSTAGRAM, ChannelType.LINKEDIN, ChannelType.REDDIT)),
   InPerson(setOf(ChannelType.IN_PERSON)),
   Phone(setOf(ChannelType.PHONE)),
 }

@@ -91,9 +91,9 @@ fun rememberEntryFormState(initial: EntryEntity? = null): EntryFormState =
     )
   }
 
-/** Canals que es poden triar: els de la persona (o tots si no es poden mostrar) més "Altres". */
+/** Canals que es poden triar: els de la persona, en l'ordre fix, o tots si no en té o no es poden mostrar. */
 fun availableChannels(personChannels: List<ChannelType>, showAll: Boolean = false): List<ChannelType> =
-  if (showAll) ChannelType.entries else (personChannels.distinct() + ChannelType.OTHER).distinct()
+  if (showAll || personChannels.isEmpty()) ChannelType.entries else personChannels.distinct().sorted()
 
 /**
  * Formulari d'entrada comú: Qui, text, On i Quan.
@@ -107,7 +107,6 @@ fun EntryForm(
   channel: ChannelType,
   onChannelChange: (ChannelType) -> Unit,
   modifier: Modifier = Modifier,
-  otherHandle: String? = null,
   header: @Composable () -> Unit = {},
   saveButton: @Composable () -> Unit = {},
 ) {
@@ -116,7 +115,7 @@ fun EntryForm(
     FormSection(title = stringResource(R.string.entry_who_title)) { WhoSelector(state, person) }
     EntryTextField(state, placeholder = entryHint(state.kind, person?.name?.let(::firstName).orEmpty()))
     FormSection(title = stringResource(R.string.entry_where_title)) {
-      ChannelChips(channels = channels, selected = channel, onSelected = onChannelChange, otherHandle = otherHandle)
+      ChannelChips(channels = channels, selected = channel, onSelected = onChannelChange)
     }
     FormSection(title = stringResource(R.string.entry_when_title)) {
       WhenRow(choice = state.whenChoice, onChoice = { state.whenChoice = it })
@@ -204,7 +203,6 @@ fun ChannelChips(
   selected: ChannelType,
   onSelected: (ChannelType) -> Unit,
   modifier: Modifier = Modifier,
-  otherHandle: String? = null,
 ) {
   val scheme = MaterialTheme.colorScheme
   Row(
@@ -217,7 +215,7 @@ fun ChannelChips(
         selected = isSelected,
         onClick = { onSelected(channel) },
         modifier = Modifier.height(36.dp),
-        label = { Text(channelName(channel, otherHandle)) },
+        label = { Text(channelName(channel)) },
         leadingIcon = if (isSelected) {
           { Icon(Icons.Rounded.Check, contentDescription = null, modifier = Modifier.size(FilterChipDefaults.IconSize)) }
         } else {

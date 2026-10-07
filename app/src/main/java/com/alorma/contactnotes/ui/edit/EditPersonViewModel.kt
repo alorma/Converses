@@ -18,8 +18,6 @@ import kotlinx.coroutines.launch
 
 data class FactDraft(val key: Long, val label: String, val value: String)
 
-data class ChannelDraft(val key: Long, val type: ChannelType, val handle: String)
-
 data class EditSnapshot(
   val name: String = "",
   val alias: String = "",
@@ -27,7 +25,7 @@ data class EditSnapshot(
   val color: AvatarColor? = null,
   val isProtected: Boolean = false,
   val facts: List<FactDraft> = emptyList(),
-  val channels: List<ChannelDraft> = emptyList(),
+  val channels: Set<ChannelType> = emptySet(),
 )
 
 data class EditPersonUiState(
@@ -39,7 +37,7 @@ data class EditPersonUiState(
   val color: AvatarColor? = null,
   val isProtected: Boolean = false,
   val facts: List<FactDraft> = emptyList(),
-  val channels: List<ChannelDraft> = emptyList(),
+  val channels: Set<ChannelType> = emptySet(),
   val aliasTaken: Boolean = false,
   val entryCount: Int = 0,
   val baseline: EditSnapshot = EditSnapshot(),
@@ -61,8 +59,7 @@ interface EditPersonActions {
   fun onFactChange(key: Long, label: String, value: String)
   fun onRemoveFact(key: Long)
   fun onMoveFact(from: Int, to: Int)
-  fun onSaveChannel(key: Long?, type: ChannelType, handle: String)
-  fun onRemoveChannel(key: Long)
+  fun onToggleChannel(type: ChannelType)
   fun delete(exportFirst: Boolean, onDeleted: () -> Unit)
   fun save(onSaved: (Long) -> Unit)
 }
@@ -89,7 +86,7 @@ class EditPersonViewModel(
       val facts = repository.observePinnedFacts(personId).first()
       original = person
       val loadedFacts = facts.map { FactDraft(nextKey++, it.label, it.value) }
-      val loadedChannels = channels.map { ChannelDraft(nextKey++, it.type, it.handle.orEmpty()) }
+      val loadedChannels = channels.map { it.type }.toSet()
       _state.value = EditPersonUiState(
         isNew = false,
         loaded = true,
@@ -158,16 +155,9 @@ class EditPersonViewModel(
     }
   }
 
-  override fun onSaveChannel(key: Long?, type: ChannelType, handle: String) = _state.update { state ->
-    val cleanHandle = if (type == ChannelType.IN_PERSON) "" else handle.trim()
-    if (key == null) {
-      state.copy(channels = state.channels + ChannelDraft(nextKey++, type, cleanHandle))
-    } else {
-      state.copy(channels = state.channels.map { if (it.key == key) it.copy(type = type, handle = cleanHandle) else it })
-    }
+  override fun onToggleChannel(type: ChannelType) = _state.update { state ->
+    state.copy(channels = if (type in state.channels) state.channels - type else state.channels + type)
   }
-
-  override fun onRemoveChannel(key: Long) = _state.update { state -> state.copy(channels = state.channels.filterNot { it.key == key }) }
 
   override fun delete(exportFirst: Boolean, onDeleted: () -> Unit) {
     val person = original ?: return
@@ -201,9 +191,7 @@ class EditPersonViewModel(
         createdAt = base?.createdAt ?: now,
         updatedAt = now,
       )
-      val channels = current.channels.map {
-        ChannelEntity(personId = 0, type = it.type, handle = it.handle.takeIf { handle -> handle.isNotBlank() })
-      }
+      val channels = current.channels.sorted().map { ChannelEntity(personId = 0, type = it) }
       val facts = current.facts
         .filter { it.label.isNotBlank() || it.value.isNotBlank() }
         .map { PinnedFactEntity(personId = 0, label = it.label.trim(), value = it.value.trim(), position = 0) }

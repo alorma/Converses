@@ -41,8 +41,8 @@ class QuickNoteViewModelTest {
   fun selectingAPersonLoadsItsChannelsAndTheChannelOfTheLastEntry() = runTest {
     val marta = db.addPerson("Marta")
     db.addChannel(marta.id, ChannelType.WHATSAPP)
-    db.addChannel(marta.id, ChannelType.OTHER, "Signal")
-    db.addEntry(marta.id, channel = ChannelType.OTHER, occurredAt = 9_000)
+    db.addChannel(marta.id, ChannelType.SIGNAL)
+    db.addEntry(marta.id, channel = ChannelType.SIGNAL, occurredAt = 9_000)
     db.addEntry(marta.id, channel = ChannelType.WHATSAPP, occurredAt = 1_000)
     val vm = viewModel()
 
@@ -50,9 +50,8 @@ class QuickNoteViewModelTest {
 
     val state = vm.uiState.value
     assertEquals(marta.id, state.selected?.id)
-    assertEquals(listOf(ChannelType.WHATSAPP, ChannelType.OTHER), state.channels)
-    assertEquals(ChannelType.OTHER, state.lastChannel)
-    assertEquals("Signal", state.otherHandle)
+    assertEquals(listOf(ChannelType.WHATSAPP, ChannelType.SIGNAL), state.channels)
+    assertEquals(ChannelType.SIGNAL, state.lastChannel)
   }
 
   @Test

@@ -63,7 +63,6 @@ import com.alorma.contactnotes.ui.people.initialsOf
 import com.alorma.contactnotes.ui.people.label
 import com.alorma.contactnotes.ui.person.canUnlockWithDevice
 import com.alorma.contactnotes.ui.person.openSecuritySetup
-import com.alorma.contactnotes.ui.person.otherHandle
 import com.alorma.contactnotes.ui.person.promptUnlock
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -88,7 +87,6 @@ data class QuickNoteUiState(
   val pending: PersonEntity? = null,
   val channels: List<ChannelType> = emptyList(),
   val lastChannel: ChannelType? = null,
-  val otherHandle: String? = null,
 )
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -132,7 +130,6 @@ class QuickNoteViewModel(
           pending = pending,
           channels = channels.map { it.type },
           lastChannel = last,
-          otherHandle = channels.otherHandle(),
         )
       }
     }
@@ -292,7 +289,6 @@ fun QuickNoteContent(
           channels = available,
           channel = channel,
           onChannelChange = { form.channel = it },
-          otherHandle = state.otherHandle,
           header = {
             PersonPicker(selected = selected, people = state.people, onSelect = onSelectPerson, onNewPerson = onNewPerson)
           },

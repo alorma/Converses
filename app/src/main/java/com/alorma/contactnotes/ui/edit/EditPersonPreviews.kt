@@ -18,8 +18,7 @@ private object NoOpEditPersonActions : EditPersonActions {
   override fun onFactChange(key: Long, label: String, value: String) = Unit
   override fun onRemoveFact(key: Long) = Unit
   override fun onMoveFact(from: Int, to: Int) = Unit
-  override fun onSaveChannel(key: Long?, type: ChannelType, handle: String) = Unit
-  override fun onRemoveChannel(key: Long) = Unit
+  override fun onToggleChannel(type: ChannelType) = Unit
   override fun delete(exportFirst: Boolean, onDeleted: () -> Unit) = Unit
   override fun save(onSaved: (Long) -> Unit) = Unit
 }
@@ -45,10 +44,7 @@ private val Facts = listOf(
   FactDraft(key = 2, label = "Work", value = "Designer in Barcelona"),
 )
 
-private val Channels = listOf(
-  ChannelDraft(key = 3, type = ChannelType.WHATSAPP, handle = "+34 600 111 222"),
-  ChannelDraft(key = 4, type = ChannelType.IN_PERSON, handle = ""),
-)
+private val Channels = setOf(ChannelType.WHATSAPP, ChannelType.IN_PERSON)
 
 @Preview
 @Composable
@@ -98,7 +94,7 @@ internal fun EditPersonProtectedPreview() {
       isProtected = true,
       aliasTaken = true,
       facts = Facts.take(1),
-      channels = Channels.take(1),
+      channels = Channels.take(1).toSet(),
       entryCount = 1,
     ),
   )
@@ -119,14 +115,6 @@ internal fun DeletePersonDialogPreview() {
   }
 }
 
-@Preview
-@Composable
-internal fun ChannelDialogPreview() {
-  EditorDialogPreview {
-    ChannelDialog(initial = Channels.first(), onDismiss = {}, onConfirm = { _, _ -> })
-  }
-}
-
 /** Amb `CustomAvatarFeature` encesa: l'avatar és un botó amb la insígnia d'edició. */
 @Preview
 @Composable
@@ -139,7 +127,7 @@ internal fun EditPersonCustomAvatarPreview() {
       shape = AvatarShape.Clover4Leaf,
       color = AvatarColor.Sky,
       facts = Facts.take(1),
-      channels = Channels.take(1),
+      channels = Channels.take(1).toSet(),
       entryCount = 3,
     ),
     customAvatar = true,

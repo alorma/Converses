@@ -17,7 +17,7 @@ internal suspend fun ConversesDatabase.insertSampleData(now: Long = System.curre
   val people = listOf(
     SamplePerson(
       name = "Luna Roja", alias = "Luna", shape = AvatarShape.Cookie9Sided, color = AvatarColor.Lavender,
-      channels = listOf(ChannelType.DISCORD to "lunaroja", ChannelType.TELEGRAM to "@luna"),
+      channels = listOf(ChannelType.DISCORD, ChannelType.TELEGRAM),
       facts = listOf("Secret" to "This is private"),
       entries = listOf(
         Triple(EntryKind.SAID, ChannelType.DISCORD, "I told her Kael comes from the north.") to ago(0, 1),
@@ -26,7 +26,7 @@ internal suspend fun ConversesDatabase.insertSampleData(now: Long = System.curre
     ),
     SamplePerson(
       name = "Marta Soler", alias = "Marta", shape = AvatarShape.Cookie9Sided, color = AvatarColor.Lavender,
-      channels = listOf(ChannelType.WHATSAPP to "+34 600 111 222", ChannelType.IN_PERSON to null),
+      channels = listOf(ChannelType.WHATSAPP, ChannelType.IN_PERSON),
       facts = listOf("Birthday" to "March 14", "Job" to "Designer in Barcelona"),
       entries = listOf(
         Triple(EntryKind.SAID, ChannelType.WHATSAPP, "I told her I can't make it to dinner on Saturday.") to ago(0, 2),
@@ -36,7 +36,7 @@ internal suspend fun ConversesDatabase.insertSampleData(now: Long = System.curre
     ),
     SamplePerson(
       name = "Jordi Puig", alias = "Jordi P.", shape = AvatarShape.Clover4Leaf, color = AvatarColor.Mint,
-      channels = listOf(ChannelType.DISCORD to "jordip#2201", ChannelType.TELEGRAM to "@jordip"),
+      channels = listOf(ChannelType.TELEGRAM, ChannelType.DISCORD),
       facts = listOf("Games" to "Elden Ring, Hades"),
       entries = listOf(
         Triple(EntryKind.HEARD, ChannelType.DISCORD, "He told me he wants to set up a game on Friday.") to ago(3),
@@ -45,7 +45,7 @@ internal suspend fun ConversesDatabase.insertSampleData(now: Long = System.curre
     ),
     SamplePerson(
       name = "Laia Ferrer", alias = null, shape = AvatarShape.Flower, color = AvatarColor.Peach,
-      channels = listOf(ChannelType.REDDIT to "u/laiaf", ChannelType.PHONE to "+34 611 333 444"),
+      channels = listOf(ChannelType.PHONE, ChannelType.REDDIT),
       facts = emptyList(),
       entries = listOf(
         Triple(EntryKind.HAPPENED, ChannelType.PHONE, "Long call about the trip to Lisbon.") to ago(20),
@@ -53,7 +53,7 @@ internal suspend fun ConversesDatabase.insertSampleData(now: Long = System.curre
     ),
     SamplePerson(
       name = "Pau Vidal", alias = "Pau", shape = AvatarShape.Sunny, color = AvatarColor.Sky,
-      channels = listOf(ChannelType.OTHER to "Signal"),
+      channels = listOf(ChannelType.SIGNAL),
       facts = listOf("Allergy" to "Nuts"),
       entries = emptyList(),
     ),
@@ -71,7 +71,7 @@ internal suspend fun ConversesDatabase.insertSampleData(now: Long = System.curre
         createdAt = created,
         updatedAt = created,
       ),
-      channels = sample.channels.map { (type, handle) -> ChannelEntity(personId = 0, type = type, handle = handle) },
+      channels = sample.channels.map { ChannelEntity(personId = 0, type = it) },
       facts = sample.facts.map { (label, value) ->
         PinnedFactEntity(personId = 0, label = label, value = value, position = 0)
       },
@@ -90,7 +90,7 @@ private class SamplePerson(
   val alias: String?,
   val shape: AvatarShape,
   val color: AvatarColor,
-  val channels: List<Pair<ChannelType, String?>>,
+  val channels: List<ChannelType>,
   val facts: List<Pair<String, String>>,
   val entries: List<Pair<Triple<EntryKind, ChannelType, String>, Long>>,
   val isProtected: Boolean = false,

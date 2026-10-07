@@ -82,6 +82,9 @@
     <string name="channel_telegram">Telegram</string>
     <string name="channel_whatsapp">WhatsApp</string>
     <string name="channel_reddit">Reddit</string>
+    <string name="channel_email">Correu</string>
+    <string name="channel_signal">Signal</string>
+    <string name="channel_linkedin">LinkedIn</string>
     <string name="channel_x">X</string>
     <string name="channel_instagram">Instagram</string>
     <string name="channel_phone">Telèfon</string>
@@ -95,7 +98,6 @@
     <string name="color_rose">Rosa</string>
     <string name="color_lemon">Llimona</string>
     <string name="color_sand">Sorra</string>
-    <string name="channel_other">Altres</string>
 
     <string name="new_entry">Nova entrada</string>
     <string name="with_person">amb %1$s</string>
@@ -138,9 +140,11 @@
     <string name="move_down">Mou avall</string>
     <string name="reorder">Reordena</string>
     <string name="channels_title">On hi parles</string>
-    <string name="add_channel">Afegeix un canal</string>
-    <string name="edit_channel">Edita el canal</string>
-    <string name="channel_handle">Usuari o número</string>
+    <string name="channels_count_none">Cap</string>
+    <plurals name="channels_count">
+        <item quantity="one">%d triat</item>
+        <item quantity="other">%d triats</item>
+    </plurals>
     <string name="protected_person">Persona protegida</string>
     <string name="protected_person_summary">Cal l\'empremta per veure-la. Al llistat no es mostra l\'últim comentari.</string>
     <string name="protected_unavailable">Cal una empremta o un bloqueig de pantalla al dispositiu</string>

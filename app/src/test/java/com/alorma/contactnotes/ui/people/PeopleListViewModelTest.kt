@@ -25,7 +25,7 @@ class PeopleListViewModelTest {
     val social = db.addPerson("Social", createdAt = 2)
     val inPerson = db.addPerson("InPerson", createdAt = 1)
     db.addChannel(chat.id, ChannelType.WHATSAPP)
-    db.addChannel(social.id, ChannelType.OTHER)
+    db.addChannel(social.id, ChannelType.LINKEDIN)
     db.addChannel(inPerson.id, ChannelType.IN_PERSON)
     val vm = PeopleListViewModel(archived = false, repository = db.repository)
     backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { vm.uiState.collect {} }
