@@ -2,9 +2,7 @@ package com.alorma.contactnotes.ui.person
 
 import com.alorma.contactnotes.data.db.shape
 import com.alorma.contactnotes.data.db.color
-import android.content.ActivityNotFoundException
 import android.content.ClipData
-import android.content.Intent
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -55,7 +53,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ClipEntry
 import androidx.compose.ui.platform.LocalClipboard
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
@@ -144,7 +141,6 @@ fun PersonDetailRoute(
   val actionEntry = state.entries.firstOrNull { it.id == actionEntryId }
   val clipboard = LocalClipboard.current
   val scope = androidx.compose.runtime.rememberCoroutineScope()
-  val context = LocalContext.current
   val snackbarHostState = remember { SnackbarHostState() }
   val deletedMessage = stringResource(R.string.entry_deleted)
   val undoLabel = stringResource(R.string.undo)
@@ -177,18 +173,6 @@ fun PersonDetailRoute(
         menuExpanded = false
         viewModel.setArchived(!person.archived) { if (!person.archived) onBack() }
       },
-      onChannelOpen = { channel ->
-        channelLink(channel.type, channel.handle)?.let { uri ->
-          try {
-            context.startActivity(Intent(Intent.ACTION_VIEW, uri).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
-          } catch (_: ActivityNotFoundException) {
-            Unit
-          }
-        }
-      },
-      onChannelCopy = { channel ->
-        scope.launch { clipboard.setClipEntry(ClipEntry(ClipData.newPlainText(person.name, channel.handle.orEmpty()))) }
-      },
       snackbarHostState = snackbarHostState,
     )
 
@@ -196,7 +180,6 @@ fun PersonDetailRoute(
       NewEntrySheet(
         person = person,
         channels = state.channels.map { it.type },
-        otherHandle = state.channels.otherHandle(),
         onDismiss = { showNewEntry = false },
         onSave = { kind, channel, text, at ->
           viewModel.addEntry(kind, channel, text, at)
@@ -210,7 +193,6 @@ fun PersonDetailRoute(
         EntryAction.Menu -> EntryActionsSheet(
           entry = actionEntry,
           firstName = firstName(person.name),
-          otherHandle = state.channels.otherHandle(),
           dayCount = dayCount,
           onDismiss = ::closeAction,
           onEdit = { action = EntryAction.Edit },
@@ -243,7 +225,6 @@ fun PersonDetailRoute(
         EntryAction.Edit -> NewEntrySheet(
           person = person,
           channels = state.channels.map { it.type },
-          otherHandle = state.channels.otherHandle(),
           initial = actionEntry,
           onDismiss = ::closeAction,
           onSave = { kind, channel, text, at ->
@@ -265,7 +246,7 @@ fun PersonDetailRoute(
             R.plurals.entry_delete_day_summary,
             dayCount,
             dayCount,
-            channelName(actionEntry.channelType, state.channels.otherHandle()),
+            channelName(actionEntry.channelType),
           ),
           onDismiss = ::closeAction,
           onConfirm = {
@@ -291,8 +272,6 @@ fun PersonDetailScreen(
   onEditPerson: () -> Unit,
   onExport: () -> Unit,
   onToggleArchived: () -> Unit,
-  onChannelOpen: (ChannelEntity) -> Unit,
-  onChannelCopy: (ChannelEntity) -> Unit,
   snackbarHostState: SnackbarHostState,
 ) {
   val person = state.person
@@ -300,7 +279,6 @@ fun PersonDetailScreen(
     if (person == null) return@Surface
     val items = remember(state.entries) { state.entries.toTimelineItems() }
     val firstName = remember(person.name) { firstName(person.name) }
-    val otherHandle = remember(state.channels) { state.channels.otherHandle() }
 
     Box(modifier = Modifier.fillMaxSize()) {
       LazyColumn(
@@ -327,7 +305,7 @@ fun PersonDetailScreen(
         }
         item(key = "header") { Header(person) }
         if (state.channels.isNotEmpty()) {
-          item(key = "channels") { ChannelRow(state.channels, onChannelOpen, onChannelCopy) }
+          item(key = "channels") { ChannelRow(state.channels) }
         }
         if (state.facts.isNotEmpty()) {
           item(key = "facts") { PinnedFacts(state.facts) }
@@ -398,7 +376,7 @@ fun PersonDetailScreen(
               isLast = isLast,
               marker = { EntryMarker(item.entry.kind, person) },
             ) {
-              EntryCard(item.entry, firstName, otherHandle, onMenu = { onEntryMenu(item.entry) })
+              EntryCard(item.entry, firstName, onMenu = { onEntryMenu(item.entry) })
             }
           }
         }
@@ -477,24 +455,13 @@ private fun Header(person: PersonEntity) {
 }
 
 @Composable
-private fun ChannelRow(
-  channels: List<ChannelEntity>,
-  onOpen: (ChannelEntity) -> Unit,
-  onCopy: (ChannelEntity) -> Unit,
-) {
+private fun ChannelRow(channels: List<ChannelEntity>) {
   LazyRow(
     contentPadding = PaddingValues(vertical = 16.dp),
     horizontalArrangement = Arrangement.spacedBy(8.dp),
   ) {
-    items(channels, key = { it.id }) { channel ->
-      val hasLink = channelLink(channel.type, channel.handle) != null
-      val hasHandle = !channel.handle.isNullOrBlank()
-      ConversesChannelChip(
-        label = channelName(channel.type, channel.handle),
-        icon = channel.type.icon(),
-        onClick = if (hasLink) ({ onOpen(channel) }) else null,
-        onLongClick = if (hasHandle) ({ onCopy(channel) }) else null,
-      )
+    items(channels.map { it.type }.distinct().sorted(), key = { it.name }) { type ->
+      ConversesChannelChip(label = channelName(type), icon = type.icon(), onClick = null, onLongClick = null)
     }
   }
 }
@@ -547,7 +514,7 @@ private fun SectionHeader(title: String, topPadding: androidx.compose.ui.unit.Dp
 }
 
 @Composable
-private fun EntryCard(entry: EntryEntity, firstName: String, otherHandle: String?, onMenu: () -> Unit) {
+private fun EntryCard(entry: EntryEntity, firstName: String, onMenu: () -> Unit) {
   Surface(
     shape = MaterialTheme.shapes.extraLarge,
     color = GroupedListDefaults.containerColor,
@@ -558,7 +525,7 @@ private fun EntryCard(entry: EntryEntity, firstName: String, otherHandle: String
       whoLabel(entry.kind, firstName),
       dayLabel(entryDate(entry.occurredAt)),
       formatTime(entry.occurredAt),
-      channelName(entry.channelType, otherHandle),
+      channelName(entry.channelType),
       entry.text,
     )
     Row(verticalAlignment = Alignment.Top) {
@@ -572,7 +539,7 @@ private fun EntryCard(entry: EntryEntity, firstName: String, otherHandle: String
           text = listOf(
             whoLabel(entry.kind, firstName),
             formatTime(entry.occurredAt),
-            channelName(entry.channelType, otherHandle),
+            channelName(entry.channelType),
           ).joinToString(" · ") { it.uppercase() },
           style = MaterialTheme.typography.labelMedium,
           fontWeight = FontWeight.SemiBold,

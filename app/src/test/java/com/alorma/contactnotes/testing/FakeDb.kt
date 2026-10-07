@@ -55,8 +55,8 @@ class FakeDb {
     return person
   }
 
-  fun addChannel(personId: Long, type: ChannelType, handle: String? = null): ChannelEntity {
-    val channel = ChannelEntity(id = nextId(), personId = personId, type = type, handle = handle)
+  fun addChannel(personId: Long, type: ChannelType): ChannelEntity {
+    val channel = ChannelEntity(id = nextId(), personId = personId, type = type)
     channels.update { it + channel }
     return channel
   }

@@ -9,7 +9,8 @@ import androidx.room.Relation
 import com.alorma.contactnotes.designsystem.components.AvatarColor
 import com.alorma.contactnotes.designsystem.components.AvatarShape
 
-enum class ChannelType { DISCORD, TELEGRAM, WHATSAPP, REDDIT, X, INSTAGRAM, PHONE, IN_PERSON, OTHER }
+/** L'ordre de declaració és l'ordre fix amb què es mostren els canals, del més habitual al menys. */
+enum class ChannelType { IN_PERSON, WHATSAPP, TELEGRAM, X, INSTAGRAM, PHONE, EMAIL, DISCORD, SIGNAL, LINKEDIN, REDDIT }
 
 enum class EntryKind { SAID, HEARD, HAPPENED }
 
@@ -48,7 +49,6 @@ data class ChannelEntity(
   @PrimaryKey(autoGenerate = true) val id: Long = 0,
   val personId: Long,
   val type: ChannelType,
-  val handle: String? = null,
 )
 
 @Entity(

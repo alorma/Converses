@@ -65,7 +65,7 @@ internal object PreviewData {
   )
 
   val martaChannels = listOf(
-    ChannelEntity(id = 1, personId = 1, type = ChannelType.WHATSAPP, handle = "+34 600 111 222"),
+    ChannelEntity(id = 1, personId = 1, type = ChannelType.WHATSAPP),
     ChannelEntity(id = 2, personId = 1, type = ChannelType.IN_PERSON),
   )
 
@@ -115,14 +115,14 @@ internal object PreviewData {
         occurredAt = at(3, 2, 18),
       ),
       channels = listOf(
-        ChannelEntity(id = 3, personId = 3, type = ChannelType.DISCORD, handle = "jordip#2201"),
-        ChannelEntity(id = 4, personId = 3, type = ChannelType.TELEGRAM, handle = "@jordip"),
+        ChannelEntity(id = 3, personId = 3, type = ChannelType.DISCORD),
+        ChannelEntity(id = 4, personId = 3, type = ChannelType.TELEGRAM),
       ),
     ),
     PersonListItem(
       person = laia,
       lastEntry = null,
-      channels = listOf(ChannelEntity(id = 5, personId = 4, type = ChannelType.PHONE, handle = "+34 611 333 444")),
+      channels = listOf(ChannelEntity(id = 5, personId = 4, type = ChannelType.PHONE)),
     ),
   )
 }

@@ -89,8 +89,8 @@ class EditPersonViewModelTest {
     val (first, second) = vm.state.value.facts
     vm.onFactChange(first.key, " Birthday ", " 14 March ")
     vm.onFactChange(second.key, "", "")
-    vm.onSaveChannel(null, ChannelType.WHATSAPP, "  +34 600  ")
-    vm.onSaveChannel(null, ChannelType.IN_PERSON, "ignored")
+    vm.onToggleChannel(ChannelType.WHATSAPP)
+    vm.onToggleChannel(ChannelType.IN_PERSON)
 
     var savedId = -1L
     vm.save { savedId = it }
@@ -103,29 +103,19 @@ class EditPersonViewModelTest {
     val facts = db.repository.observePinnedFacts(savedId).first()
     assertEquals(listOf("Birthday" to "14 March"), facts.map { it.label to it.value })
     val channels = db.repository.observeChannels(savedId).first()
-    assertEquals(listOf(ChannelType.WHATSAPP to "+34 600", ChannelType.IN_PERSON to null), channels.map { it.type to it.handle })
+    assertEquals(listOf(ChannelType.IN_PERSON, ChannelType.WHATSAPP), channels.map { it.type })
   }
 
   @Test
-  fun inPersonChannelsNeverKeepAHandle() {
+  fun togglingAChannelSelectsAndDeselectsIt() {
     val vm = viewModel()
 
-    vm.onSaveChannel(null, ChannelType.IN_PERSON, "x")
+    vm.onToggleChannel(ChannelType.TELEGRAM)
+    vm.onToggleChannel(ChannelType.X)
+    assertEquals(setOf(ChannelType.TELEGRAM, ChannelType.X), vm.state.value.channels)
 
-    assertEquals("", vm.state.value.channels.single().handle)
-  }
-
-  @Test
-  fun editingAChannelAndRemovingItWorksByKey() {
-    val vm = viewModel()
-    vm.onSaveChannel(null, ChannelType.DISCORD, "old")
-    val key = vm.state.value.channels.single().key
-
-    vm.onSaveChannel(key, ChannelType.TELEGRAM, "new")
-    assertEquals(ChannelType.TELEGRAM to "new", vm.state.value.channels.single().let { it.type to it.handle })
-
-    vm.onRemoveChannel(key)
-    assertTrue(vm.state.value.channels.isEmpty())
+    vm.onToggleChannel(ChannelType.TELEGRAM)
+    assertEquals(setOf(ChannelType.X), vm.state.value.channels)
   }
 
   @Test

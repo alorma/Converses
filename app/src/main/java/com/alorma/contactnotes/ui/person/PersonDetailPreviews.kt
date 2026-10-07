@@ -28,8 +28,6 @@ private fun PersonDetailScreenPreview(state: PersonDetailUiState) {
         onEditPerson = {},
         onExport = {},
         onToggleArchived = {},
-        onChannelOpen = {},
-        onChannelCopy = {},
         snackbarHostState = remember { SnackbarHostState() },
       )
     }

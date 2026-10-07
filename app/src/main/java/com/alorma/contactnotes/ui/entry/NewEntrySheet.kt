@@ -45,13 +45,12 @@ import com.alorma.contactnotes.ui.people.initialsOf
 fun NewEntrySheet(
   person: PersonEntity,
   channels: List<ChannelType>,
-  otherHandle: String?,
   onDismiss: () -> Unit,
   initial: EntryEntity? = null,
   onSave: (kind: EntryKind, channel: ChannelType, text: String, occurredAt: Long?) -> Unit,
 ) {
   val form = rememberEntryFormState(initial)
-  val available = availableChannels(channels)
+  val available = availableChannels(channels + listOfNotNull(initial?.channelType))
   val channel = form.channel?.takeIf { it in available } ?: available.first()
 
   ModalBottomSheet(
@@ -64,7 +63,6 @@ fun NewEntrySheet(
       form = form,
       available = available,
       channel = channel,
-      otherHandle = otherHandle,
       isNew = initial == null,
       onDismiss = onDismiss,
       onSave = { onSave(form.kind, channel, form.text.trim(), form.occurredAt) },
@@ -79,7 +77,6 @@ fun NewEntrySheetContent(
   form: EntryFormState,
   available: List<ChannelType>,
   channel: ChannelType,
-  otherHandle: String?,
   isNew: Boolean,
   onDismiss: () -> Unit,
   onSave: () -> Unit,
@@ -117,7 +114,6 @@ fun NewEntrySheetContent(
         channels = available,
         channel = channel,
         onChannelChange = { form.channel = it },
-        otherHandle = otherHandle,
       )
     }
     // El botó queda fix a baix, fora del que es desplaça, perquè el teclat no el tapi

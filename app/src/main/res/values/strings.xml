@@ -82,6 +82,9 @@
     <string name="channel_telegram">Telegram</string>
     <string name="channel_whatsapp">WhatsApp</string>
     <string name="channel_reddit">Reddit</string>
+    <string name="channel_email">Email</string>
+    <string name="channel_signal">Signal</string>
+    <string name="channel_linkedin">LinkedIn</string>
     <string name="channel_x">X</string>
     <string name="channel_instagram">Instagram</string>
     <string name="channel_phone">Phone</string>
@@ -95,7 +98,6 @@
     <string name="color_rose">Rose</string>
     <string name="color_lemon">Lemon</string>
     <string name="color_sand">Sand</string>
-    <string name="channel_other">Other</string>
 
     <string name="new_entry">New entry</string>
     <string name="with_person">with %1$s</string>
@@ -138,9 +140,11 @@
     <string name="move_down">Move down</string>
     <string name="reorder">Reorder</string>
     <string name="channels_title">Where you talk</string>
-    <string name="add_channel">Add a channel</string>
-    <string name="edit_channel">Edit channel</string>
-    <string name="channel_handle">Username or number</string>
+    <string name="channels_count_none">None</string>
+    <plurals name="channels_count">
+        <item quantity="one">%d selected</item>
+        <item quantity="other">%d selected</item>
+    </plurals>
     <string name="protected_person">Protected person</string>
     <string name="protected_person_summary">Needs your fingerprint to be viewed. The last comment isn\'t shown in the list.</string>
     <string name="protected_unavailable">Needs a fingerprint or a screen lock on the device</string>

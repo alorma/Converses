@@ -5,17 +5,18 @@ import androidx.compose.material.icons.rounded.AlternateEmail
 import androidx.compose.material.icons.rounded.Call
 import androidx.compose.material.icons.rounded.Chat
 import androidx.compose.material.icons.rounded.Forum
-import androidx.compose.material.icons.rounded.MoreHoriz
-import androidx.compose.material.icons.rounded.People
+import androidx.compose.material.icons.rounded.Group
+import androidx.compose.material.icons.rounded.HeadsetMic
+import androidx.compose.material.icons.rounded.Lock
+import androidx.compose.material.icons.rounded.Mail
 import androidx.compose.material.icons.rounded.PhotoCamera
-import androidx.compose.material.icons.rounded.Public
 import androidx.compose.material.icons.rounded.Send
+import androidx.compose.material.icons.rounded.Work
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import com.alorma.contactnotes.R
 import android.content.Context
-import com.alorma.contactnotes.data.db.ChannelEntity
 import com.alorma.contactnotes.data.db.ChannelType
 import com.alorma.contactnotes.ui.people.label
 import java.time.Instant
@@ -26,15 +27,17 @@ import java.time.temporal.ChronoUnit
 import java.util.Locale
 
 fun ChannelType.icon(): ImageVector = when (this) {
-  ChannelType.DISCORD -> Icons.Rounded.Forum
-  ChannelType.TELEGRAM -> Icons.Rounded.Send
+  ChannelType.IN_PERSON -> Icons.Rounded.Group
   ChannelType.WHATSAPP -> Icons.Rounded.Chat
-  ChannelType.REDDIT -> Icons.Rounded.Public
+  ChannelType.TELEGRAM -> Icons.Rounded.Send
   ChannelType.X -> Icons.Rounded.AlternateEmail
   ChannelType.INSTAGRAM -> Icons.Rounded.PhotoCamera
   ChannelType.PHONE -> Icons.Rounded.Call
-  ChannelType.IN_PERSON -> Icons.Rounded.People
-  ChannelType.OTHER -> Icons.Rounded.MoreHoriz
+  ChannelType.EMAIL -> Icons.Rounded.Mail
+  ChannelType.DISCORD -> Icons.Rounded.HeadsetMic
+  ChannelType.SIGNAL -> Icons.Rounded.Lock
+  ChannelType.LINKEDIN -> Icons.Rounded.Work
+  ChannelType.REDDIT -> Icons.Rounded.Forum
 }
 
 fun entryDate(epochMillis: Long, zone: ZoneId = ZoneId.systemDefault()): LocalDate =
@@ -58,14 +61,7 @@ fun dayLabel(date: LocalDate, today: LocalDate = LocalDate.now(), locale: Locale
   }
 }
 
-/** Valor del canal «Other» de la persona (per exemple «Signal»), si en té. */
-fun List<ChannelEntity>.otherHandle(): String? =
-  firstOrNull { it.type == ChannelType.OTHER && !it.handle.isNullOrBlank() }?.handle
-
-/** Nom del canal; «Other» mostra només el valor que s'hi ha escrit («Signal»). */
 @Composable
-fun channelName(type: ChannelType, otherHandle: String?): String =
-  if (type == ChannelType.OTHER && !otherHandle.isNullOrBlank()) otherHandle else stringResource(type.label())
+fun channelName(type: ChannelType): String = stringResource(type.label())
 
-fun channelName(context: Context, type: ChannelType, otherHandle: String?): String =
-  if (type == ChannelType.OTHER && !otherHandle.isNullOrBlank()) otherHandle else context.getString(type.label())
+fun channelName(context: Context, type: ChannelType): String = context.getString(type.label())

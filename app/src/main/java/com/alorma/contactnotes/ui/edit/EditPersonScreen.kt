@@ -78,6 +78,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
+import androidx.compose.material.icons.rounded.Check
+import androidx.compose.material3.FilterChipDefaults
+import androidx.compose.material3.FilterChip
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
@@ -159,7 +164,6 @@ fun EditPersonContent(
   onProtectedChange: (Boolean) -> Unit,
   customAvatar: Boolean = true,
 ) {
-  var channelDialog by remember { mutableStateOf<ChannelDialogState?>(null) }
   var showDelete by remember { mutableStateOf(false) }
   var showAvatarSheet by remember { mutableStateOf(false) }
 
@@ -238,33 +242,7 @@ fun EditPersonContent(
         SectionHeader(title = stringResource(R.string.facts_title))
         FactsEditor(state.facts, actions)
 
-        SectionHeader(title = stringResource(R.string.channels_title))
-        Column(verticalArrangement = Arrangement.spacedBy(GroupedListDefaults.ItemSpacing)) {
-          val count = state.channels.size + 1
-          state.channels.forEachIndexed { index, channel ->
-            FieldCard(index = index, count = count, onClick = { channelDialog = ChannelDialogState(channel) }) {
-              Row(
-                modifier = Modifier.fillMaxWidth().padding(start = 16.dp, end = 4.dp, top = 8.dp, bottom = 8.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(16.dp),
-              ) {
-                Icon(channel.type.icon(), contentDescription = null)
-                Column(modifier = Modifier.weight(1f)) {
-                  Text(stringResource(channel.type.label()), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                  if (channel.handle.isNotBlank()) {
-                    Text(channel.handle, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                  }
-                }
-                IconButton(onClick = { actions.onRemoveChannel(channel.key) }) {
-                  Icon(Icons.Rounded.RemoveCircleOutline, contentDescription = stringResource(R.string.remove))
-                }
-              }
-            }
-          }
-          FieldCard(index = state.channels.size, count = count, onClick = { channelDialog = ChannelDialogState(null) }) {
-            AddRow(stringResource(R.string.add_channel))
-          }
-        }
+        ChannelsCard(selected = state.channels, onToggle = actions::onToggleChannel)
 
         FieldCard(index = 0, count = 1) {
           Row(
@@ -328,20 +306,8 @@ fun EditPersonContent(
       )
     }
 
-    channelDialog?.let { dialog ->
-      ChannelDialog(
-        initial = dialog.channel,
-        onDismiss = { channelDialog = null },
-        onConfirm = { type, handle ->
-          actions.onSaveChannel(dialog.channel?.key, type, handle)
-          channelDialog = null
-        },
-      )
-    }
   }
 }
-
-private data class ChannelDialogState(val channel: ChannelDraft?)
 
 @Composable
 private fun SectionHeader(title: String) {
@@ -557,43 +523,65 @@ private fun InlineField(value: String, onValueChange: (String) -> Unit, placehol
   )
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
-internal fun ChannelDialog(
-  initial: ChannelDraft?,
-  onDismiss: () -> Unit,
-  onConfirm: (ChannelType, String) -> Unit,
-) {
-  var type by remember { mutableStateOf(initial?.type ?: ChannelType.DISCORD) }
-  var handle by remember { mutableStateOf(initial?.handle.orEmpty()) }
-  AlertDialog(
-    onDismissRequest = onDismiss,
-    title = { Text(stringResource(if (initial == null) R.string.add_channel else R.string.edit_channel)) },
-    text = {
-      Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-          items(ChannelType.entries, key = { it.name }) { option ->
-            ConversesFilterChip(
-              label = stringResource(option.label()),
-              selected = option == type,
-              onClick = { type = option },
-              tonal = true,
-            )
-          }
-        }
-        if (type != ChannelType.IN_PERSON) {
-          TextField(
-            value = handle,
-            onValueChange = { handle = it },
-            singleLine = true,
-            label = { Text(stringResource(R.string.channel_handle)) },
-            modifier = Modifier.fillMaxWidth(),
+private fun ChannelsCard(selected: Set<ChannelType>, onToggle: (ChannelType) -> Unit) {
+  Surface(
+    shape = MaterialTheme.shapes.extraLarge,
+    color = GroupedListDefaults.containerColor,
+    modifier = Modifier.fillMaxWidth(),
+  ) {
+    Column(
+      modifier = Modifier.padding(start = 14.dp, top = 14.dp, end = 14.dp, bottom = 16.dp),
+      verticalArrangement = Arrangement.spacedBy(10.dp),
+    ) {
+      Row(verticalAlignment = Alignment.CenterVertically) {
+        Text(
+          text = stringResource(R.string.channels_title),
+          style = MaterialTheme.typography.titleSmall,
+          fontWeight = FontWeight.Bold,
+          color = MaterialTheme.colorScheme.onSurfaceVariant,
+          modifier = Modifier.weight(1f),
+        )
+        Text(
+          text = if (selected.isEmpty()) {
+            stringResource(R.string.channels_count_none)
+          } else {
+            pluralStringResource(R.plurals.channels_count, selected.size, selected.size)
+          },
+          style = MaterialTheme.typography.labelMedium,
+          color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+      }
+      FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        ChannelType.entries.forEach { type ->
+          val isSelected = type in selected
+          FilterChip(
+            selected = isSelected,
+            onClick = { onToggle(type) },
+            modifier = Modifier.height(36.dp),
+            label = {
+              Text(stringResource(type.label()), fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium)
+            },
+            leadingIcon = {
+              Icon(
+                imageVector = if (isSelected) Icons.Rounded.Check else type.icon(),
+                contentDescription = null,
+                modifier = Modifier.size(FilterChipDefaults.IconSize),
+              )
+            },
+            shape = RoundedCornerShape(10.dp),
+            colors = FilterChipDefaults.filterChipColors(
+              selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+              selectedLabelColor = MaterialTheme.colorScheme.onPrimaryContainer,
+              selectedLeadingIconColor = MaterialTheme.colorScheme.onPrimaryContainer,
+            ),
+            border = if (isSelected) null else BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
           )
         }
       }
-    },
-    confirmButton = { TextButton(onClick = { onConfirm(type, handle) }) { Text(stringResource(android.R.string.ok)) } },
-    dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(android.R.string.cancel)) } },
-  )
+    }
+  }
 }
 
 @Composable

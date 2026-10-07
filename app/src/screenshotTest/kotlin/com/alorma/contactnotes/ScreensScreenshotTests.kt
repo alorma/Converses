@@ -6,7 +6,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.android.tools.screenshot.PreviewTest
 import com.alorma.contactnotes.ui.edit.AvatarSheetAutoPreview
 import com.alorma.contactnotes.ui.edit.AvatarSheetCustomPreview
-import com.alorma.contactnotes.ui.edit.ChannelDialogPreview
 import com.alorma.contactnotes.ui.edit.EditPersonCustomAvatarPreview
 import com.alorma.contactnotes.ui.edit.DeletePersonDialogPreview
 import com.alorma.contactnotes.ui.edit.EditPersonExistingPreview
@@ -305,13 +304,6 @@ class ScreensScreenshotTests {
   @Composable
   fun deletePersonDialog() {
     DeletePersonDialogPreview()
-  }
-
-  @ScreenPreviews
-  @PreviewTest
-  @Composable
-  fun channelDialog() {
-    ChannelDialogPreview()
   }
 
   @ScreenPreviews

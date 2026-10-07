@@ -55,7 +55,6 @@ import com.alorma.contactnotes.designsystem.components.ToolbarDestination
 import com.alorma.contactnotes.designsystem.components.groupedItems
 import com.alorma.contactnotes.designsystem.theme.ListTitleStyle
 import com.alorma.contactnotes.ui.person.channelName
-import com.alorma.contactnotes.ui.person.otherHandle
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 
@@ -269,11 +268,10 @@ private fun PersonRow(item: PersonListItem, onClick: () -> Unit) {
           color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
       } else {
-        val channels = item.channels.map { it.type }.distinct()
-        val otherHandle = item.channels.otherHandle()
+        val channels = item.channels.map { it.type }.distinct().sorted()
         if (channels.isNotEmpty()) {
           Text(
-            text = channels.map { channelName(it, otherHandle).uppercase() }.joinToString(" · "),
+            text = channels.map { channelName(it).uppercase() }.joinToString(" · "),
             style = MaterialTheme.typography.labelMedium,
             fontWeight = FontWeight.SemiBold,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
