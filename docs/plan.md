@@ -327,12 +327,13 @@ El detall és a `docs/pro.md` (document de treball, es continuarà). **La v1 no 
     - **Room:** la base de dades és la **versió 1** de la v1, neta i **sense cap migració**: l'esquema (`1.json`) s'ha regenerat des de zero i les dues columnes d'avatar són nul·lables. Com que l'app no és publicada, no hi ha cap instal·lació a conservar; en debug la base de dades es recrea sola si canvia l'esquema. A partir de la publicació, qualsevol canvi serà v1 → v2 amb migració i test (`MigrationTestHelper`);
     - editor: l'estat guarda `null` mentre no es tria res i l'avatar de previsualització segueix el nom mentre s'escriu; amb `CustomAvatarFeature` apagada s'amaguen la forma i el color i només queda l'avatar (`customAvatar` a `EditPersonContent`); una persona nova es desa amb `null` (test a `EditPersonViewModelTest`);
     - pendent al CI: etiqueta `update-screenshots` (canvia `editPersonNew`; les captures de l'onboarding són noves).
-- [ ] **3 · Redisseny de Nova persona / Editar persona** (especificació a `docs/nova-persona/redisseny-nova-persona.md`, captures a `docs/nova-persona/img/`; si hi ha cap diferència amb el pla, mana aquest document). Es fa abans del pas 4 perquè canvia el formulari que s'hi ha de comprovar. Resum:
-    - s'elimina la targeta d'avatar: l'avatar (56 dp, Galeta amb color automàtic, no clicable) passa a la primera fila del grup «Nom» i s'actualitza mentre s'escriu;
-    - amb `CustomAvatarFeature` encesa, l'avatar és un botó amb insígnia d'edició que obre el full «Avatar» (forma, color i «Automàtic»; es desa amb la persona; `avatarColor = null` = automàtic);
-    - fila «Omple des d'un contacte» a Nova persona (selector de contactes del sistema). **Cal revisar-ho:** a «Fora de la v1» el vincle amb l'agenda està descartat i `docs/pro.md` situa la integració amb contactes al Pro; cal decidir si aquesta fila entra a la v1 (sense permisos) o va darrere d'un flag;
-    - «Dades fixades» passa a ser «Dades» (es «Datos», en «Info») a tota l'app, sense la icona `push_pin`; només textos, la taula `pinned_fact` no canvia;
-    - una sola `resolveAvatar(person)`; textos nous a `strings.xml` (en/ca/es); previews i captures (etiqueta `update-screenshots`).
+- [x] **3 · Redisseny de Nova persona / Editar persona** (especificació a `docs/nova-persona/redisseny-nova-persona.md`; fet i provat a l'emulador):
+    - s'ha eliminat la targeta d'avatar: l'avatar (56 dp, Galeta amb color automàtic, no clicable) és a la primera fila del grup «Nom», amb transició de color de 300 ms, inicials = primera lletra del primer mot + primera de l'últim (`initialsOf`) i «?» sobre fons neutre amb el nom buit;
+    - amb `CustomAvatarFeature` encesa, l'avatar és un botó amb insígnia d'edició que obre el full «Avatar» (`AvatarSheet.kt`: previsualització, forma, color amb «Automàtic», «Fet»); els canvis es veuen en directe i es desen amb la persona (`avatarColor = null` = automàtic);
+    - **fila «Omple des d'un contacte»: no s'ha fet** (la importació de contactes queda fora de la v1);
+    - «Dades fixades» passa a ser «Dades» / «Datos» / «Info» (clau `facts_title`) i es treuen la icona `push_pin` i el subtítol; només textos;
+    - textos nous (en/ca/es); previews i captures `editPersonCustomAvatar`, `avatarSheetAuto` i `avatarSheetCustom`, i referències locals de les captures de l'editor que han canviat;
+    - provat amb el menú de debug («Pro mode»): insígnia, full, desar i detall amb la forma i el color triats.
 - [ ] **4 · Comprovar que res de Pro és visible** amb totes les funcions apagades (llista de `docs/pro.md` → «Proves») i, amb l'interruptor del menú de debug, que els dos modes funcionen.
 
 **Relació amb altres fases:** el pas 4 i la prova «amb `CustomAvatar` activada» depenen del mòdul **Pro** del menú de debug (vegeu «Menú de debug»), que es fa en paral·lel. M5 no pot començar a signar ni a omplir la fitxa de Play fins que 1–3 estiguin fets.

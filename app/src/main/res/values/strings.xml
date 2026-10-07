@@ -57,7 +57,7 @@
     <string name="app_lock_prompt_title">Unlock Converses</string>
     <string name="today">Today</string>
     <string name="since">since %1$s</string>
-    <string name="pinned_facts">Pinned facts</string>
+    <string name="facts_title">Info</string>
     <string name="timeline">Timeline</string>
     <string name="add_first_person">Add the first person</string>
     <string name="people_empty_filter">No one on this channel</string>
@@ -84,7 +84,6 @@
     <string name="channel_in_person">In person</string>
     <string name="channel_with_value">%1$s - %2$s</string>
     <string name="more_options">More options</string>
-    <string name="shape_option">Shape %1$d</string>
     <string name="entry_description">%1$s, %2$s at %3$s, via %4$s: %5$s</string>
     <string name="color_lavender">Lavender</string>
     <string name="color_mint">Mint</string>
@@ -125,12 +124,9 @@
     <string name="edit_person">Edit person</string>
     <string name="new_person">New person</string>
     <string name="add_person">Add a person</string>
-    <string name="shape_label">Shape</string>
-    <string name="color_label">Color</string>
     <string name="field_name">Name</string>
     <string name="field_alias">Alias</string>
     <string name="alias_taken">You already have another person with the alias @%1$s</string>
-    <string name="pinned_hint">They appear at the top of the detail</string>
     <string name="fact_label_hint">Label</string>
     <string name="fact_value_hint">Value</string>
     <string name="add_fact">Add a fact</string>
@@ -201,4 +197,15 @@
     <string name="onb_sample_2_text">Kael lost his brother.</string>
     <string name="onb_sample_3_label">NOTE · YESTERDAY · IN PERSON</string>
     <string name="onb_sample_3_text">Game at the board games day.</string>
+    <string name="avatar_edit_cd">Change avatar shape and colour</string>
+    <string name="avatar_sheet_title">Avatar</string>
+    <string name="avatar_shape">Shape</string>
+    <string name="avatar_color">Colour</string>
+    <string name="avatar_color_auto">Automatic</string>
+    <string name="avatar_summary_auto">%1$s · automatic colour (%2$s)</string>
+    <string name="avatar_done">Done</string>
+    <string name="shape_cookie">Cookie</string>
+    <string name="shape_clover">Clover</string>
+    <string name="shape_flower">Flower</string>
+    <string name="shape_sunny">Sun</string>
 </resources>
