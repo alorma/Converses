@@ -29,7 +29,21 @@ android {
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
   }
 
+  // Keystore de debug compartida (al repo): l'APK de debug sempre té la mateixa signatura,
+  // es construeixi on es construeixi, i es pot instal·lar a sobre sense esborrar l'app
+  signingConfigs {
+    getByName("debug") {
+      storeFile = file("debug.keystore")
+      storePassword = "android"
+      keyAlias = "androiddebugkey"
+      keyPassword = "android"
+    }
+  }
+
   buildTypes {
+    debug {
+      signingConfig = signingConfigs.getByName("debug")
+    }
     release {
       optimization {
         enable = true
