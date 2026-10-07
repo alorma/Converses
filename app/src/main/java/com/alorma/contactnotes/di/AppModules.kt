@@ -6,6 +6,7 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.alorma.contactnotes.data.ConversesRepository
+import com.alorma.contactnotes.data.FeatureGate
 import com.alorma.contactnotes.data.db.ConversesDatabase
 import com.alorma.contactnotes.data.insertSampleData
 import com.alorma.contactnotes.data.settings.AppLockManager
@@ -64,6 +65,7 @@ val settingsModule = module {
   single { OnboardingFlag(DataStoreFireAndForgetRunner(get())) }
   single { AppLockManager(get()) }
   single { SecureWindow() }
+  single { FeatureGate() }
   single { PersonExporter(androidContext(), get()) }
   single { PersonSelectionBridge() }
 }

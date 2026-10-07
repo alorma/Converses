@@ -1,6 +1,6 @@
 # Converses — Pla i estat (v2)
 
-Actualitzat el 7 d'oct. de 2026 · @Bernat · M1, M2 i M3 fets, més el color de persona i el backlog de disseny («Quan», «Qui» i bloqueig); queden els bugs prioritaris del backlog (`docs/backlog.md`), M4, M5 i unes quantes coses soltes; follow-ups i gestor de canals passen a l'Iteració 2, després de la publicació (vegeu «On som»)
+Actualitzat el 7 d'oct. de 2026 · @Bernat · fets M1 a M4, el color de persona, el backlog de disseny, el backlog de bugs i l'onboarding (implementat). **La v1 no té Pro.** Abans de la release 1 queden els canvis de la versió gratuïta (avatar estàndard i importar un contacte; vegeu «Versió gratuïta i Pro») i **M5**; el menú de debug es fa en paral·lel en un worktree apart. Follow-ups i gestor de canals passen a l'Iteració 2, després de la publicació (vegeu «On som»)
 
 ## Resum
 
@@ -12,7 +12,7 @@ Converses és una app Android per recordar què has dit, què t'han dit i què h
 
 ## On som
 
-La v1 funcional està feta: interfície polida, fluxos complets, privacitat tancada i color de persona. El que queda és la feina de qualitat i de publicació, més unes quantes coses soltes.
+La v1 funcional està feta: interfície polida, fluxos complets, privacitat tancada, color de persona i onboarding. Abans de publicar queden els canvis de la versió gratuïta (avatar estàndard i importació de contactes; a la v1 no hi ha Pro) i la feina de publicació (M5), més unes quantes coses soltes.
 
 | Fase | Objectiu | Estat |
 | --- | --- | --- |
@@ -26,8 +26,8 @@ La v1 funcional està feta: interfície polida, fluxos complets, privacitat tanc
 | Backlog de bugs | Àrea clicable, etiqueta «Other», biometria sense desar | Fet (`docs/backlog.md`) |
 | M4 · Qualitat | Tests, accessibilitat, mode fosc, dispositiu real | Fet (amb excepcions acceptades) |
 | M5 · Publicació | minSdk, signatura, R8, mida, migracions, Play Store | Per fer |
-| Pro i versió gratuïta | `FeatureGate`, avatar estàndard, importar un contacte; res de Pro visible a la v1 (vegeu «Pro i versió gratuïta») | Per fer (`docs/pro.md`) |
-| Menú de debug | Botó flotant i full amb mòduls, només en builds de debug (vegeu «Menú de debug») | Per fer (planificat, sense codi) |
+| Versió gratuïta (v1 sense Pro) | Avatar estàndard i importar un contacte; el Pro queda per després de la v1 (vegeu «Versió gratuïta i Pro») | **Per fer abans de la release 1**; va abans de M5 (`docs/pro.md`) |
+| Menú de debug | Botó flotant i full amb mòduls, només en builds de debug (vegeu «Menú de debug») | En curs en un worktree apart; hi viurà l'interruptor gratuït/Pro |
 | Iteració 2 | Follow-ups i gestor de canals | Després de la publicació (vegeu «Iteració 2») |
 | Després de la v1 | Cerca, còpia de seguretat, etiquetes, widget | Idees |
 
@@ -36,9 +36,10 @@ La v1 funcional està feta: interfície polida, fluxos complets, privacitat tanc
 - Sincronitzar el design system a Claude Design (vegeu M1 · Design system); és feina de Bernat.
 - Provar a l'emulador el color de persona i, a dispositiu real, el bloqueig desactivat sol.
 - Afinar el snackbar de desfer (posició i marges) si no queda bé.
-- Bugs i features pendents: vegeu `docs/backlog.md` (issues #4, #5 i #6).
-- Onboarding animat (tanda 4): especificació i disseny a `docs/onboarding/` (vegeu «Onboarding»).
-- Pro i versió gratuïta: document de treball a `docs/pro.md` (vegeu «Pro i versió gratuïta»).
+- Features pendents: vegeu `docs/backlog.md`; només queden les de l'Iteració 2 (issue #5).
+- Onboarding: proves manuals, pop del botó «Comença» al pas 3, test del runner del flag i referències de captures (etiqueta `update-screenshots`); vegeu «Onboarding».
+- Canvis de la versió gratuïta: vegeu «Versió gratuïta i Pro»; són obligatoris abans de la release.
+- Versió gratuïta i Pro: document de treball a `docs/pro.md` (vegeu «Versió gratuïta i Pro»).
 - Menú de debug: pendent d'implementar (vegeu «Menú de debug»).
 
 ## Decisions (només queda D1)
@@ -304,20 +305,33 @@ No són prioritaris: es faran quan l'app ja estigui publicada. El detall és a `
 - **Follow-ups / entrades pendents (6, issue #5):** flag `pending` a `EntryEntity` i interruptor a `EntryForm`, sota de «Quan». Primera migració de Room (v2 → v3) amb el seu test de migració (`MigrationTestHelper`).
 - **Gestor de canals (8):** l'enum `ChannelType` passa a una taula `Channel`, amb migració i test. Absorbeix «Empresa» (7); l'etiqueta «Other - valor» (3) es fa abans, com a bug. Només val la pena si es vol que els canals siguin editables.
 
-## Pro i versió gratuïta
+## Versió gratuïta i Pro
 
-El detall és a `docs/pro.md` (document de treball, es continuarà). Resum:
+El detall és a `docs/pro.md` (document de treball, es continuarà). **La v1 no té Pro: no hi ha cap funció, pantalla ni reclam de Pro.** El que s'ha de fer abans de la release 1 són els canvis de la versió gratuïta, perquè toquen el model de dades de les persones (avatar) i no es poden fer sense migració un cop publicada l'app. El Pro (pagament únic) es planifica per a després. Resum:
 
 - **Model:** Pro de pagament únic, sense subscripció ni anuncis. Play Billing no entra encara. Regla: mai es cobra per accedir, protegir o treure les dades pròpies.
 - **Pro:** avatar personalitzat (color i forma), canals propis (backlog 8), follow-ups (backlog 6) i integració amb contactes (vincle, Connected apps, avís de trucada, importació múltiple).
-- **No s'esborra codi:** tot el que és Pro queda amagat darrere d'un `FeatureGate.isPro` (sempre `false` a la v1), amb un interruptor a Ajustos només en debug.
+- **No s'esborra codi:** tot el que és Pro queda amagat darrere d'un `FeatureGate.proEnabled` (sempre `false` a la v1).
 - **A la primera release no es mostra res de Pro.**
-- **Per a la v1 gratuïta:** avatar estàndard (forma Galeta i color automàtic per hash del nom; `avatarShape` i `avatarColor` nul·lables, sense migració perquè l'app encara no és publicada) i importar una persona des del selector de contactes del sistema.
 - **Pendent de decidir:** canal «Empresa» (backlog 7), gratuït o Pro segons si es fa abans dels canals propis.
+
+**Feina abans de la release 1** (en aquest ordre, un commit per pas):
+
+- [x] **1 · `FeatureGate`** (`data/FeatureGate.kt`, singleton de Koin): `proEnabled: StateFlow<Boolean>`, sempre `false` a la v1 i **sense cap comprovació de pagament** (el Pro encara no existeix). Les funcions Pro queden amagades i l'app es comporta com la gratuïta, sense mostrar enlloc «gratuït» ni «Pro». Més endavant, aquest és el punt on es mirarà si s'ha pagat. `setProEnabled(value)` només el crida el menú de debug. Test: `FeatureGateTest`.
+- [ ] **2 · Avatar estàndard:**
+    - `AvatarColor.forName(name)` al `designsystem`, amb hash estable del nom normalitzat (minúscules, sense accents ni espais als extrems), i test amb una llista de 20 noms que repartixi els 7 colors;
+    - `avatarShape` i `avatarColor` nul·lables a `PersonEntity` (`null` = estàndard: Galeta + color automàtic) i resolució en un sol lloc (`resolvedShape` / `resolvedColor`) usat per llistat, detall, selector «Qui», selector de persona, onboarding i `PersonTheme`;
+    - **Room:** l'esquema canvia però **no s'hi afegeix migració**, perquè l'app encara no és publicada (decidit a `docs/pro.md`). Cal regenerar `app/schemas/.../2.json` i que no es faci cap altra publicació abans d'això; un cop publicada, qualsevol canvi ja serà v2 → v3 amb migració i test;
+    - Editar persona / Nova persona: amagar la targeta de forma i color quan `proEnabled` és `false`; es manté l'avatar de previsualització;
+    - captures: actualitzar les de l'editor i les del detall amb els 7 colors (el color del tema de persona ve ara del color automàtic).
+- [ ] **3 · Importar una persona des dels contactes** (`ACTION_PICK` amb el selector del sistema, sense `READ_CONTACTS`): fila «Omple des d'un contacte» a Nova persona i segon botó «Importa dels contactes» al llistat buit; pre-omple el nom i el telèfon com a canal «Telèfon» (i «WhatsApp» si es marca); avís de duplicats per número («Ja tens en {nom} · Obre-la»), sense filtrar res de les persones protegides. Textos en/ca/es.
+- [ ] **4 · Comprovar que res de Pro és visible** amb `proEnabled = false` (llista de `docs/pro.md` → «Proves») i, amb l'interruptor del menú de debug, que els dos modes funcionen.
+
+**Relació amb altres fases:** el pas 4 i la prova «amb `proEnabled = true`» depenen del mòdul **Pro** del menú de debug (vegeu «Menú de debug»), que es fa en paral·lel. M5 no pot començar a signar ni a omplir la fitxa de Play fins que 1–3 estiguin fets: la fitxa i el formulari de seguretat de les dades han de reflectir la importació de contactes (selector del sistema, sense permís).
 
 ## Menú de debug
 
-Pendent d'implementar. Inspirat en el debug menu de [sevibus-android](https://github.com/Sloy/sevibus-android) (mòduls `debug-menu` i `debug-menu-noop`). Serveix, entre altres coses, per provar els dos modes del `FeatureGate` (vegeu «Pro i versió gratuïta»).
+Pendent d'implementar. Inspirat en el debug menu de [sevibus-android](https://github.com/Sloy/sevibus-android) (mòduls `debug-menu` i `debug-menu-noop`). Serveix, entre altres coses, per provar els dos modes del `FeatureGate` (vegeu «Versió gratuïta i Pro»).
 
 **Com és a SeviBus:**
 
@@ -332,12 +346,14 @@ Pendent d'implementar. Inspirat en el debug menu de [sevibus-android](https://gi
 - **Botó flotant sempre visible en debug** (decidit). Té l'inconvenient que sortirà a les captures: les captures de pantalles no passen per `MainActivity`, així que no s'hi veurà; s'ha de comprovar quan s'implementi.
 - **On es col·loca:** a `MainActivity`, embolcallant `AppNavigation` (i el bloqueig de l'app) amb `DebugMenuHost`.
 - **El menú no pot filtrar dades de persones protegides:** cap mòdul no mostra noms ni contingut d'entrades, i el full ha d'heretar `FLAG_SECURE` quan la finestra el tingui actiu.
-- **L'interruptor Pro passa del menú d'Ajustos al menú de debug:** substitueix «un interruptor a Ajustos (només en builds de debug)» de `docs/pro.md`, perquè Ajustos no tingui res de debug.
+- **L'interruptor Pro passa del menú d'Ajustos al menú de debug:** substitueix «un interruptor a Ajustos (només en builds de debug)» de `docs/pro.md`, perquè Ajustos no tingui res de debug. El mòdul Pro crida `FeatureGate.setProEnabled(...)` i desa l'estat; com que el menú es fa en un worktree apart, el contracte entre els dos és aquesta API (vegeu «Versió gratuïta i Pro», pas 1).
+
+**Estat:** en curs en un worktree apart. Els passos 1 i 4 no depenen de la feina de Pro; el 2 depèn del pas 1 de Pro.
 
 **Passos:**
 
 1. Esquelet: `DebugMenuHost` (botó flotant + full), `DebugModule` i `DebugCell`, amb la variant `release` buida.
-2. Mòdul **Pro**: interruptor de `FeatureGate.isPro` (depèn del primer pas de `docs/pro.md`).
+2. Mòdul **Pro**: interruptor de `FeatureGate.proEnabled` (depèn del primer pas de `docs/pro.md`).
 3. Mòduls petits segons faci falta: tornar a sembrar les dades d'exemple, tornar a mostrar l'onboarding (`OnboardingFlag.reset()`), esborrar el DataStore.
 4. Comprovar que l'APK de release no conté cap classe del menú.
 
@@ -427,6 +443,7 @@ Cada persona porta el color de l'avatar com a **llavor del tema** de les seves p
 
 | Destinació | Ruta (`NavKey`) | Notes |
 | --- | --- | --- |
+| Onboarding | `OnboardingRoute` | Només el primer cop (`OnboardingFlag`); en acabar substitueix la pila per `PeopleRoute` |
 | Llistat | `PeopleRoute` | Filtres per canal, nova persona a la capçalera i fila final, barra flotant |
 | Arxivades | `ArchivedRoute` | Destinació de la barra flotant; sense filtres de canal ni fila d'afegir |
 | Detall | `PersonRoute(id)` | Split button «Nota ▾», ⋮ a cada entrada, `FLAG_SECURE` si és protegida |

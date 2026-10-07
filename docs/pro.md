@@ -1,6 +1,6 @@
 # Converses — Versió gratuïta (v1) i Pro
 
-Què queda fora de la primera versió gratuïta, perquè passarà a ser Pro, i què es queda gratis per sempre. Document de treball: s'hi continuarà treballant (vegeu «Pro i versió gratuïta» a `docs/plan.md`).
+Què queda fora de la primera versió gratuïta, perquè passarà a ser Pro, i què es queda gratis per sempre. **La v1 no té Pro. Els canvis de «Canvis a fer per a la v1 gratuïta» s'han de fer abans de la release 1.** Document de treball: s'hi continuarà treballant (vegeu «Versió gratuïta i Pro» a `docs/plan.md`).
 
 Model previst per al Pro: **pagament únic**, sense subscripció i sense anuncis. La compra (Play Billing) no forma part d'aquests canvis.
 
@@ -35,8 +35,8 @@ Mai es cobra per **accedir, protegir o treure** les dades pròpies. Al Pro hi va
 
 ### 1. Interruptor de funcions Pro
 
-- Un sol punt de consulta, p. ex. `FeatureGate.isPro: StateFlow<Boolean>`. A la v1 sempre és `false`; més endavant el connectarà Play Billing.
-- En debug, un interruptor a Ajustos (només en builds de debug) per provar els dos modes.
+- Un sol punt de consulta, p. ex. `FeatureGate.proEnabled: StateFlow<Boolean>`. A la v1 sempre és `false` i no comprova cap pagament (el Pro encara no existeix); més endavant hi connectarà Play Billing. La UI no mostra mai res de gratuït ni de Pro.
+- L'interruptor per provar els dos modes viu al **menú de debug** (mòdul Pro), que crida `FeatureGate.setProEnabled(...)`; Ajustos no en porta cap.
 
 ### 2. Avatar estàndard
 
@@ -48,7 +48,7 @@ Mai es cobra per **accedir, protegir o treure** les dades pròpies. Al Pro hi va
 
 ### 3. Fora del codi de la v1
 
-No s'hi ha de començar res, o queda darrere de `FeatureGate.isPro`:
+No s'hi ha de començar res, o queda darrere de `FeatureGate.proEnabled`:
 
 - backlog 6 (pendents);
 - backlog 8 (gestor de canals);
@@ -68,8 +68,8 @@ No s'hi ha de començar res, o queda darrere de `FeatureGate.isPro`:
 
 ## Proves
 
-- [ ] Amb `isPro = false`: no hi ha selector d'avatar, tots els avatars són Galeta, i el mateix nom dona sempre el mateix color.
+- [ ] Amb `proEnabled = false`: no hi ha selector d'avatar, tots els avatars són Galeta, i el mateix nom dona sempre el mateix color.
 - [ ] Els 7 colors surten repartits amb noms diferents (prova amb una llista de 20 noms).
-- [ ] Amb `isPro = true` (debug): el selector torna a sortir i desa els valors.
+- [ ] Amb `proEnabled = true` (debug): el selector torna a sortir i desa els valors.
 - [ ] Importar un contacte sense haver concedit `READ_CONTACTS`.
 - [ ] Importar un contacte amb un número que ja existeix avisa del duplicat.
