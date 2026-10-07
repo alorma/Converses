@@ -51,6 +51,11 @@ android {
       }
     }
   }
+  testOptions {
+    // Els tests de ViewModel construeixen classes que reben un `Context` que no arriben a fer servir
+    unitTests.isReturnDefaultValues = true
+  }
+
   compileOptions {
     sourceCompatibility = JavaVersion.VERSION_11
     targetCompatibility = JavaVersion.VERSION_11
