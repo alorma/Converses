@@ -43,11 +43,12 @@ android {
   buildTypes {
     debug {
       signingConfig = signingConfigs.getByName("debug")
+      // Permet tenir instal·lades a la vegada la versió de debug i la de release
+      applicationIdSuffix = ".debug"
     }
     release {
       optimization {
         enable = true
-        packageScope = setOf("androidx.**", "kotlin.**", "kotlinx.**")
       }
     }
   }
