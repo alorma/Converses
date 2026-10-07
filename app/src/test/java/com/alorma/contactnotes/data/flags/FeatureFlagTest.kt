@@ -59,4 +59,16 @@ class FeatureFlagTest {
     assertTrue(CustomAvatarFeature(restored).isEnabled())
     assertFalse(restored.hasOverride(channels.key))
   }
+
+  @Test
+  fun proModeSwitchesEveryProFlagAtOnce() {
+    val flags = listOf(avatar, channels, followUps, contacts)
+    assertTrue(flags.all { it.pro })
+
+    flags.filter { it.pro }.forEach { runner.setOverride(it.key, true) }
+    assertTrue(flags.all { it.isEnabled() })
+
+    flags.filter { it.pro }.forEach { runner.setOverride(it.key, false) }
+    assertTrue(flags.none { it.isEnabled() })
+  }
 }
