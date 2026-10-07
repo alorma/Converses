@@ -7,11 +7,11 @@ Actualitzat el 7 d'oct. de 2026, reconciliat amb `docs/plan.md`. Només hi ha el
 | 1 | Bug | L'àrea clicable surt fora de la superfície | [#6](https://github.com/alorma/Contacts-Notes/issues/6) |
 | 3 | Bug | Canal "Other" ha de mostrar "Other - {valor}" | — |
 | 5 | Bug | Activar/desactivar biometria sense desar el perfil | [#4](https://github.com/alorma/Contacts-Notes/issues/4) |
-| 6 | Feature | Follow-ups / entrades pendents | [#5](https://github.com/alorma/Contacts-Notes/issues/5) |
-| 7 | Feature | Nou canal "Empresa" (queda dins el 8) | — |
-| 8 | Feature | Gestor de canals propis | — |
+| 6 | Feature (Iteració 2) | Follow-ups / entrades pendents | [#5](https://github.com/alorma/Contacts-Notes/issues/5) |
+| 7 | Feature (Iteració 2) | Nou canal "Empresa" (queda dins el 8) | — |
+| 8 | Feature (Iteració 2) | Gestor de canals propis | — |
 
-La numeració és la del backlog original, perquè els issues i les referències no canviïn.
+Els punts 6, 7 i 8 són features no prioritàries: es faran a l'**Iteració 2**, després de publicar l'app (vegeu `docs/plan.md`). La numeració és la del backlog original, perquè els issues i les referències no canviïn.
 
 **Resolts** (ja són a l'app):
 
