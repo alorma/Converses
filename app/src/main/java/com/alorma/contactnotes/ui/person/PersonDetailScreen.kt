@@ -194,6 +194,7 @@ fun PersonDetailRoute(
       NewEntrySheet(
         person = person,
         channels = state.channels.map { it.type },
+        otherHandle = state.channels.otherHandle(),
         onDismiss = { showNewEntry = false },
         onSave = { kind, channel, text, at ->
           viewModel.addEntry(kind, channel, text, at)
@@ -207,6 +208,7 @@ fun PersonDetailRoute(
         EntryAction.Menu -> EntryActionsSheet(
           entry = actionEntry,
           firstName = firstName(person.name),
+          otherHandle = state.channels.otherHandle(),
           dayCount = dayCount,
           onDismiss = ::closeAction,
           onEdit = { action = EntryAction.Edit },
@@ -239,6 +241,7 @@ fun PersonDetailRoute(
         EntryAction.Edit -> NewEntrySheet(
           person = person,
           channels = state.channels.map { it.type },
+          otherHandle = state.channels.otherHandle(),
           initial = actionEntry,
           onDismiss = ::closeAction,
           onSave = { kind, channel, text, at ->
@@ -260,7 +263,7 @@ fun PersonDetailRoute(
             R.plurals.entry_delete_day_summary,
             dayCount,
             dayCount,
-            stringResource(actionEntry.channelType.label()),
+            channelName(actionEntry.channelType, state.channels.otherHandle()),
           ),
           onDismiss = ::closeAction,
           onConfirm = {
@@ -295,6 +298,7 @@ fun PersonDetailScreen(
     if (person == null) return@Surface
     val items = remember(state.entries) { state.entries.toTimelineItems() }
     val firstName = remember(person.name) { firstName(person.name) }
+    val otherHandle = remember(state.channels) { state.channels.otherHandle() }
 
     Box(modifier = Modifier.fillMaxSize()) {
       LazyColumn(
@@ -377,7 +381,7 @@ fun PersonDetailScreen(
               isLast = isLast,
               marker = { EntryMarker(item.entry.kind, person) },
             ) {
-              EntryCard(item.entry, firstName, onMenu = { onEntryMenu(item.entry) })
+              EntryCard(item.entry, firstName, otherHandle, onMenu = { onEntryMenu(item.entry) })
             }
           }
         }
@@ -481,7 +485,7 @@ private fun ChannelRow(
       val hasLink = channelLink(channel.type, channel.handle) != null
       val hasHandle = !channel.handle.isNullOrBlank()
       ConversesChannelChip(
-        label = stringResource(channel.type.label()),
+        label = channelName(channel.type, channel.handle),
         icon = channel.type.icon(),
         onClick = if (hasLink) ({ onOpen(channel) }) else null,
         onLongClick = if (hasHandle) ({ onCopy(channel) }) else null,
@@ -552,7 +556,7 @@ private fun TimelineHeader(count: Int) {
 }
 
 @Composable
-private fun EntryCard(entry: EntryEntity, firstName: String, onMenu: () -> Unit) {
+private fun EntryCard(entry: EntryEntity, firstName: String, otherHandle: String?, onMenu: () -> Unit) {
   Surface(
     shape = MaterialTheme.shapes.extraLarge,
     color = GroupedListDefaults.containerColor,
@@ -564,7 +568,7 @@ private fun EntryCard(entry: EntryEntity, firstName: String, onMenu: () -> Unit)
           text = listOf(
             whoLabel(entry.kind, firstName),
             formatTime(entry.occurredAt),
-            stringResource(entry.channelType.label()),
+            channelName(entry.channelType, otherHandle),
           ).joinToString(" · ") { it.uppercase() },
           style = MaterialTheme.typography.labelMedium,
           fontWeight = FontWeight.SemiBold,

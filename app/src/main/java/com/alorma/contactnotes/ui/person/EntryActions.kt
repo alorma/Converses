@@ -51,6 +51,7 @@ import java.time.LocalDate
 fun EntryActionsSheet(
   entry: EntryEntity,
   firstName: String,
+  otherHandle: String?,
   dayCount: Int,
   onDismiss: () -> Unit,
   onEdit: () -> Unit,
@@ -67,6 +68,7 @@ fun EntryActionsSheet(
     EntryActionsContent(
       entry = entry,
       firstName = firstName,
+      otherHandle = otherHandle,
       dayCount = dayCount,
       onEdit = onEdit,
       onCopy = onCopy,
@@ -82,6 +84,7 @@ fun EntryActionsSheet(
 fun EntryActionsContent(
   entry: EntryEntity,
   firstName: String,
+  otherHandle: String?,
   dayCount: Int,
   onEdit: () -> Unit,
   onCopy: () -> Unit,
@@ -101,7 +104,7 @@ fun EntryActionsContent(
       text = listOf(
         whoLabel(entry.kind, firstName),
         formatTime(entry.occurredAt),
-        stringResource(entry.channelType.label()),
+        channelName(entry.channelType, otherHandle),
       ).joinToString(" · ") { it.uppercase() },
       style = MaterialTheme.typography.labelMedium,
       fontWeight = FontWeight.SemiBold,
@@ -137,7 +140,7 @@ fun EntryActionsContent(
             if (isToday) R.plurals.entry_delete_today_summary else R.plurals.entry_delete_day_summary,
             dayCount,
             dayCount,
-            stringResource(entry.channelType.label()),
+            channelName(entry.channelType, otherHandle),
           ),
           index = 1,
           count = 2,

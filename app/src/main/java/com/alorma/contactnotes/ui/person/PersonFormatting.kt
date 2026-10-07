@@ -12,7 +12,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import com.alorma.contactnotes.R
+import android.content.Context
+import com.alorma.contactnotes.data.db.ChannelEntity
 import com.alorma.contactnotes.data.db.ChannelType
+import com.alorma.contactnotes.ui.people.label
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
@@ -48,5 +51,29 @@ fun dayLabel(date: LocalDate, today: LocalDate = LocalDate.now(), locale: Locale
     days == 1L -> stringResource(R.string.yesterday)
     date.year == today.year -> date.format(DateTimeFormatter.ofPattern("d MMMM", locale))
     else -> date.format(DateTimeFormatter.ofPattern("d MMMM yyyy", locale))
+  }
+}
+
+/** Valor del canal «Other» de la persona (per exemple «Signal»), si en té. */
+fun List<ChannelEntity>.otherHandle(): String? =
+  firstOrNull { it.type == ChannelType.OTHER && !it.handle.isNullOrBlank() }?.handle
+
+/** Nom del canal; «Other» porta el valor que s'hi ha escrit: «Other - Signal». */
+@Composable
+fun channelName(type: ChannelType, otherHandle: String?): String {
+  val label = stringResource(type.label())
+  return if (type == ChannelType.OTHER && !otherHandle.isNullOrBlank()) {
+    stringResource(R.string.channel_with_value, label, otherHandle)
+  } else {
+    label
+  }
+}
+
+fun channelName(context: Context, type: ChannelType, otherHandle: String?): String {
+  val label = context.getString(type.label())
+  return if (type == ChannelType.OTHER && !otherHandle.isNullOrBlank()) {
+    context.getString(R.string.channel_with_value, label, otherHandle)
+  } else {
+    label
   }
 }

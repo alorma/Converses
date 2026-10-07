@@ -82,6 +82,7 @@
     <string name="channel_reddit">Reddit</string>
     <string name="channel_phone">Phone</string>
     <string name="channel_in_person">In person</string>
+    <string name="channel_with_value">%1$s - %2$s</string>
     <string name="channel_other">Other</string>
 
     <string name="new_entry">New entry</string>

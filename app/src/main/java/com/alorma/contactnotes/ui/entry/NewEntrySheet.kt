@@ -43,6 +43,7 @@ import com.alorma.contactnotes.ui.people.initialsOf
 fun NewEntrySheet(
   person: PersonEntity,
   channels: List<ChannelType>,
+  otherHandle: String?,
   onDismiss: () -> Unit,
   initial: EntryEntity? = null,
   onSave: (kind: EntryKind, channel: ChannelType, text: String, occurredAt: Long?) -> Unit,
@@ -61,6 +62,7 @@ fun NewEntrySheet(
       form = form,
       available = available,
       channel = channel,
+      otherHandle = otherHandle,
       isNew = initial == null,
       onDismiss = onDismiss,
       onSave = { onSave(form.kind, channel, form.text.trim(), form.occurredAt) },
@@ -75,6 +77,7 @@ fun NewEntrySheetContent(
   form: EntryFormState,
   available: List<ChannelType>,
   channel: ChannelType,
+  otherHandle: String?,
   isNew: Boolean,
   onDismiss: () -> Unit,
   onSave: () -> Unit,
@@ -108,6 +111,7 @@ fun NewEntrySheetContent(
       channels = available,
       channel = channel,
       onChannelChange = { form.channel = it },
+      otherHandle = otherHandle,
       saveButton = {
         Button(
           onClick = onSave,
