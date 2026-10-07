@@ -76,6 +76,7 @@ fun TimelineRow(
   isLast: Boolean,
   modifier: Modifier = Modifier,
   marker: (@Composable () -> Unit)? = null,
+  lineProgress: () -> Float = { 1f },
   content: @Composable () -> Unit,
 ) {
   val lineColor = MaterialTheme.colorScheme.outlineVariant
@@ -90,7 +91,8 @@ fun TimelineRow(
           val start = if (isFirst) (if (marker != null) markerCenter else size.height) else 0f
           val end = if (isLast) markerCenter.coerceAtMost(size.height) else size.height
           if (end > start) {
-            drawLine(lineColor, Offset(x, start), Offset(x, end), strokeWidth = LineWidth.toPx())
+            val drawnEnd = start + (end - start) * lineProgress()
+            drawLine(lineColor, Offset(x, start), Offset(x, drawnEnd), strokeWidth = LineWidth.toPx())
           }
         },
       contentAlignment = Alignment.TopCenter,

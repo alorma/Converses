@@ -19,6 +19,7 @@ data class AppSettings(
   val personColorTheme: Boolean = true,
   val appLock: Boolean = false,
   val relockAfterSeconds: Int = 60,
+  val onboardingDone: Boolean = false,
 )
 
 interface SettingsRepository {
@@ -35,6 +36,8 @@ interface SettingsRepository {
   suspend fun setAppLock(enabled: Boolean)
 
   suspend fun setRelockAfterSeconds(seconds: Int)
+
+  suspend fun setOnboardingDone(done: Boolean)
 }
 
 private val Context.settingsDataStore by preferencesDataStore(name = "settings")
@@ -56,6 +59,8 @@ class DataStoreSettingsRepository(context: Context) : SettingsRepository {
 
   override suspend fun setRelockAfterSeconds(seconds: Int) = write { it[RelockAfterKey] = seconds }
 
+  override suspend fun setOnboardingDone(done: Boolean) = write { it[OnboardingDoneKey] = done }
+
   private suspend fun write(block: (androidx.datastore.preferences.core.MutablePreferences) -> Unit) {
     dataStore.edit { block(it) }
   }
@@ -69,6 +74,7 @@ class DataStoreSettingsRepository(context: Context) : SettingsRepository {
       personColorTheme = this[PersonColorThemeKey] ?: defaults.personColorTheme,
       appLock = this[AppLockKey] ?: defaults.appLock,
       relockAfterSeconds = this[RelockAfterKey] ?: defaults.relockAfterSeconds,
+      onboardingDone = this[OnboardingDoneKey] ?: defaults.onboardingDone,
     )
   }
 
@@ -79,6 +85,7 @@ class DataStoreSettingsRepository(context: Context) : SettingsRepository {
     val PersonColorThemeKey = booleanPreferencesKey("person_color_theme")
     val AppLockKey = booleanPreferencesKey("app_lock")
     val RelockAfterKey = intPreferencesKey("relock_after")
+    val OnboardingDoneKey = booleanPreferencesKey("onboarding_done")
   }
 }
 

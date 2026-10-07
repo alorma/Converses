@@ -33,6 +33,8 @@ private class FakeSettingsRepository : SettingsRepository {
   override suspend fun setAppLock(enabled: Boolean) = state.update { it.copy(appLock = enabled) }
 
   override suspend fun setRelockAfterSeconds(seconds: Int) = state.update { it.copy(relockAfterSeconds = seconds) }
+
+  override suspend fun setOnboardingDone(done: Boolean) = state.update { it.copy(onboardingDone = done) }
 }
 
 @OptIn(ExperimentalCoroutinesApi::class)
