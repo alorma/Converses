@@ -20,7 +20,6 @@ Mai es cobra per **accedir, protegir o treure** les dades pròpies. Al Pro hi va
 - Exportar notes.
 - Canals del sistema + «Altres – {valor}».
 - Importar **una** persona des del selector de contactes del sistema (`ACTION_PICK`, sense `READ_CONTACTS`). Pre-omple Nova persona.
-- Color de la persona com a tema del detall (`color-persona.md`), amb el color automàtic de l'avatar.
 
 ## Pro (fora de la v1 gratuïta)
 
@@ -29,13 +28,14 @@ Mai es cobra per **accedir, protegir o treure** les dades pròpies. Al Pro hi va
 | **Avatar personalitzat** (color i forma) | Forma fixa **Galeta** (`Cookie9Sided`) i color automàtic a partir del nom; no es poden canviar | Selector de color i forma a Editar persona / Nova persona |
 | **Canals propis** (backlog 8) | No existeix: canals del sistema + «Altres – {valor}» | Crear canals amb nom i icona. Els «Altres – {valor}» es converteixen sols en canals propis (agrupant els valors repetits sense distingir majúscules ni espais) |
 | **Follow-ups / pendents** (backlog 6) | No existeix | Marcar entrades com a pendents, secció «Pendents» al detall, comptador al llistat i recordatoris |
+| **Color de la persona** (tema del detall, `PersonColorFeature`) | No hi és: les pantalles de la persona usen el tema de l'app i l'avatar només té el color automàtic pel nom | Activar el tema que pren el color de l'avatar (i l'ajust «Color de la persona» a Ajustos) |
 | **Contact integration** | No existeix | Vincular una persona a un contacte (`LOOKUP_KEY`), enllaç a «Connected apps» de Contactes, avís de trucada entrant (`CallScreeningService`), importació de diversos contactes de cop (`READ_CONTACTS`) |
 
 ## Canvis a fer per a la v1 gratuïta
 
 ### 1. Interruptor de funcions Pro
 
-- Feature flags a `data/flags/` amb l'estil de Caducity i FireAndForget: una classe per funció (`CustomAvatarFeature`, `CustomChannelsFeature`, `FollowUpsFeature`, `ContactIntegrationFeature`), cadascuna activable per separat; ara tot és local (`LocalFeatureFlagRunner`). A la v1 totes estan apagades i no es comprova cap pagament (el Pro encara no existeix); més endavant el runner mirarà si s'ha pagat. La UI no mostra mai res de gratuït ni de Pro.
+- Feature flags a `data/flags/` amb l'estil de Caducity i FireAndForget: una classe per funció (`CustomAvatarFeature`, `PersonColorFeature`, `CustomChannelsFeature`, `FollowUpsFeature`, `ContactIntegrationFeature`), cadascuna activable per separat; ara tot és local (`LocalFeatureFlagRunner`). A la v1 totes estan apagades i no es comprova cap pagament (el Pro encara no existeix); més endavant el runner mirarà si s'ha pagat. La UI no mostra mai res de gratuït ni de Pro.
 - L'interruptor per provar els dos modes viu al **menú de debug** (mòdul Pro), que crida `LocalFeatureFlagRunner.setOverride(key, value)`; Ajustos no en porta cap.
 
 ### 2. Avatar estàndard

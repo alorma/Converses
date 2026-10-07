@@ -16,6 +16,8 @@ import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.alorma.contactnotes.data.ConversesRepository
+import com.alorma.contactnotes.data.flags.PersonColorFeature
+import com.alorma.contactnotes.data.flags.rememberFeatureEnabled
 import com.alorma.contactnotes.data.settings.AppLockManager
 import com.alorma.contactnotes.data.settings.OnboardingFlag
 import com.alorma.contactnotes.data.settings.SecureWindow
@@ -53,6 +55,7 @@ class MainActivity : FragmentActivity() {
       val showLock by appLock.showLock.collectAsStateWithLifecycle()
       val secure by secureFlow.collectAsStateWithLifecycle(initialSettings.appLock)
 
+      val personColorFeature = rememberFeatureEnabled<PersonColorFeature>()
       val systemDark = isSystemInDarkTheme()
       val isDark = when (settings.themeMode) {
         ThemeMode.System -> systemDark
@@ -80,7 +83,7 @@ class MainActivity : FragmentActivity() {
         themeMode = settings.themeMode,
         dynamicColor = settings.dynamicColor,
         themeColor = settings.themeColor,
-        personColorTheme = settings.personColorTheme,
+        personColorTheme = settings.personColorTheme && personColorFeature,
       ) {
         DebugMenuHost {
           Box {

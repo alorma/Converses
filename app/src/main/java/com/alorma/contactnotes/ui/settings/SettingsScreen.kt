@@ -64,6 +64,8 @@ import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.alorma.compose.settings.ui.expressive.SettingsGroup
 import com.alorma.contactnotes.R
+import com.alorma.contactnotes.data.flags.PersonColorFeature
+import com.alorma.contactnotes.data.flags.rememberFeatureEnabled
 import com.alorma.contactnotes.data.settings.AppLockManager
 import com.alorma.contactnotes.data.settings.AppSettings
 import com.alorma.contactnotes.designsystem.components.ColorSwatches
@@ -102,6 +104,7 @@ fun SettingsScreen(
 
   SettingsContent(
     settings = settings,
+    showPersonColor = rememberFeatureEnabled<PersonColorFeature>(),
     canUnlock = canUnlock,
     languageName = remember { currentLanguageName(context) },
     versionName = remember { versionName(context) },
@@ -141,6 +144,7 @@ fun SettingsContent(
   onRelockAfter: (Int) -> Unit,
   onOpenLanguage: () -> Unit,
   onOpenSecuritySetup: () -> Unit,
+  showPersonColor: Boolean = true,
 ) {
   Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.surface) {
     Column(
@@ -165,7 +169,7 @@ fun SettingsContent(
         title = { SectionTitle(stringResource(R.string.settings_appearance)) },
         verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap),
       ) {
-        val themeCount = if (settings.dynamicColor) 3 else 4
+        val themeCount = (if (settings.dynamicColor) 3 else 4) - (if (showPersonColor) 0 else 1)
         ThemeModeRow(
           selected = settings.themeMode,
           onSelected = onThemeMode,
@@ -186,7 +190,7 @@ fun SettingsContent(
             shape = groupedItemShape(2, themeCount),
           )
         }
-        SettingSwitchRow(
+        if (showPersonColor) SettingSwitchRow(
           title = stringResource(R.string.settings_person_color),
           subtitle = stringResource(R.string.settings_person_color_summary),
           icon = Icons.Rounded.Face,
