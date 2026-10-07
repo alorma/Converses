@@ -1,6 +1,6 @@
 name: Build APK
 
-# Builds the debug APK and uploads it as an artifact. Pull requests only build it (pr-build.yml)
+# Runs the unit tests, builds the debug APK and uploads it as an artifact. Pull requests only build it (pr-build.yml)
 on:
   push:
     branches: ["main"]
@@ -24,6 +24,17 @@ jobs:
           java-version: "21"
 
       - uses: gradle/actions/setup-gradle@v6
+
+      - name: Run unit tests
+        run: ./gradlew testDebugUnitTest --stacktrace
+
+      - name: Upload test report
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: unit-test-report
+          path: "*/build/reports/tests/testDebugUnitTest"
+          retention-days: 7
 
       - name: Build debug APK
         run: ./gradlew :app:assembleDebug --stacktrace

@@ -1,6 +1,6 @@
 name: PR Build
 
-# Checks that the debug APK builds, without uploading it
+# Runs the unit tests and checks that the debug APK builds, without uploading it
 on:
   pull_request:
 
@@ -22,6 +22,17 @@ jobs:
           java-version: "21"
 
       - uses: gradle/actions/setup-gradle@v6
+
+      - name: Run unit tests
+        run: ./gradlew testDebugUnitTest --stacktrace
+
+      - name: Upload test report
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: unit-test-report
+          path: "*/build/reports/tests/testDebugUnitTest"
+          retention-days: 7
 
       - name: Build debug APK
         run: ./gradlew :app:assembleDebug --stacktrace
