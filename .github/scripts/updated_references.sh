@@ -5,7 +5,8 @@ set -euo pipefail
 
 base="$1"
 head="$2"
-raw="https://raw.githubusercontent.com/$GITHUB_REPOSITORY"
+# github.com blob URLs instead of raw.githubusercontent.com, which only serves private repos with a token
+blob="https://github.com/$GITHUB_REPOSITORY/blob"
 
 echo "| Screenshot | Before | After |"
 echo "|---|---|---|"
@@ -13,11 +14,11 @@ git diff --no-renames --name-status "$base" "$head" -- ':(glob)*/src/screenshotT
   name="${file%%/*}:$(basename "$(dirname "$file")")/$(basename "$file" .png)"
   case "$status" in
     A) before="New" ;;
-    *) before="<img src=\"$raw/$base/$file\" width=\"250\">" ;;
+    *) before="<img src=\"$blob/$base/$file?raw=true\" width=\"250\">" ;;
   esac
   case "$status" in
     D) after="Deleted" ;;
-    *) after="<img src=\"$raw/$head/$file\" width=\"250\">" ;;
+    *) after="<img src=\"$blob/$head/$file?raw=true\" width=\"250\">" ;;
   esac
   echo "| \`$name\` | $before | $after |"
 done
