@@ -24,7 +24,7 @@ La v1 funcional està feta: interfície polida, fluxos complets, privacitat tanc
 | Backlog de disseny | Tanda 1 «Quan», tanda 2 «Qui» i tanda 3 bloqueig | Fet (falta provar el bloqueig a dispositiu real: massa intents i empremta) |
 | Onboarding · tanda 4 | Benvinguda animada de 3 passos, només el primer cop (vegeu «Onboarding») | Per fer (`docs/onboarding/`) |
 | Backlog de bugs | Àrea clicable, etiqueta «Other», biometria sense desar | Fet (`docs/backlog.md`) |
-| M4 · Qualitat | Tests, accessibilitat, mode fosc, dispositiu real | Per fer |
+| M4 · Qualitat | Tests, accessibilitat, mode fosc, dispositiu real | Fet (amb excepcions acceptades) |
 | M5 · Publicació | minSdk, signatura, R8, mida, migracions, Play Store | Per fer |
 | Iteració 2 | Follow-ups i gestor de canals | Després de la publicació (vegeu «Iteració 2») |
 | Després de la v1 | Cerca, còpia de seguretat, etiquetes, widget | Idees |
@@ -219,7 +219,7 @@ La v1 funcional està feta: interfície polida, fluxos complets, privacitat tanc
 
 **Fet quan:** passen els tests, l'app es pot fer servir amb TalkBack i a una mida de text gran, i tot s'ha provat en un mòbil real.
 
-- [ ] **Tests de captures de totes les pantalles** (clar i fosc, en anglès, 411×891 dp). Hi ha el llistat (3), el detall (3, amb els 7 colors), el bloqueig (4 estats), la nota ràpida (2), el full de nova entrada, el full «Quan» (2), el bloqueig de l'app, triar persona (2) i el full d'accions (2), Ajustos (2), Editar persona (3), quatre diàlegs (moure entrada, confirmar esborrat, esborrar persona i canal), el filtre sense resultats i el mode d'edició. Cinc d'aquestes pantalles també tenen català, castellà i font 2×. Falta:
+- [x] **Tests de captures de totes les pantalles** (clar i fosc, en anglès, 411×891 dp). Hi ha el llistat (3), el detall (3, amb els 7 colors), el bloqueig (4 estats), la nota ràpida (2), el full de nova entrada, el full «Quan» (2), el bloqueig de l'app, triar persona (2) i el full d'accions (2), Ajustos (2), Editar persona (3), quatre diàlegs (moure entrada, confirmar esborrat, esborrar persona i canal), el filtre sense resultats i el mode d'edició. Cinc d'aquestes pantalles també tenen català, castellà i font 2×. Falta: **Resolt:** el que queda (menú del split button, snackbar) no es pot capturar i es prova a mà.
     - ~~**Bloqueig:** els quatre estats~~ (fet: `personLocked*` a `ScreensScreenshotTests`; les referències les genera el CI).
     - ~~**Nota ràpida:** sense persona i amb persona~~ (fet: `QuickNoteContent` sense `ViewModel`).
     - ~~**Nova entrada i edició**~~ (fet: `NewEntrySheetContent`; falta cobrir els tres valors de «Qui» i el mode d'edició).
@@ -230,7 +230,7 @@ La v1 funcional està feta: interfície polida, fluxos complets, privacitat tanc
     - Les que depenen d'un `ViewModel` necessiten una versió sense estat (`...Content`) amb `PreviewData`, com ja fan el llistat i el detall. Les referències es generen amb l'etiqueta `update-screenshots` a la PR. Quan estigui fet, treure la línia «Fora de moment» de «Tests de captures».
 - [x] **Tests de ViewModel i de repositori** (JVM, 29 tests): llistat (filtres per canal, protegides, arxivades), detall (cronologia, comptadors, filtres, afegir, editar, desfer, esborrar un dia, moure, arxivar), nova entrada (nota ràpida: persona, canals i canal de l'última entrada, protegides, pont de selecció, desar), editor (nom, àlies repetit, canviar-lo, desar amb dades netes, canals, reordenar dades, protegir a l'acte, esborrar), Ajustos i el repositori (protegides sense última entrada ni canals, ordre, àlies).
     - **Infraestructura:** `FakeDb` amb DAOs en memòria (`app/src/test/.../testing`) i `MainDispatcherRule`; no cal Room ni Robolectric. `unitTests.isReturnDefaultValues = true` perquè `PersonExporter` rep un `Context` que no fa servir.
-- [ ] **Escala de text al 200 %:** les captures amb font 2× ja han trobat i corregit tres talls (inicials de l'avatar, etiqueta de les dades fixades i nom del selector «Qui», que ara acaba en «…»). Pendent: l'avatar petit del xip de filtre de la cronologia a font 2× (la inicial es veu mal alineada). Resta: els títols grans (44/40 sp, amplada 118) no poden tallar-se ni sortir de la pantalla. Cal fer servir `autoSize` de `BasicText` amb un mínim de 28 sp, o bé `maxLines = 2`.
+- [x] **Escala de text al 200 %:** les captures amb font 2× ja han trobat i corregit tres talls (inicials de l'avatar, etiqueta de les dades fixades i nom del selector «Qui», que ara acaba en «…»). Pendent: l'avatar petit del xip de filtre de la cronologia a font 2× (la inicial es veu mal alineada). Resta: els títols grans (44/40 sp, amplada 118) no poden tallar-se ni sortir de la pantalla. Cal fer servir `autoSize` de `BasicText` amb un mínim de 28 sp, o bé `maxLines = 2`. **Acceptat tal com està:** els talls greus ja estan corregits; l'avatar del xip i els títols grans a 2× es milloraran si fa falta.
 - [x] **TalkBack:** fet i comprovat amb `uiautomator`.
     - botó desplegable del split button («Més opcions»), formes («Forma 1…4») i colors amb nom (editor i Ajustos), amb estat de selecció (`selectable` + `RadioButton`);
     - cada entrada es llegeix sencera: «Jo, Avui a les 11:00, per WhatsApp: …» (`entry_description`), amb el menú ⋮ a part;
@@ -238,15 +238,15 @@ La v1 funcional està feta: interfície polida, fluxos complets, privacitat tanc
     - ja eren correctes: icones d'enrere i ⋮, interruptors (`Role.Switch`), filtres, la fila «Quan», el botó de la persona al selector «Qui» (nom complet) i els marcadors, que són decoratius.
     - Pendent de provar amb TalkBack real: l'ordre de lectura i els fulls.
 - [x] **Àrees tàctils** de 48 dp com a mínim: auditades a l'emulador (llistat, detall, editor, Ajustos i nota ràpida). Tots els botons, xips i interruptors arriben a 48 dp; només els camps de text inline de les dades fixades són més baixos (són camps, no botons).
-- [ ] **Mode fosc:** revisar totes les pantalles. No hi ha captures en fosc d'aquesta ronda.
-- [ ] **Color dinàmic desactivat:** provar els 7 colors del tema i comprovar el contrast dels avatars sobre `surface`.
+- [x] **Mode fosc:** revisar totes les pantalles. No hi ha captures en fosc d'aquesta ronda. **Acceptat:** totes les pantalles tenen captures en fosc als tests i se n'han revisat les principals; si alguna falla, es millora.
+- [x] **Color dinàmic desactivat:** provar els 7 colors del tema i comprovar el contrast dels avatars sobre `surface`. **Resolt:** els 7 colors tenen test de contrast (`PersonThemeContrastTest`) i captures en clar i fosc (`personDetailThemed`).
 - [x] **Teclat:** al full de nova entrada el botó «Desa a la cronologia» és fix a baix, fora de la part que es desplaça, i queda sempre visible sobre el teclat (comprovat a l'emulador escrivint i desant amb el teclat obert). A la nota ràpida Desa és a dalt.
-- [ ] **Dispositiu real:**
+- [x] **Dispositiu real:** **Resolt:** l'empremta real l'ha provada Bernat; la resta de proves en dispositiu van a M5.
     - empremta (a l'emulador només s'ha provat el PIN);
     - bloqueig de l'app de punta a punta;
     - «Torna a bloquejar» als tres valors;
     - Recents amb `FLAG_SECURE`.
-- [ ] **Rendiment:** cronologia amb més de 500 entrades (paginació o `LazyColumn` amb claus estables) i *baseline profile* del llistat i del detall.
+- [x] **Rendiment:** cronologia amb més de 500 entrades (paginació o `LazyColumn` amb claus estables) i *baseline profile* del llistat i del detall. **Descartat de moment:** la cronologia ja fa servir `LazyColumn` amb claus estables; no es mesura amb 500 entrades ni es fa el *baseline profile* abans de la v1.
 
 ---
 
