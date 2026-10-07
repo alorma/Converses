@@ -76,7 +76,7 @@ def copy_image(source, images_dir, name):
 
 
 def image_cell(name):
-    return f'<img src="{{IMAGES_URL}}/{name}" width="250">' if name else "—"
+    return f'<img src="{{IMAGES_URL}}/{name}?raw=true" width="250">' if name else "—"
 
 
 def build_comment(failures, images_dir, run_url):

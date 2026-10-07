@@ -172,7 +172,8 @@ jobs:
           git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
             commit -qm "Screenshots for PR #$PR_NUMBER"
           git push -qf "https://x-access-token:$GH_TOKEN@github.com/$GITHUB_REPOSITORY.git" "HEAD:refs/heads/$COMPANION_BRANCH"
-          echo "url=https://raw.githubusercontent.com/$GITHUB_REPOSITORY/$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+          # github.com blob URLs, raw.githubusercontent.com only serves private repos with a token
+          echo "url=https://github.com/$GITHUB_REPOSITORY/blob/$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
 
       - name: Comment on PR
         if: github.event_name == 'pull_request' && steps.report.outcome == 'success'
