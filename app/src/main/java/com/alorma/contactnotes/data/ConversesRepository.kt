@@ -63,6 +63,9 @@ class ConversesRepository(
   suspend fun setArchived(person: PersonEntity, archived: Boolean) =
     personDao.update(person.copy(archived = archived, updatedAt = System.currentTimeMillis()))
 
+  suspend fun setProtected(person: PersonEntity, isProtected: Boolean) =
+    personDao.update(person.copy(isProtected = isProtected, updatedAt = System.currentTimeMillis()))
+
   suspend fun countEntriesInRange(personId: Long, channel: ChannelType, from: Long, to: Long): Int =
     entryDao.countInRange(personId, channel, from, to)
 

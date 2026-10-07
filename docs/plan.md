@@ -290,7 +290,7 @@ El detall de cada punt és a `docs/backlog.md`. Ordre proposat:
 
 1. **Bugs petits, junts i abans de M4** (no toquen la base de dades):
     - ~~**1** · àrea clicable fora de la superfície (issue #6)~~ (fet);
-    - **5** · biometria sense desar el perfil (issue #4);
+    - ~~**5** · biometria sense desar el perfil (issue #4)~~ (fet);
     - **3** · etiqueta `OTHER - SIGNAL`.
 2. **Tests de captures de totes les pantalles** (vegeu M4): així els canvis següents es validen en clar i fosc i es veuen a la PR. El bloqueig ja està fet.
 3. **Empremta a la nota ràpida d'una persona protegida** (backlog 10): privacitat; es pot fer abans de M4 perquè es provi amb la resta al mòbil.

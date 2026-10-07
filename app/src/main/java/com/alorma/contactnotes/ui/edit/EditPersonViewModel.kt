@@ -129,7 +129,18 @@ class EditPersonViewModel(
 
   override fun onColor(color: AvatarColor) = _state.update { it.copy(color = color) }
 
-  override fun onProtected(value: Boolean) = _state.update { it.copy(isProtected = value) }
+  /** En una persona que ja existeix, el canvi es desa a l'acte; en una de nova, es desa amb el perfil. */
+  override fun onProtected(value: Boolean) {
+    val person = original
+    if (person == null) {
+      _state.update { it.copy(isProtected = value) }
+      return
+    }
+    _state.update { it.copy(isProtected = value, baseline = it.baseline.copy(isProtected = value)) }
+    val updated = person.copy(isProtected = value)
+    original = updated
+    viewModelScope.launch { repository.setProtected(updated, value) }
+  }
 
   override fun onAddFact() = _state.update { it.copy(facts = it.facts + FactDraft(nextKey++, "", "")) }
 

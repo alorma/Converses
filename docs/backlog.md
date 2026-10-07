@@ -5,7 +5,6 @@ Actualitzat el 7 d'oct. de 2026, reconciliat amb `docs/plan.md`. Només hi ha el
 | # | Tipus | Tema | Issue |
 | --- | --- | --- | --- |
 | 3 | Bug | Canal "Other" ha de mostrar "Other - {valor}" | — |
-| 5 | Bug | Activar/desactivar biometria sense desar el perfil | [#4](https://github.com/alorma/Contacts-Notes/issues/4) |
 | 10 | Seguretat | Demanar l'empremta en triar una persona protegida a la nota ràpida | — |
 | 6 | Feature (Iteració 2) | Follow-ups / entrades pendents | [#5](https://github.com/alorma/Contacts-Notes/issues/5) |
 | 7 | Feature (Iteració 2) | Nou canal "Empresa" (queda dins el 8) | — |
@@ -18,6 +17,7 @@ Els punts 6, 7 i 8 són features no prioritàries: es faran a l'**Iteració 2**,
 - **1** · L'àrea clicable sortia de la superfície: la fila d'interruptor d'Ajustos posava el `toggleable` fora del retall de la forma; ara va dins (`SettingRow.contentModifier`). La resta de components ja retallaven abans de fer-se clicables. (Issue #6.)
 - **2** · La pantalla de bloqueig d'una persona ja no mostra el layout: només el nom, la forma i el color de l'avatar, amb els estats de càrrega, cancel·lat, massa intents i sense biometria.
 - **4** · «Ha passat» ja no es talla: el selector és «Qui» (Jo · {nom} · Apunt), amb textos curts i la icona sempre visible. Queda per comprovar a M4 amb noms de 12 caràcters, en ca i es i amb la font gran.
+- **5** · Activar o desactivar la biometria d'una persona es desa a l'acte (`EditPersonViewModel.onProtected` i `ConversesRepository.setProtected`); en una persona nova es continua desant amb el perfil. Ja demanava l'empremta tant en activar com en desactivar. (Issue #4.)
 - **9** · «Qui» i «Quan»: un sol `EntryForm`, fila «Quan» amb el full «Quan va ser?», cronologia, filtres, marcadors i exportació.
 
 ---
@@ -34,21 +34,6 @@ Els punts 6, 7 i 8 són features no prioritàries: es faran a l'**Iteració 2**,
 - Una entrada només desa `channelType`, no el valor de «Other». Per a l'etiqueta `qui · hora · canal` (`EntryCard`, `EntryActionsSheet` i `PersonExporter`) cal buscar el `handle` del canal `OTHER` de la persona: `PersonDetailUiState.channels` ja el té, i `EntryCard` només hauria de rebre'l.
 
 **Fitxers:** `ui/people/PeopleFormatting.kt`, `ui/person/PersonFormatting.kt`, `ui/person/PersonDetailScreen.kt`, `ui/person/EntryActions.kt`, `ui/person/PersonExporter.kt`, `ui/entry/EntryForm.kt`.
-
-## 5 · Bug: activar/desactivar la biometria d'una persona no hauria de requerir desar el perfil
-
-Issue: [#4](https://github.com/alorma/Contacts-Notes/issues/4)
-
-Ara mateix, per activar o desactivar el bloqueig biomètric d'una persona cal canviar l'interruptor i després **desar el perfil**.
-
-**Esperat:** el canvi s'aplica directament en canviar l'interruptor, sense haver de desar la resta del formulari.
-
-**Notes**
-- Separar aquest camp de l'estat del formulari d'edició i desar-lo amb una crida pròpia al repositori/DAO.
-- Valorar demanar la biometria abans de **desactivar**-la, perquè ningú la pugui treure sense autenticar-se (`promptUnlock` ja ho fa en activar-la).
-- Si s'està creant una persona nova (encara sense id), mantenir el comportament actual.
-
-**Fitxers:** `ui/edit/EditPersonScreen.kt`, `ui/edit/EditPersonViewModel.kt`.
 
 ## 6 · Feature: follow-ups / entrades pendents a la cronologia
 
