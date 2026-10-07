@@ -7,6 +7,7 @@ plugins {
   alias(libs.plugins.ksp)
   alias(libs.plugins.room)
   alias(libs.plugins.compose.screenshot)
+  alias(libs.plugins.version)
 }
 
 room {
@@ -23,8 +24,6 @@ android {
     applicationId = "com.alorma.contactnotes"
     minSdk = 31
     targetSdk = 37
-    versionCode = 1
-    versionName = "1.0"
 
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
   }
@@ -38,6 +37,17 @@ android {
       keyAlias = "androiddebugkey"
       keyPassword = "android"
     }
+    // Keystore de release: fora del repo. A la CI es descodifica del secret RELEASE_KEYSTORE_BASE64 a
+    // `certs/release.keystore`; les contrasenyes arriben per KEYSTORE_PASSWORD, KEY_ALIAS i KEY_PASSWORD
+    val releaseKeystore = rootProject.file("certs/release.keystore")
+    if (releaseKeystore.exists() && System.getenv("KEYSTORE_PASSWORD") != null) {
+      create("release") {
+        storeFile = releaseKeystore
+        storePassword = System.getenv("KEYSTORE_PASSWORD")
+        keyAlias = System.getenv("KEY_ALIAS")
+        keyPassword = System.getenv("KEY_PASSWORD")
+      }
+    }
   }
 
   buildTypes {
@@ -50,6 +60,7 @@ android {
       optimization {
         enable = true
       }
+      signingConfigs.findByName("release")?.let { signingConfig = it }
     }
   }
   testOptions {

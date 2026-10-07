@@ -25,7 +25,7 @@ La v1 funcional està feta: interfície polida, fluxos complets, privacitat tanc
 | Onboarding · tanda 4 | Benvinguda animada de 3 passos, només el primer cop (vegeu «Onboarding») | Implementat; falten les proves manuals i les referències de captures (`docs/onboarding/`) |
 | Backlog de bugs | Àrea clicable, etiqueta «Other», biometria sense desar | Fet (`docs/backlog.md`) |
 | M4 · Qualitat | Tests, accessibilitat, mode fosc, dispositiu real | Fet (amb excepcions acceptades) |
-| M5 · Publicació | minSdk (fet), R8 (arrencada arreglada), signatura, mida de la font, CI de release, Play Store | En curs |
+| M5 · Publicació | minSdk (fet), R8 (arrencada arreglada), signatura (fet: vegeu «Signatura de release»), mida de la font, versió i CI de release (fets: vegeu «Signatura de release»), Play Store | En curs |
 | Versió gratuïta (v1 sense Pro) | Avatar estàndard; el Pro queda per després de la v1 (vegeu «Versió gratuïta i Pro») | **Per fer abans de la release 1**; va abans de M5 (`docs/pro.md`) |
 | Menú de debug | Botó flotant i full amb mòduls, només en builds de debug (vegeu «Menú de debug») | Esquelet i mòduls Dades i Onboarding fets; falta el mòdul Pro (interruptor gratuït/Pro) i provar-lo a l'emulador |
 | Iteració 2 | Follow-ups i gestor de canals | Després de la publicació (vegeu «Iteració 2») |
@@ -504,3 +504,12 @@ Amb [Compose Preview Screenshot Testing](https://developer.android.com/studio/pr
 - **«Esborrar tota la conversa»:** esborra les entrades d'aquell dia en aquell canal.
 - **Idioma per defecte:** anglès (`values/`), amb català (`values-ca/`) i castellà (`values-es/`).
 - **Fora de la v1:** el vincle amb l'agenda.
+
+## Signatura de release
+
+- `app/build.gradle.kts` crea la `signingConfig` `release` només si existeix `certs/release.keystore` (fora del repo, a `.gitignore`) i hi ha la variable `KEYSTORE_PASSWORD`; també llegeix `KEY_ALIAS` i `KEY_PASSWORD`. Sense keystore, el release es construeix sense signar.
+- Mateix patró que Caducity: la keystore es guarda en base64 al secret `RELEASE_KEYSTORE_BASE64` i el workflow manual `release.yml` la descodifica a `certs/release.keystore`. Secrets necessaris: `RELEASE_KEYSTORE_BASE64`, `KEYSTORE_PASSWORD`, `KEY_ALIAS`, `KEY_PASSWORD`.
+- Per generar el secret: `base64 -i release.keystore | pbcopy`.
+- **Versió:** el plugin `io.github.alorma.version` (com a Caducity) genera `versionName` i `versionCode` a partir de `version.properties` (`major`, `minor`, `patch`, `snapshot`). No s'han d'escriure a mà a `build.gradle.kts`. `./gradlew printVersionName` / `printVersionCode` els mostren.
+- **Release:** el workflow manual `release.yml` (sobre `main`, amb l'entrada `track`: alpha per defecte) desactiva el snapshot, construeix l'APK i l'AAB signats, puja l'AAB a Google Play (`r0adkll/upload-google-play`, secret `SERVICE_ACCOUNT_JSON`, paquet `com.alorma.contactnotes`), crea el tag i la GitHub Release amb l'APK i, al final, puja la versió menor (`X.Y+1.0-SNAPSHOT`) i la puja a `main`. Si `main` té protecció de branca, el bot ha de poder-hi fer push.
+- Pendent a Play Console: crear l'app, activar Play App Signing (aquesta keystore és la clau d'upload), pujar la primera versió a mà (l'API no pot crear una app nova) i crear el compte de servei amb permís de publicació; el secret `SERVICE_ACCOUNT_JSON` és la seva clau JSON.
