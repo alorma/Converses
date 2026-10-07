@@ -23,7 +23,7 @@ La v1 funcional està feta: interfície polida, fluxos complets, privacitat tanc
 | Color de la persona | Les pantalles de cada persona prenen el color del seu avatar | Fet (falta provar-lo a l'emulador: animació de l'editor, fulls i interruptor apagat) |
 | Backlog de disseny | Tanda 1 «Quan», tanda 2 «Qui» i tanda 3 bloqueig | Fet (falta provar el bloqueig a dispositiu real: massa intents i empremta) |
 | Onboarding · tanda 4 | Benvinguda animada de 3 passos, només el primer cop (vegeu «Onboarding») | Per fer (`docs/onboarding/`) |
-| Backlog de bugs | Àrea clicable, etiqueta «Other», biometria sense desar (vegeu «Canvis futurs») | Per fer (`docs/backlog.md`) |
+| Backlog de bugs | Àrea clicable, etiqueta «Other», biometria sense desar | Fet (`docs/backlog.md`) |
 | M4 · Qualitat | Tests, accessibilitat, mode fosc, dispositiu real | Per fer |
 | M5 · Publicació | minSdk, signatura, R8, mida, migracions, Play Store | Per fer |
 | Iteració 2 | Follow-ups i gestor de canals | Després de la publicació (vegeu «Iteració 2») |
@@ -288,11 +288,11 @@ La v1 funcional està feta: interfície polida, fluxos complets, privacitat tanc
 
 El detall de cada punt és a `docs/backlog.md`. Ordre proposat:
 
-1. **Bugs petits, junts i abans de M4** (no toquen la base de dades):
+1. ~~**Bugs petits, junts i abans de M4**~~ (fets tots tres, sense tocar la base de dades):
     - ~~**1** · àrea clicable fora de la superfície (issue #6)~~ (fet);
     - ~~**5** · biometria sense desar el perfil (issue #4)~~ (fet);
     - ~~**3** · etiqueta `OTHER - SIGNAL`~~ (fet).
-2. **Tests de captures de totes les pantalles** (vegeu M4): així els canvis següents es validen en clar i fosc i es veuen a la PR. El bloqueig ja està fet.
+2. **Tests de captures de totes les pantalles** (vegeu M4): gairebé fet; només queden el menú del split button i el snackbar, que no es poden capturar, i l'avatar petit del xip a font 2×.
 3. **Empremta a la nota ràpida d'una persona protegida** (backlog 10): privacitat; es pot fer abans de M4 perquè es provi amb la resta al mòbil.
 4. **M4 i M5** (qualitat i publicació).
 
