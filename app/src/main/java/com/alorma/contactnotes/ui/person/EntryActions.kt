@@ -64,62 +64,86 @@ fun EntryActionsSheet(
     sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
     containerColor = MaterialTheme.colorScheme.surface,
   ) {
-    Column(
-      modifier = Modifier
-        .fillMaxWidth()
-        .windowInsetsPadding(WindowInsets.navigationBars)
-        .padding(horizontal = 16.dp)
-        .padding(bottom = 16.dp),
-      verticalArrangement = Arrangement.spacedBy(2.dp),
-    ) {
-      Text(
-        text = listOf(
-          whoLabel(entry.kind, firstName),
-          formatTime(entry.occurredAt),
-          stringResource(entry.channelType.label()),
-        ).joinToString(" · ") { it.uppercase() },
-        style = MaterialTheme.typography.labelMedium,
-        fontWeight = FontWeight.SemiBold,
-        color = MaterialTheme.colorScheme.onSurfaceVariant,
-        modifier = Modifier.padding(start = 4.dp),
+    EntryActionsContent(
+      entry = entry,
+      firstName = firstName,
+      dayCount = dayCount,
+      onEdit = onEdit,
+      onCopy = onCopy,
+      onMove = onMove,
+      onDelete = onDelete,
+      onDeleteDay = onDeleteDay,
+    )
+  }
+}
+
+/** Contingut del full d'accions; el `ModalBottomSheet` és una finestra a part. */
+@Composable
+fun EntryActionsContent(
+  entry: EntryEntity,
+  firstName: String,
+  dayCount: Int,
+  onEdit: () -> Unit,
+  onCopy: () -> Unit,
+  onMove: () -> Unit,
+  onDelete: () -> Unit,
+  onDeleteDay: () -> Unit,
+) {
+  Column(
+    modifier = Modifier
+      .fillMaxWidth()
+      .windowInsetsPadding(WindowInsets.navigationBars)
+      .padding(horizontal = 16.dp)
+      .padding(bottom = 16.dp),
+    verticalArrangement = Arrangement.spacedBy(2.dp),
+  ) {
+    Text(
+      text = listOf(
+        whoLabel(entry.kind, firstName),
+        formatTime(entry.occurredAt),
+        stringResource(entry.channelType.label()),
+      ).joinToString(" · ") { it.uppercase() },
+      style = MaterialTheme.typography.labelMedium,
+      fontWeight = FontWeight.SemiBold,
+      color = MaterialTheme.colorScheme.onSurfaceVariant,
+      modifier = Modifier.padding(start = 4.dp),
+    )
+    Text(
+      text = entry.text,
+      style = MaterialTheme.typography.titleMedium,
+      fontWeight = FontWeight.Bold,
+      modifier = Modifier.padding(start = 4.dp, bottom = 12.dp),
+    )
+    ActionRow(Icons.Rounded.Edit, stringResource(R.string.entry_edit), null, 0, 3, onEdit)
+    ActionRow(Icons.Rounded.ContentCopy, stringResource(R.string.entry_copy), null, 1, 3, onCopy)
+    ActionRow(Icons.Rounded.Logout, stringResource(R.string.entry_move), null, 2, 3, onMove)
+    val canDeleteDay = dayCount > 1
+    val isToday = entryDate(entry.occurredAt) == LocalDate.now()
+    Column(modifier = Modifier.padding(top = 12.dp), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+      ActionRow(
+        icon = Icons.Rounded.Delete,
+        title = stringResource(R.string.entry_delete),
+        subtitle = null,
+        index = 0,
+        count = if (canDeleteDay) 2 else 1,
+        onClick = onDelete,
+        destructive = true,
       )
-      Text(
-        text = entry.text,
-        style = MaterialTheme.typography.titleMedium,
-        fontWeight = FontWeight.Bold,
-        modifier = Modifier.padding(start = 4.dp, bottom = 12.dp),
-      )
-      ActionRow(Icons.Rounded.Edit, stringResource(R.string.entry_edit), null, 0, 3, onEdit)
-      ActionRow(Icons.Rounded.ContentCopy, stringResource(R.string.entry_copy), null, 1, 3, onCopy)
-      ActionRow(Icons.Rounded.Logout, stringResource(R.string.entry_move), null, 2, 3, onMove)
-      val canDeleteDay = dayCount > 1
-      val isToday = entryDate(entry.occurredAt) == LocalDate.now()
-      Column(modifier = Modifier.padding(top = 12.dp), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+      if (canDeleteDay) {
         ActionRow(
-          icon = Icons.Rounded.Delete,
-          title = stringResource(R.string.entry_delete),
-          subtitle = null,
-          index = 0,
-          count = if (canDeleteDay) 2 else 1,
-          onClick = onDelete,
+          icon = Icons.Rounded.DeleteSweep,
+          title = stringResource(R.string.entry_delete_day),
+          subtitle = pluralStringResource(
+            if (isToday) R.plurals.entry_delete_today_summary else R.plurals.entry_delete_day_summary,
+            dayCount,
+            dayCount,
+            stringResource(entry.channelType.label()),
+          ),
+          index = 1,
+          count = 2,
+          onClick = onDeleteDay,
           destructive = true,
         )
-        if (canDeleteDay) {
-          ActionRow(
-            icon = Icons.Rounded.DeleteSweep,
-            title = stringResource(R.string.entry_delete_day),
-            subtitle = pluralStringResource(
-              if (isToday) R.plurals.entry_delete_today_summary else R.plurals.entry_delete_day_summary,
-              dayCount,
-              dayCount,
-              stringResource(entry.channelType.label()),
-            ),
-            index = 1,
-            count = 2,
-            onClick = onDeleteDay,
-            destructive = true,
-          )
-        }
       }
     }
   }

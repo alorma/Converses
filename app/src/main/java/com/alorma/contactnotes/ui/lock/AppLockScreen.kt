@@ -57,6 +57,11 @@ fun AppLockScreen(onUnlocked: () -> Unit, onDeviceUnprotected: () -> Unit) {
     }
   }
 
+  AppLockContent(canUnlock = canUnlock, onUnlock = { unlock() })
+}
+
+@Composable
+fun AppLockContent(canUnlock: Boolean, onUnlock: () -> Unit) {
   Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.surface) {
     Column(
       modifier = Modifier.fillMaxSize().padding(32.dp),
@@ -67,7 +72,7 @@ fun AppLockScreen(onUnlocked: () -> Unit, onDeviceUnprotected: () -> Unit) {
       Spacer(Modifier.height(16.dp))
       Text(stringResource(R.string.app_lock_title), style = ScreenTitleStyle, textAlign = TextAlign.Center)
       Spacer(Modifier.height(32.dp))
-      Button(onClick = { unlock() }, enabled = canUnlock) {
+      Button(onClick = onUnlock, enabled = canUnlock) {
         Icon(Icons.Rounded.Fingerprint, contentDescription = null)
         Spacer(Modifier.padding(horizontal = 4.dp))
         Text(stringResource(R.string.unlock_action))
