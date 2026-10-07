@@ -9,6 +9,8 @@ import com.alorma.contactnotes.ui.entry.PersonPickerFewPreview
 import com.alorma.contactnotes.ui.entry.PersonPickerManyPreview
 import com.alorma.contactnotes.ui.lock.AppLockPreview
 import com.alorma.contactnotes.ui.person.EntryActionsDayPreview
+import com.alorma.contactnotes.ui.settings.SettingsAppLockPreview
+import com.alorma.contactnotes.ui.settings.SettingsNoLockPreview
 import com.alorma.contactnotes.ui.person.EntryActionsSinglePreview
 import com.alorma.contactnotes.ui.entry.QuickNoteFilledPreview
 import com.alorma.contactnotes.ui.entry.QuickNoteNoPersonPreview
@@ -179,5 +181,19 @@ class ScreensScreenshotTests {
   @Composable
   fun entryActionsDay() {
     EntryActionsDayPreview()
+  }
+
+  @ScreenPreviews
+  @PreviewTest
+  @Composable
+  fun settingsAppLock() {
+    SettingsAppLockPreview()
+  }
+
+  @ScreenPreviews
+  @PreviewTest
+  @Composable
+  fun settingsNoLock() {
+    SettingsNoLockPreview()
   }
 }
