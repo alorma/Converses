@@ -23,6 +23,7 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 
 /**
@@ -95,6 +96,7 @@ fun <T> ConversesToggleGroup(
         Text(
           text = option.label,
           maxLines = 1,
+          overflow = TextOverflow.Ellipsis,
           fontWeight = if (prominent) (if (checked) FontWeight.Bold else FontWeight.Medium) else null,
         )
       }

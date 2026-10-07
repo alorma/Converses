@@ -220,7 +220,7 @@ La v1 funcional està feta: interfície polida, fluxos complets, privacitat tanc
 
 **Fet quan:** passen els tests, l'app es pot fer servir amb TalkBack i a una mida de text gran, i tot s'ha provat en un mòbil real.
 
-- [ ] **Tests de captures de totes les pantalles** (clar i fosc, en anglès, 411×891 dp). Hi ha el llistat (3), el detall (3, amb els 7 colors), el bloqueig (4 estats), la nota ràpida (2), el full de nova entrada, el full «Quan» (2), el bloqueig de l'app, triar persona (2) i el full d'accions (2), Ajustos (2), Editar persona (3) i quatre diàlegs (moure entrada, confirmar esborrat, esborrar persona i canal). Falta:
+- [ ] **Tests de captures de totes les pantalles** (clar i fosc, en anglès, 411×891 dp). Hi ha el llistat (3), el detall (3, amb els 7 colors), el bloqueig (4 estats), la nota ràpida (2), el full de nova entrada, el full «Quan» (2), el bloqueig de l'app, triar persona (2) i el full d'accions (2), Ajustos (2), Editar persona (3), quatre diàlegs (moure entrada, confirmar esborrat, esborrar persona i canal), el filtre sense resultats i el mode d'edició. Cinc d'aquestes pantalles també tenen català, castellà i font 2×. Falta:
     - ~~**Bloqueig:** els quatre estats~~ (fet: `personLocked*` a `ScreensScreenshotTests`; les referències les genera el CI).
     - ~~**Nota ràpida:** sense persona i amb persona~~ (fet: `QuickNoteContent` sense `ViewModel`).
     - ~~**Nova entrada i edició**~~ (fet: `NewEntrySheetContent`; falta cobrir els tres valors de «Qui» i el mode d'edició).
@@ -235,7 +235,7 @@ La v1 funcional està feta: interfície polida, fluxos complets, privacitat tanc
     - protegir → bloquejar → desbloquejar;
     - arxivar → desarxivar;
     - esborrar entrada → desfer.
-- [ ] **Escala de text al 200 %:** els títols grans (44/40 sp, amplada 118) no poden tallar-se ni sortir de la pantalla. Cal fer servir `autoSize` de `BasicText` amb un mínim de 28 sp, o bé `maxLines = 2`.
+- [ ] **Escala de text al 200 %:** les captures amb font 2× ja han trobat i corregit tres talls (inicials de l'avatar, etiqueta de les dades fixades i nom del selector «Qui», que ara acaba en «…»). Pendent: l'avatar petit del xip de filtre de la cronologia a font 2× (la inicial es veu mal alineada). Resta: els títols grans (44/40 sp, amplada 118) no poden tallar-se ni sortir de la pantalla. Cal fer servir `autoSize` de `BasicText` amb un mínim de 28 sp, o bé `maxLines = 2`.
 - [ ] **TalkBack:**
     - etiquetes de les icones (enrere, ⋮, chevron del split button, «Nota ràpida»);
     - avatar amb el nom;
@@ -418,7 +418,7 @@ Amb [Compose Preview Screenshot Testing](https://developer.android.com/studio/pr
 - **Tests** a `src/screenshotTest`: `ComponentsScreenshotTests` (`designsystem`) i `ScreensScreenshotTests` (`app`) criden les previews amb `@PreviewTest`. Els noms dels mètodes de test van en camelCase sense `_` (el CI hi separa el nom de la preview). Cada test es renderitza en clar i fosc, en anglès; les pantalles a 411×891 dp.
 - **Referències** a `<mòdul>/src/screenshotTestDebug/reference/`, es versionen. Llindar de diferència: 1 %.
 - **Ordres:** `./gradlew validateDebugScreenshotTest` (validar), `./gradlew updateDebugScreenshotTest` (regenerar), i per a un sol test `./gradlew :app:updateDebugScreenshotTest --tests '*ScreensScreenshotTests.peopleListLoaded'`.
-- **Encara sense captura:** el menú del split button, el snackbar de desfer, el detall amb filtre sense resultats i el de persona protegida desbloquejada, els tres valors de «Qui» i el mode d'edició del formulari, i totes les variants en català, castellà i amb font gran (ara tot és en anglès).
+- **Sense captura (no es pot amb aquest renderitzador):** el menú del split button (el popup es pinta com una caixa buida) i el snackbar de desfer (no hi surt). Es proven a mà. Idiomes (català i castellà) i font 2× només per al detall, la nota ràpida, la nova entrada, el bloqueig cancel·lat i Ajustos.
 
 **CI** (`.github/workflows/screenshot-tests.yml`, adaptat de [Sloy/sevibus-android#16](https://github.com/Sloy/sevibus-android/pull/16)):
 

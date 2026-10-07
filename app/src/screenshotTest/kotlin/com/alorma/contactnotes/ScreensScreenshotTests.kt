@@ -9,6 +9,7 @@ import com.alorma.contactnotes.ui.edit.DeletePersonDialogPreview
 import com.alorma.contactnotes.ui.edit.EditPersonExistingPreview
 import com.alorma.contactnotes.ui.edit.EditPersonNewPreview
 import com.alorma.contactnotes.ui.edit.EditPersonProtectedPreview
+import com.alorma.contactnotes.ui.entry.EditEntrySheetPreview
 import com.alorma.contactnotes.ui.entry.NewEntrySheetPreview
 import com.alorma.contactnotes.ui.entry.PersonPickerFewPreview
 import com.alorma.contactnotes.ui.entry.PersonPickerManyPreview
@@ -31,6 +32,7 @@ import com.alorma.contactnotes.designsystem.components.AvatarColor
 import com.alorma.contactnotes.ui.person.AvatarColorProvider
 import com.alorma.contactnotes.ui.person.PersonDetailScreenEmptyPreview
 import com.alorma.contactnotes.ui.person.PersonDetailScreenThemedPreview
+import com.alorma.contactnotes.ui.person.PersonDetailScreenFilteredEmptyPreview
 import com.alorma.contactnotes.ui.person.PersonDetailScreenLoadedPreview
 import com.alorma.contactnotes.ui.person.PersonLockedCanceledPreview
 import com.alorma.contactnotes.ui.person.PersonLockedLockedOutPreview
@@ -47,6 +49,12 @@ import com.alorma.contactnotes.ui.person.PersonLockedWaitingPreview
   uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_NORMAL,
 )
 annotation class ScreenPreviews
+
+/** Idiomes que no són l'anglès i font gran, per veure que els textos no es tallen. Només en clar. */
+@Preview(name = "Catalan", locale = "ca", widthDp = 411, heightDp = 891)
+@Preview(name = "Spanish", locale = "es", widthDp = 411, heightDp = 891)
+@Preview(name = "FontScale2", locale = "en", widthDp = 411, heightDp = 891, fontScale = 2f)
+annotation class LocalizedScreenPreviews
 
 class ScreensScreenshotTests {
 
@@ -72,6 +80,7 @@ class ScreensScreenshotTests {
   }
 
   @ScreenPreviews
+  @LocalizedScreenPreviews
   @PreviewTest
   @Composable
   fun personDetailLoaded() {
@@ -100,6 +109,7 @@ class ScreensScreenshotTests {
   }
 
   @ScreenPreviews
+  @LocalizedScreenPreviews
   @PreviewTest
   @Composable
   fun personLockedCanceled() {
@@ -128,6 +138,7 @@ class ScreensScreenshotTests {
   }
 
   @ScreenPreviews
+  @LocalizedScreenPreviews
   @PreviewTest
   @Composable
   fun quickNoteFilled() {
@@ -135,6 +146,7 @@ class ScreensScreenshotTests {
   }
 
   @ScreenPreviews
+  @LocalizedScreenPreviews
   @PreviewTest
   @Composable
   fun newEntrySheet() {
@@ -191,6 +203,7 @@ class ScreensScreenshotTests {
   }
 
   @ScreenPreviews
+  @LocalizedScreenPreviews
   @PreviewTest
   @Composable
   fun settingsAppLock() {
@@ -251,5 +264,19 @@ class ScreensScreenshotTests {
   @Composable
   fun channelDialog() {
     ChannelDialogPreview()
+  }
+
+  @ScreenPreviews
+  @PreviewTest
+  @Composable
+  fun personDetailFilteredEmpty() {
+    PersonDetailScreenFilteredEmptyPreview()
+  }
+
+  @ScreenPreviews
+  @PreviewTest
+  @Composable
+  fun editEntrySheet() {
+    EditEntrySheetPreview()
   }
 }

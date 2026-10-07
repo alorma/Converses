@@ -79,3 +79,22 @@ internal fun PersonDetailScreenThemedPreview(@PreviewParameter(AvatarColorProvid
     ),
   )
 }
+
+/** Hi ha entrades, però el filtre actiu no en té cap. */
+@Preview
+@Composable
+internal fun PersonDetailScreenFilteredEmptyPreview() {
+  PersonDetailScreenPreview(
+    PersonDetailUiState(
+      person = PreviewData.marta,
+      channels = PreviewData.martaChannels,
+      facts = PreviewData.martaFacts,
+      entries = emptyList(),
+      selectedKinds = setOf(EntryKind.SAID),
+      saidCount = 1,
+      heardCount = 1,
+      happenedCount = 1,
+      isLoading = false,
+    ),
+  )
+}

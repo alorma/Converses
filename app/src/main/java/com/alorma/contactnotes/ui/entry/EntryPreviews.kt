@@ -57,6 +57,31 @@ internal fun QuickNoteFilledPreview() {
   )
 }
 
+/** «Qui» a «Jo» (el valor per defecte) amb la data d'una entrada desada (mode edició). */
+@Preview
+@Composable
+internal fun EditEntrySheetPreview() {
+  ConversesPreviewTheme {
+    PersonTheme(PreviewData.marta.avatarColor) {
+      Surface(color = MaterialTheme.colorScheme.surface) {
+        NewEntrySheetContent(
+          person = PreviewData.marta,
+          form = EntryFormState(
+            kind = EntryKind.SAID,
+            text = "Told her I can't make it to dinner on Saturday.",
+            whenChoice = WhenChoice.Stored(PreviewData.formTime),
+          ),
+          available = availableChannels(Channels),
+          channel = Channels.first(),
+          isNew = false,
+          onDismiss = {},
+          onSave = {},
+        )
+      }
+    }
+  }
+}
+
 @Preview
 @Composable
 internal fun NewEntrySheetPreview() {

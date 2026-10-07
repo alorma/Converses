@@ -54,6 +54,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ClipEntry
 import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -506,15 +507,26 @@ private fun PinnedFacts(facts: List<PinnedFactEntity>) {
       )
     }
     GroupedList(items = facts, modifier = Modifier.fillMaxWidth()) { fact ->
-      Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 14.dp)) {
+      val stacked = LocalDensity.current.fontScale >= 1.5f
+      val label: @Composable (Modifier) -> Unit = { modifier ->
         Text(
           text = fact.label.uppercase(),
           style = MaterialTheme.typography.labelLarge,
           fontWeight = FontWeight.Bold,
           color = MaterialTheme.colorScheme.onSurfaceVariant,
-          modifier = Modifier.width(104.dp),
+          modifier = modifier,
         )
-        Text(text = fact.value, style = MaterialTheme.typography.bodyLarge, modifier = Modifier.weight(1f))
+      }
+      if (stacked) {
+        Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 14.dp)) {
+          label(Modifier)
+          Text(text = fact.value, style = MaterialTheme.typography.bodyLarge)
+        }
+      } else {
+        Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 14.dp)) {
+          label(Modifier.width(104.dp))
+          Text(text = fact.value, style = MaterialTheme.typography.bodyLarge, modifier = Modifier.weight(1f))
+        }
       }
     }
   }
