@@ -274,7 +274,7 @@ La v1 funcional està feta: interfície polida, fluxos complets, privacitat tanc
     - `isMinifyEnabled` i `isShrinkResources`;
     - regles de Koin, de kotlinx.serialization (rutes `NavKey`) i de Room;
     - provar l'APK de release de punta a punta.
-- [ ] **CI:** `PR Build` i `Build APK` ja executen els tests unitaris (`testDebugUnitTest`, tots els mòduls) abans de construir i pugen l'informe si fallen. Falta construir també el release (sense signar).
+- [ ] **CI:** `PR Build` i `Build APK` ja executen els tests unitaris (`testDebugUnitTest`, tots els mòduls) abans de construir i publiquen el resultat a GitHub (`mikepenz/action-junit-report`) i pugen l'informe si fallen. Falta construir també el release (sense signar).
 - [ ] **Play Store:**
     - fitxa en català, castellà i anglès;
     - captures en clar i en fosc;
