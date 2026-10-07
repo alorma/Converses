@@ -187,7 +187,11 @@ La v1 funcional està feta: interfície polida, fluxos complets, privacitat tanc
 
 **Resum:**
 
-- `onboarding_done` (DataStore, per defecte `false`) a `SettingsRepository` / `AppSettings`; `MainActivity` tria `OnboardingRoute` o `PeopleRoute` abans del primer frame. Si ja hi ha persones (restauració), es marca com a fet.
+- **Llibreria [FireAndForget](https://github.com/alorma/FireAndForget) 1.3.0** (Maven Central, grup `com.github.alorma.fire-and-forget`, només `core`; el README diu `com.alorma.fireandforget`, però no existeix) per decidir si es mostra l'onboarding. `OnboardingFlag : FireAndForget(name = "onboarding_done", defaultValue = true)`: `isEnabled()` és «cal mostrar-lo» i `disable()` el marca com a fet. Va al catàleg de versions (`gradle/libs.versions.toml`).
+- **Runner propi sobre DataStore** (decidit; no s'usa `multiplatform-settings`, que afegiria SharedPreferences i un segon magatzem a excloure del backup). L'API de la llibreria és síncrona, així que el runner ha de llegir la clau del DataStore de manera síncrona abans del primer frame, com el tema; l'escriptura de `disable()` ha de quedar desada abans de passar a `PeopleRoute`. La clau `onboarding_done` viu a `SettingsRepository` / `AppSettings` (per defecte `false`) i el runner hi delega. Cal implementar també `getCounter` / `setCounter` (la classe base els exigeix, tot i que no es fan servir).
+- `MainActivity` tria `OnboardingRoute` o `PeopleRoute` segons `OnboardingFlag.isEnabled()`. Si ja hi ha persones (restauració), es fa `disable()` i no es mostra. Es manté el splash fins que el flag està llegit i, només si és actiu, també el recompte de persones; així no hi ha parpelleig.
+- **Comença (pas 3) actiu des del principi** (decidit): es pot prémer en qualsevol moment i salta l'animació que quedi; no cal esperar els 3,7 s.
+- **Textos de mostra de les il·lustracions traduïts** (decidit): les etiquetes, els textos de les entrades del pas 2 («La Nyra deu diners al gremi.»…) i les inicials/noms d'exemple van a `strings.xml` en en/ca/es, amb claus pròpies (p. ex. `onb_sample_*`), a més de les `onb_*` de l'spec. L'spec només dona el text en català: cal escriure'n l'anglès i el castellà.
 - **Omet** (passos 1 i 2) i **Comença** (pas 3) desen la clau i substitueixen la ruta per `PeopleRoute`. Enrere al pas 1 surt de l'app sense marcar-lo.
 - `ui/onboarding/OnboardingScreen.kt` (`HorizontalPager` de 3 pàgines, punts, botons) i `OnboardingIllustrations.kt` (una il·lustració animada per pas, que es repeteix en tornar-hi i en tocar-la; amb moviment reduït mostra l'estat final).
 - Colors d'èxit nous al `designsystem` (`success`, `onSuccess`, `successContainer`), fixos i només per a aquesta pantalla.
@@ -195,7 +199,7 @@ La v1 funcional està feta: interfície polida, fluxos complets, privacitat tanc
 
 **Commits previstos:**
 
-- [ ] `onboarding_done` a `SettingsRepository` i ruta inicial condicional a `MainActivity`.
+- [ ] FireAndForget 1.3.0 al catàleg, `OnboardingFlag` amb el runner sobre DataStore, `onboarding_done` a `SettingsRepository` i ruta inicial condicional a `MainActivity`.
 - [ ] `OnboardingScreen`: pager, textos, punts, botons, Omet/Comença i enrere (il·lustracions estàtiques en l'estat final).
 - [ ] Tokens `success*` al `designsystem`.
 - [ ] Animació del pas 1 (bafarada i 5 avatars).
