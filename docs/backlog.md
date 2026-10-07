@@ -4,7 +4,7 @@ Actualitzat el 7 d'oct. de 2026, reconciliat amb `docs/plan.md`. Només hi ha el
 
 | # | Tipus | Tema | Issue |
 | --- | --- | --- | --- |
-| 6 | Feature (Iteració 2) | Follow-ups / entrades pendents | [#5](https://github.com/alorma/Contacts-Notes/issues/5) |
+| 6 | Feature (Iteració 2) | Follow-ups / entrades pendents | [#5](https://github.com/alorma/Converses/issues/5) |
 | 7 | Feature (Iteració 2) | Nou canal "Empresa" (queda dins el 8) | — |
 | 8 | Feature (Iteració 2) | Gestor de canals propis | — |
 
@@ -24,7 +24,7 @@ Els punts 6, 7 i 8 són features no prioritàries: es faran a l'**Iteració 2**,
 
 ## 6 · Feature: follow-ups / entrades pendents a la cronologia
 
-Issue: [#5](https://github.com/alorma/Contacts-Notes/issues/5)
+Issue: [#5](https://github.com/alorma/Converses/issues/5)
 
 Poder marcar coses per fer-ne seguiment amb una persona ("li he de preguntar com li ha anat l'entrevista", "m'ha de tornar el llibre"...).
 
