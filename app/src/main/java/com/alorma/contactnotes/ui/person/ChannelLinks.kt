@@ -10,6 +10,8 @@ fun channelLink(type: ChannelType, handle: String?): Uri? {
   return when (type) {
     ChannelType.WHATSAPP -> value.filter { it.isDigit() }.takeIf { it.isNotEmpty() }?.let { Uri.parse("https://wa.me/$it") }
     ChannelType.TELEGRAM -> Uri.parse("https://t.me/${value.removePrefix("@")}")
+    ChannelType.X -> Uri.parse("https://x.com/${value.removePrefix("@")}")
+    ChannelType.INSTAGRAM -> Uri.parse("https://instagram.com/${value.removePrefix("@")}")
     ChannelType.PHONE -> Uri.fromParts("tel", value, null)
     else -> null
   }

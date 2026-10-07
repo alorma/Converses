@@ -75,9 +75,9 @@ La v1 funcional està feta: interfície polida, fluxos complets, privacitat tanc
 
 ### Detall
 
-- [x] **Comptadors:** «1 · 1 · 3 Converses» no quadra, perquè el 3 és el total d'entrades. Hi ha dues opcions:
-    - **Li he dit · M'ha dit · Ha passat** (recomanada; coincideix amb els filtres);
-    - **Li he dit · M'ha dit · Entrades**.
+- [x] **Comptadors:** eliminats de la capçalera (#19): duplicaven els filtres de la cronologia, que ja mostra el total d'entrades. `countOf` es manté per amagar els filtres sense entrades.
+- [x] **Capçalera i jerarquia (#19, #18):** nom dominant amb l'àlies petit (`bodyMedium`); la data de creació surt al final de la cronologia («Fitxa creada: …», `profile_created`); Dades i Cronologia comparteixen `SectionHeader` (`SectionTitleStyle`). «Editar persona» és un llapis a dalt a la dreta, i s'ha tret del menú del split button, que passa a fer servir `EditNote` per a «Nota».
+- [x] **Canals (#20):** «Altres» mostra només el valor («Signal»; `channel_with_value` eliminat); nous canals X i Instagram (icones genèriques `AlternateEmail` i `PhotoCamera`, enllaç directe, filtre Social). **Pendent de disseny:** el diàleg del valor del canal (punt 3 de #20).
 - [x] **Espai sota la cronologia** (a comprovar): l'última entrada no pot quedar tapada pel split button. Cal `contentPadding` inferior de 96 dp més `navigationBarsPadding`.
 - [x] **Menú del split button:** ara és el `DropdownMenu` per defecte, amb cantonades rectes. Ha de fer servir la forma del sistema: `radius-group` (24), elements de 52 dp i icones `on-surface-variant`.
 
@@ -111,6 +111,7 @@ La v1 funcional està feta: interfície polida, fluxos complets, privacitat tanc
 
 ### Ajustos
 
+- [x] **Política de privadesa (#21):** fila «Política de privadesa» al grup «Quant a» d'Ajustos; obre `https://alorma.github.io/converses/privacy/#<idioma>` al navegador (sense permís `INTERNET`).
 - [x] **Tema com a `ButtonGroup` connectat i amb icones** (`light_mode`, `dark_mode`, `brightness_auto`), igual que el filtre del llistat. Ara són botons amb vora i sense icona.
 - [x] **Fila «Color dinàmic»:** ara té un fons tenyit diferent (és l'estil de la llibreria de tiles) i sembla seleccionada. Ha de ser `surface-card` i formar grup amb «Tema», amb radis 24/6.
     - Si `ui-tiles-expressive` no deixa canviar els colors i els radis, cal substituir-la per les files pròpies del `designsystem` (`GroupedList`). Així també desapareix l'excepció de l'`@OptIn`.

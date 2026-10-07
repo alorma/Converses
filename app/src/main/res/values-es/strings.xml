@@ -82,9 +82,10 @@
     <string name="channel_telegram">Telegram</string>
     <string name="channel_whatsapp">WhatsApp</string>
     <string name="channel_reddit">Reddit</string>
+    <string name="channel_x">X</string>
+    <string name="channel_instagram">Instagram</string>
     <string name="channel_phone">Teléfono</string>
     <string name="channel_in_person">En persona</string>
-    <string name="channel_with_value">%1$s - %2$s</string>
     <string name="more_options">Más opciones</string>
     <string name="entry_description">%1$s, %2$s a las %3$s, por %4$s: %5$s</string>
     <string name="color_lavender">Lavanda</string>

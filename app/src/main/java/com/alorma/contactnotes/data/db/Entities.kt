@@ -9,7 +9,7 @@ import androidx.room.Relation
 import com.alorma.contactnotes.designsystem.components.AvatarColor
 import com.alorma.contactnotes.designsystem.components.AvatarShape
 
-enum class ChannelType { DISCORD, TELEGRAM, WHATSAPP, REDDIT, PHONE, IN_PERSON, OTHER }
+enum class ChannelType { DISCORD, TELEGRAM, WHATSAPP, REDDIT, X, INSTAGRAM, PHONE, IN_PERSON, OTHER }
 
 enum class EntryKind { SAID, HEARD, HAPPENED }
 
