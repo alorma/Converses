@@ -34,7 +34,6 @@ La v1 funcional està feta: interfície polida, fluxos complets, privacitat tanc
 - Sincronitzar el design system a Claude Design (vegeu M1 · Design system); és feina de Bernat.
 - Provar a l'emulador el color de persona i, a dispositiu real, el bloqueig desactivat sol.
 - Afinar el snackbar de desfer (posició i marges) si no queda bé.
-- Tests de ViewModel i de pantalla: no començats (M4).
 - Bugs i features pendents: vegeu `docs/backlog.md` (issues #4, #5 i #6).
 - Onboarding animat (tanda 4): especificació i disseny a `docs/onboarding/` (vegeu «Onboarding»).
 
@@ -231,11 +230,6 @@ La v1 funcional està feta: interfície polida, fluxos complets, privacitat tanc
     - Les que depenen d'un `ViewModel` necessiten una versió sense estat (`...Content`) amb `PreviewData`, com ja fan el llistat i el detall. Les referències es generen amb l'etiqueta `update-screenshots` a la PR. Quan estigui fet, treure la línia «Fora de moment» de «Tests de captures».
 - [x] **Tests de ViewModel i de repositori** (JVM, 29 tests): llistat (filtres per canal, protegides, arxivades), detall (cronologia, comptadors, filtres, afegir, editar, desfer, esborrar un dia, moure, arxivar), nova entrada (nota ràpida: persona, canals i canal de l'última entrada, protegides, pont de selecció, desar), editor (nom, àlies repetit, canviar-lo, desar amb dades netes, canals, reordenar dades, protegir a l'acte, esborrar), Ajustos i el repositori (protegides sense última entrada ni canals, ordre, àlies).
     - **Infraestructura:** `FakeDb` amb DAOs en memòria (`app/src/test/.../testing`) i `MainDispatcherRule`; no cal Room ni Robolectric. `unitTests.isReturnDefaultValues = true` perquè `PersonExporter` rep un `Context` que no fa servir.
-- [ ] **Tests de pantalla** (Compose UI) dels fluxos principals:
-    - crear persona → afegir entrada → veure-la a la cronologia;
-    - protegir → bloquejar → desbloquejar;
-    - arxivar → desarxivar;
-    - esborrar entrada → desfer.
 - [ ] **Escala de text al 200 %:** les captures amb font 2× ja han trobat i corregit tres talls (inicials de l'avatar, etiqueta de les dades fixades i nom del selector «Qui», que ara acaba en «…»). Pendent: l'avatar petit del xip de filtre de la cronologia a font 2× (la inicial es veu mal alineada). Resta: els títols grans (44/40 sp, amplada 118) no poden tallar-se ni sortir de la pantalla. Cal fer servir `autoSize` de `BasicText` amb un mínim de 28 sp, o bé `maxLines = 2`.
 - [x] **TalkBack:** fet i comprovat amb `uiautomator`.
     - botó desplegable del split button («Més opcions»), formes («Forma 1…4») i colors amb nom (editor i Ajustos), amb estat de selecció (`selectable` + `RadioButton`);
@@ -433,6 +427,7 @@ Amb [Compose Preview Screenshot Testing](https://developer.android.com/studio/pr
 
 ### Decisions ja preses
 
+- **Sense tests de UI instrumentats (Compose):** compliquen el CI. La interfície es cobreix amb els tests de captures i la lògica amb els tests de `ViewModel`.
 - **Avatars:** cada persona porta el seu pastel, al llistat i al detall. Les protegides el mantenen i hi afegeixen el cadenat.
 - **Exportar notes:** text pla compartit amb el full del sistema. També es pot fer abans d'esborrar una persona.
 - **Arxivar:** amaga la persona del llistat; es recupera des d'Arxivades.
