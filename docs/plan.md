@@ -229,7 +229,8 @@ La v1 funcional està feta: interfície polida, fluxos complets, privacitat tanc
     - ~~**Editar persona** i **Ajustos**~~ (fet: `EditPersonContent` amb `EditPersonActions`, i `SettingsContent`).
     - **Estats buits:** llistat, cronologia, filtres sense resultats i arxivades.
     - Les que depenen d'un `ViewModel` necessiten una versió sense estat (`...Content`) amb `PreviewData`, com ja fan el llistat i el detall. Les referències es generen amb l'etiqueta `update-screenshots` a la PR. Quan estigui fet, treure la línia «Fora de moment» de «Tests de captures».
-- [ ] **Tests de ViewModel:** llistat (filtres, protegides), detall (filtres de la cronologia, comptadors), nova entrada (validació), editor (àlies duplicat, protecció) i Ajustos.
+- [x] **Tests de ViewModel i de repositori** (JVM, 29 tests): llistat (filtres per canal, protegides, arxivades), detall (cronologia, comptadors, filtres, afegir, editar, desfer, esborrar un dia, moure, arxivar), nova entrada (nota ràpida: persona, canals i canal de l'última entrada, protegides, pont de selecció, desar), editor (nom, àlies repetit, canviar-lo, desar amb dades netes, canals, reordenar dades, protegir a l'acte, esborrar), Ajustos i el repositori (protegides sense última entrada ni canals, ordre, àlies).
+    - **Infraestructura:** `FakeDb` amb DAOs en memòria (`app/src/test/.../testing`) i `MainDispatcherRule`; no cal Room ni Robolectric. `unitTests.isReturnDefaultValues = true` perquè `PersonExporter` rep un `Context` que no fa servir.
 - [ ] **Tests de pantalla** (Compose UI) dels fluxos principals:
     - crear persona → afegir entrada → veure-la a la cronologia;
     - protegir → bloquejar → desbloquejar;

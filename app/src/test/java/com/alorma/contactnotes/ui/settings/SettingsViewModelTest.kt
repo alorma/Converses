@@ -1,0 +1,65 @@
+package com.alorma.contactnotes.ui.settings
+
+import com.alorma.contactnotes.data.settings.AppSettings
+import com.alorma.contactnotes.data.settings.SettingsRepository
+import com.alorma.contactnotes.designsystem.theme.ThemeColor
+import com.alorma.contactnotes.designsystem.theme.ThemeMode
+import com.alorma.contactnotes.testing.MainDispatcherRule
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
+import org.junit.Rule
+import org.junit.Test
+
+private class FakeSettingsRepository : SettingsRepository {
+  val state = MutableStateFlow(AppSettings())
+  override val settings: Flow<AppSettings> = state
+
+  override suspend fun setThemeMode(mode: ThemeMode) = state.update { it.copy(themeMode = mode) }
+
+  override suspend fun setDynamicColor(enabled: Boolean) = state.update { it.copy(dynamicColor = enabled) }
+
+  override suspend fun setThemeColor(color: ThemeColor) = state.update { it.copy(themeColor = color) }
+
+  override suspend fun setPersonColorTheme(enabled: Boolean) = state.update { it.copy(personColorTheme = enabled) }
+
+  override suspend fun setAppLock(enabled: Boolean) = state.update { it.copy(appLock = enabled) }
+
+  override suspend fun setRelockAfterSeconds(seconds: Int) = state.update { it.copy(relockAfterSeconds = seconds) }
+}
+
+@OptIn(ExperimentalCoroutinesApi::class)
+class SettingsViewModelTest {
+  @get:Rule val main = MainDispatcherRule()
+
+  @Test
+  fun everyChangeReachesTheRepositoryAndComesBackInTheState() = runTest {
+    val repository = FakeSettingsRepository()
+    val vm = SettingsViewModel(repository)
+    backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { vm.settings.collect {} }
+
+    assertTrue(vm.settings.value.dynamicColor)
+
+    vm.onThemeMode(ThemeMode.Dark)
+    vm.onDynamicColor(false)
+    vm.onThemeColor(ThemeColor.Mint)
+    vm.onPersonColorTheme(false)
+    vm.onAppLock(true)
+    vm.onRelockAfter(300)
+
+    val settings = vm.settings.value
+    assertEquals(ThemeMode.Dark, settings.themeMode)
+    assertFalse(settings.dynamicColor)
+    assertEquals(ThemeColor.Mint, settings.themeColor)
+    assertFalse(settings.personColorTheme)
+    assertTrue(settings.appLock)
+    assertEquals(300, settings.relockAfterSeconds)
+  }
+}
