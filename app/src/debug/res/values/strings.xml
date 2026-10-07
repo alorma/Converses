@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="debug_menu_open">Debug menu</string>
+  <string name="debug_menu_title">Debug menu</string>
+  <string name="debug_data_title">Data</string>
+  <string name="debug_data_reseed">Reseed sample data</string>
+  <string name="debug_data_reseed_summary">Deletes every person and entry, then inserts the sample data again</string>
+  <string name="debug_data_reseeded">Sample data restored</string>
+  <string name="debug_onboarding_title">Onboarding</string>
+  <string name="debug_onboarding_show">Show onboarding again</string>
+  <string name="debug_onboarding_show_summary">Clears the flag and restarts the screen</string>
+</resources>
