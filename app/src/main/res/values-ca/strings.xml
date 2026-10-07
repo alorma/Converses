@@ -89,8 +89,15 @@
     <string name="pick_person">Tria una persona</string>
     <string name="search_by_name">Cerca pel nom</string>
     <string name="quick_with_whom">Amb qui</string>
-    <string name="quick_where">On</string>
-    <string name="time_now">Ara</string>
+    <string name="entry_where_title">On</string>
+    <string name="entry_when_title">Quan</string>
+    <string name="when_sheet_title">Quan va ser?</string>
+    <string name="when_now">Ara</string>
+    <string name="when_hour_ago">Fa una hora</string>
+    <string name="when_yesterday">Ahir a aquesta hora</string>
+    <string name="when_pick">Tria dia i hora…</string>
+    <string name="when_pick_sub">Calendari i rellotge</string>
+    <string name="when_row_description">Quan: %1$s, %2$s. Toca per canviar-ho</string>
 
     <string name="edit_person">Editar persona</string>
     <string name="new_person">Nova persona</string>

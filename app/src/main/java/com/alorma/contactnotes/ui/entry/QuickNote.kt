@@ -167,11 +167,15 @@ fun QuickNoteScreen(
         }
         Text(stringResource(R.string.quick_note), style = ScreenTitleStyle, modifier = Modifier.padding(start = 4.dp))
 
-        PersonPicker(selected = selected, people = state.people, onSelect = viewModel::select, onNewPerson = onNewPerson)
-        KindSelector(form)
-        EntryTextField(form, placeholder = stringResource(form.kind.promptLabel()))
-        WhereSection(channels = available, selected = channel, onSelected = { form.channel = it })
-        Row { TimeChip(occurredAt = form.occurredAt, onChange = { form.occurredAt = it }) }
+        EntryForm(
+          state = form,
+          channels = available,
+          channel = channel,
+          onChannelChange = { form.channel = it },
+          header = {
+            PersonPicker(selected = selected, people = state.people, onSelect = viewModel::select, onNewPerson = onNewPerson)
+          },
+        )
       }
     }
   }

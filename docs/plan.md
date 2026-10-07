@@ -21,6 +21,7 @@ La v1 funcional està feta: interfície polida, fluxos complets, privacitat tanc
 | M2 · Fluxos que falten | Triar i crear persona, arxivades, estats buits, desfer | Fet |
 | M3 · Privacitat | Les persones protegides no es filtren enlloc | Fet (falta provar el bloqueig desactivat sol a dispositiu) |
 | Color de la persona | Les pantalles de cada persona prenen el color del seu avatar | Fet (falta provar-lo a l'emulador: animació de l'editor, fulls i interruptor apagat) |
+| Backlog de disseny | Tanda 1 «Quan» (fet), tanda 2 «Qui» (`docs/qui`), tanda 3 bloqueig (`docs/bloqueig`) | En curs: queda la 2 i la 3 |
 | M4 · Qualitat | Tests, accessibilitat, mode fosc, dispositiu real | Per fer |
 | M5 · Publicació | minSdk, signatura, R8, mida, migracions, Play Store | Per fer |
 | Després de la v1 | Cerca, còpia de seguretat, etiquetes, widget | Idees |
@@ -118,7 +119,8 @@ La v1 funcional està feta: interfície polida, fluxos complets, privacitat tanc
     - filtre de canal com a `ButtonGroup` connectat i tema d'Ajustos amb icones; files d'Ajustos amb radis 24/6;
     - xip de canal (toc obre l'app, toc llarg copia), estats buits i snackbar de desfer;
     - barra flotant amb tres destinacions (Persones · Arxivades · Ajustos);
-    - tema de color de persona (7 llavors, vegeu «Color de la persona»).
+    - tema de color de persona (7 llavors, vegeu «Color de la persona»);
+    - fila «Quan» i full «Quan va ser?» (vegeu «Formulari d'entrada i "Quan"»).
 
 ---
 
@@ -276,6 +278,14 @@ Cada persona porta el color de l'avatar com a **llavor del tema** de les seves p
 - **Avatars:** 7 pastels fixos i 4 formes (`Cookie9Sided`, `Clover4Leaf`, `Flower`, `Sunny`). Les inicials sempre van en `#1E1D24`, i hi ha un cadenat si la persona és protegida.
 - **Tipografia:** Roboto Flex. Els títols (44/40/30/28/24/22 sp) van en pes 800, amplada 118 i mida òptica 72.
 - **Formes:** llistes agrupades de 24 dp als extrems i 6 dp entre files, separades per 2 dp. Els grups de botons van amb juntes de 8 dp.
+
+### Formulari d'entrada i «Quan»
+
+- `EntryForm` és l'únic formulari (nota ràpida, nova entrada i edició), amb els slots `header` («Amb qui», només a la nota ràpida) i `saveButton`. Ordre: tipus, text, On, Quan.
+- «On»: `FilterChip` de selecció única (radi 12, 36 dp); seleccionat en `primaryContainer` amb check, no seleccionat amb vora `outlineVariant`.
+- «Quan»: fila de 72 dp (`WhenRow`) que obre `WhenSheet` («Quan va ser?»): Ara, Fa una hora, Ahir a aquesta hora i Tria dia i hora… (`DatePickerDialog` fins a avui i `TimePicker` en 24 h).
+- `WhenChoice` (`Now`, `HourAgo`, `Yesterday`, `Custom`, `Stored`) és a l'estat i al `Saver`. «Ara» es resol en desar; les altres opcions fixen l'hora en triar-les. `Stored` és la data d'una entrada que s'edita i no marca cap opció. Un `Custom` en el futur es retalla a l'hora actual.
+- El subtítol d'«Ara» es refresca cada minut (`rememberMinuteClock`). Format de data: `EEEE d MMM`, amb la primera lletra en majúscula.
 
 ### Components propis (`designsystem`)
 
