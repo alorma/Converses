@@ -46,4 +46,17 @@ class FeatureFlagTest {
     runner.setOverride(channels.key, true)
     assertNotEquals(before, runner.changes.value)
   }
+
+  @Test
+  fun overridesArePersistedAndRestored() {
+    var saved: Map<String, Boolean> = emptyMap()
+    val first = LocalFeatureFlagRunner(persist = { saved = it })
+    first.setOverride(avatar.key, true)
+    first.setOverride(channels.key, false)
+    first.clearOverride(channels.key)
+
+    val restored = LocalFeatureFlagRunner(initial = saved)
+    assertTrue(CustomAvatarFeature(restored).isEnabled())
+    assertFalse(restored.hasOverride(channels.key))
+  }
 }
