@@ -79,7 +79,6 @@ class MainActivity : FragmentActivity() {
       ConversesTheme(
         themeMode = settings.themeMode,
         dynamicColor = settings.dynamicColor,
-        themeColor = settings.themeColor,
         personColorTheme = settings.personColorTheme && personColorFeature,
       ) {
         DebugMenuHost {

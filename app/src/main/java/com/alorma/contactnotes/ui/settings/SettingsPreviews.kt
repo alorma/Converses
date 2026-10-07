@@ -4,7 +4,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import com.alorma.contactnotes.data.settings.AppSettings
 import com.alorma.contactnotes.designsystem.preview.ConversesPreviewTheme
-import com.alorma.contactnotes.designsystem.theme.ThemeColor
 
 @Composable
 private fun SettingsPreview(settings: AppSettings, canUnlock: Boolean) {
@@ -17,7 +16,6 @@ private fun SettingsPreview(settings: AppSettings, canUnlock: Boolean) {
       onBack = {},
       onThemeMode = {},
       onDynamicColor = {},
-      onThemeColor = {},
       onPersonColorTheme = {},
       onAppLockChange = {},
       onRelockAfter = {},
@@ -28,12 +26,12 @@ private fun SettingsPreview(settings: AppSettings, canUnlock: Boolean) {
   }
 }
 
-/** Color dinàmic apagat (surt el selector de color), bloqueig de l'app activat i «Torna a bloquejar». */
+/** Color dinàmic apagat (tema Grafit), bloqueig de l'app activat i «Torna a bloquejar». */
 @Preview
 @Composable
 internal fun SettingsAppLockPreview() {
   SettingsPreview(
-    settings = AppSettings(dynamicColor = false, themeColor = ThemeColor.Mint, appLock = true),
+    settings = AppSettings(dynamicColor = false, appLock = true),
     canUnlock = true,
   )
 }
