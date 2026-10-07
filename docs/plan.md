@@ -213,8 +213,9 @@ La v1 funcional està feta: interfície polida, fluxos complets, privacitat tanc
 - [ ] **Migracions de Room:**
     - treure la recreació automàtica fora de debug;
     - afegir `MigrationTestHelper` de la versió 2 a la 3 abans de qualsevol canvi d'esquema.
+- [x] **Signatura de debug:** `app/debug.keystore` al repo (contrasenyes estàndard `android`, àlies `androiddebugkey`), perquè l'APK de debug de la CI i de qualsevol màquina tingui la mateixa signatura i s'instal·li a sobre sense esborrar l'app.
 - [ ] **Signatura i R8:**
-    - signatura de release;
+    - signatura de release (aquesta keystore **no** va al repo);
     - `isMinifyEnabled` i `isShrinkResources`;
     - regles de Koin, de kotlinx.serialization (rutes `NavKey`) i de Room;
     - provar l'APK de release de punta a punta.
