@@ -10,7 +10,7 @@ Mai es cobra per **accedir, protegir o treure** les dades pròpies. Al Pro hi va
 
 ## Principis d'implementació
 
-- **No s'esborra codi.** El que passa a Pro s'amaga darrere d'un sistema de feature flag (`FeatureGate`), amb un interruptor de debug per provar els dos modes.
+- **No s'esborra codi.** El que passa a Pro s'amaga darrere d'un sistema de feature flag (els feature flags), amb un interruptor de debug per provar els dos modes.
 - **A la primera release no es mostra res de Pro:** ni selectors, ni reclams, ni pantalles de compra.
 
 ## Gratis per sempre
@@ -35,8 +35,8 @@ Mai es cobra per **accedir, protegir o treure** les dades pròpies. Al Pro hi va
 
 ### 1. Interruptor de funcions Pro
 
-- Un sol punt de consulta, p. ex. `FeatureGate.proEnabled: StateFlow<Boolean>`. A la v1 sempre és `false` i no comprova cap pagament (el Pro encara no existeix); més endavant hi connectarà Play Billing. La UI no mostra mai res de gratuït ni de Pro.
-- L'interruptor per provar els dos modes viu al **menú de debug** (mòdul Pro), que crida `FeatureGate.setProEnabled(...)`; Ajustos no en porta cap.
+- Feature flags a `data/flags/` amb l'estil de Caducity i FireAndForget: una classe per funció (`CustomAvatarFeature`, `CustomChannelsFeature`, `FollowUpsFeature`, `ContactIntegrationFeature`), cadascuna activable per separat; ara tot és local (`LocalFeatureFlagRunner`). A la v1 totes estan apagades i no es comprova cap pagament (el Pro encara no existeix); més endavant el runner mirarà si s'ha pagat. La UI no mostra mai res de gratuït ni de Pro.
+- L'interruptor per provar els dos modes viu al **menú de debug** (mòdul Pro), que crida `LocalFeatureFlagRunner.setOverride(key, value)`; Ajustos no en porta cap.
 
 ### 2. Avatar estàndard
 
@@ -48,7 +48,7 @@ Mai es cobra per **accedir, protegir o treure** les dades pròpies. Al Pro hi va
 
 ### 3. Fora del codi de la v1
 
-No s'hi ha de començar res, o queda darrere de `FeatureGate.proEnabled`:
+No s'hi ha de començar res, o queda darrere de els feature flags:
 
 - backlog 6 (pendents);
 - backlog 8 (gestor de canals);
@@ -68,8 +68,8 @@ No s'hi ha de començar res, o queda darrere de `FeatureGate.proEnabled`:
 
 ## Proves
 
-- [ ] Amb `proEnabled = false`: no hi ha selector d'avatar, tots els avatars són Galeta, i el mateix nom dona sempre el mateix color.
+- [ ] Amb totes les funcions apagades: no hi ha selector d'avatar, tots els avatars són Galeta, i el mateix nom dona sempre el mateix color.
 - [ ] Els 7 colors surten repartits amb noms diferents (prova amb una llista de 20 noms).
-- [ ] Amb `proEnabled = true` (debug): el selector torna a sortir i desa els valors.
+- [ ] Amb `CustomAvatar` activada (debug): el selector torna a sortir i desa els valors.
 - [ ] Importar un contacte sense haver concedit `READ_CONTACTS`.
 - [ ] Importar un contacte amb un número que ja existeix avisa del duplicat.
