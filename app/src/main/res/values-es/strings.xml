@@ -133,6 +133,8 @@
     <string name="fact_value_hint">Valor</string>
     <string name="add_fact">Añade un dato</string>
     <string name="remove">Quitar</string>
+    <string name="move_up">Mover arriba</string>
+    <string name="move_down">Mover abajo</string>
     <string name="reorder">Reordenar</string>
     <string name="channels_title">Dónde habláis</string>
     <string name="add_channel">Añade un canal</string>

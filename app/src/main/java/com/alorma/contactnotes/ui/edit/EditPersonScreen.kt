@@ -78,6 +78,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.semantics.CustomAccessibilityAction
+import androidx.compose.ui.semantics.customActions
+import androidx.compose.ui.semantics.semantics
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.alorma.contactnotes.R
@@ -353,15 +360,26 @@ private fun FieldCard(
   count: Int,
   modifier: Modifier = Modifier,
   error: Boolean = false,
+  dragging: Boolean = false,
   onClick: (() -> Unit)? = null,
   content: @Composable () -> Unit,
 ) {
-  val shape = groupedItemShape(index, count)
-  val color = if (error) MaterialTheme.colorScheme.errorContainer else GroupedListDefaults.containerColor
+  val shape = if (dragging) MaterialTheme.shapes.extraLarge else groupedItemShape(index, count)
+  val color = when {
+    error -> MaterialTheme.colorScheme.errorContainer
+    dragging -> MaterialTheme.colorScheme.surfaceContainerHighest
+    else -> GroupedListDefaults.containerColor
+  }
+  val elevation by animateDpAsState(if (dragging) 8.dp else 0.dp, label = "dragElevation")
+  val scale by animateFloatAsState(if (dragging) 1.03f else 1f, label = "dragScale")
+  val lifted = modifier.graphicsLayer {
+    scaleX = scale
+    scaleY = scale
+  }
   if (onClick != null) {
-    Surface(onClick = onClick, shape = shape, color = color, modifier = modifier.fillMaxWidth()) { content() }
+    Surface(onClick = onClick, shape = shape, color = color, shadowElevation = elevation, modifier = lifted.fillMaxWidth()) { content() }
   } else {
-    Surface(shape = shape, color = color, modifier = modifier.fillMaxWidth()) { content() }
+    Surface(shape = shape, color = color, shadowElevation = elevation, modifier = lifted.fillMaxWidth()) { content() }
   }
 }
 
@@ -423,6 +441,9 @@ private fun FactsEditor(facts: List<FactDraft>, actions: EditPersonActions) {
   val heights = remember { mutableStateMapOf<Long, Int>() }
   val currentFacts by rememberUpdatedState(facts)
   val count = facts.size + 1
+  val haptics = LocalHapticFeedback.current
+  val moveUpLabel = stringResource(R.string.move_up)
+  val moveDownLabel = stringResource(R.string.move_down)
 
   Column(verticalArrangement = Arrangement.spacedBy(GroupedListDefaults.ItemSpacing)) {
     facts.forEachIndexed { index, fact ->
@@ -431,10 +452,17 @@ private fun FactsEditor(facts: List<FactDraft>, actions: EditPersonActions) {
       FieldCard(
         index = index,
         count = count,
+        dragging = dragging,
         modifier = Modifier
           .onSizeChanged { heights[fact.key] = it.height }
           .zIndex(if (dragging) 1f else 0f)
-          .graphicsLayer { translationY = if (dragging) dragOffset else 0f },
+          .graphicsLayer { translationY = if (dragging) dragOffset else 0f }
+          .semantics {
+            customActions = buildList {
+              if (index > 0) add(CustomAccessibilityAction(moveUpLabel) { actions.onMoveFact(index, index - 1); true })
+              if (index < facts.lastIndex) add(CustomAccessibilityAction(moveDownLabel) { actions.onMoveFact(index, index + 1); true })
+            }
+          },
       ) {
         Row(
           modifier = Modifier.fillMaxWidth().padding(start = 4.dp, end = 4.dp, top = 6.dp, bottom = 6.dp),
@@ -449,6 +477,7 @@ private fun FactsEditor(facts: List<FactDraft>, actions: EditPersonActions) {
               .pointerInput(fact.key) {
                 detectDragGestures(
                   onDragStart = {
+                    haptics.performHapticFeedback(HapticFeedbackType.LongPress)
                     dragKey = fact.key
                     dragOffset = 0f
                   },
@@ -469,9 +498,11 @@ private fun FactsEditor(facts: List<FactDraft>, actions: EditPersonActions) {
                     if (dragOffset > height / 2f && at < list.lastIndex) {
                       dragOffset -= heights[list[at + 1].key] ?: height
                       actions.onMoveFact(at, at + 1)
+                      haptics.performHapticFeedback(HapticFeedbackType.SegmentTick)
                     } else if (dragOffset < -height / 2f && at > 0) {
                       dragOffset += heights[list[at - 1].key] ?: height
                       actions.onMoveFact(at, at - 1)
+                      haptics.performHapticFeedback(HapticFeedbackType.SegmentTick)
                     }
                   },
                 )
