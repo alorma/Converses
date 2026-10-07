@@ -1,6 +1,6 @@
 # Converses — Pla i estat (v2)
 
-Actualitzat el 7 d'oct. de 2026 · @Bernat · M1, M2 i M3 fets, més el color de persona i el backlog de disseny («Quan», «Qui» i bloqueig); queden el backlog de bugs i features (`docs/backlog.md`), M4, M5 i unes quantes coses soltes (vegeu «On som»)
+Actualitzat el 7 d'oct. de 2026 · @Bernat · M1, M2 i M3 fets, més el color de persona i el backlog de disseny («Quan», «Qui» i bloqueig); queden els bugs prioritaris del backlog (`docs/backlog.md`), M4, M5 i unes quantes coses soltes; follow-ups i gestor de canals passen a l'Iteració 2, després de la publicació (vegeu «On som»)
 
 ## Resum
 
@@ -22,9 +22,10 @@ La v1 funcional està feta: interfície polida, fluxos complets, privacitat tanc
 | M3 · Privacitat | Les persones protegides no es filtren enlloc | Fet (falta provar el bloqueig desactivat sol a dispositiu) |
 | Color de la persona | Les pantalles de cada persona prenen el color del seu avatar | Fet (falta provar-lo a l'emulador: animació de l'editor, fulls i interruptor apagat) |
 | Backlog de disseny | Tanda 1 «Quan», tanda 2 «Qui» i tanda 3 bloqueig | Fet (falta provar el bloqueig a dispositiu real: massa intents i empremta) |
-| Backlog de bugs i features | Àrea clicable, etiqueta «Other», biometria sense desar, follow-ups, gestor de canals (vegeu «Canvis futurs») | Per fer (`docs/backlog.md`) |
+| Backlog de bugs | Àrea clicable, etiqueta «Other», biometria sense desar (vegeu «Canvis futurs») | Per fer (`docs/backlog.md`) |
 | M4 · Qualitat | Tests, accessibilitat, mode fosc, dispositiu real | Per fer |
 | M5 · Publicació | minSdk, signatura, R8, mida, migracions, Play Store | Per fer |
+| Iteració 2 | Follow-ups i gestor de canals | Després de la publicació (vegeu «Iteració 2») |
 | Després de la v1 | Cerca, còpia de seguretat, etiquetes, widget | Idees |
 
 **Coses soltes:**
@@ -221,7 +222,7 @@ La v1 funcional està feta: interfície polida, fluxos complets, privacitat tanc
     - (b) un subconjunt amb `fonttools` (llatí, eixos `wght` 400–800, `wdth` 100–118 i `opsz` limitats), que deixa el fitxer en uns 300–500 KB.
 - [ ] **Migracions de Room:**
     - treure la recreació automàtica fora de debug;
-    - afegir `MigrationTestHelper` de la versió 2 a la 3 abans de qualsevol canvi d'esquema.
+    - afegir `MigrationTestHelper` quan hi hagi un canvi d'esquema (ara no n'hi ha cap de previst abans de publicar).
 - [x] **Signatura de debug:** `app/debug.keystore` al repo (contrasenyes estàndard `android`, àlies `androiddebugkey`), perquè l'APK de debug de la CI i de qualsevol màquina tingui la mateixa signatura i s'instal·li a sobre sense esborrar l'app.
 - [ ] **Signatura i R8:**
     - signatura de release (aquesta keystore **no** va al repo);
@@ -247,13 +248,18 @@ El detall de cada punt és a `docs/backlog.md`. Ordre proposat:
 1. **Bugs petits, junts i abans de M4** (no toquen la base de dades):
     - **1** · àrea clicable fora de la superfície (issue #6);
     - **5** · biometria sense desar el perfil (issue #4);
-    - **3** · etiqueta `OTHER - SIGNAL`; si es vol fer el gestor de canals (8), s'absorbeix i es pot saltar.
-2. **Tests de captures de totes les pantalles** (vegeu M4): així els canvis següents (follow-ups, canals) es validen en clar i fosc i es veuen a la PR. El bloqueig ja està fet.
-3. **6 · Follow-ups** (issue #5): flag `pending` a `EntryEntity` i interruptor a `EntryForm`, sota de «Quan». Primera migració de Room (v2 → v3).
-4. **8 · Gestor de canals**, que absorbeix el 7 («Empresa») i el 3: l'enum passa a una taula `Channel`, amb migració. És el canvi més gran; només val la pena si es vol que els canals siguin editables.
-5. **M4 i M5** (qualitat i publicació) amb l'esquema ja estable.
+    - **3** · etiqueta `OTHER - SIGNAL`.
+2. **Tests de captures de totes les pantalles** (vegeu M4): així els canvis següents es validen en clar i fosc i es veuen a la PR. El bloqueig ja està fet.
+3. **M4 i M5** (qualitat i publicació).
 
-**Decisió d'ordre:** els punts 3 i 4 canvien l'esquema de Room. Convé fer-los **abans de M5**, perquè la publicació vegi la migració definitiva i es provi en un sol pas.
+**Migracions:** M5 només necessita el test de migració (`MigrationTestHelper`) si l'esquema de Room canvia abans de publicar. Els canvis d'esquema que hi ha previstos són a l'Iteració 2 i es faran amb la seva migració i el seu test.
+
+## Iteració 2 (després de la publicació)
+
+No són prioritaris: es faran quan l'app ja estigui publicada. El detall és a `docs/backlog.md`.
+
+- **Follow-ups / entrades pendents (6, issue #5):** flag `pending` a `EntryEntity` i interruptor a `EntryForm`, sota de «Quan». Primera migració de Room (v2 → v3) amb el seu test de migració (`MigrationTestHelper`).
+- **Gestor de canals (8):** l'enum `ChannelType` passa a una taula `Channel`, amb migració i test. Absorbeix «Empresa» (7); l'etiqueta «Other - valor» (3) es fa abans, com a bug. Només val la pena si es vol que els canals siguin editables.
 
 ## Després de la v1
 
