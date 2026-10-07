@@ -18,29 +18,29 @@ internal suspend fun ConversesDatabase.insertSampleData(now: Long = System.curre
     SamplePerson(
       name = "Luna Roja", alias = "Luna", shape = AvatarShape.Cookie9Sided, color = AvatarColor.Lavender,
       channels = listOf(ChannelType.DISCORD to "lunaroja", ChannelType.TELEGRAM to "@luna"),
-      facts = listOf("Secret" to "Això és privat"),
+      facts = listOf("Secret" to "This is private"),
       entries = listOf(
-        Triple(EntryKind.SAID, ChannelType.DISCORD, "Li he dit que en Kael ve del nord.") to ago(0, 1),
+        Triple(EntryKind.SAID, ChannelType.DISCORD, "I told her Kael comes from the north.") to ago(0, 1),
       ),
       isProtected = true,
     ),
     SamplePerson(
       name = "Marta Soler", alias = "Marta", shape = AvatarShape.Cookie9Sided, color = AvatarColor.Lavender,
       channels = listOf(ChannelType.WHATSAPP to "+34 600 111 222", ChannelType.IN_PERSON to null),
-      facts = listOf("Aniversari" to "14 de març", "Feina" to "Dissenyadora a Bcn"),
+      facts = listOf("Birthday" to "March 14", "Job" to "Designer in Barcelona"),
       entries = listOf(
-        Triple(EntryKind.SAID, ChannelType.WHATSAPP, "Li he dit que dissabte no puc venir al sopar.") to ago(0, 2),
-        Triple(EntryKind.HEARD, ChannelType.WHATSAPP, "M'ha dit que ha canviat de pis.") to ago(1),
-        Triple(EntryKind.HAPPENED, ChannelType.IN_PERSON, "Hem anat a veure l'exposició de fotografia.") to ago(9),
+        Triple(EntryKind.SAID, ChannelType.WHATSAPP, "I told her I can't make it to dinner on Saturday.") to ago(0, 2),
+        Triple(EntryKind.HEARD, ChannelType.WHATSAPP, "She told me she moved to a new flat.") to ago(1),
+        Triple(EntryKind.HAPPENED, ChannelType.IN_PERSON, "We went to see the photography exhibition.") to ago(9),
       ),
     ),
     SamplePerson(
       name = "Jordi Puig", alias = "Jordi P.", shape = AvatarShape.Clover4Leaf, color = AvatarColor.Mint,
       channels = listOf(ChannelType.DISCORD to "jordip#2201", ChannelType.TELEGRAM to "@jordip"),
-      facts = listOf("Jocs" to "Elden Ring, Hades"),
+      facts = listOf("Games" to "Elden Ring, Hades"),
       entries = listOf(
-        Triple(EntryKind.HEARD, ChannelType.DISCORD, "M'ha dit que vol muntar una partida el divendres.") to ago(3),
-        Triple(EntryKind.SAID, ChannelType.TELEGRAM, "Li he passat el link del servidor.") to ago(3, 4),
+        Triple(EntryKind.HEARD, ChannelType.DISCORD, "He told me he wants to set up a game on Friday.") to ago(3),
+        Triple(EntryKind.SAID, ChannelType.TELEGRAM, "I sent him the server link.") to ago(3, 4),
       ),
     ),
     SamplePerson(
@@ -48,13 +48,13 @@ internal suspend fun ConversesDatabase.insertSampleData(now: Long = System.curre
       channels = listOf(ChannelType.REDDIT to "u/laiaf", ChannelType.PHONE to "+34 611 333 444"),
       facts = emptyList(),
       entries = listOf(
-        Triple(EntryKind.HAPPENED, ChannelType.PHONE, "Trucada llarga sobre el viatge a Lisboa.") to ago(20),
+        Triple(EntryKind.HAPPENED, ChannelType.PHONE, "Long call about the trip to Lisbon.") to ago(20),
       ),
     ),
     SamplePerson(
       name = "Pau Vidal", alias = "Pau", shape = AvatarShape.Sunny, color = AvatarColor.Sky,
       channels = listOf(ChannelType.OTHER to "Signal"),
-      facts = listOf("Alergia" to "Fruits secs"),
+      facts = listOf("Allergy" to "Nuts"),
       entries = emptyList(),
     ),
   )
