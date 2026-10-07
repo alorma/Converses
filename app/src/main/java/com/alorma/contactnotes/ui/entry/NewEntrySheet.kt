@@ -85,48 +85,51 @@ fun NewEntrySheetContent(
   Column(
     modifier = Modifier
       .fillMaxWidth()
-      .imePadding()
       .windowInsetsPadding(WindowInsets.navigationBars)
-      .verticalScroll(rememberScrollState())
-      .padding(horizontal = 16.dp),
-    verticalArrangement = Arrangement.spacedBy(16.dp),
+      .imePadding(),
   ) {
-    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-      Avatar(initials = initialsOf(person.name), shape = person.avatarShape, color = person.avatarColor, size = 44.dp)
-      Column(modifier = Modifier.weight(1f)) {
-        Text(stringResource(if (isNew) R.string.new_entry else R.string.edit_entry), style = SheetTitleStyle)
-        Text(
-          text = stringResource(R.string.with_person, person.name),
-          style = MaterialTheme.typography.bodyMedium,
-          color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
-      }
-      FilledTonalIconButton(onClick = onDismiss) {
-        Icon(Icons.Rounded.Close, contentDescription = stringResource(R.string.close))
-      }
-    }
-    EntryForm(
-      state = form,
-      person = person,
-      channels = available,
-      channel = channel,
-      onChannelChange = { form.channel = it },
-      otherHandle = otherHandle,
-      saveButton = {
-        Button(
-          onClick = onSave,
-          enabled = form.canSave,
-          modifier = Modifier.fillMaxWidth().height(56.dp),
-        ) {
-          Icon(Icons.Rounded.Check, contentDescription = null)
-          Spacer(Modifier.padding(horizontal = 4.dp))
+    Column(
+      modifier = Modifier
+        .weight(1f, fill = false)
+        .verticalScroll(rememberScrollState())
+        .padding(horizontal = 16.dp),
+      verticalArrangement = Arrangement.spacedBy(16.dp),
+    ) {
+      Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+        Avatar(initials = initialsOf(person.name), shape = person.avatarShape, color = person.avatarColor, size = 44.dp)
+        Column(modifier = Modifier.weight(1f)) {
+          Text(stringResource(if (isNew) R.string.new_entry else R.string.edit_entry), style = SheetTitleStyle)
           Text(
-            stringResource(if (isNew) R.string.save_to_timeline else R.string.save_changes),
-            style = MaterialTheme.typography.titleMedium,
+            text = stringResource(R.string.with_person, person.name),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
           )
         }
-      },
-    )
-    Spacer(Modifier.height(8.dp))
+        FilledTonalIconButton(onClick = onDismiss) {
+          Icon(Icons.Rounded.Close, contentDescription = stringResource(R.string.close))
+        }
+      }
+      EntryForm(
+        state = form,
+        person = person,
+        channels = available,
+        channel = channel,
+        onChannelChange = { form.channel = it },
+        otherHandle = otherHandle,
+      )
+    }
+    // El botó queda fix a baix, fora del que es desplaça, perquè el teclat no el tapi
+    Button(
+      onClick = onSave,
+      enabled = form.canSave,
+      modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 12.dp).height(56.dp),
+    ) {
+      Icon(Icons.Rounded.Check, contentDescription = null)
+      Spacer(Modifier.padding(horizontal = 4.dp))
+      Text(
+        stringResource(if (isNew) R.string.save_to_timeline else R.string.save_changes),
+        style = MaterialTheme.typography.titleMedium,
+      )
+    }
   }
 }
