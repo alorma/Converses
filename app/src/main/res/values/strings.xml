@@ -35,7 +35,6 @@
     <string name="settings_person_color_summary">Each person\'s screens take the color of their avatar</string>
     <string name="settings_dynamic_color">Dynamic color</string>
     <string name="settings_dynamic_color_summary">Takes the tone of your wallpaper</string>
-    <string name="settings_dynamic_color_off">Off: neutral greys (graphite)</string>
     <string name="settings_language">Language</string>
     <string name="settings_app_language">App language</string>
     <string name="settings_security">Security</string>
