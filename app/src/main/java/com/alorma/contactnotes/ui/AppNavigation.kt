@@ -10,12 +10,16 @@ import androidx.navigation3.ui.NavDisplay
 import com.alorma.contactnotes.ui.edit.EditPersonScreen
 import com.alorma.contactnotes.ui.entry.PersonSelectionBridge
 import com.alorma.contactnotes.ui.entry.QuickNoteScreen
+import com.alorma.contactnotes.ui.onboarding.OnboardingScreen
 import com.alorma.contactnotes.ui.people.PeopleListRoute
 import com.alorma.contactnotes.ui.person.PersonDetailRoute
 import com.alorma.contactnotes.ui.person.PersonLockedScreen
 import com.alorma.contactnotes.ui.settings.SettingsScreen
 import kotlinx.serialization.Serializable
 import org.koin.compose.koinInject
+
+@Serializable
+data object OnboardingRoute : NavKey
 
 @Serializable
 data object PeopleRoute : NavKey
@@ -39,8 +43,8 @@ data class PersonRoute(val id: Long) : NavKey
 data class PersonLockedRoute(val id: Long) : NavKey
 
 @Composable
-fun AppNavigation() {
-  val backStack = rememberNavBackStack(PeopleRoute)
+fun AppNavigation(startOnboarding: Boolean = false) {
+  val backStack = rememberNavBackStack(if (startOnboarding) OnboardingRoute else PeopleRoute)
   val selectionBridge: PersonSelectionBridge = koinInject()
 
   NavDisplay(
@@ -51,6 +55,14 @@ fun AppNavigation() {
       rememberViewModelStoreNavEntryDecorator(),
     ),
     entryProvider = entryProvider {
+      entry<OnboardingRoute> {
+        OnboardingScreen(
+          onFinished = {
+            backStack.clear()
+            backStack.add(PeopleRoute)
+          },
+        )
+      }
       entry<PeopleRoute> {
         PeopleListRoute(
           archived = false,

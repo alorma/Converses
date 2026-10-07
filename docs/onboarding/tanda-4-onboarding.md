@@ -170,7 +170,6 @@ Al pas 3, el botó **Comença** no s'activa fins que acaba l'animació (o es pot
 - [ ] Primera obertura: surt l'onboarding; després de **Comença** o **Omet**, no torna a sortir encara que es tanqui l'app.
 - [ ] Enrere al pas 1 surt de l'app i l'onboarding torna a sortir la propera vegada.
 - [ ] Lliscar entre pàgines llança l'animació de la pàgina d'arribada, no la de la pàgina que es deixa.
-- [ ] Tocar la il·lustració la repeteix des del principi.
 - [ ] Amb les animacions del sistema desactivades, es veu l'estat final i no hi ha moviments infinits.
 - [ ] Clar i fosc; verd d'èxit llegible en tots dos.
 - [ ] ca, es i en amb la font gran: res es talla ni queda tapat pel peu.

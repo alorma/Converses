@@ -9,7 +9,9 @@ import com.alorma.contactnotes.data.ConversesRepository
 import com.alorma.contactnotes.data.db.ConversesDatabase
 import com.alorma.contactnotes.data.insertSampleData
 import com.alorma.contactnotes.data.settings.AppLockManager
+import com.alorma.contactnotes.data.settings.DataStoreFireAndForgetRunner
 import com.alorma.contactnotes.data.settings.DataStoreSettingsRepository
+import com.alorma.contactnotes.data.settings.OnboardingFlag
 import com.alorma.contactnotes.data.settings.SecureWindow
 import com.alorma.contactnotes.data.settings.SettingsRepository
 import com.alorma.contactnotes.ui.edit.EditPersonViewModel
@@ -59,6 +61,7 @@ val databaseModule = module {
 
 val settingsModule = module {
   single<SettingsRepository> { DataStoreSettingsRepository(androidContext()) }
+  single { OnboardingFlag(DataStoreFireAndForgetRunner(get())) }
   single { AppLockManager(get()) }
   single { SecureWindow() }
   single { PersonExporter(androidContext(), get()) }

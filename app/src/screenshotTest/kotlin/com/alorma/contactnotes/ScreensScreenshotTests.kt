@@ -17,6 +17,9 @@ import com.alorma.contactnotes.ui.lock.AppLockPreview
 import com.alorma.contactnotes.ui.person.ConfirmDeleteDialogPreview
 import com.alorma.contactnotes.ui.person.EntryActionsDayPreview
 import com.alorma.contactnotes.ui.person.MoveEntryDialogPreview
+import com.alorma.contactnotes.ui.onboarding.OnboardingStep1Preview
+import com.alorma.contactnotes.ui.onboarding.OnboardingStep2Preview
+import com.alorma.contactnotes.ui.onboarding.OnboardingStep3Preview
 import com.alorma.contactnotes.ui.settings.SettingsAppLockPreview
 import com.alorma.contactnotes.ui.settings.SettingsNoLockPreview
 import com.alorma.contactnotes.ui.person.EntryActionsSinglePreview
@@ -200,6 +203,27 @@ class ScreensScreenshotTests {
   @Composable
   fun entryActionsDay() {
     EntryActionsDayPreview()
+  }
+
+  @ScreenPreviews
+  @PreviewTest
+  @Composable
+  fun onboardingStep1() {
+    OnboardingStep1Preview()
+  }
+
+  @ScreenPreviews
+  @PreviewTest
+  @Composable
+  fun onboardingStep2() {
+    OnboardingStep2Preview()
+  }
+
+  @ScreenPreviews
+  @PreviewTest
+  @Composable
+  fun onboardingStep3() {
+    OnboardingStep3Preview()
   }
 
   @ScreenPreviews
