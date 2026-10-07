@@ -23,6 +23,7 @@ private fun SettingsPreview(settings: AppSettings, canUnlock: Boolean) {
       onRelockAfter = {},
       onOpenLanguage = {},
       onOpenSecuritySetup = {},
+      onOpenPrivacyPolicy = {},
     )
   }
 }

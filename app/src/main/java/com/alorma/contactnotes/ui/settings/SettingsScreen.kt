@@ -36,6 +36,7 @@ import androidx.compose.material.icons.rounded.Fingerprint
 import androidx.compose.material.icons.rounded.Language
 import androidx.compose.material.icons.rounded.OpenInNew
 import androidx.compose.material.icons.rounded.Palette
+import androidx.compose.material.icons.rounded.PrivacyTip
 import androidx.compose.material.icons.rounded.Timer
 import androidx.compose.material.icons.rounded.UnfoldMore
 import androidx.compose.material3.DropdownMenu
@@ -123,6 +124,7 @@ fun SettingsScreen(
     onRelockAfter = viewModel::onRelockAfter,
     onOpenLanguage = { context.openLanguageSettings() },
     onOpenSecuritySetup = { context.openSecuritySetup() },
+    onOpenPrivacyPolicy = { context.openPrivacyPolicy() },
   )
 }
 
@@ -141,6 +143,7 @@ fun SettingsContent(
   onRelockAfter: (Int) -> Unit,
   onOpenLanguage: () -> Unit,
   onOpenSecuritySetup: () -> Unit,
+  onOpenPrivacyPolicy: () -> Unit,
   showPersonColor: Boolean = true,
 ) {
   Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.surface) {
@@ -249,6 +252,19 @@ fun SettingsContent(
         color = MaterialTheme.colorScheme.onSurfaceVariant,
         modifier = Modifier.padding(horizontal = 4.dp),
       )
+
+      SettingsGroup(
+        title = { SectionTitle(stringResource(R.string.settings_about)) },
+        verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap),
+      ) {
+        SettingRow(
+          title = stringResource(R.string.settings_privacy_policy),
+          icon = Icons.Rounded.PrivacyTip,
+          trailing = { Icon(Icons.Rounded.OpenInNew, contentDescription = null) },
+          shape = groupedItemShape(0, 1),
+          onClick = onOpenPrivacyPolicy,
+        )
+      }
       Text(
         text = stringResource(R.string.settings_footer, versionName),
         style = MaterialTheme.typography.bodyMedium,
@@ -360,6 +376,13 @@ private fun Context.openLanguageSettings() {
     Intent(Settings.ACTION_LOCALE_SETTINGS)
   }
   startActivity(intent)
+}
+
+private const val PrivacyPolicyUrl = "https://alorma.github.io/converses/privacy/"
+
+private fun Context.openPrivacyPolicy() {
+  val language = resources.configuration.locales[0].language.takeIf { it in SupportedLanguages } ?: "en"
+  startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("$PrivacyPolicyUrl#$language")))
 }
 
 private fun currentLanguageName(context: Context): String {

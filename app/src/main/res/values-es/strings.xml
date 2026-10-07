@@ -52,6 +52,8 @@
     <string name="relock_summary_1_min">Tras 1 minuto en segundo plano</string>
     <string name="relock_summary_5_min">Tras 5 minutos en segundo plano</string>
     <string name="settings_protected_note">Las personas protegidas piden la huella igualmente, aunque la app ya esté desbloqueada.</string>
+    <string name="settings_about">Acerca de</string>
+    <string name="settings_privacy_policy">Política de privacidad</string>
     <string name="settings_footer">Converses · versión %1$s</string>
     <string name="app_lock_title">Converses está bloqueada</string>
     <string name="app_lock_prompt_title">Desbloquea Converses</string>
