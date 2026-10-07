@@ -266,9 +266,9 @@ La v1 funcional està feta: interfície polida, fluxos complets, privacitat tanc
 - [ ] **Mida de la font:** Roboto Flex variable pesa ~1,7 MB. Hi ha dues opcions:
     - (a) fonts descarregables de Google Fonts (`androidx.compose.ui.text.googlefonts`), amb Roboto com a alternativa;
     - (b) un subconjunt amb `fonttools` (llatí, eixos `wght` 400–800, `wdth` 100–118 i `opsz` limitats), que deixa el fitxer en uns 300–500 KB.
-- [ ] **Migracions de Room:**
-    - la recreació automàtica només és en debug (a release no n'hi ha); la base de dades és la v1 neta, sense migracions;
-    - afegir `MigrationTestHelper` quan hi hagi el primer canvi d'esquema, ja després de publicar.
+- [ ] **Migracions de Room:** **la v1 ja és publicada a Google Play (alpha): tot canvi de la base de dades ha d'incloure una migració.**
+    - qualsevol canvi d'esquema puja la `version` de `ConversesDatabase`, desa el nou JSON a `app/schemas` (el `1.json` no es toca mai més), afegeix la `Migration` (o `AutoMigration`) i el seu test amb `MigrationTestHelper` (`room-testing` ja és a `androidTestImplementation`);
+    - la recreació automàtica (`fallbackToDestructiveMigration`) només és en debug; a release esborraria les dades dels usuaris, així que no s'hi pot confiar.
 - [x] **Dues apps a la vegada:** el build de debug té `applicationIdSuffix = ".debug"` (`com.alorma.contactnotes.debug`) i el nom «Converses Debug» (`src/debug/AndroidManifest.xml`), així es pot tenir instal·lada a la vegada amb la de release.
 - [x] **Icona vermella en debug:** els colors del primer pla de la icona són recursos (`ic_launcher_extrusion`, `ic_launcher_front`, `ic_launcher_highlight`, `ic_launcher_lines` a `values/colors.xml`, lila) i `src/debug/res/values/colors.xml` els sobreescriu en vermell, així la build de debug es distingeix d'un cop d'ull. El fons i la silueta monocroma no canvien.
 - [x] **Signatura de debug:** `app/debug.keystore` al repo (contrasenyes estàndard `android`, àlies `androiddebugkey`), perquè l'APK de debug de la CI i de qualsevol màquina tingui la mateixa signatura i s'instal·li a sobre sense esborrar l'app.
@@ -301,7 +301,7 @@ El detall de cada punt és a `docs/backlog.md`. Ordre proposat:
 3. ~~**Empremta a la nota ràpida d'una persona protegida** (backlog 10)~~ (fet).
 4. **M4 i M5** (qualitat i publicació).
 
-**Migracions:** M5 només necessita el test de migració (`MigrationTestHelper`) si l'esquema de Room canvia abans de publicar. Els canvis d'esquema que hi ha previstos són a l'Iteració 2 i es faran amb la seva migració i el seu test.
+**Migracions:** la v1 ja és a Google Play (alpha). **Tot canvi de la base de dades ha d'incloure una migració** (v1 → v2…) amb el seu test (`MigrationTestHelper`). Els canvis d'esquema previstos són a l'Iteració 2.
 
 ## Iteració 2 (després de la publicació)
 
@@ -327,7 +327,7 @@ El detall és a `docs/pro.md` (document de treball, es continuarà). **La v1 no 
 - [x] **2 · Avatar estàndard** (fet; falta provar-lo a l'emulador amb el flag apagat i encès):
     - `AvatarColor.forName(name)` al `designsystem`: hash FNV-1a del nom normalitzat (minúscules, sense accents ni espais als extrems), estable i amb els 7 colors repartits (`AvatarColorTest`, 20 noms); `AvatarShape.Standard` = Galeta;
     - `avatarShape` i `avatarColor` nul·lables a `PersonEntity` (`null` = estàndard). Tota la UI llegeix `person.shape` / `person.color` (extensions a `Entities.kt`), que resolen l'estàndard; el tema de persona, el selector «Qui», el llistat, el detall i els fulls hi passen;
-    - **Room:** la base de dades és la **versió 1** de la v1, neta i **sense cap migració**: l'esquema (`1.json`) s'ha regenerat des de zero i les dues columnes d'avatar són nul·lables. Com que l'app no és publicada, no hi ha cap instal·lació a conservar; en debug la base de dades es recrea sola si canvia l'esquema. A partir de la publicació, qualsevol canvi serà v1 → v2 amb migració i test (`MigrationTestHelper`);
+    - **Room:** la base de dades és la **versió 1** de la v1, neta i **sense cap migració**: l'esquema (`1.json`) s'ha regenerat des de zero i les dues columnes d'avatar són nul·lables. Ara la v1 ja és publicada a Google Play (alpha): qualsevol canvi serà v1 → v2 amb migració i test (`MigrationTestHelper`);
     - editor: l'estat guarda `null` mentre no es tria res i l'avatar de previsualització segueix el nom mentre s'escriu; amb `CustomAvatarFeature` apagada s'amaguen la forma i el color i només queda l'avatar (`customAvatar` a `EditPersonContent`); una persona nova es desa amb `null` (test a `EditPersonViewModelTest`);
     - pendent al CI: etiqueta `update-screenshots` (canvia `editPersonNew`; les captures de l'onboarding són noves).
 - [x] **3 · Redisseny de Nova persona / Editar persona** (especificació a `docs/nova-persona/redisseny-nova-persona.md`; fet i provat a l'emulador):
@@ -392,7 +392,7 @@ Una sola activitat (`MainActivity`, una `FragmentActivity` pel `BiometricPrompt`
 | Formes | `graphics-shapes` 1.1.0 | Formes dels avatars |
 | Color | `material-kolor` 5.0.1 | `Neutral` amb color dinàmic, `TonalSpot` amb el color triat |
 | Navegació | Navigation 3 1.2.0 + `lifecycle-viewmodel-navigation3` | Rutes tipades amb `NavKey` serialitzables |
-| Dades | Room 2.8.4 + KSP 2.3.12 | Base de dades versió 1 (neta, sense migracions), esquema a `app/schemas` |
+| Dades | Room 2.8.4 + KSP 2.3.12 | Base de dades versió 1 (publicada a Google Play; tot canvi necessita migració), esquema a `app/schemas` |
 | DI | Koin 4.2.2 | |
 | Preferències | DataStore Preferences 1.2.1 | `SettingsRepository` |
 | Ajustos UI | Compose-Settings `ui-tiles-expressive` 3.3.0 | Només es fa servir `SettingsGroup`; les files són pròpies (`SettingRow`) |
