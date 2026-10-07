@@ -133,6 +133,8 @@
     <string name="fact_value_hint">Valor</string>
     <string name="add_fact">Afegeix una dada</string>
     <string name="remove">Treu</string>
+    <string name="move_up">Mou amunt</string>
+    <string name="move_down">Mou avall</string>
     <string name="reorder">Reordena</string>
     <string name="channels_title">On hi parles</string>
     <string name="add_channel">Afegeix un canal</string>
