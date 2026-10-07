@@ -116,15 +116,36 @@ fun EditPersonScreen(
   val canAuthenticate = remember { activity.canUnlockWithDevice() }
   val authTitle = stringResource(R.string.protected_person)
   val authSubtitle = stringResource(R.string.unlock_subtitle)
-  var channelDialog by remember { mutableStateOf<ChannelDialogState?>(null) }
-  var showDelete by remember { mutableStateOf(false) }
-
   val secureWindow: SecureWindow = koinInject()
   val secure = state.loaded && (state.baseline.isProtected || state.isProtected)
   DisposableEffect(secure) {
     if (secure) secureWindow.acquire()
     onDispose { if (secure) secureWindow.release() }
   }
+
+  EditPersonContent(
+    state = state,
+    canAuthenticate = canAuthenticate,
+    actions = viewModel,
+    onClose = onClose,
+    onSaved = onSaved,
+    onDeleted = onDeleted,
+    onProtectedChange = { value -> activity.promptUnlock(authTitle, authSubtitle) { viewModel.onProtected(value) } },
+  )
+}
+
+@Composable
+fun EditPersonContent(
+  state: EditPersonUiState,
+  canAuthenticate: Boolean,
+  actions: EditPersonActions,
+  onClose: () -> Unit,
+  onSaved: (Long) -> Unit,
+  onDeleted: () -> Unit,
+  onProtectedChange: (Boolean) -> Unit,
+) {
+  var channelDialog by remember { mutableStateOf<ChannelDialogState?>(null) }
+  var showDelete by remember { mutableStateOf(false) }
 
   PersonTheme(state.color) {
     Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.surface) {
@@ -143,7 +164,7 @@ fun EditPersonScreen(
           FilledTonalIconButton(onClick = onClose) {
             Icon(Icons.Rounded.Close, contentDescription = stringResource(R.string.close))
           }
-          Button(onClick = { viewModel.save(onSaved) }, enabled = state.canSave) {
+          Button(onClick = { actions.save(onSaved) }, enabled = state.canSave) {
             Text(stringResource(R.string.save), fontWeight = FontWeight.Bold)
           }
         }
@@ -153,17 +174,17 @@ fun EditPersonScreen(
           modifier = Modifier.padding(start = 4.dp),
         )
 
-        AppearanceCard(state, viewModel)
+        AppearanceCard(state, actions)
 
         Column(verticalArrangement = Arrangement.spacedBy(GroupedListDefaults.ItemSpacing)) {
           FieldCard(index = 0, count = if (state.aliasTaken) 3 else 2) {
-            LabeledField(label = stringResource(R.string.field_name), value = state.name, onValueChange = viewModel::onName)
+            LabeledField(label = stringResource(R.string.field_name), value = state.name, onValueChange = actions::onName)
           }
           FieldCard(index = 1, count = if (state.aliasTaken) 3 else 2, error = state.aliasTaken) {
             LabeledField(
               label = stringResource(R.string.field_alias),
               value = state.alias,
-              onValueChange = viewModel::onAlias,
+              onValueChange = actions::onAlias,
               prefix = "@",
               isError = state.aliasTaken,
             )
@@ -182,7 +203,7 @@ fun EditPersonScreen(
         }
 
         SectionHeader(icon = true, title = stringResource(R.string.pinned_facts), hint = stringResource(R.string.pinned_hint))
-        FactsEditor(state.facts, viewModel)
+        FactsEditor(state.facts, actions)
 
         SectionHeader(icon = false, title = stringResource(R.string.channels_title), hint = null)
         Column(verticalArrangement = Arrangement.spacedBy(GroupedListDefaults.ItemSpacing)) {
@@ -201,7 +222,7 @@ fun EditPersonScreen(
                     Text(channel.handle, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                   }
                 }
-                IconButton(onClick = { viewModel.onRemoveChannel(channel.key) }) {
+                IconButton(onClick = { actions.onRemoveChannel(channel.key) }) {
                   Icon(Icons.Rounded.RemoveCircleOutline, contentDescription = stringResource(R.string.remove))
                 }
               }
@@ -230,9 +251,7 @@ fun EditPersonScreen(
             Switch(
               checked = state.isProtected,
               enabled = canAuthenticate,
-              onCheckedChange = { value ->
-                activity.promptUnlock(authTitle, authSubtitle) { viewModel.onProtected(value) }
-              },
+              onCheckedChange = onProtectedChange,
             )
           }
         }
@@ -260,7 +279,7 @@ fun EditPersonScreen(
         onDismiss = { showDelete = false },
         onConfirm = { exportFirst ->
           showDelete = false
-          viewModel.delete(exportFirst, onDeleted)
+          actions.delete(exportFirst, onDeleted)
         },
       )
     }
@@ -270,7 +289,7 @@ fun EditPersonScreen(
         initial = dialog.channel,
         onDismiss = { channelDialog = null },
         onConfirm = { type, handle ->
-          viewModel.onSaveChannel(dialog.channel?.key, type, handle)
+          actions.onSaveChannel(dialog.channel?.key, type, handle)
           channelDialog = null
         },
       )
@@ -281,7 +300,7 @@ fun EditPersonScreen(
 private data class ChannelDialogState(val channel: ChannelDraft?)
 
 @Composable
-private fun AppearanceCard(state: EditPersonUiState, viewModel: EditPersonViewModel) {
+private fun AppearanceCard(state: EditPersonUiState, actions: EditPersonActions) {
   Surface(shape = MaterialTheme.shapes.extraLarge, color = GroupedListDefaults.containerColor, modifier = Modifier.fillMaxWidth()) {
     Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
       Row(horizontalArrangement = Arrangement.spacedBy(16.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -295,13 +314,13 @@ private fun AppearanceCard(state: EditPersonUiState, viewModel: EditPersonViewMo
           SmallLabel(stringResource(R.string.shape_label))
           Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             AvatarShape.entries.forEach { shape ->
-              ShapeOption(shape = shape, selected = shape == state.shape, onClick = { viewModel.onShape(shape) })
+              ShapeOption(shape = shape, selected = shape == state.shape, onClick = { actions.onShape(shape) })
             }
           }
         }
       }
       SmallLabel(stringResource(R.string.color_label))
-      ColorSwatches(entries = AvatarColor.entries, selected = state.color, colorOf = { it.color }, onSelect = viewModel::onColor)
+      ColorSwatches(entries = AvatarColor.entries, selected = state.color, colorOf = { it.color }, onSelect = actions::onColor)
     }
   }
 }
@@ -427,7 +446,7 @@ private fun AddRow(text: String) {
 }
 
 @Composable
-private fun FactsEditor(facts: List<FactDraft>, viewModel: EditPersonViewModel) {
+private fun FactsEditor(facts: List<FactDraft>, actions: EditPersonActions) {
   var dragKey by remember { mutableStateOf<Long?>(null) }
   var dragOffset by remember { mutableFloatStateOf(0f) }
   val heights = remember { mutableStateMapOf<Long, Int>() }
@@ -478,10 +497,10 @@ private fun FactsEditor(facts: List<FactDraft>, viewModel: EditPersonViewModel) 
                     val height = heights[fact.key] ?: 0
                     if (dragOffset > height / 2f && at < list.lastIndex) {
                       dragOffset -= heights[list[at + 1].key] ?: height
-                      viewModel.onMoveFact(at, at + 1)
+                      actions.onMoveFact(at, at + 1)
                     } else if (dragOffset < -height / 2f && at > 0) {
                       dragOffset += heights[list[at - 1].key] ?: height
-                      viewModel.onMoveFact(at, at - 1)
+                      actions.onMoveFact(at, at - 1)
                     }
                   },
                 )
@@ -490,25 +509,25 @@ private fun FactsEditor(facts: List<FactDraft>, viewModel: EditPersonViewModel) 
           Column(modifier = Modifier.weight(1f)) {
             InlineField(
               value = fact.label,
-              onValueChange = { viewModel.onFactChange(fact.key, it, fact.value) },
+              onValueChange = { actions.onFactChange(fact.key, it, fact.value) },
               placeholder = stringResource(R.string.fact_label_hint),
               small = true,
             )
             InlineField(
               value = fact.value,
-              onValueChange = { viewModel.onFactChange(fact.key, fact.label, it) },
+              onValueChange = { actions.onFactChange(fact.key, fact.label, it) },
               placeholder = stringResource(R.string.fact_value_hint),
               small = false,
             )
           }
-          IconButton(onClick = { viewModel.onRemoveFact(fact.key) }) {
+          IconButton(onClick = { actions.onRemoveFact(fact.key) }) {
             Icon(Icons.Rounded.RemoveCircleOutline, contentDescription = stringResource(R.string.remove))
           }
         }
       }
       }
     }
-    FieldCard(index = facts.size, count = count, onClick = { viewModel.onAddFact() }) {
+    FieldCard(index = facts.size, count = count, onClick = { actions.onAddFact() }) {
       AddRow(stringResource(R.string.add_fact))
     }
   }

@@ -4,6 +4,9 @@ import android.content.res.Configuration
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import com.android.tools.screenshot.PreviewTest
+import com.alorma.contactnotes.ui.edit.EditPersonExistingPreview
+import com.alorma.contactnotes.ui.edit.EditPersonNewPreview
+import com.alorma.contactnotes.ui.edit.EditPersonProtectedPreview
 import com.alorma.contactnotes.ui.entry.NewEntrySheetPreview
 import com.alorma.contactnotes.ui.entry.PersonPickerFewPreview
 import com.alorma.contactnotes.ui.entry.PersonPickerManyPreview
@@ -195,5 +198,26 @@ class ScreensScreenshotTests {
   @Composable
   fun settingsNoLock() {
     SettingsNoLockPreview()
+  }
+
+  @ScreenPreviews
+  @PreviewTest
+  @Composable
+  fun editPersonNew() {
+    EditPersonNewPreview()
+  }
+
+  @ScreenPreviews
+  @PreviewTest
+  @Composable
+  fun editPersonExisting() {
+    EditPersonExistingPreview()
+  }
+
+  @ScreenPreviews
+  @PreviewTest
+  @Composable
+  fun editPersonProtected() {
+    EditPersonProtectedPreview()
   }
 }
