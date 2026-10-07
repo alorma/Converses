@@ -1,5 +1,7 @@
 package com.alorma.contactnotes.ui.entry
 
+import com.alorma.contactnotes.data.db.shape
+import com.alorma.contactnotes.data.db.color
 import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -262,7 +264,7 @@ fun QuickNoteContent(
     ?: state.lastChannel?.takeIf { it in available }
     ?: available.first()
 
-  PersonTheme(selected?.avatarColor) {
+  PersonTheme(selected?.color) {
     Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.surface) {
       Column(
         modifier = Modifier
@@ -320,7 +322,7 @@ private fun PersonPicker(
       horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
       if (selected != null) {
-        Avatar(initialsOf(selected.name), selected.avatarShape, selected.avatarColor, size = 44.dp, locked = selected.isProtected)
+        Avatar(initialsOf(selected.name), selected.shape, selected.color, size = 44.dp, locked = selected.isProtected)
       } else {
         Surface(shape = CircleShape, color = MaterialTheme.colorScheme.surfaceContainerHigh, modifier = Modifier.size(44.dp)) {
           Box(contentAlignment = Alignment.Center) {

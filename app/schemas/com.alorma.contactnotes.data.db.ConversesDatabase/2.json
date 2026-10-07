@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 2,
-    "identityHash": "64a4c88b42b19ce3a0e1f03e63e2f08f",
+    "identityHash": "ea6d8b154fc4d8063ed2e70f0070b46d",
     "entities": [
       {
         "tableName": "person",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `alias` TEXT, `avatarShape` TEXT NOT NULL, `avatarColor` TEXT NOT NULL, `isProtected` INTEGER NOT NULL, `archived` INTEGER NOT NULL, `notes` TEXT, `createdAt` INTEGER NOT NULL, `updatedAt` INTEGER NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `alias` TEXT, `avatarShape` TEXT, `avatarColor` TEXT, `isProtected` INTEGER NOT NULL, `archived` INTEGER NOT NULL, `notes` TEXT, `createdAt` INTEGER NOT NULL, `updatedAt` INTEGER NOT NULL)",
         "fields": [
           {
             "fieldPath": "id",
@@ -28,14 +28,12 @@
           {
             "fieldPath": "avatarShape",
             "columnName": "avatarShape",
-            "affinity": "TEXT",
-            "notNull": true
+            "affinity": "TEXT"
           },
           {
             "fieldPath": "avatarColor",
             "columnName": "avatarColor",
-            "affinity": "TEXT",
-            "notNull": true
+            "affinity": "TEXT"
           },
           {
             "fieldPath": "isProtected",
@@ -275,7 +273,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '64a4c88b42b19ce3a0e1f03e63e2f08f')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'ea6d8b154fc4d8063ed2e70f0070b46d')"
     ]
   }
 }

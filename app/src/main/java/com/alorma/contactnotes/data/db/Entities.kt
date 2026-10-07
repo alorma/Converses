@@ -18,14 +18,19 @@ data class PersonEntity(
   @PrimaryKey(autoGenerate = true) val id: Long = 0,
   val name: String,
   val alias: String? = null,
-  val avatarShape: AvatarShape,
-  val avatarColor: AvatarColor,
+  /** `null` vol dir avatar estàndard (Galeta i color automàtic pel nom); usa [shape] i [color] per mostrar-lo. */
+  val avatarShape: AvatarShape? = null,
+  val avatarColor: AvatarColor? = null,
   val isProtected: Boolean = false,
   val archived: Boolean = false,
   val notes: String? = null,
   val createdAt: Long,
   val updatedAt: Long,
 )
+
+val PersonEntity.shape: AvatarShape get() = avatarShape ?: AvatarShape.Standard
+
+val PersonEntity.color: AvatarColor get() = avatarColor ?: AvatarColor.forName(name)
 
 @Entity(
   tableName = "channel",

@@ -92,6 +92,8 @@ import com.alorma.contactnotes.designsystem.components.GroupedListDefaults
 import com.alorma.contactnotes.designsystem.components.asShape
 import com.alorma.contactnotes.designsystem.components.groupedItemShape
 import com.alorma.contactnotes.designsystem.theme.DialogTitleStyle
+import com.alorma.contactnotes.data.flags.CustomAvatarFeature
+import com.alorma.contactnotes.data.flags.rememberFeatureEnabled
 import com.alorma.contactnotes.designsystem.theme.PersonTheme
 import com.alorma.contactnotes.designsystem.theme.ScreenTitleStyle
 import com.alorma.contactnotes.ui.people.initialsOf
@@ -136,6 +138,7 @@ fun EditPersonScreen(
     onSaved = onSaved,
     onDeleted = onDeleted,
     onProtectedChange = { value -> activity.promptUnlock(authTitle, authSubtitle) { viewModel.onProtected(value) } },
+    customAvatar = rememberFeatureEnabled<CustomAvatarFeature>(),
   )
 }
 
@@ -148,11 +151,12 @@ fun EditPersonContent(
   onSaved: (Long) -> Unit,
   onDeleted: () -> Unit,
   onProtectedChange: (Boolean) -> Unit,
+  customAvatar: Boolean = true,
 ) {
   var channelDialog by remember { mutableStateOf<ChannelDialogState?>(null) }
   var showDelete by remember { mutableStateOf(false) }
 
-  PersonTheme(state.color) {
+  PersonTheme(state.color ?: AvatarColor.forName(state.name)) {
     Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.surface) {
       if (!state.loaded) return@Surface
       Column(
@@ -179,7 +183,7 @@ fun EditPersonContent(
           modifier = Modifier.padding(start = 4.dp),
         )
 
-        AppearanceCard(state, actions)
+        AppearanceCard(state, actions, customAvatar)
 
         Column(verticalArrangement = Arrangement.spacedBy(GroupedListDefaults.ItemSpacing)) {
           FieldCard(index = 0, count = if (state.aliasTaken) 3 else 2) {
@@ -305,33 +309,39 @@ fun EditPersonContent(
 private data class ChannelDialogState(val channel: ChannelDraft?)
 
 @Composable
-private fun AppearanceCard(state: EditPersonUiState, actions: EditPersonActions) {
+private fun AppearanceCard(state: EditPersonUiState, actions: EditPersonActions, customAvatar: Boolean) {
+  val shape = state.shape ?: AvatarShape.Standard
+  val color = state.color ?: AvatarColor.forName(state.name)
   Surface(shape = MaterialTheme.shapes.extraLarge, color = GroupedListDefaults.containerColor, modifier = Modifier.fillMaxWidth()) {
     Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
       Row(horizontalArrangement = Arrangement.spacedBy(16.dp), verticalAlignment = Alignment.CenterVertically) {
         Avatar(
           initials = initialsOf(state.name.ifBlank { "?" }),
-          shape = state.shape,
-          color = state.color,
+          shape = shape,
+          color = color,
           size = 96.dp,
         )
-        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-          SmallLabel(stringResource(R.string.shape_label))
-          Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            AvatarShape.entries.forEachIndexed { index, shape ->
-              ShapeOption(shape = shape, number = index + 1, selected = shape == state.shape, onClick = { actions.onShape(shape) })
+        if (customAvatar) {
+          Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            SmallLabel(stringResource(R.string.shape_label))
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+              AvatarShape.entries.forEachIndexed { index, option ->
+                ShapeOption(shape = option, number = index + 1, selected = option == shape, onClick = { actions.onShape(option) })
+              }
             }
           }
         }
       }
-      SmallLabel(stringResource(R.string.color_label))
-      ColorSwatches(
-        entries = AvatarColor.entries,
-        selected = state.color,
-        colorOf = { it.color },
-        onSelect = actions::onColor,
-        labelOf = { stringResource(colorNameRes(it.name)) },
-      )
+      if (customAvatar) {
+        SmallLabel(stringResource(R.string.color_label))
+        ColorSwatches(
+          entries = AvatarColor.entries,
+          selected = color,
+          colorOf = { it.color },
+          onSelect = actions::onColor,
+          labelOf = { stringResource(colorNameRes(it.name)) },
+        )
+      }
     }
   }
 }

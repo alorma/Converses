@@ -1,5 +1,7 @@
 package com.alorma.contactnotes.ui.person
 
+import com.alorma.contactnotes.data.db.shape
+import com.alorma.contactnotes.data.db.color
 import android.content.Context
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.EditNote
@@ -60,8 +62,8 @@ fun EntryKind.whoIcon(selected: Boolean = false): ImageVector? = when (this) {
 fun PersonInitialAvatar(person: PersonEntity, size: Dp, modifier: Modifier = Modifier) {
   Avatar(
     initials = initialOf(person.name),
-    shape = person.avatarShape,
-    color = person.avatarColor,
+    shape = person.shape,
+    color = person.color,
     modifier = modifier,
     size = size,
   )

@@ -1,5 +1,6 @@
 package com.alorma.contactnotes.ui.entry
 
+import com.alorma.contactnotes.data.db.color
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -62,7 +63,7 @@ internal fun QuickNoteFilledPreview() {
 @Composable
 internal fun EditEntrySheetPreview() {
   ConversesPreviewTheme {
-    PersonTheme(PreviewData.marta.avatarColor) {
+    PersonTheme(PreviewData.marta.color) {
       Surface(color = MaterialTheme.colorScheme.surface) {
         NewEntrySheetContent(
           person = PreviewData.marta,
@@ -87,7 +88,7 @@ internal fun EditEntrySheetPreview() {
 @Composable
 internal fun NewEntrySheetPreview() {
   ConversesPreviewTheme {
-    PersonTheme(PreviewData.marta.avatarColor) {
+    PersonTheme(PreviewData.marta.color) {
       Surface(color = MaterialTheme.colorScheme.surface) {
         NewEntrySheetContent(
           person = PreviewData.marta,
