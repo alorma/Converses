@@ -19,7 +19,6 @@ Mai es cobra per **accedir, protegir o treure** les dades pròpies. Al Pro hi va
 - Persones protegides i bloqueig de l'app.
 - Exportar notes.
 - Canals del sistema + «Altres – {valor}».
-- Importar **una** persona des del selector de contactes del sistema (`ACTION_PICK`, sense `READ_CONTACTS`). Pre-omple Nova persona.
 
 ## Pro (fora de la v1 gratuïta)
 
@@ -54,14 +53,6 @@ No s'hi ha de començar res, o queda darrere de els feature flags:
 - backlog 8 (gestor de canals);
 - vincle amb contactes, Connected apps, avís de trucada i importació múltiple.
 
-### 4. Afegit a la v1 gratuïta
-
-- **Importar una persona des dels contactes:**
-  - **a Nova persona:** una fila «Omple des d'un contacte»;
-  - **al llistat buit (1b):** un segon botó «Importa dels contactes»;
-  - **pre-omple:** nom, i el telèfon com a canal «Telèfon» (i «WhatsApp» si l'usuari el marca);
-  - **duplicats:** si ja hi ha una persona amb el mateix número, avisa «Ja tens en {nom} · Obre-la».
-
 ## Pendent de decidir
 
 - **Canal «Empresa»** (backlog 7): si es fa abans dels canals propis, és un canal del sistema gratuït; si no, serà un canal propi (Pro).
@@ -71,5 +62,3 @@ No s'hi ha de començar res, o queda darrere de els feature flags:
 - [ ] Amb totes les funcions apagades: no hi ha selector d'avatar, tots els avatars són Galeta, i el mateix nom dona sempre el mateix color.
 - [ ] Els 7 colors surten repartits amb noms diferents (prova amb una llista de 20 noms).
 - [ ] Amb `CustomAvatar` activada (debug): el selector torna a sortir i desa els valors.
-- [ ] Importar un contacte sense haver concedit `READ_CONTACTS`.
-- [ ] Importar un contacte amb un número que ja existeix avisa del duplicat.
