@@ -1,6 +1,6 @@
 # Backlog: bugs i features pendents
 
-Actualitzat el 7 d'oct. de 2026, reconciliat amb `docs/plan.md`. Només hi ha el que encara no està fet; el que ja s'ha resolt està resumit a `docs/plan.md` («Formulari d'entrada i "Quan"», «Qui» i «Bloqueig d'una persona protegida»).
+Actualitzat el 7 d'oct. de 2026. Només hi ha el que encara no està fet.
 
 | # | Tipus | Tema | Issue |
 | --- | --- | --- | --- |
@@ -8,17 +8,7 @@ Actualitzat el 7 d'oct. de 2026, reconciliat amb `docs/plan.md`. Només hi ha el
 | 7 | Feature (Iteració 2) | Nou canal "Empresa" (queda dins el 8) | — |
 | 8 | Feature (Iteració 2) | Gestor de canals propis | — |
 
-Els punts 6, 7 i 8 són features no prioritàries: es faran a l'**Iteració 2**, després de publicar l'app (vegeu `docs/plan.md`). La numeració és la del backlog original, perquè els issues i les referències no canviïn.
-
-**Resolts** (ja són a l'app):
-
-- **1** · L'àrea clicable sortia de la superfície: la fila d'interruptor d'Ajustos posava el `toggleable` fora del retall de la forma; ara va dins (`SettingRow.contentModifier`). La resta de components ja retallaven abans de fer-se clicables. (Issue #6.)
-- **2** · La pantalla de bloqueig d'una persona ja no mostra el layout: només el nom, la forma i el color de l'avatar, amb els estats de càrrega, cancel·lat, massa intents i sense biometria.
-- **4** · «Ha passat» ja no es talla: el selector és «Qui» (Jo · {nom} · Apunt), amb textos curts i la icona sempre visible. Queda per comprovar a M4 amb noms de 12 caràcters, en ca i es i amb la font gran.
-- **3** · El canal «Other» mostra el valor: «Other - Signal» (`channelName` a `PersonFormatting.kt`, amb `channel_with_value`) als xips del detall, al selector «On», a l'etiqueta de cada entrada, al full d'accions, a l'exportació i a la fila del llistat. Fa servir el nom ja existent del canal: «Altres - Signal» en català i «Otros - Signal» en castellà. **Substituït (#20):** els canals ja no porten valor ni hi ha «Altres»; vegeu `docs/plan.md` › «On hi parles».
-- **5** · Activar o desactivar la biometria d'una persona es desa a l'acte (`EditPersonViewModel.onProtected` i `ConversesRepository.setProtected`); en una persona nova es continua desant amb el perfil. Ja demanava l'empremta tant en activar com en desactivar. (Issue #4.)
-- **10** · Triar una persona protegida a la nota ràpida demana l'empremta (`QuickNoteViewModel`: `pending`, `unlock` i `cancelPending`). Si es cancel·la, la selecció es queda com estava; sense bloqueig al dispositiu surt el diàleg «Sense bloqueig» amb «Configura la seguretat». Només un cop desbloquejada es carreguen els seus canals i el de l'última entrada, i la pantalla té `FLAG_SECURE` mentre hi ha una protegida triada o pendent.
-- **9** · «Qui» i «Quan»: un sol `EntryForm`, fila «Quan» amb el full «Quan va ser?», cronologia, filtres, marcadors i exportació.
+Els tres són de l'**Iteració 2**, després de publicar l'app; el 6 i el 8 són Pro (vegeu `docs/pro.md`). **Qualsevol canvi de la base de dades ha d'incloure una migració i el seu test** (la v1 ja és a Google Play). La numeració és la del backlog original, perquè els issues i les referències no canviïn; els punts resolts (1–5, 9, 10) són a l'historial de git.
 
 ---
 
@@ -31,7 +21,7 @@ Poder marcar coses per fer-ne seguiment amb una persona ("li he de preguntar com
 **Decisió recomanada:** un flag `pending` a `EntryEntity` (i, opcionalment, una data de recordatori), no un quart tipus. «Qui» (Jo · {nom} · Apunt) és un grup de 3 botons que respon a «qui»; un «Follow-up» no hi encaixa, i amb el flag qualsevol entrada pot quedar pendent.
 
 **Què cal fer**
-- Camp `pending` a `EntryEntity` i **migració de Room** (versió 1 → 2).
+- Camp `pending` a `EntryEntity` i **migració de Room** (versió 1 → 2) amb el seu test (`MigrationTestHelper`).
 - Un interruptor o xip «Pendent» a `EntryForm`, a sota de «Quan», que és el formulari comú de la nota ràpida, la nova entrada i l'edició.
 - Indicador visual a la cronologia, i potser un comptador o filtre de pendents al detall i a la llista.
 - Marcar i desmarcar des del full d'accions de l'entrada.
@@ -40,8 +30,8 @@ Poder marcar coses per fer-ne seguiment amb una persona ("li he de preguntar com
 
 ## 7 · Feature: nou canal "Empresa" (entrevistes de feina)
 
-- Afegir el valor a `enum class ChannelType` (`data/db/Entities.kt`); comprovar el converter de Room i si cal migració.
-- Icona a `ui/person/PersonFormatting.kt` (p. ex. `Icons.Rounded.Business` o `Work`).
+- Afegir el valor a `enum class ChannelType` (`data/db/Entities.kt`); comprovar el converter de Room i, si l'esquema canvia, fer la migració.
+- Icona a `ChannelType.icon()` (p. ex. `Icons.Rounded.Business` o `Work`).
 - String a `ui/people/PeopleFormatting.kt` + `strings.xml` (en: "Company", ca/es: "Empresa").
 - Decidir a quin `ChannelFilter` (`ui/people/PeopleListViewModel.kt`) pertany.
 
@@ -49,13 +39,13 @@ Poder marcar coses per fer-ne seguiment amb una persona ("li he de preguntar com
 
 ## 8 · Feature: gestor de canals (crear canals globals propis)
 
-Permetre crear canals propis (Signal, LinkedIn, Empresa...) en lloc de dependre només de l'enum `ChannelType` + "Other".
+Permetre crear canals propis (Signal, LinkedIn, Empresa...) en lloc de dependre només de l'enum `ChannelType`.
 
 **Idea**
 - Pantalla de gestió de canals (des d'Ajustos): llistar, crear, reanomenar, triar icona, reordenar, esborrar/arxivar.
 - Els canals actuals es mantenen com a canals de sistema.
 
 **Impacte tècnic**
-- Passar de l'enum a una taula `Channel` a Room (id, nom, icona, sistema/usuari, ordre) amb migració, incloent convertir els `OTHER` amb valor en canals propis. Això també resol el 3.
-- Afecta: detall de persona, `EntryForm` (xips d'«On»), edició de persona, `ChannelFilter`, `ui/person/ChannelLinks.kt` i `PersonExporter.kt`.
+- Passar de l'enum a una taula de canals a Room (id, nom, icona, sistema/usuari, ordre) amb **migració i test**: els canals i les entrades existents han d'apuntar als canals de sistema equivalents.
+- Afecta: detall de persona, `EntryForm` (xips d'«On»), `ChannelsCard` de l'editor, `ChannelFilter` i `PersonExporter.kt`.
 - Els noms creats per l'usuari no es tradueixen.

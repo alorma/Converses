@@ -10,7 +10,7 @@ Android app to remember what I said, what people said to me and what happened wi
 
 - `docs/plan.md`: state of the app and the plan (stack, theme, components, screens, data model, decisions and pending work). Keep it up to date at the end of every task. It is written in Catalan.
 - `docs/backlog.md`: pending bugs and features (Iteration 2).
-- `docs/onboarding/tanda-4-onboarding.md`: onboarding specification; if it differs from the plan, this document wins.
+- `docs/pro.md`: what is free forever and what will be Pro (behind feature flags).
 
 ## Stack
 
