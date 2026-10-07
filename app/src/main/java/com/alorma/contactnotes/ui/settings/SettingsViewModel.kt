@@ -4,7 +4,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.alorma.contactnotes.data.settings.AppSettings
 import com.alorma.contactnotes.data.settings.SettingsRepository
-import com.alorma.contactnotes.designsystem.theme.ThemeColor
 import com.alorma.contactnotes.designsystem.theme.ThemeMode
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -20,8 +19,6 @@ class SettingsViewModel(
   fun onThemeMode(mode: ThemeMode) = viewModelScope.launch { repository.setThemeMode(mode) }
 
   fun onDynamicColor(enabled: Boolean) = viewModelScope.launch { repository.setDynamicColor(enabled) }
-
-  fun onThemeColor(color: ThemeColor) = viewModelScope.launch { repository.setThemeColor(color) }
 
   fun onPersonColorTheme(enabled: Boolean) = viewModelScope.launch { repository.setPersonColorTheme(enabled) }
 

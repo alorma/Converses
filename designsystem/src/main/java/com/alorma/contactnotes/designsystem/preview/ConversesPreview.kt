@@ -8,11 +8,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.alorma.contactnotes.designsystem.theme.ConversesTheme
-import com.alorma.contactnotes.designsystem.theme.ThemeColor
 import com.alorma.contactnotes.designsystem.theme.ThemeMode
 
 /**
- * Tema de les previews i dels tests de captures: sense color dinàmic, perquè el resultat no depengui del fons
+ * Tema de les previews i dels tests de captures: sense color dinàmic (tema Grafit), perquè el resultat no depengui del fons
  * de pantalla. El mode clar o fosc el decideix el `uiMode` de la preview.
  */
 @Composable
@@ -20,7 +19,6 @@ fun ConversesPreviewTheme(content: @Composable () -> Unit) {
   ConversesTheme(
     themeMode = ThemeMode.System,
     dynamicColor = false,
-    themeColor = ThemeColor.Lavender,
     content = content,
   )
 }
