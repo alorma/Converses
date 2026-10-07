@@ -35,7 +35,7 @@ Mai es cobra per **accedir, protegir o treure** les dades pròpies. Al Pro hi va
 
 ### 1. Interruptor de funcions Pro
 
-- Feature flags a `data/flags/` amb l'estil de Caducity i FireAndForget: una classe per funció (`CustomAvatarFeature`, `PersonColorFeature`, `CustomChannelsFeature`, `FollowUpsFeature`, `ContactIntegrationFeature`), cadascuna activable per separat; ara tot és local (`LocalFeatureFlagRunner`). A la v1 totes estan apagades i no es comprova cap pagament (el Pro encara no existeix); més endavant el runner mirarà si s'ha pagat. La UI no mostra mai res de gratuït ni de Pro.
+- Feature flags a `data/flags/` amb l'estil de Caducity i FireAndForget: una classe per funció (de moment `CustomAvatarFeature` i `PersonColorFeature`; els flags de canals propis, follow-ups i integració amb contactes s'afegiran quan aquestes funcions existeixin), cadascuna activable per separat; ara tot és local (`LocalFeatureFlagRunner`). A la v1 totes estan apagades i no es comprova cap pagament (el Pro encara no existeix); més endavant el runner mirarà si s'ha pagat. La UI no mostra mai res de gratuït ni de Pro.
 - L'interruptor per provar els dos modes viu al **menú de debug** (mòdul Pro), que crida `LocalFeatureFlagRunner.setOverride(key, value)`; Ajustos no en porta cap.
 
 ### 2. Avatar estàndard

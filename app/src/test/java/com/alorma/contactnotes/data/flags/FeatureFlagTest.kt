@@ -8,43 +8,38 @@ import org.junit.Test
 class FeatureFlagTest {
   private val runner = LocalFeatureFlagRunner()
   private val avatar = CustomAvatarFeature(runner)
-  private val channels = CustomChannelsFeature(runner)
-  private val followUps = FollowUpsFeature(runner)
-  private val contacts = ContactIntegrationFeature(runner)
   private val personColor = PersonColorFeature(runner)
 
   @Test
   fun everythingIsOffByDefault() {
-    listOf(avatar, channels, followUps, contacts, personColor).forEach { assertFalse(it.key, it.isEnabled()) }
+    listOf(avatar, personColor).forEach { assertFalse(it.key, it.isEnabled()) }
   }
 
   @Test
   fun keysAreUnique() {
-    val keys = listOf(avatar, channels, followUps, contacts, personColor).map { it.key }
+    val keys = listOf(avatar, personColor).map { it.key }
     assertTrue(keys.size == keys.toSet().size)
   }
 
   @Test
   fun eachFlagIsOverriddenIndependently() {
     runner.setOverride(avatar.key, true)
-    runner.setOverride(followUps.key, true)
+    runner.setOverride(personColor.key, true)
     assertTrue(avatar.isEnabled())
-    assertTrue(followUps.isEnabled())
-    assertFalse(channels.isEnabled())
-    assertFalse(contacts.isEnabled())
+    assertTrue(personColor.isEnabled())
 
     runner.clearOverride(avatar.key)
     assertFalse(avatar.isEnabled())
-    assertTrue(followUps.isEnabled())
+    assertTrue(personColor.isEnabled())
 
     runner.clearAllOverrides()
-    assertFalse(followUps.isEnabled())
+    assertFalse(personColor.isEnabled())
   }
 
   @Test
   fun changesEmitWhenAnOverrideChanges() {
     val before = runner.changes.value
-    runner.setOverride(channels.key, true)
+    runner.setOverride(personColor.key, true)
     assertNotEquals(before, runner.changes.value)
   }
 
@@ -53,17 +48,17 @@ class FeatureFlagTest {
     var saved: Map<String, Boolean> = emptyMap()
     val first = LocalFeatureFlagRunner(persist = { saved = it })
     first.setOverride(avatar.key, true)
-    first.setOverride(channels.key, false)
-    first.clearOverride(channels.key)
+    first.setOverride(personColor.key, false)
+    first.clearOverride(personColor.key)
 
     val restored = LocalFeatureFlagRunner(initial = saved)
     assertTrue(CustomAvatarFeature(restored).isEnabled())
-    assertFalse(restored.hasOverride(channels.key))
+    assertFalse(restored.hasOverride(personColor.key))
   }
 
   @Test
   fun proModeSwitchesEveryProFlagAtOnce() {
-    val flags = listOf(avatar, channels, followUps, contacts, personColor)
+    val flags = listOf(avatar, personColor)
     assertTrue(flags.all { it.pro })
 
     flags.filter { it.pro }.forEach { runner.setOverride(it.key, true) }
