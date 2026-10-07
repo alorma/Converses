@@ -375,6 +375,7 @@ Esquelet i mòduls implementats (passos 1 a 4), inclòs el mòdul de flags. Insp
 - **Etiquetes** i la vista de **dades fixades** de totes les persones: les dues icones del disseny original de la barra flotant.
 - **Widget** de nota ràpida.
 - **Recordatoris** a partir de les dades fixades (per exemple, l'aniversari).
+- **Splash que segueixi el tema triat a l'app:** ara l'splash segueix el mode del sistema; si a Ajustos es força Clar o Fosc i el sistema té l'altre, l'splash surt amb el mode del sistema i després l'app canvia. Es resoldria amb `core-splashscreen` (`installSplashScreen()`, `postSplashScreenTheme` i `setKeepOnScreenCondition` fins que els ajustos estiguin llegits). Afegeix una llibreria: comprovar-ne abans la versió estable a la documentació oficial. Sense pressa.
 
 ---
 
