@@ -29,7 +29,7 @@ Una benvinguda de 3 pantalles que es mostra **només el primer cop** que s'obre 
 - Enrere del sistema:
   - al pas 2 o 3, torna al pas anterior;
   - al pas 1, surt de l'app sense marcar-lo com a fet.
-- Si l'usuari ja té persones (per exemple, després d'una restauració), es marca com a fet i no es mostra.
+- No es comprova si ja hi ha persones: només compta el flag `onboarding_done`.
 
 ## 2. Estructura de la pantalla
 

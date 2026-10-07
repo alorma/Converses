@@ -193,7 +193,7 @@ La v1 funcional està feta: interfície polida, fluxos complets, privacitat tanc
 
 - **Llibreria [FireAndForget](https://github.com/alorma/FireAndForget) 1.3.0** (Maven Central, grup `com.github.alorma.fire-and-forget`, només `core`; el README diu `com.alorma.fireandforget`, però no existeix) per decidir si es mostra l'onboarding. `OnboardingFlag : FireAndForget(name = "onboarding_done", defaultValue = true)`: `isEnabled()` és «cal mostrar-lo» i `disable()` el marca com a fet. Va al catàleg de versions (`gradle/libs.versions.toml`).
 - **Runner propi sobre DataStore** (decidit; no s'usa `multiplatform-settings`, que afegiria SharedPreferences i un segon magatzem a excloure del backup). L'API de la llibreria és síncrona, així que el runner ha de llegir la clau del DataStore de manera síncrona abans del primer frame, com el tema; l'escriptura de `disable()` ha de quedar desada abans de passar a `PeopleRoute`. La clau `onboarding_done` viu a `SettingsRepository` / `AppSettings` (per defecte `false`) i el runner hi delega. Cal implementar també `getCounter` / `setCounter` (la classe base els exigeix, tot i que no es fan servir).
-- `MainActivity` tria `OnboardingRoute` o `PeopleRoute` segons `OnboardingFlag.isEnabled()`. Si ja hi ha persones (restauració), es fa `disable()` i no es mostra. Es manté el splash fins que el flag està llegit i, només si és actiu, també el recompte de persones; així no hi ha parpelleig. En debug la base de dades ja no sembra dades de mostra per defecte: només es fa des del menú de debug (mòdul Dades, `insertSampleData`). Per tornar a veure l'onboarding, mòdul Onboarding del menú de debug.
+- `MainActivity` tria `OnboardingRoute` o `PeopleRoute` segons `OnboardingFlag.isEnabled()`, llegit de manera síncrona abans del primer frame (com el tema), així no hi ha parpelleig. **No es mira si ja hi ha persones** (decidit): només compta el flag. Per tornar a veure l'onboarding, el menú de debug té «Show onboarding again» (`OnboardingFlag.reset()`) o es poden esborrar les dades de l'app.
 - **Comença (pas 3) actiu des del principi** (decidit): es pot prémer en qualsevol moment i salta l'animació que quedi; no cal esperar els 3,7 s.
 - **Textos de mostra de les il·lustracions traduïts** (decidit): les etiquetes, els textos de les entrades del pas 2 («La Nyra deu diners al gremi.»…) i les inicials/noms d'exemple van a `strings.xml` en en/ca/es, amb claus pròpies (p. ex. `onb_sample_*`), a més de les `onb_*` de l'spec. L'spec només dona el text en català: cal escriure'n l'anglès i el castellà.
 - **Omet** (passos 1 i 2) i **Comença** (pas 3) desen la clau i substitueixen la ruta per `PeopleRoute`. Enrere al pas 1 surt de l'app sense marcar-lo.
@@ -264,8 +264,8 @@ La v1 funcional està feta: interfície polida, fluxos complets, privacitat tanc
     - (a) fonts descarregables de Google Fonts (`androidx.compose.ui.text.googlefonts`), amb Roboto com a alternativa;
     - (b) un subconjunt amb `fonttools` (llatí, eixos `wght` 400–800, `wdth` 100–118 i `opsz` limitats), que deixa el fitxer en uns 300–500 KB.
 - [ ] **Migracions de Room:**
-    - treure la recreació automàtica fora de debug;
-    - afegir `MigrationTestHelper` quan hi hagi un canvi d'esquema (ara no n'hi ha cap de previst abans de publicar).
+    - la recreació automàtica només és en debug (a release no n'hi ha); la base de dades és la v1 neta, sense migracions;
+    - afegir `MigrationTestHelper` quan hi hagi el primer canvi d'esquema, ja després de publicar.
 - [x] **Signatura de debug:** `app/debug.keystore` al repo (contrasenyes estàndard `android`, àlies `androiddebugkey`), perquè l'APK de debug de la CI i de qualsevol màquina tingui la mateixa signatura i s'instal·li a sobre sense esborrar l'app.
 - [ ] **Signatura i R8:**
     - signatura de release (aquesta keystore **no** va al repo);
@@ -302,7 +302,7 @@ El detall de cada punt és a `docs/backlog.md`. Ordre proposat:
 
 No són prioritaris: es faran quan l'app ja estigui publicada. El detall és a `docs/backlog.md`.
 
-- **Follow-ups / entrades pendents (6, issue #5):** flag `pending` a `EntryEntity` i interruptor a `EntryForm`, sota de «Quan». Primera migració de Room (v2 → v3) amb el seu test de migració (`MigrationTestHelper`).
+- **Follow-ups / entrades pendents (6, issue #5):** flag `pending` a `EntryEntity` i interruptor a `EntryForm`, sota de «Quan». Primera migració de Room (v1 → v2) amb el seu test de migració (`MigrationTestHelper`).
 - **Gestor de canals (8):** l'enum `ChannelType` passa a una taula `Channel`, amb migració i test. Absorbeix «Empresa» (7); l'etiqueta «Other - valor» (3) es fa abans, com a bug. Només val la pena si es vol que els canals siguin editables.
 
 ## Versió gratuïta i Pro
@@ -322,7 +322,7 @@ El detall és a `docs/pro.md` (document de treball, es continuarà). **La v1 no 
 - [x] **2 · Avatar estàndard** (fet; falta provar-lo a l'emulador amb el flag apagat i encès):
     - `AvatarColor.forName(name)` al `designsystem`: hash FNV-1a del nom normalitzat (minúscules, sense accents ni espais als extrems), estable i amb els 7 colors repartits (`AvatarColorTest`, 20 noms); `AvatarShape.Standard` = Galeta;
     - `avatarShape` i `avatarColor` nul·lables a `PersonEntity` (`null` = estàndard). Tota la UI llegeix `person.shape` / `person.color` (extensions a `Entities.kt`), que resolen l'estàndard; el tema de persona, el selector «Qui», el llistat, el detall i els fulls hi passen;
-    - **Room:** `2.json` regenerat (les dues columnes ja no són `NOT NULL`), **sense migració ni canvi de versió** perquè l'app encara no és publicada (decidit). En debug la base de dades es recrea. A partir de la publicació, qualsevol canvi serà v2 → v3 amb migració i test;
+    - **Room:** la base de dades és la **versió 1** de la v1, neta i **sense cap migració**: l'esquema (`1.json`) s'ha regenerat des de zero i les dues columnes d'avatar són nul·lables. Com que l'app no és publicada, no hi ha cap instal·lació a conservar; en debug la base de dades es recrea sola si canvia l'esquema. A partir de la publicació, qualsevol canvi serà v1 → v2 amb migració i test (`MigrationTestHelper`);
     - editor: l'estat guarda `null` mentre no es tria res i l'avatar de previsualització segueix el nom mentre s'escriu; amb `CustomAvatarFeature` apagada s'amaguen la forma i el color i només queda l'avatar (`customAvatar` a `EditPersonContent`); una persona nova es desa amb `null` (test a `EditPersonViewModelTest`);
     - pendent al CI: etiqueta `update-screenshots` (canvia `editPersonNew`; les captures de l'onboarding són noves).
 - [ ] **3 · Comprovar que res de Pro és visible** amb totes les funcions apagades (llista de `docs/pro.md` → «Proves») i, amb l'interruptor del menú de debug, que els dos modes funcionen.
@@ -379,7 +379,7 @@ Una sola activitat (`MainActivity`, una `FragmentActivity` pel `BiometricPrompt`
 | Formes | `graphics-shapes` 1.1.0 | Formes dels avatars |
 | Color | `material-kolor` 5.0.1 | `Neutral` amb color dinàmic, `TonalSpot` amb el color triat |
 | Navegació | Navigation 3 1.2.0 + `lifecycle-viewmodel-navigation3` | Rutes tipades amb `NavKey` serialitzables |
-| Dades | Room 2.8.4 + KSP 2.3.12 | Base de dades versió 2, esquemes a `app/schemas` |
+| Dades | Room 2.8.4 + KSP 2.3.12 | Base de dades versió 1 (neta, sense migracions), esquema a `app/schemas` |
 | DI | Koin 4.2.2 | |
 | Preferències | DataStore Preferences 1.2.1 | `SettingsRepository` |
 | Ajustos UI | Compose-Settings `ui-tiles-expressive` 3.3.0 | Només es fa servir `SettingsGroup`; les files són pròpies (`SettingRow`) |
@@ -455,7 +455,7 @@ Cada persona porta el color de l'avatar com a **llavor del tema** de les seves p
 | Ajustos | `SettingsRoute` | |
 | Fulls i diàlegs | Dins del detall i de l'editor | Nova entrada, accions d'entrada, menú del split button, triar persona, esborrar |
 
-### Model de dades (Room, versió 2)
+### Model de dades (Room, versió 1)
 
 | Taula | Camps |
 | --- | --- |

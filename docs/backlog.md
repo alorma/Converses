@@ -31,7 +31,7 @@ Poder marcar coses per fer-ne seguiment amb una persona ("li he de preguntar com
 **Decisió recomanada:** un flag `pending` a `EntryEntity` (i, opcionalment, una data de recordatori), no un quart tipus. «Qui» (Jo · {nom} · Apunt) és un grup de 3 botons que respon a «qui»; un «Follow-up» no hi encaixa, i amb el flag qualsevol entrada pot quedar pendent.
 
 **Què cal fer**
-- Camp `pending` a `EntryEntity` i **migració de Room** (versió 2 → 3).
+- Camp `pending` a `EntryEntity` i **migració de Room** (versió 1 → 2).
 - Un interruptor o xip «Pendent» a `EntryForm`, a sota de «Quan», que és el formulari comú de la nota ràpida, la nova entrada i l'edició.
 - Indicador visual a la cronologia, i potser un comptador o filtre de pendents al detall i a la llista.
 - Marcar i desmarcar des del full d'accions de l'entrada.
