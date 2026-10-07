@@ -4,13 +4,10 @@ import android.content.Context
 import android.content.pm.ApplicationInfo
 import androidx.room.Room
 import com.alorma.contactnotes.data.ConversesRepository
-import com.alorma.contactnotes.data.flags.ContactIntegrationFeature
 import com.alorma.contactnotes.data.flags.CustomAvatarFeature
-import com.alorma.contactnotes.data.flags.CustomChannelsFeature
 import com.alorma.contactnotes.data.flags.FeatureFlag
 import com.alorma.contactnotes.data.flags.FeatureFlagRunner
 import com.alorma.contactnotes.data.flags.FeatureFlagStore
-import com.alorma.contactnotes.data.flags.FollowUpsFeature
 import com.alorma.contactnotes.data.flags.LocalFeatureFlagRunner
 import com.alorma.contactnotes.data.flags.PersonColorFeature
 import com.alorma.contactnotes.data.db.ConversesDatabase
@@ -62,10 +59,7 @@ val settingsModule = module {
     LocalFeatureFlagRunner(initial = store.load(), persist = store::save)
   } bind FeatureFlagRunner::class
   singleOf(::CustomAvatarFeature) bind FeatureFlag::class
-  singleOf(::CustomChannelsFeature) bind FeatureFlag::class
-  singleOf(::FollowUpsFeature) bind FeatureFlag::class
   singleOf(::PersonColorFeature) bind FeatureFlag::class
-  singleOf(::ContactIntegrationFeature) bind FeatureFlag::class
   single { PersonExporter(androidContext(), get()) }
   single { PersonSelectionBridge() }
 }
