@@ -2,7 +2,6 @@ package com.alorma.contactnotes.ui.settings
 
 import com.alorma.contactnotes.data.settings.AppSettings
 import com.alorma.contactnotes.data.settings.SettingsRepository
-import com.alorma.contactnotes.designsystem.theme.ThemeColor
 import com.alorma.contactnotes.designsystem.theme.ThemeMode
 import com.alorma.contactnotes.testing.MainDispatcherRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -25,8 +24,6 @@ private class FakeSettingsRepository : SettingsRepository {
   override suspend fun setThemeMode(mode: ThemeMode) = state.update { it.copy(themeMode = mode) }
 
   override suspend fun setDynamicColor(enabled: Boolean) = state.update { it.copy(dynamicColor = enabled) }
-
-  override suspend fun setThemeColor(color: ThemeColor) = state.update { it.copy(themeColor = color) }
 
   override suspend fun setPersonColorTheme(enabled: Boolean) = state.update { it.copy(personColorTheme = enabled) }
 
@@ -51,7 +48,6 @@ class SettingsViewModelTest {
 
     vm.onThemeMode(ThemeMode.Dark)
     vm.onDynamicColor(false)
-    vm.onThemeColor(ThemeColor.Mint)
     vm.onPersonColorTheme(false)
     vm.onAppLock(true)
     vm.onRelockAfter(300)
@@ -59,7 +55,6 @@ class SettingsViewModelTest {
     val settings = vm.settings.value
     assertEquals(ThemeMode.Dark, settings.themeMode)
     assertFalse(settings.dynamicColor)
-    assertEquals(ThemeColor.Mint, settings.themeColor)
     assertFalse(settings.personColorTheme)
     assertTrue(settings.appLock)
     assertEquals(300, settings.relockAfterSeconds)
