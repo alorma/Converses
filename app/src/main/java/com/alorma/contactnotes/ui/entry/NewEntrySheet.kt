@@ -1,5 +1,7 @@
 package com.alorma.contactnotes.ui.entry
 
+import com.alorma.contactnotes.data.db.shape
+import com.alorma.contactnotes.data.db.color
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -96,7 +98,7 @@ fun NewEntrySheetContent(
       verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
       Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-        Avatar(initials = initialsOf(person.name), shape = person.avatarShape, color = person.avatarColor, size = 44.dp)
+        Avatar(initials = initialsOf(person.name), shape = person.shape, color = person.color, size = 44.dp)
         Column(modifier = Modifier.weight(1f)) {
           Text(stringResource(if (isNew) R.string.new_entry else R.string.edit_entry), style = SheetTitleStyle)
           Text(

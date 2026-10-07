@@ -1,5 +1,7 @@
 package com.alorma.contactnotes.ui.person
 
+import com.alorma.contactnotes.data.db.shape
+import com.alorma.contactnotes.data.db.color
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -192,7 +194,7 @@ fun MoveEntryDialog(people: List<PersonEntity>, onDismiss: () -> Unit, onSelect:
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(12.dp),
           ) {
-            Avatar(initialsOf(person.name), person.avatarShape, person.avatarColor, size = 40.dp, locked = person.isProtected)
+            Avatar(initialsOf(person.name), person.shape, person.color, size = 40.dp, locked = person.isProtected)
             Text(person.name, style = MaterialTheme.typography.titleMedium)
           }
         }

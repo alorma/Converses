@@ -98,6 +98,8 @@ class EditPersonViewModelTest {
     val person = db.person(savedId)!!
     assertEquals("Marta", person.name)
     assertEquals("m", person.alias)
+    assertNull(person.avatarShape)
+    assertNull(person.avatarColor)
     val facts = db.repository.observePinnedFacts(savedId).first()
     assertEquals(listOf("Birthday" to "14 March"), facts.map { it.label to it.value })
     val channels = db.repository.observeChannels(savedId).first()

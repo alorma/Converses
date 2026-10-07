@@ -1,5 +1,7 @@
 package com.alorma.contactnotes.ui.people
 
+import com.alorma.contactnotes.data.db.shape
+import com.alorma.contactnotes.data.db.color
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -225,8 +227,8 @@ private fun PersonRow(item: PersonListItem, onClick: () -> Unit) {
   ) {
     Avatar(
       initials = initialsOf(person.name),
-      shape = person.avatarShape,
-      color = person.avatarColor,
+      shape = person.shape,
+      color = person.color,
       size = 56.dp,
       locked = person.isProtected,
     )

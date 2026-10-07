@@ -1,5 +1,7 @@
 package com.alorma.contactnotes.ui.person
 
+import com.alorma.contactnotes.data.db.shape
+import com.alorma.contactnotes.data.db.color
 import androidx.activity.compose.LocalActivity
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.fadeIn
@@ -104,12 +106,12 @@ fun PersonLockedScreen(
     if (lockViewModel.started && state == LockState.NoCredentials) begin()
   }
 
-  PersonTheme(person?.avatarColor) {
+  PersonTheme(person?.color) {
     person?.let { p ->
       PersonLockedContent(
         name = p.name,
-        shape = p.avatarShape,
-        color = p.avatarColor,
+        shape = p.shape,
+        color = p.color,
         state = state,
         onBack = onBack,
         onRetry = { begin() },

@@ -1,5 +1,6 @@
 package com.alorma.contactnotes.ui.person
 
+import com.alorma.contactnotes.data.db.color
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -15,7 +16,7 @@ import com.alorma.contactnotes.ui.preview.PreviewData
 @Composable
 private fun PersonDetailScreenPreview(state: PersonDetailUiState) {
   ConversesPreviewTheme {
-    PersonTheme(state.person?.avatarColor) {
+    PersonTheme(state.person?.color) {
       PersonDetailScreen(
         state = state,
         menuExpanded = false,

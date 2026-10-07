@@ -21,6 +21,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import java.text.Normalizer
 
 /** Pastel fix de l'avatar i llavor de l'esquema de color de la persona. */
 enum class AvatarColor(val color: Color, val seed: Color) {
@@ -30,10 +31,31 @@ enum class AvatarColor(val color: Color, val seed: Color) {
   Sky(Color(0xFFCBE3F7), Color(0xFF2D6FA3)),
   Rose(Color(0xFFF7CFDD), Color(0xFFB04670)),
   Lemon(Color(0xFFF1E9A8), Color(0xFF8A7A12)),
-  Sand(Color(0xFFE8DDCB), Color(0xFF86704C)),
+  Sand(Color(0xFFE8DDCB), Color(0xFF86704C));
+
+  companion object {
+    /** Color automàtic: el mateix nom (sense majúscules, accents ni espais als extrems) dona sempre el mateix color. */
+    fun forName(name: String): AvatarColor {
+      val normalized = Normalizer.normalize(name.trim().lowercase(), Normalizer.Form.NFD).replace(Regex("\\p{M}+"), "")
+      // FNV-1a: estable entre execucions i reparteix millor els noms curts que `String.hashCode`
+      var hash = -0x7ee3623b
+      for (char in normalized) hash = (hash xor char.code) * 16777619
+      return entries[Math.floorMod(hash, entries.size)]
+    }
+  }
 }
 
-enum class AvatarShape { Cookie9Sided, Clover4Leaf, Flower, Sunny }
+enum class AvatarShape {
+  Cookie9Sided,
+  Clover4Leaf,
+  Flower,
+  Sunny;
+
+  companion object {
+    /** Forma de l'avatar estàndard, la mateixa per a tothom. */
+    val Standard = Cookie9Sided
+  }
+}
 
 private val AvatarInitialsColor = Color(0xFF1E1D24)
 

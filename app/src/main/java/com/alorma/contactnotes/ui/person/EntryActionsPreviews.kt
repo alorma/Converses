@@ -1,5 +1,6 @@
 package com.alorma.contactnotes.ui.person
 
+import com.alorma.contactnotes.data.db.color
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
@@ -14,7 +15,7 @@ import com.alorma.contactnotes.ui.preview.PreviewData
 @Composable
 private fun EntryActionsPreview(dayCount: Int) {
   ConversesPreviewTheme {
-    PersonTheme(PreviewData.marta.avatarColor) {
+    PersonTheme(PreviewData.marta.color) {
       Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.surface) {
         Box {
           EntryActionsContent(

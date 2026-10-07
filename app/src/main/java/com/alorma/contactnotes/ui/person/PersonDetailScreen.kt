@@ -1,5 +1,7 @@
 package com.alorma.contactnotes.ui.person
 
+import com.alorma.contactnotes.data.db.shape
+import com.alorma.contactnotes.data.db.color
 import android.content.ActivityNotFoundException
 import android.content.ClipData
 import android.content.Intent
@@ -154,7 +156,7 @@ fun PersonDetailRoute(
     actionEntryId = null
   }
 
-  PersonTheme(person.avatarColor) {
+  PersonTheme(person.color) {
     PersonDetailScreen(
       state = state,
       menuExpanded = menuExpanded,
@@ -456,8 +458,8 @@ private fun Header(person: PersonEntity, state: PersonDetailUiState) {
     }
     Avatar(
       initials = initialsOf(person.name),
-      shape = person.avatarShape,
-      color = person.avatarColor,
+      shape = person.shape,
+      color = person.color,
       size = 80.dp,
     )
   }

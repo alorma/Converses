@@ -1,5 +1,7 @@
 package com.alorma.contactnotes.ui.entry
 
+import com.alorma.contactnotes.data.db.shape
+import com.alorma.contactnotes.data.db.color
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -124,7 +126,7 @@ fun PersonPickerContent(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(16.dp),
           ) {
-            Avatar(initialsOf(person.name), person.avatarShape, person.avatarColor, size = 44.dp, locked = person.isProtected)
+            Avatar(initialsOf(person.name), person.shape, person.color, size = 44.dp, locked = person.isProtected)
             Text(
               text = person.name,
               style = MaterialTheme.typography.titleMedium,
