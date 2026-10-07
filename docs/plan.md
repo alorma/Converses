@@ -293,7 +293,8 @@ El detall de cada punt és a `docs/backlog.md`. Ordre proposat:
     - **5** · biometria sense desar el perfil (issue #4);
     - **3** · etiqueta `OTHER - SIGNAL`.
 2. **Tests de captures de totes les pantalles** (vegeu M4): així els canvis següents es validen en clar i fosc i es veuen a la PR. El bloqueig ja està fet.
-3. **M4 i M5** (qualitat i publicació).
+3. **Empremta a la nota ràpida d'una persona protegida** (backlog 10): privacitat; es pot fer abans de M4 perquè es provi amb la resta al mòbil.
+4. **M4 i M5** (qualitat i publicació).
 
 **Migracions:** M5 només necessita el test de migració (`MigrationTestHelper`) si l'esquema de Room canvia abans de publicar. Els canvis d'esquema que hi ha previstos són a l'Iteració 2 i es faran amb la seva migració i el seu test.
 
