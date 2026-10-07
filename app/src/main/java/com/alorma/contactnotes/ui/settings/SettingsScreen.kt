@@ -3,6 +3,7 @@ package com.alorma.contactnotes.ui.settings
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.provider.Settings
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -120,11 +121,7 @@ fun SettingsScreen(
       }
     },
     onRelockAfter = viewModel::onRelockAfter,
-    onOpenLanguage = {
-      context.startActivity(
-        Intent(Settings.ACTION_APP_LOCALE_SETTINGS).setData(Uri.fromParts("package", context.packageName, null)),
-      )
-    },
+    onOpenLanguage = { context.openLanguageSettings() },
     onOpenSecuritySetup = { context.openSecuritySetup() },
   )
 }
@@ -355,6 +352,16 @@ private fun ThemeColorPicker(
 private val SupportedLanguages = setOf("ca", "es", "en")
 
 /** Idioma efectiu de l'app; si el sistema en té un de no suportat, l'app cau a l'anglès per defecte. */
+/** Idioma per app des d'Android 13; abans, l'idioma del sistema, que l'app ja segueix (en, ca i es). */
+private fun Context.openLanguageSettings() {
+  val intent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+    Intent(Settings.ACTION_APP_LOCALE_SETTINGS).setData(Uri.fromParts("package", packageName, null))
+  } else {
+    Intent(Settings.ACTION_LOCALE_SETTINGS)
+  }
+  startActivity(intent)
+}
+
 private fun currentLanguageName(context: Context): String {
   val configured = context.resources.configuration.locales[0]
   val locale = if (configured.language in SupportedLanguages) configured else Locale.ENGLISH
