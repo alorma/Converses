@@ -52,6 +52,8 @@
     <string name="relock_summary_1_min">Després d\'1 minut en segon pla</string>
     <string name="relock_summary_5_min">Després de 5 minuts en segon pla</string>
     <string name="settings_protected_note">Les persones protegides demanen l\'empremta igualment, encara que l\'app ja estigui desbloquejada.</string>
+    <string name="settings_about">Quant a</string>
+    <string name="settings_privacy_policy">Política de privadesa</string>
     <string name="settings_footer">Converses · versió %1$s</string>
     <string name="app_lock_title">Converses està bloquejada</string>
     <string name="app_lock_prompt_title">Desbloqueja Converses</string>
