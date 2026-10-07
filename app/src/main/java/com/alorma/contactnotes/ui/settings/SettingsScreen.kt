@@ -172,9 +172,7 @@ fun SettingsContent(
         )
         SettingSwitchRow(
           title = stringResource(R.string.settings_dynamic_color),
-          subtitle = stringResource(
-            if (settings.dynamicColor) R.string.settings_dynamic_color_summary else R.string.settings_dynamic_color_off,
-          ),
+          subtitle = stringResource(R.string.settings_dynamic_color_summary),
           icon = Icons.Rounded.Palette,
           checked = settings.dynamicColor,
           onCheckedChange = onDynamicColor,
