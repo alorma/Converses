@@ -177,13 +177,13 @@ La v1 funcional està feta: interfície polida, fluxos complets, privacitat tanc
 
 **Fet quan:** passen els tests, l'app es pot fer servir amb TalkBack i a una mida de text gran, i tot s'ha provat en un mòbil real.
 
-- [ ] **Tests de captures de totes les pantalles** (clar i fosc, en anglès, 411×891 dp). Hi ha el llistat (3), el detall (3, amb els 7 colors), el bloqueig (4 estats), la nota ràpida (2), el full de nova entrada i el full «Quan» (2). Falta:
+- [ ] **Tests de captures de totes les pantalles** (clar i fosc, en anglès, 411×891 dp). Hi ha el llistat (3), el detall (3, amb els 7 colors), el bloqueig (4 estats), la nota ràpida (2), el full de nova entrada, el full «Quan» (2), el bloqueig de l'app, triar persona (2) i el full d'accions (2). Falta:
     - ~~**Bloqueig:** els quatre estats~~ (fet: `personLocked*` a `ScreensScreenshotTests`; les referències les genera el CI).
     - ~~**Nota ràpida:** sense persona i amb persona~~ (fet: `QuickNoteContent` sense `ViewModel`).
     - ~~**Nova entrada i edició**~~ (fet: `NewEntrySheetContent`; falta cobrir els tres valors de «Qui» i el mode d'edició).
     - ~~**«Quan»**~~ (fet: `WhenSheetContent` amb «Ara» i amb data personalitzada).
-    - **Fulls i diàlegs:** accions d'entrada, triar persona, moure entrada, esborrar i el menú del split button.
-    - **Editar persona** (nova, existent i protegida), **Ajustos** (amb i sense bloqueig) i **bloqueig de l'app** (`AppLockScreen`).
+    - **Fulls i diàlegs:** fets accions d'entrada i triar persona; falten moure entrada, esborrar i el menú del split button (finestres a part).
+    - **Editar persona** (nova, existent i protegida) i **Ajustos** (amb i sense bloqueig): calen refactors grans per separar-ne el `ViewModel`. El **bloqueig de l'app** (`AppLockContent`) ja està fet.
     - **Estats buits:** llistat, cronologia, filtres sense resultats i arxivades.
     - Les que depenen d'un `ViewModel` necessiten una versió sense estat (`...Content`) amb `PreviewData`, com ja fan el llistat i el detall. Les referències es generen amb l'etiqueta `update-screenshots` a la PR. Quan estigui fet, treure la línia «Fora de moment» de «Tests de captures».
 - [ ] **Tests de ViewModel:** llistat (filtres, protegides), detall (filtres de la cronologia, comptadors), nova entrada (validació), editor (àlies duplicat, protecció) i Ajustos.
@@ -375,7 +375,7 @@ Amb [Compose Preview Screenshot Testing](https://developer.android.com/studio/pr
 - **Tests** a `src/screenshotTest`: `ComponentsScreenshotTests` (`designsystem`) i `ScreensScreenshotTests` (`app`) criden les previews amb `@PreviewTest`. Els noms dels mètodes de test van en camelCase sense `_` (el CI hi separa el nom de la preview). Cada test es renderitza en clar i fosc, en anglès; les pantalles a 411×891 dp.
 - **Referències** a `<mòdul>/src/screenshotTestDebug/reference/`, es versionen. Llindar de diferència: 1 %.
 - **Ordres:** `./gradlew validateDebugScreenshotTest` (validar), `./gradlew updateDebugScreenshotTest` (regenerar), i per a un sol test `./gradlew :app:updateDebugScreenshotTest --tests '*ScreensScreenshotTests.peopleListLoaded'`.
-- **Fora de moment:** Editar persona, Ajustos, bloqueig de l'app, accions d'entrada, triar persona i diàlegs (depenen del ViewModel o són finestres a part); el pla per cobrir-ho és a M4. El bloqueig ja té els quatre estats.
+- **Fora de moment:** Editar persona, Ajustos i els diàlegs (depenen del ViewModel o són finestres a part); el pla per cobrir-ho és a M4. El bloqueig ja té els quatre estats.
 
 **CI** (`.github/workflows/screenshot-tests.yml`, adaptat de [Sloy/sevibus-android#16](https://github.com/Sloy/sevibus-android/pull/16)):
 
