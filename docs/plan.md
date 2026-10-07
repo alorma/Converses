@@ -1,6 +1,6 @@
 # Converses — Pla i estat (v2)
 
-Actualitzat el 6 d'oct. de 2026 · @Bernat · M1, M2 i M3 fets, més el color de persona; queden M4, M5 i unes quantes coses soltes (vegeu «On som»)
+Actualitzat el 7 d'oct. de 2026 · @Bernat · M1, M2 i M3 fets, més el color de persona i el backlog de disseny («Quan», «Qui» i bloqueig); queden el backlog de bugs i features (`docs/backlog.md`), M4, M5 i unes quantes coses soltes (vegeu «On som»)
 
 ## Resum
 
@@ -22,6 +22,7 @@ La v1 funcional està feta: interfície polida, fluxos complets, privacitat tanc
 | M3 · Privacitat | Les persones protegides no es filtren enlloc | Fet (falta provar el bloqueig desactivat sol a dispositiu) |
 | Color de la persona | Les pantalles de cada persona prenen el color del seu avatar | Fet (falta provar-lo a l'emulador: animació de l'editor, fulls i interruptor apagat) |
 | Backlog de disseny | Tanda 1 «Quan», tanda 2 «Qui» i tanda 3 bloqueig | Fet (falta provar el bloqueig a dispositiu real: massa intents i empremta) |
+| Backlog de bugs i features | Àrea clicable, etiqueta «Other», biometria sense desar, follow-ups, gestor de canals (vegeu «Canvis futurs») | Per fer (`docs/backlog.md`) |
 | M4 · Qualitat | Tests, accessibilitat, mode fosc, dispositiu real | Per fer |
 | M5 · Publicació | minSdk, signatura, R8, mida, migracions, Play Store | Per fer |
 | Després de la v1 | Cerca, còpia de seguretat, etiquetes, widget | Idees |
@@ -32,6 +33,7 @@ La v1 funcional està feta: interfície polida, fluxos complets, privacitat tanc
 - Provar a l'emulador el color de persona i, a dispositiu real, el bloqueig desactivat sol.
 - Afinar el snackbar de desfer (posició i marges) si no queda bé.
 - Tests de ViewModel i de pantalla: no començats (M4).
+- Bugs i features pendents: vegeu `docs/backlog.md` (issues #4, #5 i #6).
 
 ## Decisions (només queda D1)
 
@@ -227,6 +229,20 @@ La v1 funcional està feta: interfície polida, fluxos complets, privacitat tanc
 - [x] **Idiomes:** no queda cap text fix a la UI (només dades de prova a les previews) i els tres idiomes tenen exactament les mateixes cadenes i plurals.
 
 ---
+
+## Canvis futurs (backlog)
+
+El detall de cada punt és a `docs/backlog.md`. Ordre proposat:
+
+1. **Bugs petits, junts i abans de M4** (no toquen la base de dades):
+    - **1** · àrea clicable fora de la superfície (issue #6);
+    - **5** · biometria sense desar el perfil (issue #4);
+    - **3** · etiqueta `OTHER - SIGNAL`; si es vol fer el gestor de canals (8), s'absorbeix i es pot saltar.
+2. **6 · Follow-ups** (issue #5): flag `pending` a `EntryEntity` i interruptor a `EntryForm`, sota de «Quan». Primera migració de Room (v2 → v3).
+3. **8 · Gestor de canals**, que absorbeix el 7 («Empresa») i el 3: l'enum passa a una taula `Channel`, amb migració. És el canvi més gran; només val la pena si es vol que els canals siguin editables.
+4. **M4 i M5** (qualitat i publicació) amb l'esquema ja estable.
+
+**Decisió d'ordre:** els punts 2 i 3 canvien l'esquema de Room. Convé fer-los **abans de M5**, perquè la publicació vegi la migració definitiva i es provi en un sol pas.
 
 ## Després de la v1
 
