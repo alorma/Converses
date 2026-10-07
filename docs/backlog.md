@@ -4,7 +4,6 @@ Actualitzat el 7 d'oct. de 2026, reconciliat amb `docs/plan.md`. Només hi ha el
 
 | # | Tipus | Tema | Issue |
 | --- | --- | --- | --- |
-| 1 | Bug | L'àrea clicable surt fora de la superfície | [#6](https://github.com/alorma/Contacts-Notes/issues/6) |
 | 3 | Bug | Canal "Other" ha de mostrar "Other - {valor}" | — |
 | 5 | Bug | Activar/desactivar biometria sense desar el perfil | [#4](https://github.com/alorma/Contacts-Notes/issues/4) |
 | 10 | Seguretat | Demanar l'empremta en triar una persona protegida a la nota ràpida | — |
@@ -16,22 +15,12 @@ Els punts 6, 7 i 8 són features no prioritàries: es faran a l'**Iteració 2**,
 
 **Resolts** (ja són a l'app):
 
+- **1** · L'àrea clicable sortia de la superfície: la fila d'interruptor d'Ajustos posava el `toggleable` fora del retall de la forma; ara va dins (`SettingRow.contentModifier`). La resta de components ja retallaven abans de fer-se clicables. (Issue #6.)
 - **2** · La pantalla de bloqueig d'una persona ja no mostra el layout: només el nom, la forma i el color de l'avatar, amb els estats de càrrega, cancel·lat, massa intents i sense biometria.
 - **4** · «Ha passat» ja no es talla: el selector és «Qui» (Jo · {nom} · Apunt), amb textos curts i la icona sempre visible. Queda per comprovar a M4 amb noms de 12 caràcters, en ca i es i amb la font gran.
 - **9** · «Qui» i «Quan»: un sol `EntryForm`, fila «Quan» amb el full «Quan va ser?», cronologia, filtres, marcadors i exportació.
 
 ---
-
-## 1 · Bug: l'àrea clicable surt fora de la superfície dels elements
-
-Issue: [#6](https://github.com/alorma/Contacts-Notes/issues/6)
-
-L'efecte de clic (ripple) i l'àrea clicable surten per fora de la superfície visible de l'element. S'ha vist a **Ajustos**, però cal revisar totes les pantalles.
-
-**Què cal fer**
-- Revisar `ui/settings/SettingsScreen.kt` i la resta de pantalles (llista, detall, edició, fulls inferiors).
-- Normalment passa quan `Modifier.clickable` va abans del `clip`/`background`: l'ordre ha de ser `clip(shape)`, després `clickable`, després `padding`. O fer servir les variants de `Surface`/`ListItem` amb `onClick`, que ja retallen.
-- Si hi ha un component compartit al `designsystem`, arreglar-ho allà.
 
 ## 3 · Bug: el canal "Other" hauria de mostrar "Other - {valor}"
 

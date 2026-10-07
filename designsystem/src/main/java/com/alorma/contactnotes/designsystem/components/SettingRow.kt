@@ -16,7 +16,10 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 
-/** Fila d'ajustos sobre `surface-card`; la forma ve de la posició dins el grup (24 als extrems, 6 entre files). */
+/**
+ * Fila d'ajustos sobre `surface-card`; la forma ve de la posició dins el grup (24 als extrems, 6 entre files).
+ * `modifier` va fora del retall de la forma; el que ha de rebre clics, dins d'ella, va a `contentModifier`.
+ */
 @Composable
 fun SettingRow(
   title: String,
@@ -26,9 +29,11 @@ fun SettingRow(
   icon: ImageVector? = null,
   onClick: (() -> Unit)? = null,
   trailing: (@Composable () -> Unit)? = null,
+  contentModifier: Modifier = Modifier,
 ) {
   val content = @Composable {
     ListItem(
+      modifier = contentModifier,
       headlineContent = { Text(title, fontWeight = FontWeight.SemiBold) },
       supportingContent = subtitle?.let { { Text(it) } },
       leadingContent = icon?.let { { Icon(it, contentDescription = null) } },
@@ -60,7 +65,8 @@ fun SettingSwitchRow(
     shape = shape,
     subtitle = subtitle,
     icon = icon,
-    modifier = modifier.toggleable(value = checked, role = Role.Switch, onValueChange = onCheckedChange),
+    modifier = modifier,
+    contentModifier = Modifier.toggleable(value = checked, role = Role.Switch, onValueChange = onCheckedChange),
     trailing = { Switch(checked = checked, onCheckedChange = null) },
   )
 }
