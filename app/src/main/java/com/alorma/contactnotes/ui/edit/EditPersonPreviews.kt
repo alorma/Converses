@@ -6,6 +6,7 @@ import com.alorma.contactnotes.data.db.ChannelType
 import com.alorma.contactnotes.designsystem.components.AvatarColor
 import com.alorma.contactnotes.designsystem.components.AvatarShape
 import com.alorma.contactnotes.designsystem.preview.ConversesPreviewTheme
+import com.alorma.contactnotes.designsystem.theme.PersonTheme
 
 private object NoOpEditPersonActions : EditPersonActions {
   override fun onName(value: String) = Unit
@@ -100,4 +101,27 @@ internal fun EditPersonProtectedPreview() {
       entryCount = 1,
     ),
   )
+}
+
+@Composable
+private fun EditorDialogPreview(content: @Composable () -> Unit) {
+  ConversesPreviewTheme {
+    PersonTheme(AvatarColor.Lavender) { content() }
+  }
+}
+
+@Preview
+@Composable
+internal fun DeletePersonDialogPreview() {
+  EditorDialogPreview {
+    DeletePersonDialog(name = "Marta Soler", factsCount = 2, entriesCount = 3, onDismiss = {}, onConfirm = {})
+  }
+}
+
+@Preview
+@Composable
+internal fun ChannelDialogPreview() {
+  EditorDialogPreview {
+    ChannelDialog(initial = Channels.first(), onDismiss = {}, onConfirm = { _, _ -> })
+  }
 }
