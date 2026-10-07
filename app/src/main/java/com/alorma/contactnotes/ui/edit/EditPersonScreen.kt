@@ -556,7 +556,7 @@ private fun InlineField(value: String, onValueChange: (String) -> Unit, placehol
 }
 
 @Composable
-private fun ChannelDialog(
+internal fun ChannelDialog(
   initial: ChannelDraft?,
   onDismiss: () -> Unit,
   onConfirm: (ChannelType, String) -> Unit,
@@ -595,7 +595,7 @@ private fun ChannelDialog(
 }
 
 @Composable
-private fun DeletePersonDialog(
+internal fun DeletePersonDialog(
   name: String,
   factsCount: Int,
   entriesCount: Int,

@@ -22,6 +22,7 @@ La v1 funcional està feta: interfície polida, fluxos complets, privacitat tanc
 | M3 · Privacitat | Les persones protegides no es filtren enlloc | Fet (falta provar el bloqueig desactivat sol a dispositiu) |
 | Color de la persona | Les pantalles de cada persona prenen el color del seu avatar | Fet (falta provar-lo a l'emulador: animació de l'editor, fulls i interruptor apagat) |
 | Backlog de disseny | Tanda 1 «Quan», tanda 2 «Qui» i tanda 3 bloqueig | Fet (falta provar el bloqueig a dispositiu real: massa intents i empremta) |
+| Onboarding · tanda 4 | Benvinguda animada de 3 passos, només el primer cop (vegeu «Onboarding») | Per fer (`docs/onboarding/`) |
 | Backlog de bugs | Àrea clicable, etiqueta «Other», biometria sense desar (vegeu «Canvis futurs») | Per fer (`docs/backlog.md`) |
 | M4 · Qualitat | Tests, accessibilitat, mode fosc, dispositiu real | Per fer |
 | M5 · Publicació | minSdk, signatura, R8, mida, migracions, Play Store | Per fer |
@@ -35,6 +36,7 @@ La v1 funcional està feta: interfície polida, fluxos complets, privacitat tanc
 - Afinar el snackbar de desfer (posició i marges) si no queda bé.
 - Tests de ViewModel i de pantalla: no començats (M4).
 - Bugs i features pendents: vegeu `docs/backlog.md` (issues #4, #5 i #6).
+- Onboarding animat (tanda 4): especificació i disseny a `docs/onboarding/` (vegeu «Onboarding»).
 
 ## Decisions (només queda D1)
 
@@ -173,17 +175,54 @@ La v1 funcional està feta: interfície polida, fluxos complets, privacitat tanc
 
 ---
 
+## Onboarding (tanda 4)
+
+**Fet quan:** el primer cop que s'obre l'app surt una benvinguda de 3 passos amb il·lustracions animades, i en acabar porta al llistat buit.
+
+**Fonts a `docs/onboarding/`:**
+
+- `tanda-4-onboarding.md`: especificació completa (flux, estructura, animacions, textos ca/es/en, accessibilitat, proves). Si hi ha cap diferència amb el pla, mana aquest document.
+- `imatges/`: captures del llenç, 3 passos en clar i en fosc (0a · Recorda cada conversa, 0b · Tot en una cronologia, 0c · Només per a tu).
+- `design/`: HTML exportat del llenç com a referència de lectura (vegeu `design/README.md`).
+
+**Resum:**
+
+- `onboarding_done` (DataStore, per defecte `false`) a `SettingsRepository` / `AppSettings`; `MainActivity` tria `OnboardingRoute` o `PeopleRoute` abans del primer frame. Si ja hi ha persones (restauració), es marca com a fet.
+- **Omet** (passos 1 i 2) i **Comença** (pas 3) desen la clau i substitueixen la ruta per `PeopleRoute`. Enrere al pas 1 surt de l'app sense marcar-lo.
+- `ui/onboarding/OnboardingScreen.kt` (`HorizontalPager` de 3 pàgines, punts, botons) i `OnboardingIllustrations.kt` (una il·lustració animada per pas, que es repeteix en tornar-hi i en tocar-la; amb moviment reduït mostra l'estat final).
+- Colors d'èxit nous al `designsystem` (`success`, `onSuccess`, `successContainer`), fixos i només per a aquesta pantalla.
+- Textos `onb_*` a `strings.xml` (en, ca, es).
+
+**Commits previstos:**
+
+- [ ] `onboarding_done` a `SettingsRepository` i ruta inicial condicional a `MainActivity`.
+- [ ] `OnboardingScreen`: pager, textos, punts, botons, Omet/Comença i enrere (il·lustracions estàtiques en l'estat final).
+- [ ] Tokens `success*` al `designsystem`.
+- [ ] Animació del pas 1 (bafarada i 5 avatars).
+- [ ] Animació del pas 2 (cronologia amb `TimelineRow`).
+- [ ] Animació del pas 3 (empremta, verd d'èxit, cadenat).
+- [ ] Repetició en tocar, moviment reduït, previews (estat final de cada pas, en clar i en fosc) i tests.
+
+**Proves** (llista completa al document): primera obertura i no tornar a sortir; enrere al pas 1; animació de la pàgina d'arribada; repetir en tocar; moviment reduït; clar i fosc; ca/es/en amb font gran; rendiment de les animacions infinites.
+
+**Notes:**
+
+- La il·lustració del pas 2 ja fa servir els tipus nous (Luna · Jo · Apunt); és només un dibuix i no depèn del codi de la cronologia.
+- Cal afegir les captures de l'onboarding als tests de captures (M4) i el verd d'èxit a la sincronització del design system.
+
+---
+
 ## M4 · Qualitat
 
 **Fet quan:** passen els tests, l'app es pot fer servir amb TalkBack i a una mida de text gran, i tot s'ha provat en un mòbil real.
 
-- [ ] **Tests de captures de totes les pantalles** (clar i fosc, en anglès, 411×891 dp). Hi ha el llistat (3), el detall (3, amb els 7 colors), el bloqueig (4 estats), la nota ràpida (2), el full de nova entrada, el full «Quan» (2), el bloqueig de l'app, triar persona (2) i el full d'accions (2). Falta:
+- [ ] **Tests de captures de totes les pantalles** (clar i fosc, en anglès, 411×891 dp). Hi ha el llistat (3), el detall (3, amb els 7 colors), el bloqueig (4 estats), la nota ràpida (2), el full de nova entrada, el full «Quan» (2), el bloqueig de l'app, triar persona (2) i el full d'accions (2), Ajustos (2), Editar persona (3) i quatre diàlegs (moure entrada, confirmar esborrat, esborrar persona i canal). Falta:
     - ~~**Bloqueig:** els quatre estats~~ (fet: `personLocked*` a `ScreensScreenshotTests`; les referències les genera el CI).
     - ~~**Nota ràpida:** sense persona i amb persona~~ (fet: `QuickNoteContent` sense `ViewModel`).
     - ~~**Nova entrada i edició**~~ (fet: `NewEntrySheetContent`; falta cobrir els tres valors de «Qui» i el mode d'edició).
     - ~~**«Quan»**~~ (fet: `WhenSheetContent` amb «Ara» i amb data personalitzada).
-    - **Fulls i diàlegs:** fets accions d'entrada i triar persona; falten moure entrada, esborrar i el menú del split button (finestres a part).
-    - **Editar persona** (nova, existent i protegida) i **Ajustos** (amb i sense bloqueig): calen refactors grans per separar-ne el `ViewModel`. El **bloqueig de l'app** (`AppLockContent`) ja està fet.
+    - ~~**Fulls i diàlegs**~~ (fet: accions d'entrada, triar persona i els diàlegs; els `AlertDialog` sí que es renderitzen als tests). Falten el menú del split button i el snackbar de desfer.
+    - ~~**Editar persona** i **Ajustos**~~ (fet: `EditPersonContent` amb `EditPersonActions`, i `SettingsContent`).
     - **Estats buits:** llistat, cronologia, filtres sense resultats i arxivades.
     - Les que depenen d'un `ViewModel` necessiten una versió sense estat (`...Content`) amb `PreviewData`, com ja fan el llistat i el detall. Les referències es generen amb l'etiqueta `update-screenshots` a la PR. Quan estigui fet, treure la línia «Fora de moment» de «Tests de captures».
 - [ ] **Tests de ViewModel:** llistat (filtres, protegides), detall (filtres de la cronologia, comptadors), nova entrada (validació), editor (àlies duplicat, protecció) i Ajustos.
@@ -375,7 +414,7 @@ Amb [Compose Preview Screenshot Testing](https://developer.android.com/studio/pr
 - **Tests** a `src/screenshotTest`: `ComponentsScreenshotTests` (`designsystem`) i `ScreensScreenshotTests` (`app`) criden les previews amb `@PreviewTest`. Els noms dels mètodes de test van en camelCase sense `_` (el CI hi separa el nom de la preview). Cada test es renderitza en clar i fosc, en anglès; les pantalles a 411×891 dp.
 - **Referències** a `<mòdul>/src/screenshotTestDebug/reference/`, es versionen. Llindar de diferència: 1 %.
 - **Ordres:** `./gradlew validateDebugScreenshotTest` (validar), `./gradlew updateDebugScreenshotTest` (regenerar), i per a un sol test `./gradlew :app:updateDebugScreenshotTest --tests '*ScreensScreenshotTests.peopleListLoaded'`.
-- **Fora de moment:** Editar persona, Ajustos i els diàlegs (depenen del ViewModel o són finestres a part); el pla per cobrir-ho és a M4. El bloqueig ja té els quatre estats.
+- **Encara sense captura:** el menú del split button, el snackbar de desfer, el detall amb filtre sense resultats i el de persona protegida desbloquejada, els tres valors de «Qui» i el mode d'edició del formulari, i totes les variants en català, castellà i amb font gran (ara tot és en anglès).
 
 **CI** (`.github/workflows/screenshot-tests.yml`, adaptat de [Sloy/sevibus-android#16](https://github.com/Sloy/sevibus-android/pull/16)):
 

@@ -4,6 +4,8 @@ import android.content.res.Configuration
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import com.android.tools.screenshot.PreviewTest
+import com.alorma.contactnotes.ui.edit.ChannelDialogPreview
+import com.alorma.contactnotes.ui.edit.DeletePersonDialogPreview
 import com.alorma.contactnotes.ui.edit.EditPersonExistingPreview
 import com.alorma.contactnotes.ui.edit.EditPersonNewPreview
 import com.alorma.contactnotes.ui.edit.EditPersonProtectedPreview
@@ -11,7 +13,9 @@ import com.alorma.contactnotes.ui.entry.NewEntrySheetPreview
 import com.alorma.contactnotes.ui.entry.PersonPickerFewPreview
 import com.alorma.contactnotes.ui.entry.PersonPickerManyPreview
 import com.alorma.contactnotes.ui.lock.AppLockPreview
+import com.alorma.contactnotes.ui.person.ConfirmDeleteDialogPreview
 import com.alorma.contactnotes.ui.person.EntryActionsDayPreview
+import com.alorma.contactnotes.ui.person.MoveEntryDialogPreview
 import com.alorma.contactnotes.ui.settings.SettingsAppLockPreview
 import com.alorma.contactnotes.ui.settings.SettingsNoLockPreview
 import com.alorma.contactnotes.ui.person.EntryActionsSinglePreview
@@ -219,5 +223,33 @@ class ScreensScreenshotTests {
   @Composable
   fun editPersonProtected() {
     EditPersonProtectedPreview()
+  }
+
+  @ScreenPreviews
+  @PreviewTest
+  @Composable
+  fun confirmDeleteDialog() {
+    ConfirmDeleteDialogPreview()
+  }
+
+  @ScreenPreviews
+  @PreviewTest
+  @Composable
+  fun moveEntryDialog() {
+    MoveEntryDialogPreview()
+  }
+
+  @ScreenPreviews
+  @PreviewTest
+  @Composable
+  fun deletePersonDialog() {
+    DeletePersonDialogPreview()
+  }
+
+  @ScreenPreviews
+  @PreviewTest
+  @Composable
+  fun channelDialog() {
+    ChannelDialogPreview()
   }
 }
