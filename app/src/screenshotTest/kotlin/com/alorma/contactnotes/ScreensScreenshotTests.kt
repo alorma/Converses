@@ -13,6 +13,10 @@ import com.alorma.contactnotes.ui.person.AvatarColorProvider
 import com.alorma.contactnotes.ui.person.PersonDetailScreenEmptyPreview
 import com.alorma.contactnotes.ui.person.PersonDetailScreenThemedPreview
 import com.alorma.contactnotes.ui.person.PersonDetailScreenLoadedPreview
+import com.alorma.contactnotes.ui.person.PersonLockedCanceledPreview
+import com.alorma.contactnotes.ui.person.PersonLockedLockedOutPreview
+import com.alorma.contactnotes.ui.person.PersonLockedNoCredentialsPreview
+import com.alorma.contactnotes.ui.person.PersonLockedWaitingPreview
 
 /** Pantalla d'un mòbil de mida mitjana, en clar i en fosc, amb l'idioma fixat perquè no depengui de la màquina. */
 @Preview(name = "Light", locale = "en", widthDp = 411, heightDp = 891)
@@ -67,5 +71,33 @@ class ScreensScreenshotTests {
   @Composable
   fun personDetailThemed(@PreviewParameter(AvatarColorProvider::class) color: AvatarColor) {
     PersonDetailScreenThemedPreview(color)
+  }
+
+  @ScreenPreviews
+  @PreviewTest
+  @Composable
+  fun personLockedWaiting() {
+    PersonLockedWaitingPreview()
+  }
+
+  @ScreenPreviews
+  @PreviewTest
+  @Composable
+  fun personLockedCanceled() {
+    PersonLockedCanceledPreview()
+  }
+
+  @ScreenPreviews
+  @PreviewTest
+  @Composable
+  fun personLockedLockedOut() {
+    PersonLockedLockedOutPreview()
+  }
+
+  @ScreenPreviews
+  @PreviewTest
+  @Composable
+  fun personLockedNoCredentials() {
+    PersonLockedNoCredentialsPreview()
   }
 }

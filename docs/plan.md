@@ -176,8 +176,8 @@ La v1 funcional està feta: interfície polida, fluxos complets, privacitat tanc
 
 **Fet quan:** passen els tests, l'app es pot fer servir amb TalkBack i a una mida de text gran, i tot s'ha provat en un mòbil real.
 
-- [ ] **Tests de captures de totes les pantalles** (clar i fosc, en anglès, 411×891 dp). Ara només hi ha el llistat (3) i el detall (3, amb els 7 colors). Falta:
-    - **Bloqueig:** els quatre estats (`PersonLockedPreviews.kt` ja té les previews; només cal registrar-les a `ScreensScreenshotTests`).
+- [ ] **Tests de captures de totes les pantalles** (clar i fosc, en anglès, 411×891 dp). Hi ha el llistat (3), el detall (3, amb els 7 colors) i el bloqueig (4 estats). Falta:
+    - ~~**Bloqueig:** els quatre estats~~ (fet: `personLocked*` a `ScreensScreenshotTests`; les referències les genera el CI).
     - **Nota ràpida:** sense persona i amb persona, amb text buit i ple (cal separar el contingut sense `ViewModel`, per exemple `QuickNoteContent`).
     - **Nova entrada i edició:** el contingut d'`EntryForm` amb els tres valors de «Qui»; el `ModalBottomSheet` és una finestra a part, així que es renderitza el contingut.
     - **«Quan»:** la fila amb data personalitzada i el contingut de `WhenSheet` amb cada opció marcada.
@@ -248,7 +248,7 @@ El detall de cada punt és a `docs/backlog.md`. Ordre proposat:
     - **1** · àrea clicable fora de la superfície (issue #6);
     - **5** · biometria sense desar el perfil (issue #4);
     - **3** · etiqueta `OTHER - SIGNAL`; si es vol fer el gestor de canals (8), s'absorbeix i es pot saltar.
-2. **Tests de captures de totes les pantalles** (vegeu M4): així els canvis següents (follow-ups, canals) es validen en clar i fosc i es veuen a la PR. Comença registrant les previews del bloqueig, que ja existeixen.
+2. **Tests de captures de totes les pantalles** (vegeu M4): així els canvis següents (follow-ups, canals) es validen en clar i fosc i es veuen a la PR. El bloqueig ja està fet.
 3. **6 · Follow-ups** (issue #5): flag `pending` a `EntryEntity` i interruptor a `EntryForm`, sota de «Quan». Primera migració de Room (v2 → v3).
 4. **8 · Gestor de canals**, que absorbeix el 7 («Empresa») i el 3: l'enum passa a una taula `Channel`, amb migració. És el canvi més gran; només val la pena si es vol que els canals siguin editables.
 5. **M4 i M5** (qualitat i publicació) amb l'esquema ja estable.
@@ -369,7 +369,7 @@ Amb [Compose Preview Screenshot Testing](https://developer.android.com/studio/pr
 - **Tests** a `src/screenshotTest`: `ComponentsScreenshotTests` (`designsystem`) i `ScreensScreenshotTests` (`app`) criden les previews amb `@PreviewTest`. Els noms dels mètodes de test van en camelCase sense `_` (el CI hi separa el nom de la preview). Cada test es renderitza en clar i fosc, en anglès; les pantalles a 411×891 dp.
 - **Referències** a `<mòdul>/src/screenshotTestDebug/reference/`, es versionen. Llindar de diferència: 1 %.
 - **Ordres:** `./gradlew validateDebugScreenshotTest` (validar), `./gradlew updateDebugScreenshotTest` (regenerar), i per a un sol test `./gradlew :app:updateDebugScreenshotTest --tests '*ScreensScreenshotTests.peopleListLoaded'`.
-- **Fora de moment:** Editar persona, Ajustos, nota ràpida, fulls i diàlegs (depenen del ViewModel o són finestres a part); el pla per cobrir-ho és a M4. Les previews del bloqueig ja existeixen però encara no tenen test.
+- **Fora de moment:** Editar persona, Ajustos, nota ràpida, fulls i diàlegs (depenen del ViewModel o són finestres a part); el pla per cobrir-ho és a M4. El bloqueig ja té els quatre estats.
 
 **CI** (`.github/workflows/screenshot-tests.yml`, adaptat de [Sloy/sevibus-android#16](https://github.com/Sloy/sevibus-android/pull/16)):
 
