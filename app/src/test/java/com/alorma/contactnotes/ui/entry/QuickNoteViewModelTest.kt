@@ -56,17 +56,101 @@ class QuickNoteViewModelTest {
   }
 
   @Test
-  fun aProtectedPersonIsSelectableButExposesNoChannelsNorLastChannel() = runTest {
+  fun selectingAProtectedPersonLeavesItPendingAndKeepsTheCurrentSelection() = runTest {
+    val marta = db.addPerson("Marta")
     val luna = db.addPerson("Luna", isProtected = true)
     db.addChannel(luna.id, ChannelType.DISCORD)
     db.addEntry(luna.id)
-    val vm = viewModel(luna.id)
+    val vm = viewModel(marta.id)
+
+    vm.select(luna)
 
     val state = vm.uiState.value
+    assertEquals(marta.id, state.selected?.id)
+    assertEquals(luna.id, state.pending?.id)
+  }
 
-    assertEquals(luna.id, state.selected?.id)
+  @Test
+  fun aPendingProtectedPersonExposesNoChannelsNorLastChannelUntilItIsUnlocked() = runTest {
+    val luna = db.addPerson("Luna", isProtected = true)
+    db.addChannel(luna.id, ChannelType.DISCORD)
+    db.addEntry(luna.id, channel = ChannelType.DISCORD)
+    val vm = viewModel()
+
+    vm.select(luna)
+
+    val state = vm.uiState.value
+    assertNull(state.selected)
     assertTrue(state.channels.isEmpty())
     assertNull(state.lastChannel)
+  }
+
+  @Test
+  fun unlockingSelectsTheProtectedPersonAndLoadsItsChannels() = runTest {
+    val luna = db.addPerson("Luna", isProtected = true)
+    db.addChannel(luna.id, ChannelType.DISCORD)
+    db.addChannel(luna.id, ChannelType.TELEGRAM)
+    db.addEntry(luna.id, channel = ChannelType.TELEGRAM)
+    val vm = viewModel()
+    vm.select(luna)
+
+    vm.unlock(luna.id)
+
+    val state = vm.uiState.value
+    assertEquals(luna.id, state.selected?.id)
+    assertNull(state.pending)
+    assertEquals(listOf(ChannelType.DISCORD, ChannelType.TELEGRAM), state.channels)
+    assertEquals(ChannelType.TELEGRAM, state.lastChannel)
+  }
+
+  @Test
+  fun cancelingTheAuthenticationKeepsTheSelectionAsItWas() = runTest {
+    val marta = db.addPerson("Marta")
+    val luna = db.addPerson("Luna", isProtected = true)
+    val vm = viewModel(marta.id)
+    vm.select(luna)
+
+    vm.cancelPending()
+
+    assertEquals(marta.id, vm.uiState.value.selected?.id)
+    assertNull(vm.uiState.value.pending)
+  }
+
+  @Test
+  fun anUnlockedProtectedPersonIsNotAskedAgainWhenPickedAgain() = runTest {
+    val marta = db.addPerson("Marta")
+    val luna = db.addPerson("Luna", isProtected = true)
+    val vm = viewModel()
+    vm.select(luna)
+    vm.unlock(luna.id)
+    vm.select(marta)
+
+    vm.select(luna)
+
+    assertEquals(luna.id, vm.uiState.value.selected?.id)
+    assertNull(vm.uiState.value.pending)
+  }
+
+  @Test
+  fun openingWithAProtectedPersonLeavesItPendingInsteadOfSelected() = runTest {
+    val luna = db.addPerson("Luna", isProtected = true)
+
+    val state = viewModel(luna.id).uiState.value
+
+    assertNull(state.selected)
+    assertEquals(luna.id, state.pending?.id)
+  }
+
+  @Test
+  fun aProtectedPersonPostedOnTheBridgeIsPendingToo() = runTest {
+    val luna = db.addPerson("Luna", isProtected = true)
+    val vm = viewModel()
+
+    bridge.post(luna.id)
+
+    assertNull(vm.uiState.value.selected)
+    assertEquals(luna.id, vm.uiState.value.pending?.id)
+    assertNull(bridge.picked.value)
   }
 
   @Test
