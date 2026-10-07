@@ -56,51 +56,73 @@ fun NewEntrySheet(
     sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
     containerColor = MaterialTheme.colorScheme.surface,
   ) {
-    Column(
-      modifier = Modifier
-        .fillMaxWidth()
-        .imePadding()
-        .windowInsetsPadding(WindowInsets.navigationBars)
-        .verticalScroll(rememberScrollState())
-        .padding(horizontal = 16.dp),
-      verticalArrangement = Arrangement.spacedBy(16.dp),
-    ) {
-      Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-        Avatar(initials = initialsOf(person.name), shape = person.avatarShape, color = person.avatarColor, size = 44.dp)
-        Column(modifier = Modifier.weight(1f)) {
-          Text(stringResource(if (initial == null) R.string.new_entry else R.string.edit_entry), style = SheetTitleStyle)
+    NewEntrySheetContent(
+      person = person,
+      form = form,
+      available = available,
+      channel = channel,
+      isNew = initial == null,
+      onDismiss = onDismiss,
+      onSave = { onSave(form.kind, channel, form.text.trim(), form.occurredAt) },
+    )
+  }
+}
+
+/** Contingut del full de nova entrada o d'edició; el `ModalBottomSheet` és una finestra a part. */
+@Composable
+fun NewEntrySheetContent(
+  person: PersonEntity,
+  form: EntryFormState,
+  available: List<ChannelType>,
+  channel: ChannelType,
+  isNew: Boolean,
+  onDismiss: () -> Unit,
+  onSave: () -> Unit,
+) {
+  Column(
+    modifier = Modifier
+      .fillMaxWidth()
+      .imePadding()
+      .windowInsetsPadding(WindowInsets.navigationBars)
+      .verticalScroll(rememberScrollState())
+      .padding(horizontal = 16.dp),
+    verticalArrangement = Arrangement.spacedBy(16.dp),
+  ) {
+    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+      Avatar(initials = initialsOf(person.name), shape = person.avatarShape, color = person.avatarColor, size = 44.dp)
+      Column(modifier = Modifier.weight(1f)) {
+        Text(stringResource(if (isNew) R.string.new_entry else R.string.edit_entry), style = SheetTitleStyle)
+        Text(
+          text = stringResource(R.string.with_person, person.name),
+          style = MaterialTheme.typography.bodyMedium,
+          color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+      }
+      FilledTonalIconButton(onClick = onDismiss) {
+        Icon(Icons.Rounded.Close, contentDescription = stringResource(R.string.close))
+      }
+    }
+    EntryForm(
+      state = form,
+      person = person,
+      channels = available,
+      channel = channel,
+      onChannelChange = { form.channel = it },
+      saveButton = {
+        Button(
+          onClick = onSave,
+          enabled = form.canSave,
+          modifier = Modifier.fillMaxWidth().height(56.dp),
+        ) {
+          Icon(Icons.Rounded.Check, contentDescription = null)
+          Spacer(Modifier.padding(horizontal = 4.dp))
           Text(
-            text = stringResource(R.string.with_person, person.name),
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            stringResource(if (isNew) R.string.save_to_timeline else R.string.save_changes),
+            style = MaterialTheme.typography.titleMedium,
           )
         }
-        FilledTonalIconButton(onClick = onDismiss) {
-          Icon(Icons.Rounded.Close, contentDescription = stringResource(R.string.close))
-        }
-      }
-      EntryForm(
-        state = form,
-        person = person,
-        channels = available,
-        channel = channel,
-        onChannelChange = { form.channel = it },
-        saveButton = {
-          Button(
-            onClick = { onSave(form.kind, channel, form.text.trim(), form.occurredAt) },
-            enabled = form.canSave,
-            modifier = Modifier.fillMaxWidth().height(56.dp),
-          ) {
-            Icon(Icons.Rounded.Check, contentDescription = null)
-            Spacer(Modifier.padding(horizontal = 4.dp))
-            Text(
-              stringResource(if (initial == null) R.string.save_to_timeline else R.string.save_changes),
-              style = MaterialTheme.typography.titleMedium,
-            )
-          }
-        },
-      )
-      Spacer(Modifier.height(8.dp))
-    }
+      },
+    )
+    Spacer(Modifier.height(8.dp))
   }
 }

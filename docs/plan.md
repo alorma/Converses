@@ -176,11 +176,11 @@ La v1 funcional està feta: interfície polida, fluxos complets, privacitat tanc
 
 **Fet quan:** passen els tests, l'app es pot fer servir amb TalkBack i a una mida de text gran, i tot s'ha provat en un mòbil real.
 
-- [ ] **Tests de captures de totes les pantalles** (clar i fosc, en anglès, 411×891 dp). Hi ha el llistat (3), el detall (3, amb els 7 colors) i el bloqueig (4 estats). Falta:
+- [ ] **Tests de captures de totes les pantalles** (clar i fosc, en anglès, 411×891 dp). Hi ha el llistat (3), el detall (3, amb els 7 colors), el bloqueig (4 estats), la nota ràpida (2), el full de nova entrada i el full «Quan» (2). Falta:
     - ~~**Bloqueig:** els quatre estats~~ (fet: `personLocked*` a `ScreensScreenshotTests`; les referències les genera el CI).
-    - **Nota ràpida:** sense persona i amb persona, amb text buit i ple (cal separar el contingut sense `ViewModel`, per exemple `QuickNoteContent`).
-    - **Nova entrada i edició:** el contingut d'`EntryForm` amb els tres valors de «Qui»; el `ModalBottomSheet` és una finestra a part, així que es renderitza el contingut.
-    - **«Quan»:** la fila amb data personalitzada i el contingut de `WhenSheet` amb cada opció marcada.
+    - ~~**Nota ràpida:** sense persona i amb persona~~ (fet: `QuickNoteContent` sense `ViewModel`).
+    - ~~**Nova entrada i edició**~~ (fet: `NewEntrySheetContent`; falta cobrir els tres valors de «Qui» i el mode d'edició).
+    - ~~**«Quan»**~~ (fet: `WhenSheetContent` amb «Ara» i amb data personalitzada).
     - **Fulls i diàlegs:** accions d'entrada, triar persona, moure entrada, esborrar i el menú del split button.
     - **Editar persona** (nova, existent i protegida), **Ajustos** (amb i sense bloqueig) i **bloqueig de l'app** (`AppLockScreen`).
     - **Estats buits:** llistat, cronologia, filtres sense resultats i arxivades.
@@ -365,11 +365,11 @@ Totes les claus `personId` tenen `onDelete = CASCADE`, i hi ha un índex a `entr
 
 Amb [Compose Preview Screenshot Testing](https://developer.android.com/studio/preview/compose-screenshot-testing), a `:designsystem` i a `:app`.
 
-- **Previews** a `main`, `internal` i amb dades fixes: `designsystem/.../components/ComponentPreviews.kt` i, a l'app, `PeopleListPreviews.kt` i `PersonDetailPreviews.kt` amb `ui/preview/PreviewData.kt` (dates del 2025 perquè «Avui»/«Ahir» no canviïn). Fan servir `ConversesPreviewTheme` (sense color dinàmic, Lavanda).
+- **Previews** a `main`, `internal` i amb dades fixes (al formulari d'entrada, `PreviewData.formTime` fixa l'hora perquè «Ara» no depengui del rellotge): `designsystem/.../components/ComponentPreviews.kt` i, a l'app, `PeopleListPreviews.kt` i `PersonDetailPreviews.kt` amb `ui/preview/PreviewData.kt` (dates del 2025 perquè «Avui»/«Ahir» no canviïn). Fan servir `ConversesPreviewTheme` (sense color dinàmic, Lavanda).
 - **Tests** a `src/screenshotTest`: `ComponentsScreenshotTests` (`designsystem`) i `ScreensScreenshotTests` (`app`) criden les previews amb `@PreviewTest`. Els noms dels mètodes de test van en camelCase sense `_` (el CI hi separa el nom de la preview). Cada test es renderitza en clar i fosc, en anglès; les pantalles a 411×891 dp.
 - **Referències** a `<mòdul>/src/screenshotTestDebug/reference/`, es versionen. Llindar de diferència: 1 %.
 - **Ordres:** `./gradlew validateDebugScreenshotTest` (validar), `./gradlew updateDebugScreenshotTest` (regenerar), i per a un sol test `./gradlew :app:updateDebugScreenshotTest --tests '*ScreensScreenshotTests.peopleListLoaded'`.
-- **Fora de moment:** Editar persona, Ajustos, nota ràpida, fulls i diàlegs (depenen del ViewModel o són finestres a part); el pla per cobrir-ho és a M4. El bloqueig ja té els quatre estats.
+- **Fora de moment:** Editar persona, Ajustos, bloqueig de l'app, accions d'entrada, triar persona i diàlegs (depenen del ViewModel o són finestres a part); el pla per cobrir-ho és a M4. El bloqueig ja té els quatre estats.
 
 **CI** (`.github/workflows/screenshot-tests.yml`, adaptat de [Sloy/sevibus-android#16](https://github.com/Sloy/sevibus-android/pull/16)):
 

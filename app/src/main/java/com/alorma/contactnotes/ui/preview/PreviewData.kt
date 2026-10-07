@@ -21,6 +21,9 @@ internal object PreviewData {
   private fun at(month: Int, day: Int, hour: Int, minute: Int = 0): Long =
     LocalDateTime.of(2025, month, day, hour, minute).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
 
+  /** Instant fix per a les previews del formulari d'entrada, perquè «Ara» no depengui del rellotge. */
+  val formTime: Long = at(3, 14, 21, 46)
+
   val marta = PersonEntity(
     id = 1,
     name = "Marta Soler",
