@@ -20,6 +20,7 @@ import com.alorma.contactnotes.data.settings.AppLockManager
 import com.alorma.contactnotes.data.settings.OnboardingFlag
 import com.alorma.contactnotes.data.settings.SecureWindow
 import com.alorma.contactnotes.data.settings.SettingsRepository
+import com.alorma.contactnotes.debug.DebugMenuHost
 import com.alorma.contactnotes.designsystem.theme.ConversesTheme
 import com.alorma.contactnotes.designsystem.theme.ThemeMode
 import com.alorma.contactnotes.ui.AppNavigation
@@ -81,16 +82,18 @@ class MainActivity : FragmentActivity() {
         themeColor = settings.themeColor,
         personColorTheme = settings.personColorTheme,
       ) {
-        Box {
-          AppNavigation(startOnboarding = showOnboarding)
-          if (showLock) {
-            AppLockScreen(
-              onUnlocked = appLock::unlock,
-              onDeviceUnprotected = {
-                lifecycleScope.launch { settingsRepository.setAppLock(false) }
-                appLock.unlock()
-              },
-            )
+        DebugMenuHost {
+          Box {
+            AppNavigation(startOnboarding = showOnboarding)
+            if (showLock) {
+              AppLockScreen(
+                onUnlocked = appLock::unlock,
+                onDeviceUnprotected = {
+                  lifecycleScope.launch { settingsRepository.setAppLock(false) }
+                  appLock.unlock()
+                },
+              )
+            }
           }
         }
       }

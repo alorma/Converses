@@ -27,7 +27,7 @@ La v1 funcional està feta: interfície polida, fluxos complets, privacitat tanc
 | M4 · Qualitat | Tests, accessibilitat, mode fosc, dispositiu real | Fet (amb excepcions acceptades) |
 | M5 · Publicació | minSdk, signatura, R8, mida, migracions, Play Store | Per fer |
 | Versió gratuïta (v1 sense Pro) | Avatar estàndard i importar un contacte; el Pro queda per després de la v1 (vegeu «Versió gratuïta i Pro») | **Per fer abans de la release 1**; va abans de M5 (`docs/pro.md`) |
-| Menú de debug | Botó flotant i full amb mòduls, només en builds de debug (vegeu «Menú de debug») | En curs en un worktree apart; hi viurà l'interruptor gratuït/Pro |
+| Menú de debug | Botó flotant i full amb mòduls, només en builds de debug (vegeu «Menú de debug») | Esquelet i mòduls Dades i Onboarding fets; falta el mòdul Pro (interruptor gratuït/Pro) i provar-lo a l'emulador |
 | Iteració 2 | Follow-ups i gestor de canals | Després de la publicació (vegeu «Iteració 2») |
 | Després de la v1 | Cerca, còpia de seguretat, etiquetes, widget | Idees |
 
@@ -40,7 +40,7 @@ La v1 funcional està feta: interfície polida, fluxos complets, privacitat tanc
 - Onboarding: proves manuals, pop del botó «Comença» al pas 3, test del runner del flag i referències de captures (etiqueta `update-screenshots`); vegeu «Onboarding».
 - Canvis de la versió gratuïta: vegeu «Versió gratuïta i Pro»; són obligatoris abans de la release.
 - Versió gratuïta i Pro: document de treball a `docs/pro.md` (vegeu «Versió gratuïta i Pro»).
-- Menú de debug: pendent d'implementar (vegeu «Menú de debug»).
+- Menú de debug: esquelet fet; falta el mòdul Pro (vegeu «Menú de debug»).
 
 ## Decisions (només queda D1)
 
@@ -331,7 +331,7 @@ El detall és a `docs/pro.md` (document de treball, es continuarà). **La v1 no 
 
 ## Menú de debug
 
-Pendent d'implementar. Inspirat en el debug menu de [sevibus-android](https://github.com/Sloy/sevibus-android) (mòduls `debug-menu` i `debug-menu-noop`). Serveix, entre altres coses, per provar els dos modes del `FeatureGate` (vegeu «Versió gratuïta i Pro»).
+Esquelet implementat (passos 1, 3 i 4); falta el mòdul Pro. Inspirat en el debug menu de [sevibus-android](https://github.com/Sloy/sevibus-android) (mòduls `debug-menu` i `debug-menu-noop`). Serveix, entre altres coses, per provar els dos modes del `FeatureGate` (vegeu «Versió gratuïta i Pro»).
 
 **Com és a SeviBus:**
 
@@ -349,6 +349,8 @@ Pendent d'implementar. Inspirat en el debug menu de [sevibus-android](https://gi
 - **L'interruptor Pro passa del menú d'Ajustos al menú de debug:** substitueix «un interruptor a Ajustos (només en builds de debug)» de `docs/pro.md`, perquè Ajustos no tingui res de debug. El mòdul Pro crida `FeatureGate.setProEnabled(...)` i desa l'estat; com que el menú es fa en un worktree apart, el contracte entre els dos és aquesta API (vegeu «Versió gratuïta i Pro», pas 1).
 
 **Estat:** en curs en un worktree apart. Els passos 1 i 4 no depenen de la feina de Pro; el 2 depèn del pas 1 de Pro.
+
+**Fet:** `app/src/debug/.../debug/` té `DebugMenuHost` (botó flotant arrossegable i `ModalBottomSheet`), `DebugModule` (acordió), `DebugCell` i `ConversesDebugMenu` amb els mòduls **Dades** (tornar a sembrar les dades d'exemple) i **Onboarding** (tornar-lo a mostrar i recrear l'activitat); `app/src/release/` només té un `DebugMenuHost` que crida el contingut. `MainActivity` embolcalla `AppNavigation` i el bloqueig amb `DebugMenuHost`. Els textos són només en anglès a `src/debug/res` (no arriben a release). El full hereta `FLAG_SECURE` per defecte (`securePolicy = Inherit`). L'APK de release no conté cap classe, cadena ni recurs del menú. No hi ha mòdul per esborrar el DataStore: `SettingsRepository` no té cap «esborrar tot» i no valia la pena afegir-lo només per al debug. Pendent: provar-lo a l'emulador (arrossegar el botó, recrear l'onboarding, FLAG_SECURE) i comprovar que el botó no surt a les captures.
 
 **Passos:**
 
