@@ -29,6 +29,7 @@ import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.Archive
 import androidx.compose.material.icons.rounded.ChatBubbleOutline
 import androidx.compose.material.icons.rounded.Edit
+import androidx.compose.material.icons.rounded.EditNote
 import androidx.compose.material.icons.rounded.IosShare
 import androidx.compose.material.icons.rounded.MoreVert
 import androidx.compose.material.icons.rounded.Unarchive
@@ -167,10 +168,7 @@ fun PersonDetailRoute(
         actionEntryId = entry.id
         action = EntryAction.Menu
       },
-      onEditPerson = {
-        menuExpanded = false
-        onEdit()
-      },
+      onEditPerson = onEdit,
       onExport = {
         menuExpanded = false
         viewModel.export()
@@ -314,18 +312,33 @@ fun PersonDetailScreen(
         ),
       ) {
         item(key = "back") {
-          IconButton(onClick = onBack, modifier = Modifier.windowInsetsPadding(WindowInsets.statusBars)) {
-            Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = stringResource(R.string.back))
+          Row(
+            modifier = Modifier.fillMaxWidth().windowInsetsPadding(WindowInsets.statusBars),
+            verticalAlignment = Alignment.CenterVertically,
+          ) {
+            IconButton(onClick = onBack) {
+              Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = stringResource(R.string.back))
+            }
+            Spacer(Modifier.weight(1f))
+            IconButton(onClick = onEditPerson) {
+              Icon(Icons.Rounded.Edit, contentDescription = stringResource(R.string.edit_person))
+            }
           }
         }
-        item(key = "header") { Header(person, state) }
+        item(key = "header") { Header(person) }
         if (state.channels.isNotEmpty()) {
           item(key = "channels") { ChannelRow(state.channels, onChannelOpen, onChannelCopy) }
         }
         if (state.facts.isNotEmpty()) {
           item(key = "facts") { PinnedFacts(state.facts) }
         }
-        item(key = "timeline-header") { TimelineHeader(count = state.entries.size) }
+        item(key = "timeline-header") {
+          SectionHeader(
+            title = stringResource(R.string.timeline),
+            topPadding = 24.dp,
+            trailing = pluralStringResource(R.plurals.entry_count, state.entries.size, state.entries.size),
+          )
+        }
         item(key = "kind-filters") {
           LazyRow(
             contentPadding = PaddingValues(vertical = 8.dp),
@@ -389,6 +402,14 @@ fun PersonDetailScreen(
             }
           }
         }
+        item(key = "created") {
+          Text(
+            text = stringResource(R.string.profile_created, formatMonthYear(person.createdAt)),
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.fillMaxWidth().padding(start = 4.dp, top = 24.dp),
+          )
+        }
       }
 
       val snackbarLift by animateDpAsState(
@@ -405,7 +426,7 @@ fun PersonDetailScreen(
 
       ConversesSplitButton(
         label = stringResource(R.string.note_button),
-        icon = Icons.Rounded.Edit,
+        icon = Icons.Rounded.EditNote,
         onClick = onNewEntry,
         menuExpanded = menuExpanded,
         onMenuExpandedChange = onMenuExpandedChange,
@@ -415,11 +436,6 @@ fun PersonDetailScreen(
           .windowInsetsPadding(WindowInsets.navigationBars)
           .padding(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 16.dp + snackbarLift),
       ) {
-        ConversesMenuItem(
-          text = stringResource(R.string.edit_person),
-          icon = Icons.Rounded.Edit,
-          onClick = onEditPerson,
-        )
         ConversesMenuItem(
           text = stringResource(R.string.menu_export),
           icon = Icons.Rounded.IosShare,
@@ -436,23 +452,19 @@ fun PersonDetailScreen(
 }
 
 @Composable
-private fun Header(person: PersonEntity, state: PersonDetailUiState) {
+private fun Header(person: PersonEntity) {
   Row(
     modifier = Modifier.fillMaxWidth().padding(start = 4.dp, top = 8.dp),
-    verticalAlignment = Alignment.Top,
+    verticalAlignment = Alignment.CenterVertically,
   ) {
     Column(modifier = Modifier.weight(1f)) {
       Text(text = person.name, style = PersonNameStyle)
-      val since = stringResource(R.string.since, formatMonthYear(person.createdAt))
-      Text(
-        text = person.alias?.let { "@$it · $since" } ?: since,
-        style = MaterialTheme.typography.bodyLarge,
-        color = MaterialTheme.colorScheme.onSurfaceVariant,
-      )
-      Spacer(Modifier.padding(top = 12.dp))
-      Row(horizontalArrangement = Arrangement.spacedBy(24.dp)) {
-        val firstName = firstName(person.name)
-        EntryKind.entries.forEach { kind -> Counter(state.countOf(kind), whoFilterLabel(kind, firstName)) }
+      person.alias?.let {
+        Text(
+          text = "@$it",
+          style = MaterialTheme.typography.bodyMedium,
+          color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
       }
     }
     Avatar(
@@ -460,18 +472,6 @@ private fun Header(person: PersonEntity, state: PersonDetailUiState) {
       shape = person.shape,
       color = person.color,
       size = 80.dp,
-    )
-  }
-}
-
-@Composable
-private fun Counter(value: Int, label: String) {
-  Column(modifier = Modifier.semantics(mergeDescendants = true) {}) {
-    Text(text = value.toString(), style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.ExtraBold)
-    Text(
-      text = label,
-      style = MaterialTheme.typography.bodyMedium,
-      color = MaterialTheme.colorScheme.onSurfaceVariant,
     )
   }
 }
@@ -502,18 +502,7 @@ private fun ChannelRow(
 @Composable
 private fun PinnedFacts(facts: List<PinnedFactEntity>) {
   Column(modifier = Modifier.padding(bottom = 8.dp)) {
-    Row(
-      modifier = Modifier.padding(start = 4.dp, bottom = 8.dp),
-      verticalAlignment = Alignment.CenterVertically,
-      horizontalArrangement = Arrangement.spacedBy(8.dp),
-    ) {
-      Text(
-        text = stringResource(R.string.facts_title),
-        style = MaterialTheme.typography.titleMedium,
-        fontWeight = FontWeight.Bold,
-        color = MaterialTheme.colorScheme.onSurfaceVariant,
-      )
-    }
+    SectionHeader(title = stringResource(R.string.facts_title), topPadding = 0.dp)
     GroupedList(items = facts, modifier = Modifier.fillMaxWidth()) { fact ->
       val stacked = LocalDensity.current.fontScale >= 1.5f
       val label: @Composable (Modifier) -> Unit = { modifier ->
@@ -541,21 +530,19 @@ private fun PinnedFacts(facts: List<PinnedFactEntity>) {
 }
 
 @Composable
-private fun TimelineHeader(count: Int) {
+private fun SectionHeader(title: String, topPadding: androidx.compose.ui.unit.Dp, trailing: String? = null) {
   Row(
-    modifier = Modifier.fillMaxWidth().padding(start = 4.dp, top = 24.dp),
+    modifier = Modifier.fillMaxWidth().padding(start = 4.dp, top = topPadding, bottom = 8.dp),
     verticalAlignment = Alignment.CenterVertically,
   ) {
-    Text(
-      text = stringResource(R.string.timeline),
-      style = SectionTitleStyle,
-      modifier = Modifier.weight(1f),
-    )
-    Text(
-      text = pluralStringResource(R.plurals.entry_count, count, count),
-      style = MaterialTheme.typography.bodyMedium,
-      color = MaterialTheme.colorScheme.onSurfaceVariant,
-    )
+    Text(text = title, style = SectionTitleStyle, modifier = Modifier.weight(1f))
+    if (trailing != null) {
+      Text(
+        text = trailing,
+        style = MaterialTheme.typography.bodyMedium,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+      )
+    }
   }
 }
 

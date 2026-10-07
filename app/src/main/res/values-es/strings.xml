@@ -58,7 +58,7 @@
     <string name="app_lock_title">Converses está bloqueada</string>
     <string name="app_lock_prompt_title">Desbloquea Converses</string>
     <string name="today">Hoy</string>
-    <string name="since">desde %1$s</string>
+    <string name="profile_created">Ficha creada: %1$s</string>
     <string name="facts_title">Datos</string>
     <string name="timeline">Cronología</string>
     <string name="add_first_person">Añade a la primera persona</string>

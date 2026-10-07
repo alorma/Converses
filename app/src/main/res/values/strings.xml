@@ -58,7 +58,7 @@
     <string name="app_lock_title">Converses is locked</string>
     <string name="app_lock_prompt_title">Unlock Converses</string>
     <string name="today">Today</string>
-    <string name="since">since %1$s</string>
+    <string name="profile_created">Profile created: %1$s</string>
     <string name="facts_title">Info</string>
     <string name="timeline">Timeline</string>
     <string name="add_first_person">Add the first person</string>
