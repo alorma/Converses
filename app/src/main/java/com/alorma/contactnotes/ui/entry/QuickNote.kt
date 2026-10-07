@@ -52,6 +52,7 @@ import com.alorma.contactnotes.designsystem.theme.PersonTheme
 import com.alorma.contactnotes.designsystem.theme.ScreenTitleStyle
 import com.alorma.contactnotes.ui.people.initialsOf
 import com.alorma.contactnotes.ui.people.label
+import com.alorma.contactnotes.ui.person.otherHandle
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -70,6 +71,7 @@ data class QuickNoteUiState(
   val selected: PersonEntity? = null,
   val channels: List<ChannelType> = emptyList(),
   val lastChannel: ChannelType? = null,
+  val otherHandle: String? = null,
 )
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -100,9 +102,17 @@ class QuickNoteViewModel(
       flowOf(QuickNoteUiState(people = people, selected = selected))
     } else {
       combine(
-        repository.observeChannels(selected.id).map { list -> list.map { it.type } },
+        repository.observeChannels(selected.id),
         repository.observeTimeline(selected.id).map { it.firstOrNull()?.channelType },
-      ) { channels, last -> QuickNoteUiState(people = people, selected = selected, channels = channels, lastChannel = last) }
+      ) { channels, last ->
+        QuickNoteUiState(
+          people = people,
+          selected = selected,
+          channels = channels.map { it.type },
+          lastChannel = last,
+          otherHandle = channels.otherHandle(),
+        )
+      }
     }
   }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), QuickNoteUiState())
 
@@ -190,6 +200,7 @@ fun QuickNoteContent(
           channels = available,
           channel = channel,
           onChannelChange = { form.channel = it },
+          otherHandle = state.otherHandle,
           header = {
             PersonPicker(selected = selected, people = state.people, onSelect = onSelectPerson, onNewPerson = onNewPerson)
           },

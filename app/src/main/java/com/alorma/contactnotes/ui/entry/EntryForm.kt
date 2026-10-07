@@ -44,6 +44,7 @@ import com.alorma.contactnotes.designsystem.components.ConversesToggleGroup
 import com.alorma.contactnotes.designsystem.components.ToggleOption
 import com.alorma.contactnotes.ui.people.label
 import com.alorma.contactnotes.ui.person.PersonInitialAvatar
+import com.alorma.contactnotes.ui.person.channelName
 import com.alorma.contactnotes.ui.person.firstName
 import com.alorma.contactnotes.ui.person.whoIcon
 import com.alorma.contactnotes.ui.person.whoLabel
@@ -106,6 +107,7 @@ fun EntryForm(
   channel: ChannelType,
   onChannelChange: (ChannelType) -> Unit,
   modifier: Modifier = Modifier,
+  otherHandle: String? = null,
   header: @Composable () -> Unit = {},
   saveButton: @Composable () -> Unit = {},
 ) {
@@ -114,7 +116,7 @@ fun EntryForm(
     FormSection(title = stringResource(R.string.entry_who_title)) { WhoSelector(state, person) }
     EntryTextField(state, placeholder = entryHint(state.kind, person?.name?.let(::firstName).orEmpty()))
     FormSection(title = stringResource(R.string.entry_where_title)) {
-      ChannelChips(channels = channels, selected = channel, onSelected = onChannelChange)
+      ChannelChips(channels = channels, selected = channel, onSelected = onChannelChange, otherHandle = otherHandle)
     }
     FormSection(title = stringResource(R.string.entry_when_title)) {
       WhenRow(choice = state.whenChoice, onChoice = { state.whenChoice = it })
@@ -202,6 +204,7 @@ fun ChannelChips(
   selected: ChannelType,
   onSelected: (ChannelType) -> Unit,
   modifier: Modifier = Modifier,
+  otherHandle: String? = null,
 ) {
   val scheme = MaterialTheme.colorScheme
   Row(
@@ -214,7 +217,7 @@ fun ChannelChips(
         selected = isSelected,
         onClick = { onSelected(channel) },
         modifier = Modifier.height(36.dp),
-        label = { Text(stringResource(channel.label())) },
+        label = { Text(channelName(channel, otherHandle)) },
         leadingIcon = if (isSelected) {
           { Icon(Icons.Rounded.Check, contentDescription = null, modifier = Modifier.size(FilterChipDefaults.IconSize)) }
         } else {

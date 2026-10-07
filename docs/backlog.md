@@ -4,7 +4,6 @@ Actualitzat el 7 d'oct. de 2026, reconciliat amb `docs/plan.md`. Només hi ha el
 
 | # | Tipus | Tema | Issue |
 | --- | --- | --- | --- |
-| 3 | Bug | Canal "Other" ha de mostrar "Other - {valor}" | — |
 | 10 | Seguretat | Demanar l'empremta en triar una persona protegida a la nota ràpida | — |
 | 6 | Feature (Iteració 2) | Follow-ups / entrades pendents | [#5](https://github.com/alorma/Contacts-Notes/issues/5) |
 | 7 | Feature (Iteració 2) | Nou canal "Empresa" (queda dins el 8) | — |
@@ -17,23 +16,11 @@ Els punts 6, 7 i 8 són features no prioritàries: es faran a l'**Iteració 2**,
 - **1** · L'àrea clicable sortia de la superfície: la fila d'interruptor d'Ajustos posava el `toggleable` fora del retall de la forma; ara va dins (`SettingRow.contentModifier`). La resta de components ja retallaven abans de fer-se clicables. (Issue #6.)
 - **2** · La pantalla de bloqueig d'una persona ja no mostra el layout: només el nom, la forma i el color de l'avatar, amb els estats de càrrega, cancel·lat, massa intents i sense biometria.
 - **4** · «Ha passat» ja no es talla: el selector és «Qui» (Jo · {nom} · Apunt), amb textos curts i la icona sempre visible. Queda per comprovar a M4 amb noms de 12 caràcters, en ca i es i amb la font gran.
+- **3** · El canal «Other» mostra el valor: «Other - Signal» (`channelName` a `PersonFormatting.kt`, amb `channel_with_value`) als xips del detall, al selector «On», a l'etiqueta de cada entrada, al full d'accions, a l'exportació i a la fila del llistat. Fa servir el nom ja existent del canal: «Altres - Signal» en català i «Otros - Signal» en castellà.
 - **5** · Activar o desactivar la biometria d'una persona es desa a l'acte (`EditPersonViewModel.onProtected` i `ConversesRepository.setProtected`); en una persona nova es continua desant amb el perfil. Ja demanava l'empremta tant en activar com en desactivar. (Issue #4.)
 - **9** · «Qui» i «Quan»: un sol `EntryForm`, fila «Quan» amb el full «Quan va ser?», cronologia, filtres, marcadors i exportació.
 
 ---
-
-## 3 · Bug: el canal "Other" hauria de mostrar "Other - {valor}"
-
-`ChannelType.OTHER` es mostra només com a "Other"/"Altre", sense el valor introduït (p. ex. "Signal").
-
-**Esperat:** `Other - Signal` (`Altre - Signal`, `Otro - Signal`). Si el valor és buit, només "Other".
-
-**Què cal fer**
-- String amb format, p. ex. `channel_other_with_value` = `"Other - %1$s"` a `values/`, `values-ca/` i `values-es/`.
-- Fer-lo servir on es pinta el nom del canal: xips del detall, selector «On» d'`EntryForm`, etiqueta de cada entrada.
-- Una entrada només desa `channelType`, no el valor de «Other». Per a l'etiqueta `qui · hora · canal` (`EntryCard`, `EntryActionsSheet` i `PersonExporter`) cal buscar el `handle` del canal `OTHER` de la persona: `PersonDetailUiState.channels` ja el té, i `EntryCard` només hauria de rebre'l.
-
-**Fitxers:** `ui/people/PeopleFormatting.kt`, `ui/person/PersonFormatting.kt`, `ui/person/PersonDetailScreen.kt`, `ui/person/EntryActions.kt`, `ui/person/PersonExporter.kt`, `ui/entry/EntryForm.kt`.
 
 ## 6 · Feature: follow-ups / entrades pendents a la cronologia
 

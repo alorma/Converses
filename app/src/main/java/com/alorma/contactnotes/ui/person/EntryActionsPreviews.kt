@@ -20,6 +20,7 @@ private fun EntryActionsPreview(dayCount: Int) {
           EntryActionsContent(
             entry = PreviewData.martaEntries.first(),
             firstName = firstName(PreviewData.marta.name),
+            otherHandle = null,
             dayCount = dayCount,
             onEdit = {},
             onCopy = {},
