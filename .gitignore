@@ -3,3 +3,6 @@
 /local.properties
 .idea/
 build/
+
+# Release signing: never commit the keystore (the CI rebuilds it from a secret)
+/certs/
