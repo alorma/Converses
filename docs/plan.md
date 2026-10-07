@@ -341,6 +341,7 @@ Amb [Compose Preview Screenshot Testing](https://developer.android.com/studio/pr
 - L'etiqueta `update-screenshots` regenera les referències dels tests que fallen, les commiteja a la branca de la PR i es treu sola. Els commits del workflow no disparen execucions noves: cal tornar a fer push per validar-les. Les PR de forks se salten.
 - A cada push a `main`, si alguna captura falla, regenera les referències a `screenshots/main-update` i obre una PR assignada a qui ha fet el push (o actualitza l'oberta); quan `main` torna a passar, la tanca. Cal activar **Settings → Actions → General → Allow GitHub Actions to create and approve pull requests**.
 - El comentari el genera `.github/scripts/screenshot_report.py` a partir dels JUnit de cada mòdul; l'informe HTML també es puja com a artefacte `screenshot-report`.
+- Les imatges dels comentaris i de les PR enllacen a `github.com/<repo>/blob/<sha>/<fitxer>?raw=true` i no a `raw.githubusercontent.com`, que en un repo privat no serveix res sense token.
 
 ### Decisions ja preses
 
