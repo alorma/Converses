@@ -89,8 +89,15 @@
     <string name="pick_person">Pick a person</string>
     <string name="search_by_name">Search by name</string>
     <string name="quick_with_whom">With</string>
-    <string name="quick_where">Where</string>
-    <string name="time_now">Now</string>
+    <string name="entry_where_title">Where</string>
+    <string name="entry_when_title">When</string>
+    <string name="when_sheet_title">When was it?</string>
+    <string name="when_now">Now</string>
+    <string name="when_hour_ago">An hour ago</string>
+    <string name="when_yesterday">Yesterday, same time</string>
+    <string name="when_pick">Pick date and time…</string>
+    <string name="when_pick_sub">Calendar and clock</string>
+    <string name="when_row_description">When: %1$s, %2$s. Tap to change</string>
 
     <string name="edit_person">Edit person</string>
     <string name="new_person">New person</string>

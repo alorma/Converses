@@ -79,22 +79,26 @@ fun NewEntrySheet(
           Icon(Icons.Rounded.Close, contentDescription = stringResource(R.string.close))
         }
       }
-      KindSelector(form)
-      EntryTextField(form, placeholder = stringResource(form.kind.promptLabel()))
-      WhereSection(channels = available, selected = channel, onSelected = { form.channel = it })
-      Row { TimeChip(occurredAt = form.occurredAt, onChange = { form.occurredAt = it }) }
-      Button(
-        onClick = { onSave(form.kind, channel, form.text.trim(), form.occurredAt) },
-        enabled = form.canSave,
-        modifier = Modifier.fillMaxWidth().height(56.dp),
-      ) {
-        Icon(Icons.Rounded.Check, contentDescription = null)
-        Spacer(Modifier.padding(horizontal = 4.dp))
-        Text(
-          stringResource(if (initial == null) R.string.save_to_timeline else R.string.save_changes),
-          style = MaterialTheme.typography.titleMedium,
-        )
-      }
+      EntryForm(
+        state = form,
+        channels = available,
+        channel = channel,
+        onChannelChange = { form.channel = it },
+        saveButton = {
+          Button(
+            onClick = { onSave(form.kind, channel, form.text.trim(), form.occurredAt) },
+            enabled = form.canSave,
+            modifier = Modifier.fillMaxWidth().height(56.dp),
+          ) {
+            Icon(Icons.Rounded.Check, contentDescription = null)
+            Spacer(Modifier.padding(horizontal = 4.dp))
+            Text(
+              stringResource(if (initial == null) R.string.save_to_timeline else R.string.save_changes),
+              style = MaterialTheme.typography.titleMedium,
+            )
+          }
+        },
+      )
       Spacer(Modifier.height(8.dp))
     }
   }
