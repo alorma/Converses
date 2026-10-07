@@ -19,6 +19,7 @@ import com.alorma.contactnotes.ui.people.PeopleListViewModel
 import com.alorma.contactnotes.ui.settings.SettingsViewModel
 import com.alorma.contactnotes.ui.person.PersonDetailViewModel
 import com.alorma.contactnotes.ui.person.PersonExporter
+import com.alorma.contactnotes.ui.person.PersonLockViewModel
 import com.alorma.contactnotes.ui.person.PersonViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -68,6 +69,7 @@ val viewModelModule = module {
   viewModel { (archived: Boolean) -> PeopleListViewModel(archived, get()) }
   viewModelOf(::SettingsViewModel)
   viewModel { (personId: Long) -> PersonViewModel(personId, get()) }
+  viewModel { PersonLockViewModel() }
   viewModel { (personId: Long) -> PersonDetailViewModel(personId, get(), get()) }
   viewModel { (personId: Long) -> QuickNoteViewModel(personId, get(), get()) }
   viewModel { (personId: Long) -> EditPersonViewModel(personId, get(), get()) }
