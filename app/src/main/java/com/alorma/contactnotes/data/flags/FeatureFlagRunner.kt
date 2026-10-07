@@ -17,20 +17,28 @@ abstract class FeatureFlagRunner {
 
 /**
  * Cada flag val el seu valor per defecte (a la v1, apagat) tret que s'hi hagi posat un override. Els overrides els
- * posa només el menú de debug i viuen en memòria; el menú és qui els desa i els torna a aplicar en arrencar.
+ * posa només el menú de debug. Les lectures són de memòria; cada canvi es passa a [persist] perquè es conservi.
  */
-class LocalFeatureFlagRunner : FeatureFlagRunner() {
-  private val overrides = MutableStateFlow<Map<String, Boolean>>(emptyMap())
+class LocalFeatureFlagRunner(
+  initial: Map<String, Boolean> = emptyMap(),
+  private val persist: (Map<String, Boolean>) -> Unit = {},
+) : FeatureFlagRunner() {
+  private val overrides = MutableStateFlow(initial)
 
   override val changes: StateFlow<Any> = overrides.asStateFlow()
 
   override fun getBoolean(key: String, defaultValue: Boolean): Boolean = overrides.value[key] ?: defaultValue
 
-  fun setOverride(key: String, value: Boolean) = overrides.update { it + (key to value) }
+  fun setOverride(key: String, value: Boolean) = change { it + (key to value) }
 
-  fun clearOverride(key: String) = overrides.update { it - key }
+  fun clearOverride(key: String) = change { it - key }
 
   fun hasOverride(key: String): Boolean = key in overrides.value
 
-  fun clearAllOverrides() = overrides.update { emptyMap() }
+  fun clearAllOverrides() = change { emptyMap() }
+
+  private fun change(transform: (Map<String, Boolean>) -> Map<String, Boolean>) {
+    overrides.update(transform)
+    persist(overrides.value)
+  }
 }

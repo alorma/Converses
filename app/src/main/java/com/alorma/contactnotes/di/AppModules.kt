@@ -3,18 +3,16 @@ package com.alorma.contactnotes.di
 import android.content.Context
 import android.content.pm.ApplicationInfo
 import androidx.room.Room
-import androidx.room.RoomDatabase
-import androidx.sqlite.db.SupportSQLiteDatabase
 import com.alorma.contactnotes.data.ConversesRepository
 import com.alorma.contactnotes.data.flags.ContactIntegrationFeature
 import com.alorma.contactnotes.data.flags.CustomAvatarFeature
 import com.alorma.contactnotes.data.flags.CustomChannelsFeature
 import com.alorma.contactnotes.data.flags.FeatureFlag
 import com.alorma.contactnotes.data.flags.FeatureFlagRunner
+import com.alorma.contactnotes.data.flags.FeatureFlagStore
 import com.alorma.contactnotes.data.flags.FollowUpsFeature
 import com.alorma.contactnotes.data.flags.LocalFeatureFlagRunner
 import com.alorma.contactnotes.data.db.ConversesDatabase
-import com.alorma.contactnotes.data.insertSampleData
 import com.alorma.contactnotes.data.settings.AppLockManager
 import com.alorma.contactnotes.data.settings.DataStoreFireAndForgetRunner
 import com.alorma.contactnotes.data.settings.DataStoreSettingsRepository
@@ -30,10 +28,6 @@ import com.alorma.contactnotes.ui.person.PersonDetailViewModel
 import com.alorma.contactnotes.ui.person.PersonExporter
 import com.alorma.contactnotes.ui.person.PersonLockViewModel
 import com.alorma.contactnotes.ui.person.PersonViewModel
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.launch
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.dsl.singleOf
 import org.koin.core.module.dsl.viewModel
@@ -46,17 +40,6 @@ val databaseModule = module {
     val context: Context = androidContext()
     val isDebuggable = context.applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE != 0
     Room.databaseBuilder(context, ConversesDatabase::class.java, "converses.db")
-      .addCallback(
-        object : RoomDatabase.Callback() {
-          override fun onCreate(db: SupportSQLiteDatabase) {
-            if (isDebuggable) {
-              CoroutineScope(SupervisorJob() + Dispatchers.IO).launch {
-                get<ConversesDatabase>().insertSampleData()
-              }
-            }
-          }
-        },
-      )
       .apply { if (isDebuggable) fallbackToDestructiveMigration(dropAllTables = true) }
       .build()
   }
@@ -72,7 +55,11 @@ val settingsModule = module {
   single { OnboardingFlag(DataStoreFireAndForgetRunner(get())) }
   single { AppLockManager(get()) }
   single { SecureWindow() }
-  single { LocalFeatureFlagRunner() } bind FeatureFlagRunner::class
+  single { FeatureFlagStore(androidContext()) }
+  single {
+    val store: FeatureFlagStore = get()
+    LocalFeatureFlagRunner(initial = store.load(), persist = store::save)
+  } bind FeatureFlagRunner::class
   singleOf(::CustomAvatarFeature) bind FeatureFlag::class
   singleOf(::CustomChannelsFeature) bind FeatureFlag::class
   singleOf(::FollowUpsFeature) bind FeatureFlag::class
