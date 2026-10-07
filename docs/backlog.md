@@ -7,6 +7,7 @@ Actualitzat el 7 d'oct. de 2026, reconciliat amb `docs/plan.md`. Només hi ha el
 | 1 | Bug | L'àrea clicable surt fora de la superfície | [#6](https://github.com/alorma/Contacts-Notes/issues/6) |
 | 3 | Bug | Canal "Other" ha de mostrar "Other - {valor}" | — |
 | 5 | Bug | Activar/desactivar biometria sense desar el perfil | [#4](https://github.com/alorma/Contacts-Notes/issues/4) |
+| 10 | Seguretat | Demanar l'empremta en triar una persona protegida a la nota ràpida | — |
 | 6 | Feature (Iteració 2) | Follow-ups / entrades pendents | [#5](https://github.com/alorma/Contacts-Notes/issues/5) |
 | 7 | Feature (Iteració 2) | Nou canal "Empresa" (queda dins el 8) | — |
 | 8 | Feature (Iteració 2) | Gestor de canals propis | — |
@@ -97,3 +98,19 @@ Permetre crear canals propis (Signal, LinkedIn, Empresa...) en lloc de dependre 
 - Passar de l'enum a una taula `Channel` a Room (id, nom, icona, sistema/usuari, ordre) amb migració, incloent convertir els `OTHER` amb valor en canals propis. Això també resol el 3.
 - Afecta: detall de persona, `EntryForm` (xips d'«On»), edició de persona, `ChannelFilter`, `ui/person/ChannelLinks.kt` i `PersonExporter.kt`.
 - Els noms creats per l'usuari no es tradueixen.
+
+## 10 · Seguretat: demanar l'empremta en triar una persona protegida a la nota ràpida
+
+**Problema.** Des del detall, per arribar a «Nota» cal desbloquejar la persona protegida. A la nota ràpida, en canvi, es pot triar una persona protegida (amb el nom i el cadenat) i escriure-hi sense demanar res. Escriure no filtra cap dada, però és un camí que se salta el bloqueig. Per això `QuickNoteViewModel` no carrega ni els canals ni l'última entrada de les protegides, i el selector «On» ensenya tots els canals.
+
+**Què cal fer**
+- En triar una persona protegida al full de triar persona (`PersonPickerSheet`), demanar l'empremta amb `promptUnlock` (el mateix que fan Ajustos i l'editor). Un sol prompt en triar-la; en desar no se'n torna a demanar.
+- Si es cancel·la o falla: la persona **no** es tria i la nota ràpida es queda com estava (decisió a confirmar amb Bernat).
+- Si va bé: ja es poden carregar els canals de la persona i el canal de l'última entrada (a `QuickNoteViewModel`, treure l'excepció per a les protegides), perquè «On» mostri el mateix que a les altres persones.
+- Cas sense bloqueig al dispositiu: igual que a la resta de l'app, no es pot triar (no hi ha manera d'autenticar-se); mostrar el mateix missatge que la pantalla de bloqueig.
+- Si la nota ràpida s'obre ja amb una persona protegida (`QuickNoteRoute(personId)`), també cal demanar-la en entrar.
+- Pantalla de nota ràpida amb `FLAG_SECURE` mentre hi hagi una persona protegida triada (com l'editor), perquè no surti a Recents.
+
+**Fitxers:** `ui/entry/QuickNote.kt`, `ui/entry/PersonPickerSheet.kt`, `ui/person/BiometricUnlock.kt`.
+
+**Proves:** triar una protegida demana l'empremta; cancel·lar deixa la selecció com estava; amb l'empremta bona, «On» mostra els canals de la persona; no es demana de nou en desar; no hi ha captura a Recents.
