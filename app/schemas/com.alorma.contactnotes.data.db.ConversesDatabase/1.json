@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "9e154b1c50ef26c6533a7b28818abe0a",
+    "identityHash": "ea6d8b154fc4d8063ed2e70f0070b46d",
     "entities": [
       {
         "tableName": "person",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `alias` TEXT, `avatarShape` TEXT NOT NULL, `avatarColor` TEXT NOT NULL, `contactLookupKey` TEXT, `archived` INTEGER NOT NULL, `createdAt` INTEGER NOT NULL, `updatedAt` INTEGER NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `alias` TEXT, `avatarShape` TEXT, `avatarColor` TEXT, `isProtected` INTEGER NOT NULL, `archived` INTEGER NOT NULL, `notes` TEXT, `createdAt` INTEGER NOT NULL, `updatedAt` INTEGER NOT NULL)",
         "fields": [
           {
             "fieldPath": "id",
@@ -28,25 +28,29 @@
           {
             "fieldPath": "avatarShape",
             "columnName": "avatarShape",
-            "affinity": "TEXT",
-            "notNull": true
+            "affinity": "TEXT"
           },
           {
             "fieldPath": "avatarColor",
             "columnName": "avatarColor",
-            "affinity": "TEXT",
-            "notNull": true
+            "affinity": "TEXT"
           },
           {
-            "fieldPath": "contactLookupKey",
-            "columnName": "contactLookupKey",
-            "affinity": "TEXT"
+            "fieldPath": "isProtected",
+            "columnName": "isProtected",
+            "affinity": "INTEGER",
+            "notNull": true
           },
           {
             "fieldPath": "archived",
             "columnName": "archived",
             "affinity": "INTEGER",
             "notNull": true
+          },
+          {
+            "fieldPath": "notes",
+            "columnName": "notes",
+            "affinity": "TEXT"
           },
           {
             "fieldPath": "createdAt",
@@ -269,7 +273,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '9e154b1c50ef26c6533a7b28818abe0a')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'ea6d8b154fc4d8063ed2e70f0070b46d')"
     ]
   }
 }

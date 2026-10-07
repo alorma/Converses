@@ -1,6 +1,5 @@
 package com.alorma.contactnotes
 
-import android.content.pm.ApplicationInfo
 import android.graphics.Color
 import android.os.Bundle
 import android.view.WindowManager
@@ -15,7 +14,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.alorma.contactnotes.data.ConversesRepository
 import com.alorma.contactnotes.data.flags.PersonColorFeature
 import com.alorma.contactnotes.data.flags.rememberFeatureEnabled
 import com.alorma.contactnotes.data.settings.AppLockManager
@@ -39,13 +37,12 @@ class MainActivity : FragmentActivity() {
   private val appLock: AppLockManager by inject()
   private val secureWindow: SecureWindow by inject()
   private val onboardingFlag: OnboardingFlag by inject()
-  private val repository: ConversesRepository by inject()
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     // Lectura síncrona abans del primer frame per evitar un parpelleig de tema en obrir.
     val initialSettings = runBlocking { settingsRepository.settings.first() }
-    val showOnboarding = shouldShowOnboarding()
+    val showOnboarding = onboardingFlag.isEnabled()
     val secureFlow = combine(settingsRepository.settings.map { it.appLock }, secureWindow.isRequested) { lock, requested ->
       lock || requested
     }
@@ -101,18 +98,5 @@ class MainActivity : FragmentActivity() {
         }
       }
     }
-  }
-
-  // Lectura síncrona abans del primer frame. Només a builds no debuggables: en debug es sembren dades de mostra
-  // a la primera obertura i l'onboarding no es veuria mai.
-  private fun shouldShowOnboarding(): Boolean {
-    if (!onboardingFlag.isEnabled()) return false
-    val isDebuggable = applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE != 0
-    val hasPeople = !isDebuggable && runBlocking {
-      repository.observePeople(archived = false).first().isNotEmpty() ||
-        repository.observePeople(archived = true).first().isNotEmpty()
-    }
-    if (hasPeople) onboardingFlag.disable()
-    return !hasPeople
   }
 }
