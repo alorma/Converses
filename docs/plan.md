@@ -22,10 +22,11 @@ La v1 funcional està feta: interfície polida, fluxos complets, privacitat tanc
 | M3 · Privacitat | Les persones protegides no es filtren enlloc | Fet (falta provar el bloqueig desactivat sol a dispositiu) |
 | Color de la persona | Les pantalles de cada persona prenen el color del seu avatar | Fet (falta provar-lo a l'emulador: animació de l'editor, fulls i interruptor apagat) |
 | Backlog de disseny | Tanda 1 «Quan», tanda 2 «Qui» i tanda 3 bloqueig | Fet (falta provar el bloqueig a dispositiu real: massa intents i empremta) |
-| Onboarding · tanda 4 | Benvinguda animada de 3 passos, només el primer cop (vegeu «Onboarding») | Per fer (`docs/onboarding/`) |
+| Onboarding · tanda 4 | Benvinguda animada de 3 passos, només el primer cop (vegeu «Onboarding») | En curs: flag, ruta i esquelet de la pantalla fets; falten il·lustracions i animacions (`docs/onboarding/`) |
 | Backlog de bugs | Àrea clicable, etiqueta «Other», biometria sense desar | Fet (`docs/backlog.md`) |
 | M4 · Qualitat | Tests, accessibilitat, mode fosc, dispositiu real | Fet (amb excepcions acceptades) |
 | M5 · Publicació | minSdk, signatura, R8, mida, migracions, Play Store | Per fer |
+| Pro i versió gratuïta | `FeatureGate`, avatar estàndard, importar un contacte; res de Pro visible a la v1 (vegeu «Pro i versió gratuïta») | Per fer (`docs/pro.md`) |
 | Iteració 2 | Follow-ups i gestor de canals | Després de la publicació (vegeu «Iteració 2») |
 | Després de la v1 | Cerca, còpia de seguretat, etiquetes, widget | Idees |
 
@@ -36,6 +37,7 @@ La v1 funcional està feta: interfície polida, fluxos complets, privacitat tanc
 - Afinar el snackbar de desfer (posició i marges) si no queda bé.
 - Bugs i features pendents: vegeu `docs/backlog.md` (issues #4, #5 i #6).
 - Onboarding animat (tanda 4): especificació i disseny a `docs/onboarding/` (vegeu «Onboarding»).
+- Pro i versió gratuïta: document de treball a `docs/pro.md` (vegeu «Pro i versió gratuïta»).
 
 ## Decisions (només queda D1)
 
@@ -198,8 +200,8 @@ La v1 funcional està feta: interfície polida, fluxos complets, privacitat tanc
 
 **Commits previstos:**
 
-- [ ] FireAndForget 1.3.0 al catàleg, `OnboardingFlag` amb el runner sobre DataStore, `onboarding_done` a `SettingsRepository` i ruta inicial condicional a `MainActivity`.
-- [ ] `OnboardingScreen`: pager, textos, punts, botons, Omet/Comença i enrere (il·lustracions estàtiques en l'estat final).
+- [x] FireAndForget 1.3.0 al catàleg, `OnboardingFlag` amb el runner sobre DataStore (`data/settings/OnboardingFlag.kt`), `onboarding_done` a `SettingsRepository` i ruta inicial condicional a `MainActivity` (`shouldShowOnboarding`, amb la regla de les persones només en builds no debuggables).
+- [ ] `OnboardingScreen`: pager, textos `onb_*`, punts, botons, Omet/Comença i enrere (fet); falten les il·lustracions estàtiques en l'estat final (ara hi ha un contenidor buit), les claus `onb_sample_*` i l'entrada de títol/cos.
 - [ ] Tokens `success*` al `designsystem`.
 - [ ] Animació del pas 1 (bafarada i 5 avatars).
 - [ ] Animació del pas 2 (cronologia amb `TimelineRow`).
@@ -300,6 +302,17 @@ No són prioritaris: es faran quan l'app ja estigui publicada. El detall és a `
 
 - **Follow-ups / entrades pendents (6, issue #5):** flag `pending` a `EntryEntity` i interruptor a `EntryForm`, sota de «Quan». Primera migració de Room (v2 → v3) amb el seu test de migració (`MigrationTestHelper`).
 - **Gestor de canals (8):** l'enum `ChannelType` passa a una taula `Channel`, amb migració i test. Absorbeix «Empresa» (7); l'etiqueta «Other - valor» (3) es fa abans, com a bug. Només val la pena si es vol que els canals siguin editables.
+
+## Pro i versió gratuïta
+
+El detall és a `docs/pro.md` (document de treball, es continuarà). Resum:
+
+- **Model:** Pro de pagament únic, sense subscripció ni anuncis. Play Billing no entra encara. Regla: mai es cobra per accedir, protegir o treure les dades pròpies.
+- **Pro:** avatar personalitzat (color i forma), canals propis (backlog 8), follow-ups (backlog 6) i integració amb contactes (vincle, Connected apps, avís de trucada, importació múltiple).
+- **No s'esborra codi:** tot el que és Pro queda amagat darrere d'un `FeatureGate.isPro` (sempre `false` a la v1), amb un interruptor a Ajustos només en debug.
+- **A la primera release no es mostra res de Pro.**
+- **Per a la v1 gratuïta:** avatar estàndard (forma Galeta i color automàtic per hash del nom; `avatarShape` i `avatarColor` nul·lables, sense migració perquè l'app encara no és publicada) i importar una persona des del selector de contactes del sistema.
+- **Pendent de decidir:** canal «Empresa» (backlog 7), gratuït o Pro segons si es fa abans dels canals propis.
 
 ## Després de la v1
 
