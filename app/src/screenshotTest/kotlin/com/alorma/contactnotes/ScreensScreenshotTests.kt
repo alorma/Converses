@@ -4,7 +4,10 @@ import android.content.res.Configuration
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import com.android.tools.screenshot.PreviewTest
+import com.alorma.contactnotes.ui.edit.AvatarSheetAutoPreview
+import com.alorma.contactnotes.ui.edit.AvatarSheetCustomPreview
 import com.alorma.contactnotes.ui.edit.ChannelDialogPreview
+import com.alorma.contactnotes.ui.edit.EditPersonCustomAvatarPreview
 import com.alorma.contactnotes.ui.edit.DeletePersonDialogPreview
 import com.alorma.contactnotes.ui.edit.EditPersonExistingPreview
 import com.alorma.contactnotes.ui.edit.EditPersonNewPreview
@@ -175,6 +178,27 @@ class ScreensScreenshotTests {
   @Composable
   fun appLock() {
     AppLockPreview()
+  }
+
+  @ScreenPreviews
+  @PreviewTest
+  @Composable
+  fun editPersonCustomAvatar() {
+    EditPersonCustomAvatarPreview()
+  }
+
+  @ScreenPreviews
+  @PreviewTest
+  @Composable
+  fun avatarSheetAuto() {
+    AvatarSheetAutoPreview()
+  }
+
+  @ScreenPreviews
+  @PreviewTest
+  @Composable
+  fun avatarSheetCustom() {
+    AvatarSheetCustomPreview()
   }
 
   @ScreenPreviews

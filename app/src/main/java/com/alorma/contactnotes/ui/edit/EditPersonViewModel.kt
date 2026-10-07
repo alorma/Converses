@@ -55,7 +55,7 @@ interface EditPersonActions {
   fun onName(value: String)
   fun onAlias(value: String)
   fun onShape(shape: AvatarShape)
-  fun onColor(color: AvatarColor)
+  fun onColor(color: AvatarColor?)
   fun onProtected(value: Boolean)
   fun onAddFact()
   fun onFactChange(key: Long, label: String, value: String)
@@ -127,7 +127,7 @@ class EditPersonViewModel(
 
   override fun onShape(shape: AvatarShape) = _state.update { it.copy(shape = shape) }
 
-  override fun onColor(color: AvatarColor) = _state.update { it.copy(color = color) }
+  override fun onColor(color: AvatarColor?) = _state.update { it.copy(color = color) }
 
   /** En una persona que ja existeix, el canvi es desa a l'acte; en una de nova, es desa amb el perfil. */
   override fun onProtected(value: Boolean) {

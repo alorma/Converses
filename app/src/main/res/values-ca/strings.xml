@@ -57,7 +57,7 @@
     <string name="app_lock_prompt_title">Desbloqueja Converses</string>
     <string name="today">Avui</string>
     <string name="since">des de %1$s</string>
-    <string name="pinned_facts">Dades fixades</string>
+    <string name="facts_title">Dades</string>
     <string name="timeline">Cronologia</string>
     <string name="add_first_person">Afegeix la primera persona</string>
     <string name="people_empty_filter">Ningú en aquest canal</string>
@@ -84,7 +84,6 @@
     <string name="channel_in_person">En persona</string>
     <string name="channel_with_value">%1$s - %2$s</string>
     <string name="more_options">Més opcions</string>
-    <string name="shape_option">Forma %1$d</string>
     <string name="entry_description">%1$s, %2$s a les %3$s, per %4$s: %5$s</string>
     <string name="color_lavender">Lavanda</string>
     <string name="color_mint">Menta</string>
@@ -125,12 +124,9 @@
     <string name="edit_person">Editar persona</string>
     <string name="new_person">Nova persona</string>
     <string name="add_person">Afegeix una persona</string>
-    <string name="shape_label">Forma</string>
-    <string name="color_label">Color</string>
     <string name="field_name">Nom</string>
     <string name="field_alias">Àlies</string>
     <string name="alias_taken">Ja tens una altra persona amb l\'àlies @%1$s</string>
-    <string name="pinned_hint">Surten a dalt del detall</string>
     <string name="fact_label_hint">Etiqueta</string>
     <string name="fact_value_hint">Valor</string>
     <string name="add_fact">Afegeix una dada</string>
@@ -201,4 +197,15 @@
     <string name="onb_sample_2_text">En Kael va perdre el germà.</string>
     <string name="onb_sample_3_label">APUNT · AHIR · EN PERSONA</string>
     <string name="onb_sample_3_text">Partida a la jornada de jocs.</string>
+    <string name="avatar_edit_cd">Canvia la forma i el color de l\'avatar</string>
+    <string name="avatar_sheet_title">Avatar</string>
+    <string name="avatar_shape">Forma</string>
+    <string name="avatar_color">Color</string>
+    <string name="avatar_color_auto">Automàtic</string>
+    <string name="avatar_summary_auto">%1$s · color automàtic (%2$s)</string>
+    <string name="avatar_done">Fet</string>
+    <string name="shape_cookie">Galeta</string>
+    <string name="shape_clover">Trèvol</string>
+    <string name="shape_flower">Flor</string>
+    <string name="shape_sunny">Sol</string>
 </resources>

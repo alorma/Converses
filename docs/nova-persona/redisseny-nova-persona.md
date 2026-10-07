@@ -28,7 +28,7 @@ S'**elimina la targeta d'avatar**. L'avatar passa a la **primera fila del grup �
 
 ### Layout (ordre complet del formulari)
 
-1. **Omple des d'un contacte** (només a Nova persona): fila de 64 dp en `surfaceContainerHigh`, radi 24, amb un cercle de 40 dp (`surfaceContainerLowest`) i `person_add`, el títol «Omple des d'un contacte», el subtítol «Nom i telèfon de l'agenda» i `chevron_right`. Obre el selector de contactes del sistema (vegeu `docs/pro.md`).
+1. ~~**Omple des d'un contacte**~~ **(no es fa a la v1; la importació de contactes queda fora)** (només a Nova persona): fila de 64 dp en `surfaceContainerHigh`, radi 24, amb un cercle de 40 dp (`surfaceContainerLowest`) i `person_add`, el títol «Omple des d'un contacte», el subtítol «Nom i telèfon de l'agenda» i `chevron_right`. Obre el selector de contactes del sistema (vegeu `docs/pro.md`).
 2. **Nom + Àlies**, amb l'avatar (detall a sota).
 3. **Dades**, com ara (abans «Dades fixades»; vegeu la secció 3).
 4. **On hi parles**, com ara.
@@ -66,11 +66,11 @@ Separació de 14 dp entre blocs.
 - L'app encara no està publicada, així que no cal migració.
 - `avatarShape` i `avatarColor` són **nul·lables**: `null` vol dir «estàndard» (Galeta + color automàtic).
 - A la versió gratuïta sempre es desen amb `null`.
-- Una sola funció resol l'avatar a tot arreu (llistat, detall, selector de persona, formulari): `resolveAvatar(person) → (shape, color)`.
+- Una sola funció resol l'avatar a tot arreu (llistat, detall, selector de persona, formulari): les extensions `person.shape` i `person.color`.
 
 ## 2. Versió Pro (4e i 4f)
 
-Per quan existeixi el Pro, darrere de `FeatureGate.isPro`.
+Per quan existeixi el Pro, darrere de `CustomAvatarFeature`.
 
 ### Formulari (4e)
 
@@ -146,6 +146,6 @@ Les dades sempre surten a dalt del perfil, així que no cal dir que estan «fixa
 - [ ] **Gratuïta:** totes les persones són Galeta i el mateix nom dona sempre el mateix color.
 - [ ] **Gratuïta:** amb 20 noms diferents, els 7 colors surten repartits.
 - [ ] **Gratuïta:** les inicials i el color canvien mentre s'escriu; amb el nom buit, «?».
-- [ ] **Pro** (`isPro = true` en debug): la insígnia obre el full, els canvis es veuen en directe i es desen amb la persona.
+- [ ] **Pro** (activant «Pro mode» al menú de debug): la insígnia obre el full, els canvis es veuen en directe i es desen amb la persona.
 - [ ] **Pro:** «Automàtic» torna al color del nom i desa `avatarColor = null`.
 - [ ] Previews: fila del nom (nom buit i ple), full «Avatar» (Automàtic i amb color triat), en clar i en fosc.

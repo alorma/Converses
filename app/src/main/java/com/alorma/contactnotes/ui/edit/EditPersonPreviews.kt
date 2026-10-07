@@ -12,7 +12,7 @@ private object NoOpEditPersonActions : EditPersonActions {
   override fun onName(value: String) = Unit
   override fun onAlias(value: String) = Unit
   override fun onShape(shape: AvatarShape) = Unit
-  override fun onColor(color: AvatarColor) = Unit
+  override fun onColor(color: AvatarColor?) = Unit
   override fun onProtected(value: Boolean) = Unit
   override fun onAddFact() = Unit
   override fun onFactChange(key: Long, label: String, value: String) = Unit
@@ -25,7 +25,7 @@ private object NoOpEditPersonActions : EditPersonActions {
 }
 
 @Composable
-private fun EditPersonPreview(state: EditPersonUiState, canAuthenticate: Boolean = true) {
+private fun EditPersonPreview(state: EditPersonUiState, canAuthenticate: Boolean = true, customAvatar: Boolean = false) {
   ConversesPreviewTheme {
     EditPersonContent(
       state = state,
@@ -35,6 +35,7 @@ private fun EditPersonPreview(state: EditPersonUiState, canAuthenticate: Boolean
       onSaved = {},
       onDeleted = {},
       onProtectedChange = {},
+      customAvatar = customAvatar,
     )
   }
 }
@@ -125,3 +126,40 @@ internal fun ChannelDialogPreview() {
     ChannelDialog(initial = Channels.first(), onDismiss = {}, onConfirm = { _, _ -> })
   }
 }
+
+/** Amb `CustomAvatarFeature` encesa: l'avatar és un botó amb la insígnia d'edició. */
+@Preview
+@Composable
+internal fun EditPersonCustomAvatarPreview() {
+  EditPersonPreview(
+    EditPersonUiState(
+      isNew = false,
+      loaded = true,
+      name = "Marta Soler",
+      shape = AvatarShape.Clover4Leaf,
+      color = AvatarColor.Sky,
+      facts = Facts.take(1),
+      channels = Channels.take(1),
+      entryCount = 3,
+    ),
+    customAvatar = true,
+  )
+}
+
+@Composable
+private fun AvatarSheetPreview(shape: AvatarShape?, color: AvatarColor?) {
+  ConversesPreviewTheme {
+    androidx.compose.material3.Surface(color = androidx.compose.material3.MaterialTheme.colorScheme.surfaceContainerLow) {
+      AvatarSheetContent(name = "Marta Soler", shape = shape, color = color, onShape = {}, onColor = {}, onDone = {})
+    }
+  }
+}
+
+/** Forma i color per defecte: el resum diu «color automàtic». */
+@Preview
+@Composable
+internal fun AvatarSheetAutoPreview() = AvatarSheetPreview(shape = null, color = null)
+
+@Preview
+@Composable
+internal fun AvatarSheetCustomPreview() = AvatarSheetPreview(shape = AvatarShape.Flower, color = AvatarColor.Rose)

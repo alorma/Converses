@@ -39,7 +39,6 @@ import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.DragIndicator
 import androidx.compose.material.icons.rounded.Fingerprint
-import androidx.compose.material.icons.rounded.PushPin
 import androidx.compose.material.icons.rounded.RemoveCircleOutline
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ButtonDefaults
@@ -155,6 +154,7 @@ fun EditPersonContent(
 ) {
   var channelDialog by remember { mutableStateOf<ChannelDialogState?>(null) }
   var showDelete by remember { mutableStateOf(false) }
+  var showAvatarSheet by remember { mutableStateOf(false) }
 
   PersonTheme(state.color ?: AvatarColor.forName(state.name)) {
     Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.surface) {
@@ -183,11 +183,28 @@ fun EditPersonContent(
           modifier = Modifier.padding(start = 4.dp),
         )
 
-        AppearanceCard(state, actions, customAvatar)
-
         Column(verticalArrangement = Arrangement.spacedBy(GroupedListDefaults.ItemSpacing)) {
           FieldCard(index = 0, count = if (state.aliasTaken) 3 else 2) {
-            LabeledField(label = stringResource(R.string.field_name), value = state.name, onValueChange = actions::onName)
+            Row(
+              modifier = Modifier.fillMaxWidth().padding(start = 12.dp, end = 4.dp, top = 8.dp, bottom = 8.dp),
+              verticalAlignment = Alignment.CenterVertically,
+              horizontalArrangement = Arrangement.spacedBy(2.dp),
+            ) {
+              NameAvatar(
+                name = state.name,
+                shape = state.shape ?: AvatarShape.Standard,
+                color = state.color ?: AvatarColor.forName(state.name),
+                editable = customAvatar,
+                onClick = { showAvatarSheet = true },
+                badgeBorder = GroupedListDefaults.containerColor,
+              )
+              LabeledField(
+                label = stringResource(R.string.field_name),
+                value = state.name,
+                onValueChange = actions::onName,
+                modifier = Modifier.weight(1f),
+              )
+            }
           }
           FieldCard(index = 1, count = if (state.aliasTaken) 3 else 2, error = state.aliasTaken) {
             LabeledField(
@@ -211,10 +228,10 @@ fun EditPersonContent(
           }
         }
 
-        SectionHeader(icon = true, title = stringResource(R.string.pinned_facts), hint = stringResource(R.string.pinned_hint))
+        SectionHeader(title = stringResource(R.string.facts_title))
         FactsEditor(state.facts, actions)
 
-        SectionHeader(icon = false, title = stringResource(R.string.channels_title), hint = null)
+        SectionHeader(title = stringResource(R.string.channels_title))
         Column(verticalArrangement = Arrangement.spacedBy(GroupedListDefaults.ItemSpacing)) {
           val count = state.channels.size + 1
           state.channels.forEachIndexed { index, channel ->
@@ -293,6 +310,17 @@ fun EditPersonContent(
       )
     }
 
+    if (showAvatarSheet && customAvatar) {
+      AvatarSheet(
+        name = state.name,
+        shape = state.shape,
+        color = state.color,
+        onShape = actions::onShape,
+        onColor = actions::onColor,
+        onDismiss = { showAvatarSheet = false },
+      )
+    }
+
     channelDialog?.let { dialog ->
       ChannelDialog(
         initial = dialog.channel,
@@ -309,94 +337,14 @@ fun EditPersonContent(
 private data class ChannelDialogState(val channel: ChannelDraft?)
 
 @Composable
-private fun AppearanceCard(state: EditPersonUiState, actions: EditPersonActions, customAvatar: Boolean) {
-  val shape = state.shape ?: AvatarShape.Standard
-  val color = state.color ?: AvatarColor.forName(state.name)
-  Surface(shape = MaterialTheme.shapes.extraLarge, color = GroupedListDefaults.containerColor, modifier = Modifier.fillMaxWidth()) {
-    Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-      Row(horizontalArrangement = Arrangement.spacedBy(16.dp), verticalAlignment = Alignment.CenterVertically) {
-        Avatar(
-          initials = initialsOf(state.name.ifBlank { "?" }),
-          shape = shape,
-          color = color,
-          size = 96.dp,
-        )
-        if (customAvatar) {
-          Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            SmallLabel(stringResource(R.string.shape_label))
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-              AvatarShape.entries.forEachIndexed { index, option ->
-                ShapeOption(shape = option, number = index + 1, selected = option == shape, onClick = { actions.onShape(option) })
-              }
-            }
-          }
-        }
-      }
-      if (customAvatar) {
-        SmallLabel(stringResource(R.string.color_label))
-        ColorSwatches(
-          entries = AvatarColor.entries,
-          selected = color,
-          colorOf = { it.color },
-          onSelect = actions::onColor,
-          labelOf = { stringResource(colorNameRes(it.name)) },
-        )
-      }
-    }
-  }
-}
-
-@Composable
-private fun ShapeOption(shape: AvatarShape, number: Int, selected: Boolean, onClick: () -> Unit) {
-  val scheme = MaterialTheme.colorScheme
-  val description = stringResource(R.string.shape_option, number)
-  Box(
-    modifier = Modifier
-      .size(52.dp)
-      .then(if (selected) Modifier.border(BorderStroke(2.dp, scheme.primary), RoundedCornerShape(16.dp)) else Modifier)
-      .clip(RoundedCornerShape(16.dp))
-      .selectable(selected = selected, role = Role.RadioButton, onClick = onClick)
-      .semantics { contentDescription = description },
-    contentAlignment = Alignment.Center,
-  ) {
-    Box(
-      modifier = Modifier
-        .size(34.dp)
-        .clip(shape.asShape())
-        .background(if (selected) scheme.primary else scheme.outline),
-    )
-  }
-}
-
-@Composable
-private fun SmallLabel(text: String) {
+private fun SectionHeader(title: String) {
   Text(
-    text = text.uppercase(),
-    style = MaterialTheme.typography.labelMedium,
+    text = title,
+    style = MaterialTheme.typography.titleMedium,
     fontWeight = FontWeight.Bold,
     color = MaterialTheme.colorScheme.onSurfaceVariant,
-  )
-}
-
-@Composable
-private fun SectionHeader(icon: Boolean, title: String, hint: String?) {
-  Row(
     modifier = Modifier.fillMaxWidth().padding(start = 4.dp, top = 8.dp),
-    verticalAlignment = Alignment.CenterVertically,
-    horizontalArrangement = Arrangement.spacedBy(8.dp),
-  ) {
-    if (icon) Icon(Icons.Rounded.PushPin, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant)
-    Text(
-      text = title,
-      style = MaterialTheme.typography.titleMedium,
-      fontWeight = FontWeight.Bold,
-      color = MaterialTheme.colorScheme.onSurfaceVariant,
-      modifier = Modifier.weight(1f),
-    )
-    if (hint != null) {
-      Text(hint, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-    }
-  }
+  )
 }
 
 @Composable
