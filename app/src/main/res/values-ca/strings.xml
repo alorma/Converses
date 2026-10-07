@@ -35,8 +35,7 @@
     <string name="settings_person_color_summary">Les pantalles de cada persona prenen el color del seu avatar</string>
     <string name="settings_dynamic_color">Color dinàmic</string>
     <string name="settings_dynamic_color_summary">Pren el to del fons de pantalla</string>
-    <string name="settings_theme_color">Color del tema</string>
-    <string name="settings_theme_color_summary">Es genera un tema complet a partir del color triat</string>
+    <string name="settings_dynamic_color_off">Desactivat: grisos neutres (grafit)</string>
     <string name="settings_language">Idioma</string>
     <string name="settings_app_language">Idioma de l\'app</string>
     <string name="settings_security">Seguretat</string>

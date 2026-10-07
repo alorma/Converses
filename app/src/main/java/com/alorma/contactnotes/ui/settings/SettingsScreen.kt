@@ -70,7 +70,6 @@ import com.alorma.contactnotes.data.flags.PersonColorFeature
 import com.alorma.contactnotes.data.flags.rememberFeatureEnabled
 import com.alorma.contactnotes.data.settings.AppLockManager
 import com.alorma.contactnotes.data.settings.AppSettings
-import com.alorma.contactnotes.designsystem.components.ColorSwatches
 import com.alorma.contactnotes.designsystem.components.ConversesToggleGroup
 import com.alorma.contactnotes.designsystem.components.GroupedListDefaults
 import com.alorma.contactnotes.designsystem.components.SettingRow
@@ -78,9 +77,7 @@ import com.alorma.contactnotes.designsystem.components.SettingSwitchRow
 import com.alorma.contactnotes.designsystem.components.groupedItemShape
 import com.alorma.contactnotes.designsystem.components.ToggleOption
 import com.alorma.contactnotes.designsystem.theme.ScreenTitleStyle
-import com.alorma.contactnotes.designsystem.theme.ThemeColor
 import com.alorma.contactnotes.designsystem.theme.ThemeMode
-import com.alorma.contactnotes.ui.people.colorNameRes
 import com.alorma.contactnotes.ui.person.canUnlockWithDevice
 import com.alorma.contactnotes.ui.person.openSecuritySetup
 import com.alorma.contactnotes.ui.person.promptUnlock
@@ -113,7 +110,6 @@ fun SettingsScreen(
     onBack = onBack,
     onThemeMode = viewModel::onThemeMode,
     onDynamicColor = viewModel::onDynamicColor,
-    onThemeColor = viewModel::onThemeColor,
     onPersonColorTheme = viewModel::onPersonColorTheme,
     onAppLockChange = { enabled ->
       activity.promptUnlock(authTitle, authSubtitle) {
@@ -137,7 +133,6 @@ fun SettingsContent(
   onBack: () -> Unit,
   onThemeMode: (ThemeMode) -> Unit,
   onDynamicColor: (Boolean) -> Unit,
-  onThemeColor: (ThemeColor) -> Unit,
   onPersonColorTheme: (Boolean) -> Unit,
   onAppLockChange: (Boolean) -> Unit,
   onRelockAfter: (Int) -> Unit,
@@ -169,7 +164,7 @@ fun SettingsContent(
         title = { SectionTitle(stringResource(R.string.settings_appearance)) },
         verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap),
       ) {
-        val themeCount = (if (settings.dynamicColor) 3 else 4) - (if (showPersonColor) 0 else 1)
+        val themeCount = if (showPersonColor) 3 else 2
         ThemeModeRow(
           selected = settings.themeMode,
           onSelected = onThemeMode,
@@ -177,19 +172,14 @@ fun SettingsContent(
         )
         SettingSwitchRow(
           title = stringResource(R.string.settings_dynamic_color),
-          subtitle = stringResource(R.string.settings_dynamic_color_summary),
+          subtitle = stringResource(
+            if (settings.dynamicColor) R.string.settings_dynamic_color_summary else R.string.settings_dynamic_color_off,
+          ),
           icon = Icons.Rounded.Palette,
           checked = settings.dynamicColor,
           onCheckedChange = onDynamicColor,
           shape = groupedItemShape(1, themeCount),
         )
-        if (!settings.dynamicColor) {
-          ThemeColorPicker(
-            selected = settings.themeColor,
-            onSelected = onThemeColor,
-            shape = groupedItemShape(2, themeCount),
-          )
-        }
         if (showPersonColor) SettingSwitchRow(
           title = stringResource(R.string.settings_person_color),
           subtitle = stringResource(R.string.settings_person_color_summary),
@@ -334,32 +324,6 @@ private fun ThemeModeRow(
         ),
         selected = selected,
         onSelect = onSelected,
-      )
-    }
-  }
-}
-
-@Composable
-private fun ThemeColorPicker(
-  selected: ThemeColor,
-  onSelected: (ThemeColor) -> Unit,
-  shape: androidx.compose.ui.graphics.Shape,
-) {
-  Surface(shape = shape, color = GroupedListDefaults.containerColor, modifier = Modifier.fillMaxWidth()) {
-    Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-      Text(stringResource(R.string.settings_theme_color), style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold)
-      Text(
-        text = stringResource(R.string.settings_theme_color_summary),
-        style = MaterialTheme.typography.bodyMedium,
-        color = MaterialTheme.colorScheme.onSurfaceVariant,
-      )
-      ColorSwatches(
-        entries = ThemeColor.entries,
-        selected = selected,
-        colorOf = { it.swatch },
-        onSelect = onSelected,
-        labelOf = { stringResource(colorNameRes(it.name)) },
-        modifier = Modifier.padding(top = 12.dp),
       )
     }
   }

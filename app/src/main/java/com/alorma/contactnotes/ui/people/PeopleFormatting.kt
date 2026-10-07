@@ -58,7 +58,7 @@ fun formatLastActivity(
   }
 }
 
-/** Nom del color d'un `AvatarColor` o d'un `ThemeColor` (comparteixen els noms). */
+/** Nom del color d'un `AvatarColor`. */
 @StringRes
 fun colorNameRes(name: String): Int = when (name) {
   "Lavender" -> R.string.color_lavender

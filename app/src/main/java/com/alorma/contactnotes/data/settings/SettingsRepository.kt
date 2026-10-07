@@ -7,7 +7,6 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
-import com.alorma.contactnotes.designsystem.theme.ThemeColor
 import com.alorma.contactnotes.designsystem.theme.ThemeMode
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -15,7 +14,6 @@ import kotlinx.coroutines.flow.map
 data class AppSettings(
   val themeMode: ThemeMode = ThemeMode.System,
   val dynamicColor: Boolean = true,
-  val themeColor: ThemeColor = ThemeColor.Lavender,
   val personColorTheme: Boolean = true,
   val appLock: Boolean = false,
   val relockAfterSeconds: Int = 60,
@@ -28,8 +26,6 @@ interface SettingsRepository {
   suspend fun setThemeMode(mode: ThemeMode)
 
   suspend fun setDynamicColor(enabled: Boolean)
-
-  suspend fun setThemeColor(color: ThemeColor)
 
   suspend fun setPersonColorTheme(enabled: Boolean)
 
@@ -51,8 +47,6 @@ class DataStoreSettingsRepository(context: Context) : SettingsRepository {
 
   override suspend fun setDynamicColor(enabled: Boolean) = write { it[DynamicColorKey] = enabled }
 
-  override suspend fun setThemeColor(color: ThemeColor) = write { it[ThemeColorKey] = color.name.uppercase() }
-
   override suspend fun setPersonColorTheme(enabled: Boolean) = write { it[PersonColorThemeKey] = enabled }
 
   override suspend fun setAppLock(enabled: Boolean) = write { it[AppLockKey] = enabled }
@@ -70,7 +64,6 @@ class DataStoreSettingsRepository(context: Context) : SettingsRepository {
     return AppSettings(
       themeMode = enumOrDefault(this[ThemeModeKey], defaults.themeMode),
       dynamicColor = this[DynamicColorKey] ?: defaults.dynamicColor,
-      themeColor = enumOrDefault(this[ThemeColorKey], defaults.themeColor),
       personColorTheme = this[PersonColorThemeKey] ?: defaults.personColorTheme,
       appLock = this[AppLockKey] ?: defaults.appLock,
       relockAfterSeconds = this[RelockAfterKey] ?: defaults.relockAfterSeconds,
@@ -81,7 +74,6 @@ class DataStoreSettingsRepository(context: Context) : SettingsRepository {
   private companion object {
     val ThemeModeKey = stringPreferencesKey("theme_mode")
     val DynamicColorKey = booleanPreferencesKey("dynamic_color")
-    val ThemeColorKey = stringPreferencesKey("theme_color")
     val PersonColorThemeKey = booleanPreferencesKey("person_color_theme")
     val AppLockKey = booleanPreferencesKey("app_lock")
     val RelockAfterKey = intPreferencesKey("relock_after")

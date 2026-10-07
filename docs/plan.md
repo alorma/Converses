@@ -4,7 +4,7 @@ Actualitzat el 7 d'oct. de 2026 · @Bernat · **la v1 és publicada a Google Pla
 
 ## Resum
 
-Converses és una app Android per recordar què has dit, què t'han dit i què ha passat amb cada persona amb qui parles, sigui per xat, per xarxes o en persona. Es construeix amb Jetpack Compose i Material 3 Expressive, en monocrom amb color dinàmic. El color apareix als avatars (pastel), als errors (vermell) i al tema triat si es desactiva el color dinàmic.
+Converses és una app Android per recordar què has dit, què t'han dit i què ha passat amb cada persona amb qui parles, sigui per xat, per xarxes o en persona. Es construeix amb Jetpack Compose i Material 3 Expressive, en monocrom amb color dinàmic. El color apareix als avatars (pastel), i als errors (vermell); amb el color dinàmic desactivat, l'app fa servir el tema Grafit, en grisos neutres.
 
 - **Referència visual:** el llenç de disseny «Converses» i el design system «Converses Design System» (tokens, components i pautes).
 - **Abast de la v1:** onboarding, llistat, Arxivades, detall amb cronologia, nova entrada (full i nota ràpida), crear i editar persona, persona protegida, bloqueig de l'app, accions d'entrada, exportar notes, arxivar, esborrar i Ajustos. **La v1 no té Pro.**
@@ -91,7 +91,7 @@ Una sola activitat (`MainActivity`, una `FragmentActivity` pel `BiometricPrompt`
 | --- | --- | --- |
 | UI | `material3` 1.5.0-alpha29 (BOM Compose 2026.09.00) | Les API d'Expressive no són públiques a la 1.4.0 estable |
 | Formes | `graphics-shapes` 1.1.0 | Formes dels avatars |
-| Color | `material-kolor` 5.0.1 | `Neutral` amb color dinàmic, `TonalSpot` amb el color triat |
+| Color | `material-kolor` 5.0.1 | `Neutral` amb color dinàmic, `Monochrome` (Grafit) sense |
 | Navegació | Navigation 3 1.2.0 + `lifecycle-viewmodel-navigation3` | Rutes tipades amb `NavKey` serialitzables |
 | Dades | Room 2.8.4 + KSP 2.3.12 | Versió 1 publicada; tot canvi necessita migració |
 | DI | Koin 4.2.2 | |
@@ -130,7 +130,7 @@ Totes les claus `personId` tenen `onDelete = CASCADE`, i hi ha un índex a `entr
 ### Tema
 
 - **Color dinàmic (per defecte):** la llavor és el `primary` de `dynamicLightColorScheme`, amb l'esquema MaterialKolor `Neutral`.
-- **Color dinàmic desactivat:** 7 colors (Lavanda, Menta, Préssec, Cel, Rosa, Llimona, Sorra) amb l'esquema `TonalSpot`.
+- **Color dinàmic desactivat (Grafit):** grisos purs, amb llavor negra i l'esquema MaterialKolor `Monochrome` (`primary` negre en clar i blanc en fosc). No hi ha selector de color: a Ajustos, «Color dinàmic» és l'última fila d'Aparença (sense el flag de Pro) i el subtítol diu «Desactivat: grisos neutres (grafit)». Proves: `GraphiteThemeTest` (grisos purs i contrast ≥ 4,5:1). Les previews i les captures fan servir aquest tema.
 - **Mode:** clar, fosc o sistema.
 - **Error fix:** clar `#BA1A1A` sobre `#FFDAD6`; fosc `#FFB4AB` sobre `#93000A`. **Èxit** (només a l'onboarding): `SuccessColors`, fixos.
 - **Avatars:** 7 pastels i 4 formes (`Cookie9Sided`, `Clover4Leaf`, `Flower`, `Sunny`). A la v1 tots són estàndard: Galeta i color automàtic pel nom (`AvatarColor.forName`, hash FNV-1a del nom normalitzat). Inicials en `#1E1D24` (primera lletra del primer i de l'últim mot), cadenat si la persona és protegida.

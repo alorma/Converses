@@ -35,8 +35,7 @@
     <string name="settings_person_color_summary">Las pantallas de cada persona toman el color de su avatar</string>
     <string name="settings_dynamic_color">Color dinámico</string>
     <string name="settings_dynamic_color_summary">Toma el tono del fondo de pantalla</string>
-    <string name="settings_theme_color">Color del tema</string>
-    <string name="settings_theme_color_summary">Se genera un tema completo a partir del color elegido</string>
+    <string name="settings_dynamic_color_off">Desactivado: grises neutros (grafito)</string>
     <string name="settings_language">Idioma</string>
     <string name="settings_app_language">Idioma de la app</string>
     <string name="settings_security">Seguridad</string>
