@@ -127,11 +127,11 @@ private class DemoAvatar(
 )
 
 private val DemoAvatars = listOf(
-  DemoAvatar("JP", AvatarShape.Cookie9Sided, AvatarColor.Mint, 18, 40, 72),
-  DemoAvatar("LF", AvatarShape.Clover4Leaf, AvatarColor.Peach, 250, 20, 88),
-  DemoAvatar("R", AvatarShape.Sunny, AvatarColor.Sky, 270, 250, 64),
-  DemoAvatar("MS", AvatarShape.Flower, AvatarColor.Rose, 40, 260, 84),
-  DemoAvatar("A", AvatarShape.Cookie9Sided, AvatarColor.Lemon, 160, 300, 48),
+  DemoAvatar("JP", AvatarShape.Standard, AvatarColor.Mint, 18, 40, 72),
+  DemoAvatar("LF", AvatarShape.Standard, AvatarColor.Peach, 250, 20, 88),
+  DemoAvatar("R", AvatarShape.Standard, AvatarColor.Sky, 270, 250, 64),
+  DemoAvatar("MS", AvatarShape.Standard, AvatarColor.Rose, 40, 260, 84),
+  DemoAvatar("A", AvatarShape.Standard, AvatarColor.Lemon, 160, 300, 48),
 )
 
 private const val BubbleCenterX = 175
