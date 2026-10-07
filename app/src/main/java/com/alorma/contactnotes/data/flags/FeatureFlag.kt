@@ -9,14 +9,16 @@ abstract class FeatureFlag(
   val runner: FeatureFlagRunner,
   val key: String,
   val defaultValue: Boolean = false,
+  /** Si és de Pro: el «pro mode» del menú de debug en canvia tots els `pro` alhora. */
+  val pro: Boolean = false,
 ) {
   open fun isEnabled(): Boolean = runner.isEnabled(this)
 }
 
-class CustomAvatarFeature(runner: FeatureFlagRunner) : FeatureFlag(runner, key = "custom_avatar_enabled")
+class CustomAvatarFeature(runner: FeatureFlagRunner) : FeatureFlag(runner, key = "custom_avatar_enabled", pro = true)
 
-class CustomChannelsFeature(runner: FeatureFlagRunner) : FeatureFlag(runner, key = "custom_channels_enabled")
+class CustomChannelsFeature(runner: FeatureFlagRunner) : FeatureFlag(runner, key = "custom_channels_enabled", pro = true)
 
-class FollowUpsFeature(runner: FeatureFlagRunner) : FeatureFlag(runner, key = "follow_ups_enabled")
+class FollowUpsFeature(runner: FeatureFlagRunner) : FeatureFlag(runner, key = "follow_ups_enabled", pro = true)
 
-class ContactIntegrationFeature(runner: FeatureFlagRunner) : FeatureFlag(runner, key = "contact_integration_enabled")
+class ContactIntegrationFeature(runner: FeatureFlagRunner) : FeatureFlag(runner, key = "contact_integration_enabled", pro = true)
