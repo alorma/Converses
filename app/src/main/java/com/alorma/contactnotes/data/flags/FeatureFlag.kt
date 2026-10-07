@@ -22,3 +22,5 @@ class CustomChannelsFeature(runner: FeatureFlagRunner) : FeatureFlag(runner, key
 class FollowUpsFeature(runner: FeatureFlagRunner) : FeatureFlag(runner, key = "follow_ups_enabled", pro = true)
 
 class ContactIntegrationFeature(runner: FeatureFlagRunner) : FeatureFlag(runner, key = "contact_integration_enabled", pro = true)
+
+class PersonColorFeature(runner: FeatureFlagRunner) : FeatureFlag(runner, key = "person_color_enabled", pro = true)
