@@ -64,6 +64,7 @@ import com.alorma.contactnotes.data.db.ChannelType
 import com.alorma.contactnotes.designsystem.components.Avatar
 import com.alorma.contactnotes.designsystem.components.rememberConversesHaptics
 import com.alorma.contactnotes.designsystem.components.DashedActionRow
+import com.alorma.contactnotes.designsystem.components.BetaBadge
 import com.alorma.contactnotes.designsystem.components.ConversesFloatingToolbar
 import com.alorma.contactnotes.designsystem.components.GroupedListDefaults
 import com.alorma.contactnotes.designsystem.components.ToolbarDestination
@@ -231,7 +232,16 @@ private fun Header(archived: Boolean, total: Int, isLoading: Boolean, onNewPerso
     verticalAlignment = Alignment.Top,
   ) {
   Column(modifier = Modifier.weight(1f)) {
-    Text(text = stringResource(if (archived) R.string.filter_archived else R.string.people_title), style = ListTitleStyle)
+    Row(verticalAlignment = Alignment.Top) {
+      Text(text = stringResource(if (archived) R.string.filter_archived else R.string.people_title), style = ListTitleStyle)
+      if (!archived) {
+        BetaBadge(
+          text = stringResource(R.string.beta_badge),
+          contentDescription = stringResource(R.string.beta_description),
+          modifier = Modifier.padding(start = 8.dp, top = 7.dp),
+        )
+      }
+    }
     if (!isLoading) {
       Text(
         text = if (total == 0 && !archived) stringResource(R.string.people_count_none) else pluralStringResource(R.plurals.people_count, total, total),
