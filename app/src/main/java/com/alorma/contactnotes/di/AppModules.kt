@@ -11,7 +11,7 @@ import com.alorma.contactnotes.data.flags.FeatureFlagStore
 import com.alorma.contactnotes.data.flags.LocalFeatureFlagRunner
 import com.alorma.contactnotes.data.flags.PersonColorFeature
 import com.alorma.contactnotes.data.db.ConversesDatabase
-import com.alorma.contactnotes.data.db.MIGRATION_1_2
+import com.alorma.contactnotes.data.db.Migration1To2
 import com.alorma.contactnotes.data.settings.AppLockManager
 import com.alorma.contactnotes.data.settings.DataStoreFireAndForgetRunner
 import com.alorma.contactnotes.data.settings.DataStoreSettingsRepository
@@ -27,6 +27,7 @@ import com.alorma.contactnotes.ui.person.PersonDetailViewModel
 import com.alorma.contactnotes.ui.person.PersonExporter
 import com.alorma.contactnotes.ui.person.PersonLockViewModel
 import com.alorma.contactnotes.ui.person.PersonViewModel
+import kotlinx.coroutines.runBlocking
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.dsl.singleOf
 import org.koin.core.module.dsl.viewModel
@@ -39,7 +40,8 @@ val databaseModule = module {
     val context: Context = androidContext()
     val isDebuggable = context.applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE != 0
     Room.databaseBuilder(context, ConversesDatabase::class.java, "converses.db")
-      .addMigrations(MIGRATION_1_2)
+      // S'executa en un fil de fons i només amb una BBDD v1: marca l'avís dels canals (les instal·lacions noves no hi passen).
+      .addMigrations(Migration1To2 { runBlocking { get<SettingsRepository>().setChannelsNoticePending(true) } })
       .apply { if (isDebuggable) fallbackToDestructiveMigration(dropAllTables = true) }
       .build()
   }
