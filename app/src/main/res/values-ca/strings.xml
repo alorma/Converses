@@ -67,6 +67,9 @@
     <string name="empty_timeline_title">Encara no hi ha res</string>
     <string name="empty_timeline_body">Què t\'ha explicat %1$s? Què li has dit tu? Comença per aquí.</string>
     <string name="empty_timeline_new_entry">Nova entrada: %1$s</string>
+    <string name="facts_less">Menys</string>
+    <string name="facts_show">Mostra les dades</string>
+    <string name="facts_hide">Amaga les dades</string>
     <string name="facts_title">Dades</string>
     <string name="timeline">Cronologia</string>
     <string name="archived_empty_description">Les persones arxivades apareixeran aquí.</string>

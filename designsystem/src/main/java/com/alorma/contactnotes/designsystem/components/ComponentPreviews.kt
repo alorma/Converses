@@ -164,3 +164,21 @@ internal fun GroupedListPreview() {
     }
   }
 }
+
+private val PreviewFacts = listOf(
+  FactItem("Character", "Bren, dwarf blacksmith, 140 years old"),
+  FactItem("Origin", "Northern lands"),
+  FactItem("Real job", "Only knows he \"works with computers\" and not much else, so don't ask"),
+)
+
+@Preview
+@Composable
+internal fun CollapsibleFactsPreview() {
+  ConversesPreviewSurface {
+    Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+      CollapsibleFacts(PreviewFacts, expanded = false, onToggle = {}, lessLabel = "Less", toggleDescription = "Show facts")
+      CollapsibleFacts(PreviewFacts, expanded = true, onToggle = {}, lessLabel = "Less", toggleDescription = "Hide facts")
+      CollapsibleFacts(PreviewFacts.take(1), expanded = false, onToggle = {}, lessLabel = "Less", toggleDescription = "Show facts")
+    }
+  }
+}
