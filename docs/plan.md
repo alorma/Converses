@@ -102,7 +102,7 @@ Una sola activitat (`MainActivity`, una `FragmentActivity` pel `BiometricPrompt`
 | Formes | `graphics-shapes` 1.1.0 | Formes dels avatars |
 | Color | `material-kolor` 5.0.1 | `Neutral` amb color dinàmic, `Monochrome` (Grafit) sense |
 | Navegació | Navigation 3 1.2.0 + `lifecycle-viewmodel-navigation3` | Rutes tipades amb `NavKey` serialitzables |
-| Dades | Room 2.8.5 + KSP 2.3.12 | Versió 1 publicada; tot canvi necessita migració |
+| Dades | Room 2.8.5 + KSP 2.3.12 | Versió 1 publicada, versió 2 (canals) pendent de publicar; tot canvi necessita migració |
 | DI | Koin 4.2.2 | |
 | Preferències | DataStore Preferences 1.2.1 | `SettingsRepository` i `FeatureFlagStore` |
 | Haptic | `ConversesHaptics` (`:designsystem`) | Única font del feedback haptic: `Confirm` en desar i esborrar, `Reject` en tocar Desa desactivat, `ToggleOn/Off` als interruptors, `SegmentTick` als selectors i xips. Mai al scroll ni a la navegació. Respecta el sistema i l'ajust «Feedback tàctil» d'Ajustos (`hapticFeedback`, per defecte actiu) |
@@ -126,7 +126,7 @@ Una sola activitat (`MainActivity`, una `FragmentActivity` pel `BiometricPrompt`
 | Ajustos | `SettingsRoute` | Inclou la política de privadesa |
 | Fulls i diàlegs | Dins del detall i de l'editor | Nova entrada, accions d'entrada, menú del split button, triar persona, «Quan», «Avatar», esborrar |
 
-### Model de dades (Room, versió 1)
+### Model de dades (Room, versió 2)
 
 | Taula | Camps |
 | --- | --- |
