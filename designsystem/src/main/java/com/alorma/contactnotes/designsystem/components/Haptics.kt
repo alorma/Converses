@@ -8,6 +8,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.hapticfeedback.HapticFeedback
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
@@ -21,23 +22,30 @@ import androidx.compose.foundation.layout.RowScope
  * El sistema ja el silencia si l'usuari té el haptic desactivat.
  */
 @Stable
-class ConversesHaptics(private val feedback: HapticFeedback) {
-  fun confirm() = feedback.performHapticFeedback(HapticFeedbackType.Confirm)
+class ConversesHaptics(private val feedback: HapticFeedback, private val enabled: Boolean = true) {
+  fun confirm() = perform(HapticFeedbackType.Confirm)
 
-  fun reject() = feedback.performHapticFeedback(HapticFeedbackType.Reject)
+  fun reject() = perform(HapticFeedbackType.Reject)
 
-  fun toggle(on: Boolean) =
-    feedback.performHapticFeedback(if (on) HapticFeedbackType.ToggleOn else HapticFeedbackType.ToggleOff)
+  fun toggle(on: Boolean) = perform(if (on) HapticFeedbackType.ToggleOn else HapticFeedbackType.ToggleOff)
 
-  fun segmentTick() = feedback.performHapticFeedback(HapticFeedbackType.SegmentTick)
+  fun segmentTick() = perform(HapticFeedbackType.SegmentTick)
 
-  fun longPress() = feedback.performHapticFeedback(HapticFeedbackType.LongPress)
+  fun longPress() = perform(HapticFeedbackType.LongPress)
+
+  private fun perform(type: HapticFeedbackType) {
+    if (enabled) feedback.performHapticFeedback(type)
+  }
 }
+
+/** Ajust de l'app per activar o apagar el haptic; el proveeix l'activitat i se suma al del sistema. */
+val LocalHapticsEnabled = staticCompositionLocalOf { true }
 
 @Composable
 fun rememberConversesHaptics(): ConversesHaptics {
   val feedback = LocalHapticFeedback.current
-  return remember(feedback) { ConversesHaptics(feedback) }
+  val enabled = LocalHapticsEnabled.current
+  return remember(feedback, enabled) { ConversesHaptics(feedback, enabled) }
 }
 
 /**

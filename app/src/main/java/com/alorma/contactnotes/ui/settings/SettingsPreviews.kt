@@ -17,6 +17,7 @@ private fun SettingsPreview(settings: AppSettings, canUnlock: Boolean) {
       onThemeMode = {},
       onDynamicColor = {},
       onPersonColorTheme = {},
+      onHapticFeedback = {},
       onAppLockChange = {},
       onRelockAfter = {},
       onOpenLanguage = {},

@@ -8,7 +8,9 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
+import com.alorma.contactnotes.designsystem.components.LocalHapticsEnabled
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.LaunchedEffect
 import androidx.fragment.app.FragmentActivity
@@ -76,6 +78,7 @@ class MainActivity : FragmentActivity() {
         }
       }
 
+      CompositionLocalProvider(LocalHapticsEnabled provides settings.hapticFeedback) {
       ConversesTheme(
         themeMode = settings.themeMode,
         dynamicColor = settings.dynamicColor,
@@ -95,6 +98,7 @@ class MainActivity : FragmentActivity() {
             }
           }
         }
+      }
       }
     }
   }

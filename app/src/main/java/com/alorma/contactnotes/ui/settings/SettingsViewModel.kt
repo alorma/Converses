@@ -22,6 +22,8 @@ class SettingsViewModel(
 
   fun onPersonColorTheme(enabled: Boolean) = viewModelScope.launch { repository.setPersonColorTheme(enabled) }
 
+  fun onHapticFeedback(enabled: Boolean) = viewModelScope.launch { repository.setHapticFeedback(enabled) }
+
   fun onAppLock(enabled: Boolean) = viewModelScope.launch { repository.setAppLock(enabled) }
 
   fun onRelockAfter(seconds: Int) = viewModelScope.launch { repository.setRelockAfterSeconds(seconds) }

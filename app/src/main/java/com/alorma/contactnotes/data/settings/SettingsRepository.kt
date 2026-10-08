@@ -15,6 +15,7 @@ data class AppSettings(
   val themeMode: ThemeMode = ThemeMode.System,
   val dynamicColor: Boolean = true,
   val personColorTheme: Boolean = true,
+  val hapticFeedback: Boolean = true,
   val appLock: Boolean = false,
   val relockAfterSeconds: Int = 60,
   val onboardingDone: Boolean = false,
@@ -28,6 +29,8 @@ interface SettingsRepository {
   suspend fun setDynamicColor(enabled: Boolean)
 
   suspend fun setPersonColorTheme(enabled: Boolean)
+
+  suspend fun setHapticFeedback(enabled: Boolean)
 
   suspend fun setAppLock(enabled: Boolean)
 
@@ -49,6 +52,8 @@ class DataStoreSettingsRepository(context: Context) : SettingsRepository {
 
   override suspend fun setPersonColorTheme(enabled: Boolean) = write { it[PersonColorThemeKey] = enabled }
 
+  override suspend fun setHapticFeedback(enabled: Boolean) = write { it[HapticFeedbackKey] = enabled }
+
   override suspend fun setAppLock(enabled: Boolean) = write { it[AppLockKey] = enabled }
 
   override suspend fun setRelockAfterSeconds(seconds: Int) = write { it[RelockAfterKey] = seconds }
@@ -65,6 +70,7 @@ class DataStoreSettingsRepository(context: Context) : SettingsRepository {
       themeMode = enumOrDefault(this[ThemeModeKey], defaults.themeMode),
       dynamicColor = this[DynamicColorKey] ?: defaults.dynamicColor,
       personColorTheme = this[PersonColorThemeKey] ?: defaults.personColorTheme,
+      hapticFeedback = this[HapticFeedbackKey] ?: defaults.hapticFeedback,
       appLock = this[AppLockKey] ?: defaults.appLock,
       relockAfterSeconds = this[RelockAfterKey] ?: defaults.relockAfterSeconds,
       onboardingDone = this[OnboardingDoneKey] ?: defaults.onboardingDone,
@@ -75,6 +81,7 @@ class DataStoreSettingsRepository(context: Context) : SettingsRepository {
     val ThemeModeKey = stringPreferencesKey("theme_mode")
     val DynamicColorKey = booleanPreferencesKey("dynamic_color")
     val PersonColorThemeKey = booleanPreferencesKey("person_color_theme")
+    val HapticFeedbackKey = booleanPreferencesKey("haptic_feedback")
     val AppLockKey = booleanPreferencesKey("app_lock")
     val RelockAfterKey = intPreferencesKey("relock_after")
     val OnboardingDoneKey = booleanPreferencesKey("onboarding_done")
