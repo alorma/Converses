@@ -44,7 +44,7 @@ private val Facts = listOf(
   FactDraft(key = 2, label = "Work", value = "Designer in Barcelona"),
 )
 
-private val Channels = setOf(ChannelType.WHATSAPP, ChannelType.IN_PERSON)
+private val Channels = setOf(ChannelType.CHAT, ChannelType.IN_PERSON)
 
 @Preview
 @Composable

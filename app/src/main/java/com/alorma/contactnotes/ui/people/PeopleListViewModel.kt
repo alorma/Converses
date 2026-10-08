@@ -12,24 +12,16 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 
-enum class ChannelGroup(val types: Set<ChannelType>) {
-  Chat(setOf(ChannelType.WHATSAPP, ChannelType.TELEGRAM, ChannelType.SIGNAL, ChannelType.DISCORD, ChannelType.EMAIL)),
-  Social(setOf(ChannelType.X, ChannelType.INSTAGRAM, ChannelType.LINKEDIN, ChannelType.REDDIT)),
-  InPerson(setOf(ChannelType.IN_PERSON)),
-  Phone(setOf(ChannelType.PHONE)),
-}
-
-/** Sense cap grup marcat es mostren totes les persones; amb grups marcats, les que en tenen algun canal (OR). */
-fun List<PersonListItem>.filterBy(groups: Set<ChannelGroup>): List<PersonListItem> {
-  if (groups.isEmpty()) return this
-  val types = groups.flatMapTo(mutableSetOf()) { it.types }
+/** Sense cap canal marcat es mostren totes les persones; amb canals marcats, les que en tenen algun (OR). */
+fun List<PersonListItem>.filterBy(types: Set<ChannelType>): List<PersonListItem> {
+  if (types.isEmpty()) return this
   return filter { item -> item.channels.any { it.type in types } }
 }
 
 data class PeopleListUiState(
   val people: List<PersonListItem> = emptyList(),
   val total: Int = 0,
-  val filter: Set<ChannelGroup> = emptySet(),
+  val filter: Set<ChannelType> = emptySet(),
   val isLoading: Boolean = true,
 )
 
@@ -37,7 +29,7 @@ class PeopleListViewModel(
   private val archived: Boolean,
   repository: ConversesRepository,
 ) : ViewModel() {
-  private val filter = MutableStateFlow(emptySet<ChannelGroup>())
+  private val filter = MutableStateFlow(emptySet<ChannelType>())
 
   val uiState: StateFlow<PeopleListUiState> =
     combine(repository.observePeople(archived = archived), filter) { people, filter ->
@@ -49,7 +41,7 @@ class PeopleListViewModel(
       )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), PeopleListUiState())
 
-  fun onFilterToggled(group: ChannelGroup) {
-    filter.update { if (group in it) it - group else it + group }
+  fun onFilterToggled(type: ChannelType) {
+    filter.update { if (type in it) it - type else it + type }
   }
 }

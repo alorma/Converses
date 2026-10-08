@@ -20,51 +20,51 @@ class PeopleListViewModelTest {
   private fun names(vm: PeopleListViewModel) = vm.uiState.value.people.map { it.person.name }
 
   @Test
-  fun filtersByChannelGroupButKeepsTheUnfilteredTotal() = runTest {
+  fun filtersByChannelButKeepsTheUnfilteredTotal() = runTest {
     val chat = db.addPerson("Chat", createdAt = 3)
     val social = db.addPerson("Social", createdAt = 2)
     val inPerson = db.addPerson("InPerson", createdAt = 1)
-    db.addChannel(chat.id, ChannelType.WHATSAPP)
-    db.addChannel(social.id, ChannelType.LINKEDIN)
+    db.addChannel(chat.id, ChannelType.CHAT)
+    db.addChannel(social.id, ChannelType.SOCIAL)
     db.addChannel(inPerson.id, ChannelType.IN_PERSON)
     val vm = PeopleListViewModel(archived = false, repository = db.repository)
     backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { vm.uiState.collect {} }
 
     assertEquals(listOf("Chat", "Social", "InPerson"), names(vm))
 
-    vm.onFilterToggled(ChannelGroup.Chat)
+    vm.onFilterToggled(ChannelType.CHAT)
     assertEquals(listOf("Chat"), names(vm))
-    vm.onFilterToggled(ChannelGroup.InPerson)
+    vm.onFilterToggled(ChannelType.IN_PERSON)
     assertEquals(listOf("Chat", "InPerson"), names(vm))
     assertEquals(3, vm.uiState.value.total)
 
-    vm.onFilterToggled(ChannelGroup.Chat)
-    vm.onFilterToggled(ChannelGroup.InPerson)
+    vm.onFilterToggled(ChannelType.CHAT)
+    vm.onFilterToggled(ChannelType.IN_PERSON)
     assertEquals(listOf("Chat", "Social", "InPerson"), names(vm))
   }
 
   @Test
-  fun xAndInstagramBelongToTheSocialFilter() = runTest {
-    val onX = db.addPerson("OnX", createdAt = 2)
-    val onInstagram = db.addPerson("OnInstagram", createdAt = 1)
-    db.addChannel(onX.id, ChannelType.X)
-    db.addChannel(onInstagram.id, ChannelType.INSTAGRAM)
+  fun filteringBySocialExcludesOtherChannels() = runTest {
+    val onX = db.addPerson("OnSocial", createdAt = 2)
+    val onInstagram = db.addPerson("OnOther", createdAt = 1)
+    db.addChannel(onX.id, ChannelType.SOCIAL)
+    db.addChannel(onInstagram.id, ChannelType.OTHER)
     val vm = PeopleListViewModel(archived = false, repository = db.repository)
     backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { vm.uiState.collect {} }
 
-    vm.onFilterToggled(ChannelGroup.Social)
-    assertEquals(listOf("OnX", "OnInstagram"), names(vm))
+    vm.onFilterToggled(ChannelType.SOCIAL)
+    assertEquals(listOf("OnSocial"), names(vm))
   }
 
   @Test
   fun protectedPeopleOnlyShowUpWithoutFilterBecauseTheirChannelsAreHidden() = runTest {
     val secret = db.addPerson("Luna", isProtected = true)
-    db.addChannel(secret.id, ChannelType.WHATSAPP)
+    db.addChannel(secret.id, ChannelType.CHAT)
     val vm = PeopleListViewModel(archived = false, repository = db.repository)
     backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { vm.uiState.collect {} }
 
     assertEquals(listOf("Luna"), names(vm))
-    vm.onFilterToggled(ChannelGroup.Chat)
+    vm.onFilterToggled(ChannelType.CHAT)
     assertEquals(emptyList<String>(), names(vm))
   }
 
@@ -75,7 +75,7 @@ class PeopleListViewModelTest {
     val vm = PeopleListViewModel(archived = true, repository = db.repository)
     backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { vm.uiState.collect {} }
 
-    vm.onFilterToggled(ChannelGroup.Phone)
+    vm.onFilterToggled(ChannelType.PHONE)
 
     assertEquals(listOf("Archived"), names(vm))
     assertFalse(vm.uiState.value.isLoading)

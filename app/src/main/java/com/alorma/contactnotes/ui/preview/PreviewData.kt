@@ -65,7 +65,7 @@ internal object PreviewData {
   )
 
   val martaChannels = listOf(
-    ChannelEntity(id = 1, personId = 1, type = ChannelType.WHATSAPP),
+    ChannelEntity(id = 1, personId = 1, type = ChannelType.CHAT),
     ChannelEntity(id = 2, personId = 1, type = ChannelType.IN_PERSON),
   )
 
@@ -79,7 +79,7 @@ internal object PreviewData {
       id = 3,
       personId = 1,
       kind = EntryKind.SAID,
-      channelType = ChannelType.WHATSAPP,
+      channelType = ChannelType.CHAT,
       text = "Told her I can't make it to dinner on Saturday.",
       occurredAt = at(3, 14, 21, 15),
     ),
@@ -87,7 +87,7 @@ internal object PreviewData {
       id = 2,
       personId = 1,
       kind = EntryKind.HEARD,
-      channelType = ChannelType.WHATSAPP,
+      channelType = ChannelType.CHAT,
       text = "She told me she moved flats.",
       occurredAt = at(3, 14, 19, 40),
     ),
@@ -110,13 +110,13 @@ internal object PreviewData {
         id = 4,
         personId = 3,
         kind = EntryKind.HEARD,
-        channelType = ChannelType.DISCORD,
+        channelType = ChannelType.CHAT,
         text = "He wants to set up a game on Friday.",
         occurredAt = at(3, 2, 18),
       ),
       channels = listOf(
-        ChannelEntity(id = 3, personId = 3, type = ChannelType.DISCORD),
-        ChannelEntity(id = 4, personId = 3, type = ChannelType.TELEGRAM),
+        ChannelEntity(id = 3, personId = 3, type = ChannelType.CHAT),
+        ChannelEntity(id = 4, personId = 3, type = ChannelType.SOCIAL),
       ),
     ),
     PersonListItem(

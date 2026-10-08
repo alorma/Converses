@@ -89,7 +89,7 @@ class EditPersonViewModelTest {
     val (first, second) = vm.state.value.facts
     vm.onFactChange(first.key, " Birthday ", " 14 March ")
     vm.onFactChange(second.key, "", "")
-    vm.onToggleChannel(ChannelType.WHATSAPP)
+    vm.onToggleChannel(ChannelType.CHAT)
     vm.onToggleChannel(ChannelType.IN_PERSON)
 
     var savedId = -1L
@@ -103,19 +103,19 @@ class EditPersonViewModelTest {
     val facts = db.repository.observePinnedFacts(savedId).first()
     assertEquals(listOf("Birthday" to "14 March"), facts.map { it.label to it.value })
     val channels = db.repository.observeChannels(savedId).first()
-    assertEquals(listOf(ChannelType.IN_PERSON, ChannelType.WHATSAPP), channels.map { it.type })
+    assertEquals(listOf(ChannelType.IN_PERSON, ChannelType.CHAT), channels.map { it.type })
   }
 
   @Test
   fun togglingAChannelSelectsAndDeselectsIt() {
     val vm = viewModel()
 
-    vm.onToggleChannel(ChannelType.TELEGRAM)
-    vm.onToggleChannel(ChannelType.X)
-    assertEquals(setOf(ChannelType.TELEGRAM, ChannelType.X), vm.state.value.channels)
+    vm.onToggleChannel(ChannelType.CHAT)
+    vm.onToggleChannel(ChannelType.SOCIAL)
+    assertEquals(setOf(ChannelType.CHAT, ChannelType.SOCIAL), vm.state.value.channels)
 
-    vm.onToggleChannel(ChannelType.TELEGRAM)
-    assertEquals(setOf(ChannelType.X), vm.state.value.channels)
+    vm.onToggleChannel(ChannelType.CHAT)
+    assertEquals(setOf(ChannelType.SOCIAL), vm.state.value.channels)
   }
 
   @Test
