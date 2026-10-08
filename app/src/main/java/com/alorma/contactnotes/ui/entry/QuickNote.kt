@@ -7,7 +7,6 @@ import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.consumeWindowInsets
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -17,8 +16,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBars
-import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
@@ -27,7 +24,6 @@ import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.PersonOutline
 import androidx.compose.material.icons.rounded.UnfoldMore
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
 import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -66,9 +62,7 @@ import com.alorma.contactnotes.data.settings.SecureWindow
 import com.alorma.contactnotes.designsystem.components.Avatar
 import com.alorma.contactnotes.designsystem.components.GroupedListDefaults
 import com.alorma.contactnotes.designsystem.theme.PersonTheme
-import com.alorma.contactnotes.designsystem.theme.ScreenTitleStyle
 import com.alorma.contactnotes.ui.people.initialsOf
-import com.alorma.contactnotes.ui.people.label
 import com.alorma.contactnotes.ui.person.canUnlockWithDevice
 import com.alorma.contactnotes.ui.person.openSecuritySetup
 import com.alorma.contactnotes.ui.person.promptUnlock
@@ -93,7 +87,6 @@ data class QuickNoteUiState(
   val selected: PersonEntity? = null,
   /** Persona protegida triada que encara no s'ha autenticat; no es tria fins que es desbloqueja. */
   val pending: PersonEntity? = null,
-  val channels: List<ChannelType> = emptyList(),
   val lastChannel: ChannelType? = null,
 )
 
@@ -128,17 +121,8 @@ class QuickNoteViewModel(
     if (selected == null) {
       flowOf(QuickNoteUiState(people = people, pending = pending))
     } else {
-      combine(
-        repository.observeChannels(selected.id),
-        repository.observeTimeline(selected.id).map { it.firstOrNull()?.channelType },
-      ) { channels, last ->
-        QuickNoteUiState(
-          people = people,
-          selected = selected,
-          pending = pending,
-          channels = channels,
-          lastChannel = last,
-        )
+      repository.observeTimeline(selected.id).map { it.firstOrNull()?.channelType }.map { last ->
+        QuickNoteUiState(people = people, selected = selected, pending = pending, lastChannel = last)
       }
     }
   }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), QuickNoteUiState())
@@ -264,10 +248,7 @@ fun QuickNoteContent(
   onSave: (person: PersonEntity, channel: ChannelType) -> Unit,
 ) {
   val selected = state.selected
-  val available = availableChannels(state.channels, showAll = selected == null)
-  val channel = form.channel?.takeIf { it in available }
-    ?: state.lastChannel?.takeIf { it in available }
-    ?: available.first()
+  val channel = form.channel ?: state.lastChannel ?: ChannelType.entries.first()
 
   PersonTheme(selected?.color) {
     val scrollBehavior = rememberTopBarScrollBehavior()
@@ -307,7 +288,6 @@ fun QuickNoteContent(
         EntryForm(
           state = form,
           person = selected,
-          channels = available,
           channel = channel,
           onChannelChange = { form.channel = it },
           header = {

@@ -194,7 +194,7 @@ fun PersonDetailRoute(
     if (showNewEntry) {
       NewEntrySheet(
         person = person,
-        channels = state.channels,
+        defaultChannel = state.entries.firstOrNull()?.channelType,
         initialKind = newEntryKind,
         focusText = newEntryFocus,
         onDismiss = { showNewEntry = false },
@@ -243,7 +243,7 @@ fun PersonDetailRoute(
         )
         EntryAction.Edit -> NewEntrySheet(
           person = person,
-          channels = state.channels,
+          defaultChannel = null,
           initial = actionEntry,
           onDismiss = ::closeAction,
           onSave = { kind, channel, text, at ->

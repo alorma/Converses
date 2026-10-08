@@ -38,7 +38,7 @@ class QuickNoteViewModelTest {
   }
 
   @Test
-  fun selectingAPersonLoadsItsChannelsAndTheChannelOfTheLastEntry() = runTest {
+  fun selectingAPersonLoadsTheChannelOfTheLastEntry() = runTest {
     val marta = db.addPerson("Marta")
     db.addEntry(marta.id, channel = ChannelType.SOCIAL, occurredAt = 9_000)
     db.addEntry(marta.id, channel = ChannelType.CHAT, occurredAt = 1_000)
@@ -48,7 +48,6 @@ class QuickNoteViewModelTest {
 
     val state = vm.uiState.value
     assertEquals(marta.id, state.selected?.id)
-    assertEquals(listOf(ChannelType.CHAT, ChannelType.SOCIAL), state.channels)
     assertEquals(ChannelType.SOCIAL, state.lastChannel)
   }
 
@@ -67,7 +66,7 @@ class QuickNoteViewModelTest {
   }
 
   @Test
-  fun aPendingProtectedPersonExposesNoChannelsNorLastChannelUntilItIsUnlocked() = runTest {
+  fun aPendingProtectedPersonExposesNoLastChannelUntilItIsUnlocked() = runTest {
     val luna = db.addPerson("Luna", isProtected = true)
     db.addEntry(luna.id, channel = ChannelType.CHAT)
     val vm = viewModel()
@@ -76,12 +75,11 @@ class QuickNoteViewModelTest {
 
     val state = vm.uiState.value
     assertNull(state.selected)
-    assertTrue(state.channels.isEmpty())
     assertNull(state.lastChannel)
   }
 
   @Test
-  fun unlockingSelectsTheProtectedPersonAndLoadsItsChannels() = runTest {
+  fun unlockingSelectsTheProtectedPersonAndLoadsItsLastChannel() = runTest {
     val luna = db.addPerson("Luna", isProtected = true)
     db.addEntry(luna.id, channel = ChannelType.CHAT, occurredAt = 1_000)
     db.addEntry(luna.id, channel = ChannelType.SOCIAL, occurredAt = 2_000)
@@ -93,7 +91,6 @@ class QuickNoteViewModelTest {
     val state = vm.uiState.value
     assertEquals(luna.id, state.selected?.id)
     assertNull(state.pending)
-    assertEquals(listOf(ChannelType.CHAT, ChannelType.SOCIAL), state.channels)
     assertEquals(ChannelType.SOCIAL, state.lastChannel)
   }
 
