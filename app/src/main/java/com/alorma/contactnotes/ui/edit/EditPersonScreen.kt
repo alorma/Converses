@@ -591,6 +591,7 @@ private fun ChannelsCard(
   onToggle: (ChannelType) -> Unit,
   modifier: Modifier = Modifier,
 ) {
+  val haptics = rememberConversesHaptics()
   Column(modifier = modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
     Row(
       modifier = Modifier.fillMaxWidth().padding(start = 4.dp, top = 8.dp, end = 4.dp),
@@ -624,7 +625,10 @@ private fun ChannelsCard(
           val isSelected = type in selected
           FilterChip(
             selected = isSelected,
-            onClick = { onToggle(type) },
+            onClick = {
+              haptics.segmentTick()
+              onToggle(type)
+            },
             modifier = Modifier.height(36.dp),
             label = {
               Text(stringResource(type.label()), fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium)
