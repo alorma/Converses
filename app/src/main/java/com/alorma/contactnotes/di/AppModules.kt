@@ -11,6 +11,7 @@ import com.alorma.contactnotes.data.flags.FeatureFlagStore
 import com.alorma.contactnotes.data.flags.LocalFeatureFlagRunner
 import com.alorma.contactnotes.data.flags.PersonColorFeature
 import com.alorma.contactnotes.data.db.ConversesDatabase
+import com.alorma.contactnotes.data.db.MIGRATION_1_2
 import com.alorma.contactnotes.data.settings.AppLockManager
 import com.alorma.contactnotes.data.settings.DataStoreFireAndForgetRunner
 import com.alorma.contactnotes.data.settings.DataStoreSettingsRepository
@@ -38,6 +39,7 @@ val databaseModule = module {
     val context: Context = androidContext()
     val isDebuggable = context.applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE != 0
     Room.databaseBuilder(context, ConversesDatabase::class.java, "converses.db")
+      .addMigrations(MIGRATION_1_2)
       .apply { if (isDebuggable) fallbackToDestructiveMigration(dropAllTables = true) }
       .build()
   }
