@@ -1,5 +1,6 @@
 package com.alorma.contactnotes.ui.entry
 
+import com.alorma.contactnotes.designsystem.components.ConversesSaveButton
 import com.alorma.contactnotes.data.db.shape
 import com.alorma.contactnotes.data.db.color
 import androidx.activity.compose.LocalActivity
@@ -284,7 +285,7 @@ fun QuickNoteContent(
             }
           },
           actions = {
-            Button(
+            ConversesSaveButton(
               onClick = { if (selected != null) onSave(selected, channel) },
               enabled = form.canSave && selected != null,
               modifier = Modifier.padding(end = 8.dp),

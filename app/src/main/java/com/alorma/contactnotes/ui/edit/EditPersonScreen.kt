@@ -108,6 +108,7 @@ import com.alorma.contactnotes.designsystem.components.Avatar
 import com.alorma.contactnotes.designsystem.components.AvatarColor
 import com.alorma.contactnotes.designsystem.components.AvatarShape
 import com.alorma.contactnotes.designsystem.components.ColorSwatches
+import com.alorma.contactnotes.designsystem.components.ConversesSaveButton
 import com.alorma.contactnotes.designsystem.components.ConversesFilterChip
 import com.alorma.contactnotes.designsystem.components.GroupedListDefaults
 import com.alorma.contactnotes.designsystem.components.asShape
@@ -196,7 +197,7 @@ fun EditPersonContent(
             }
           },
           actions = {
-            Button(onClick = { actions.save(onSaved) }, enabled = state.canSave, modifier = Modifier.padding(end = 8.dp)) {
+            ConversesSaveButton(onClick = { actions.save(onSaved) }, enabled = state.canSave, modifier = Modifier.padding(end = 8.dp)) {
               Text(stringResource(R.string.save), fontWeight = FontWeight.Bold)
             }
           },
