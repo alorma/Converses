@@ -18,32 +18,33 @@ Mai es cobra per **accedir, protegir o treure** les dades pròpies. Al Pro hi va
 - Persones, entrades, cronologia, «Qui» i «Quan».
 - Persones protegides i bloqueig de l'app.
 - Exportar notes.
-- Canals del sistema (sense usuari ni «Altres»).
+- Els 5 grups de canals: En persona, Telèfon, Xat, Social i Altres (backlog 13).
 
 ## Pro (fora de la v1 gratuïta)
 
 | Funció | A la v1 gratuïta | Amb Pro |
 | --- | --- | --- |
 | **Avatar personalitzat** (color i forma) | Forma fixa **Galeta** (`Cookie9Sided`) i color automàtic a partir del nom; no es poden canviar | Selector de color i forma a Editar persona / Nova persona |
-| **Canals propis** (backlog 8) | No existeix: només els canals del sistema | Crear canals amb nom i icona |
+| **Sub-canals** (backlog 8) | No existeix: només els 5 grups | Crear sub-canals dins de qualsevol grup, amb nom lliure (únic per persona) i valor opcional |
 | **Follow-ups / pendents** (backlog 6) | No existeix | Marcar entrades com a pendents, secció «Pendents» al detall, comptador al llistat i recordatoris |
 | **Color de la persona** (tema del detall, `PersonColorFeature`) | No hi és: les pantalles de la persona usen el tema de l'app i l'avatar només té el color automàtic pel nom | Activar el tema que pren el color de l'avatar (i l'ajust «Color de la persona» a Ajustos) |
 | **Contact integration** | No existeix | Vincular una persona a un contacte (`LOOKUP_KEY`), enllaç a «Connected apps» de Contactes, avís de trucada entrant (`CallScreeningService`), importació de diversos contactes de cop (`READ_CONTACTS`) |
 
 ## Fet a la v1 gratuïta
 
-- **Feature flags** (`data/flags/`): `CustomAvatarFeature` i `PersonColorFeature`, tots dos apagats; es provan amb el «Pro mode» del menú de debug. Els flags de canals propis, follow-ups i contactes s'afegiran quan existeixin aquestes funcions. Encara no es comprova cap pagament.
+- **Feature flags** (`data/flags/`): `CustomAvatarFeature` i `PersonColorFeature`, tots dos apagats; es provan amb el «Pro mode» del menú de debug. Els flags de sub-canals, follow-ups i contactes s'afegiran quan existeixin aquestes funcions. Encara no es comprova cap pagament.
 - **Avatar estàndard:** Galeta i color automàtic pel nom (`AvatarColor.forName`); `avatarShape` i `avatarColor` nul·lables (`null` = estàndard).
 - **Editor:** sense targeta d'avatar; l'avatar és a la fila del nom i, amb `CustomAvatarFeature`, obre el full «Avatar».
 
 ## Pendent per al Pro
 
 - Play Billing i la comprovació de pagament al runner de flags.
-- Canals propis (backlog 8), follow-ups (backlog 6) i integració amb contactes, cadascun darrere del seu flag. Tots tres toquen la base de dades: **cal migració i test** (la v1 ja és publicada).
+- Sub-canals (backlog 8), follow-ups (backlog 6) i integració amb contactes, cadascun darrere del seu flag. Tots tres toquen la base de dades: **cal migració i test** (la v1 ja és publicada).
 
-## Pendent de decidir
+## Decidit
 
-- **Canal «Empresa»** (backlog 7): si es fa abans dels canals propis, és un canal del sistema gratuït; si no, serà un canal propi (Pro).
+- **Canal «Empresa»** (backlog 7): ja no és un canal del sistema; és un sub-canal d'«Altres» (Pro).
+- Els canals que els usuaris de la beta tenien (WhatsApp, Telegram…) es migren al seu grup en una sola entrada; no es mantenen gratis (backlog 13).
 
 ## Proves
 
