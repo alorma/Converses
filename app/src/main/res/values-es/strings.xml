@@ -212,11 +212,11 @@
     <string name="onb_no_accounts">Sin cuentas</string>
     <string name="onb_page">Paso %1$d de %2$d</string>
     <string name="onb_sample_1_label">LUNA · 21:25 · DISCORD</string>
-    <string name="onb_sample_1_text">Nyra le debe dinero al gremio.</string>
+    <string name="onb_sample_1_text">Nyra me debe una caña.</string>
     <string name="onb_sample_2_label">YO · 21:40 · DISCORD</string>
-    <string name="onb_sample_2_text">Kael perdió a su hermano.</string>
+    <string name="onb_sample_2_text">Kael perdió el tren.</string>
     <string name="onb_sample_3_label">APUNTE · AYER · EN PERSONA</string>
-    <string name="onb_sample_3_text">Partida en la jornada de juegos.</string>
+    <string name="onb_sample_3_text">Paella con la pandilla.</string>
     <string name="avatar_edit_cd">Cambia la forma y el color del avatar</string>
     <string name="avatar_sheet_title">Avatar</string>
     <string name="avatar_shape">Forma</string>

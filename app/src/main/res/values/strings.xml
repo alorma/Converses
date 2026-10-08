@@ -212,11 +212,11 @@
     <string name="onb_no_accounts">No accounts</string>
     <string name="onb_page">Step %1$d of %2$d</string>
     <string name="onb_sample_1_label">LUNA · 21:25 · DISCORD</string>
-    <string name="onb_sample_1_text">Nyra owes the guild money.</string>
+    <string name="onb_sample_1_text">Nyra borrowed my umbrella.</string>
     <string name="onb_sample_2_label">ME · 21:40 · DISCORD</string>
-    <string name="onb_sample_2_text">Kael lost his brother.</string>
+    <string name="onb_sample_2_text">Kael lost his wallet.</string>
     <string name="onb_sample_3_label">NOTE · YESTERDAY · IN PERSON</string>
-    <string name="onb_sample_3_text">Game at the board games day.</string>
+    <string name="onb_sample_3_text">Tea with the gang.</string>
     <string name="avatar_edit_cd">Change avatar shape and colour</string>
     <string name="avatar_sheet_title">Avatar</string>
     <string name="avatar_shape">Shape</string>
