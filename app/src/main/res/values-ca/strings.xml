@@ -6,6 +6,8 @@
         <item quantity="one">%d persona</item>
         <item quantity="other">%d persones</item>
     </plurals>
+    <string name="people_count_none">Cap persona encara</string>
+    <string name="people_empty_description">Afegeix la primera persona i comença a apuntar què us dieu i què ha passat.</string>
     <string name="people_empty">Encara no hi ha ningú</string>
     <string name="no_entries_yet">Encara no hi ha entrades</string>
     <string name="protected_hint">Protegida · toca per desbloquejar</string>
@@ -59,7 +61,8 @@
     <string name="profile_created">Fitxa creada: %1$s</string>
     <string name="facts_title">Dades</string>
     <string name="timeline">Cronologia</string>
-    <string name="add_first_person">Afegeix la primera persona</string>
+    <string name="archived_empty_description">Les persones arxivades apareixeran aquí.</string>
+    <string name="people_empty_filter_description">Prova un altre canal, o desmarca els filtres per veure tothom.</string>
     <string name="people_empty_filter">Ningú en aquest canal</string>
     <string name="timeline_filtered_empty">Cap entrada de %1$s</string>
     <string name="timeline_empty">Encara no hi ha entrades</string>

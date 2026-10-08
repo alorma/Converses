@@ -62,7 +62,7 @@ Converses és una app Android per recordar què has dit, què t'han dit i què h
 
 ### Design system (feina de Bernat a Claude Design)
 
-Sense data: es va sincronitzant amb l'app a mesura que convé i no bloqueja res. Canvis acumulats a l'app: colors d'error fixos; split button de 56 dp i el seu menú; full d'accions; full de nova entrada i nota ràpida; full de triar persona; pantalla de bloqueig amb els quatre estats; avatar protegit; tema d'Ajustos com a `ButtonGroup` connectat; filtre de canal com a `FilterChip` de multiselecció; files d'Ajustos; pastilles de canal; estats buits i snackbar; barra flotant amb tres destinacions; fila «Quan» i full «Quan va ser?»; selector «Qui» i marcadors; verd d'èxit de l'onboarding; avatar estàndard i full «Avatar».
+Sense data: es va sincronitzant amb l'app a mesura que convé i no bloqueja res. Canvis acumulats a l'app: colors d'error fixos; split button de 56 dp i el seu menú; full d'accions; full de nova entrada i nota ràpida; full de triar persona; pantalla de bloqueig amb els quatre estats; avatar protegit; tema d'Ajustos com a `ButtonGroup` connectat; filtre de canal com a `FilterChip` de multiselecció; files d'Ajustos; pastilles de canal; estats buits (el del llistat sense persones, a pantalla completa) i snackbar; barra flotant amb tres destinacions; fila «Quan» i full «Quan va ser?»; selector «Qui» i marcadors; verd d'èxit de l'onboarding; avatar estàndard i full «Avatar».
 
 ## Iteració 2 (després de la publicació)
 
@@ -167,7 +167,7 @@ Darrere de `PersonColorFeature`. Encès, cada persona porta el color de l'avatar
 
 ### Components propis (`designsystem`)
 
-`Avatar`, `GroupedList` / `groupedItems`, `TimelineRow` i `TimelineMarker`, `ConversesFilterChip`, `ConversesChannelChip`, `ConversesToggleGroup`, `ConversesFloatingToolbar` i `ToolbarDestination`, `ConversesSplitButton` i `ConversesMenuItem`, `SettingRow` / `SettingSwitchRow`, `DashedActionRow`, `EmptyState`, `ColorSwatches`, `ConversesLoadingIndicator`, `ConversesTheme`, `PersonTheme` i `AppColors`. A l'app: `PersonPickerSheet`, `ChannelsCard`, `AvatarSheet`.
+`Avatar`, `GroupedList` / `groupedItems`, `TimelineRow` i `TimelineMarker`, `ConversesFilterChip`, `ConversesChannelChip`, `ConversesToggleGroup`, `ConversesFloatingToolbar` i `ToolbarDestination`, `ConversesSplitButton` i `ConversesMenuItem`, `SettingRow` / `SettingSwitchRow`, `DashedActionRow`, `EmptyState` i `WelcomeEmptyState` (llistat sense cap persona), `ColorSwatches`, `ConversesLoadingIndicator`, `ConversesTheme`, `PersonTheme` i `AppColors`. A l'app: `PersonPickerSheet`, `ChannelsCard`, `AvatarSheet`.
 
 ### Tests
 
