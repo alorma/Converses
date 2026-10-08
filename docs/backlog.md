@@ -7,8 +7,9 @@ Actualitzat el 7 d'oct. de 2026. Només hi ha el que encara no està fet.
 | 6 | Feature (Iteració 2) | Follow-ups / entrades pendents | [#5](https://github.com/alorma/Converses/issues/5) |
 | 7 | Feature (Iteració 2) | Nou canal "Empresa" (queda dins el 8) | — |
 | 8 | Feature (Iteració 2) | Gestor de canals propis | — |
+| 11 | Feature (Iteració 2) | Importar text a la nota ràpida (compartir, seleccionar text i enganxar) | [#30](https://github.com/alorma/Converses/issues/30) |
 
-Els tres són de l'**Iteració 2**, després de publicar l'app; el 6 i el 8 són Pro (vegeu `docs/pro.md`). **Qualsevol canvi de la base de dades ha d'incloure una migració i el seu test** (la v1 ja és a Google Play). La numeració és la del backlog original, perquè els issues i les referències no canviïn; els punts resolts (1–5, 9, 10) són a l'historial de git.
+Tots són de l'**Iteració 2**, després de publicar l'app; el 6 i el 8 són Pro i l'11 és gratis (vegeu `docs/pro.md`). **Qualsevol canvi de la base de dades ha d'incloure una migració i el seu test** (la v1 ja és a Google Play); l'11 no toca Room. La numeració és la del backlog original, perquè els issues i les referències no canviïn; els punts resolts (1–5, 9, 10) són a l'historial de git.
 
 ---
 
@@ -49,3 +50,23 @@ Permetre crear canals propis (Signal, LinkedIn, Empresa...) en lloc de dependre 
 - Passar de l'enum a una taula de canals a Room (id, nom, icona, sistema/usuari, ordre) amb **migració i test**: els canals i les entrades existents han d'apuntar als canals de sistema equivalents.
 - Afecta: detall de persona, `EntryForm` (xips d'«On»), `ChannelsCard` de l'editor, `ChannelFilter` i `PersonExporter.kt`.
 - Els noms creats per l'usuari no es tradueixen.
+
+---
+
+## 11 · Feature: importar text a la nota ràpida
+
+Issue: [#30](https://github.com/alorma/Converses/issues/30) (el detall complet, el comportament i els criteris d'acceptació són a la issue).
+
+Portar text d'altres apps a la nota ràpida amb el mínim de passos: el text ja hi és posat, l'usuari tria la persona i desa. WhatsApp, Telegram i companyia no comparteixen els missatges com a text (només deixen copiar), per això hi ha tres vies:
+
+- **A. Compartir:** `ACTION_SEND` + `text/plain` (navegador, correu, notes, X, Reddit…).
+- **B. Seleccionar text:** `ACTION_PROCESS_TEXT` (Converses surt al menú de selecció).
+- **C. Enganxar:** botó «Enganxa» a la nota ràpida, visible quan el porta-retalls té text; el contingut només es llegeix quan es prem.
+
+**Què cal fer**
+- `intent-filter`s `SEND` i `PROCESS_TEXT` a `MainActivity`; `Intent.toBackStack()` com a deep link de Navigation 3 i `QuickNoteRoute(sharedText)`.
+- Sense persones, «Crea la primera persona» obre l'editor i el text es manté en tornar.
+- «Qui» per defecte a la persona (`HEARD`); provisionalment, un enllaç sol va a `HAPPENED` (pregunta oberta de la issue).
+- **Privacitat:** el bloqueig de l'app surt abans de la nota ràpida; una persona protegida demana l'empremta i la pantalla té `FLAG_SECURE`.
+- Fora d'abast: imatges i fitxers (`SEND_MULTIPLE`), Direct Share i xats exportats.
+- Sense canvis a Room, **no cal migració**. Textos nous a `values/`, `values-ca/` i `values-es/`; en acabar, afegir-ho a «Gratis per sempre» de `docs/pro.md` i actualitzar `docs/plan.md`.
