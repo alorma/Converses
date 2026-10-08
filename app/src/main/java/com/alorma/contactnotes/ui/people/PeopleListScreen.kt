@@ -27,10 +27,11 @@ import androidx.compose.material.icons.rounded.Groups
 import androidx.compose.material.icons.rounded.Lock
 import androidx.compose.material.icons.rounded.PersonAdd
 import androidx.compose.material.icons.rounded.Settings
+import androidx.compose.material3.FabPosition
 import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -95,72 +96,36 @@ fun PeopleListScreen(
   onOpenSettings: () -> Unit,
   onNewPerson: () -> Unit,
 ) {
-  Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.surface) {
-    Box(modifier = Modifier.fillMaxSize()) {
-      LazyColumn(
-        modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(start = ScreenMargin, end = ScreenMargin, bottom = 136.dp),
+  Scaffold(
+    containerColor = MaterialTheme.colorScheme.surface,
+    contentWindowInsets = WindowInsets.navigationBars,
+    topBar = {
+      // Capçalera i filtres fixos a dalt, amb fons opac perquè la llista passi per sota, també l'àrea de la barra d'estat
+      Column(
+        modifier = Modifier
+          .background(MaterialTheme.colorScheme.surface)
+          .windowInsetsPadding(WindowInsets.statusBars)
+          .padding(horizontal = ScreenMargin),
         verticalArrangement = Arrangement.spacedBy(GroupedListDefaults.ItemSpacing),
       ) {
-        // Capçalera i filtres fixos a dalt: el fons opac tapa la llista que passa per sota, també l'àrea de la barra d'estat
-        stickyHeader(key = "header") {
-          Column(
-            modifier = Modifier
-              .background(MaterialTheme.colorScheme.surface)
-              .windowInsetsPadding(WindowInsets.statusBars),
-            verticalArrangement = Arrangement.spacedBy(GroupedListDefaults.ItemSpacing),
-          ) {
-            Header(
-              archived = archived,
-              total = state.total,
-              isLoading = state.isLoading,
-              onNewPerson = onNewPerson,
-            )
-            if (!archived) {
-              FilterRow(selected = state.filter, onSelected = onFilterSelected)
-            }
-          }
-        }
-        if (!state.isLoading && state.people.isEmpty()) {
-          item(key = "empty") {
-            val noPeopleAtAll = !archived && state.filter == ChannelFilter.All
-            EmptyState(
-              icon = if (archived) Icons.Rounded.Archive else Icons.Rounded.Groups,
-              title = stringResource(
-                when {
-                  archived -> R.string.archived_empty
-                  noPeopleAtAll -> R.string.people_empty
-                  else -> R.string.people_empty_filter
-                },
-              ),
-              actionLabel = if (noPeopleAtAll) stringResource(R.string.add_first_person) else null,
-              onAction = if (noPeopleAtAll) onNewPerson else null,
-            )
-          }
-        }
-        groupedItems(state.people, key = { it.person.id }) { item ->
-          PersonRow(item, onClick = { onPersonClick(item.person) })
-        }
-        if (!state.isLoading && !archived && state.people.isNotEmpty()) {
-          item(key = "add_person") {
-            DashedActionRow(
-              icon = Icons.Rounded.PersonAdd,
-              label = stringResource(R.string.add_person),
-              onClick = onNewPerson,
-              modifier = Modifier.padding(top = 12.dp),
-            )
-          }
+        Header(
+          archived = archived,
+          total = state.total,
+          isLoading = state.isLoading,
+          onNewPerson = onNewPerson,
+        )
+        if (!archived) {
+          FilterRow(selected = state.filter, onSelected = onFilterSelected)
         }
       }
-
+    },
+    floatingActionButtonPosition = FabPosition.Center,
+    floatingActionButton = {
       ConversesFloatingToolbar(
         fabIcon = Icons.Rounded.EditNote,
         fabContentDescription = stringResource(R.string.quick_note),
         onFabClick = onQuickNote,
-        modifier = Modifier
-          .align(Alignment.BottomCenter)
-          .windowInsetsPadding(WindowInsets.navigationBars)
-          .padding(horizontal = ScreenMargin, vertical = 16.dp),
+        modifier = Modifier.padding(horizontal = ScreenMargin),
       ) {
         ToolbarDestination(
           icon = Icons.Rounded.Groups,
@@ -180,6 +145,48 @@ fun PeopleListScreen(
           selected = false,
           onClick = onOpenSettings,
         )
+      }
+    },
+  ) { padding ->
+    LazyColumn(
+      modifier = Modifier.fillMaxSize(),
+      contentPadding = PaddingValues(
+        start = ScreenMargin,
+        end = ScreenMargin,
+        top = padding.calculateTopPadding(),
+        bottom = 96.dp + padding.calculateBottomPadding(),
+      ),
+      verticalArrangement = Arrangement.spacedBy(GroupedListDefaults.ItemSpacing),
+    ) {
+      if (!state.isLoading && state.people.isEmpty()) {
+        item(key = "empty") {
+          val noPeopleAtAll = !archived && state.filter == ChannelFilter.All
+          EmptyState(
+            icon = if (archived) Icons.Rounded.Archive else Icons.Rounded.Groups,
+            title = stringResource(
+              when {
+                archived -> R.string.archived_empty
+                noPeopleAtAll -> R.string.people_empty
+                else -> R.string.people_empty_filter
+              },
+            ),
+            actionLabel = if (noPeopleAtAll) stringResource(R.string.add_first_person) else null,
+            onAction = if (noPeopleAtAll) onNewPerson else null,
+          )
+        }
+      }
+      groupedItems(state.people, key = { it.person.id }) { item ->
+        PersonRow(item, onClick = { onPersonClick(item.person) })
+      }
+      if (!state.isLoading && !archived && state.people.isNotEmpty()) {
+        item(key = "add_person") {
+          DashedActionRow(
+            icon = Icons.Rounded.PersonAdd,
+            label = stringResource(R.string.add_person),
+            onClick = onNewPerson,
+            modifier = Modifier.padding(top = 12.dp),
+          )
+        }
       }
     }
   }
