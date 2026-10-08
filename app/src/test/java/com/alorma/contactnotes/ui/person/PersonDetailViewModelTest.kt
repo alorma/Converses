@@ -89,7 +89,7 @@ class PersonDetailViewModelTest {
     val entry = db.addEntry(person.id, occurredAt = 7_000)
     val vm = viewModel()
 
-    vm.updateEntry(entry, EntryKind.HEARD, ChannelType.DISCORD, "edited", occurredAt = null)
+    vm.updateEntry(entry, EntryKind.HEARD, ChannelType.SOCIAL, "edited", occurredAt = null)
 
     val updated = vm.uiState.value.entries.single()
     assertEquals("edited", updated.text)
@@ -111,10 +111,10 @@ class PersonDetailViewModelTest {
 
   @Test
   fun deleteDayOnlyRemovesThatDayAndChannel() = runTest {
-    val target = db.addEntry(person.id, channel = ChannelType.WHATSAPP, text = "a", occurredAt = at(5, 9))
-    db.addEntry(person.id, channel = ChannelType.WHATSAPP, text = "b", occurredAt = at(5, 21))
-    db.addEntry(person.id, channel = ChannelType.DISCORD, text = "other channel", occurredAt = at(5, 12))
-    db.addEntry(person.id, channel = ChannelType.WHATSAPP, text = "other day", occurredAt = at(6, 9))
+    val target = db.addEntry(person.id, channel = ChannelType.CHAT, text = "a", occurredAt = at(5, 9))
+    db.addEntry(person.id, channel = ChannelType.CHAT, text = "b", occurredAt = at(5, 21))
+    db.addEntry(person.id, channel = ChannelType.SOCIAL, text = "other channel", occurredAt = at(5, 12))
+    db.addEntry(person.id, channel = ChannelType.CHAT, text = "other day", occurredAt = at(6, 9))
     val vm = viewModel()
 
     assertEquals(2, vm.countDay(target))

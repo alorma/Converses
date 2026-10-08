@@ -11,26 +11,12 @@ import java.time.temporal.ChronoUnit
 import java.util.Locale
 
 @StringRes
-fun ChannelGroup.label(): Int = when (this) {
-  ChannelGroup.Chat -> R.string.filter_chat
-  ChannelGroup.Social -> R.string.filter_social
-  ChannelGroup.InPerson -> R.string.filter_in_person
-  ChannelGroup.Phone -> R.string.filter_phone
-}
-
-@StringRes
 fun ChannelType.label(): Int = when (this) {
   ChannelType.IN_PERSON -> R.string.channel_in_person
-  ChannelType.WHATSAPP -> R.string.channel_whatsapp
-  ChannelType.TELEGRAM -> R.string.channel_telegram
-  ChannelType.X -> R.string.channel_x
-  ChannelType.INSTAGRAM -> R.string.channel_instagram
   ChannelType.PHONE -> R.string.channel_phone
-  ChannelType.EMAIL -> R.string.channel_email
-  ChannelType.DISCORD -> R.string.channel_discord
-  ChannelType.SIGNAL -> R.string.channel_signal
-  ChannelType.LINKEDIN -> R.string.channel_linkedin
-  ChannelType.REDDIT -> R.string.channel_reddit
+  ChannelType.CHAT -> R.string.channel_chat
+  ChannelType.SOCIAL -> R.string.channel_social
+  ChannelType.OTHER -> R.string.channel_other
 }
 
 fun initialsOf(name: String): String {

@@ -10,7 +10,8 @@ import com.alorma.contactnotes.designsystem.components.AvatarColor
 import com.alorma.contactnotes.designsystem.components.AvatarShape
 
 /** L'ordre de declaració és l'ordre fix amb què es mostren els canals, del més habitual al menys. */
-enum class ChannelType { IN_PERSON, WHATSAPP, TELEGRAM, X, INSTAGRAM, PHONE, EMAIL, DISCORD, SIGNAL, LINKEDIN, REDDIT }
+/** Els 5 grups fixos de canals. Els valors es desen pel nom: la migració 1 → 2 va fusionar els antics (WhatsApp, X…) al seu grup. */
+enum class ChannelType { IN_PERSON, PHONE, CHAT, SOCIAL, OTHER }
 
 enum class EntryKind { SAID, HEARD, HAPPENED }
 

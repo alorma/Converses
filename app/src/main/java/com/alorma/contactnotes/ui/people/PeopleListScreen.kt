@@ -60,6 +60,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.alorma.contactnotes.R
 import com.alorma.contactnotes.data.db.PersonEntity
 import com.alorma.contactnotes.data.db.PersonListItem
+import com.alorma.contactnotes.data.db.ChannelType
 import com.alorma.contactnotes.designsystem.components.Avatar
 import com.alorma.contactnotes.designsystem.components.rememberConversesHaptics
 import com.alorma.contactnotes.designsystem.components.DashedActionRow
@@ -103,7 +104,7 @@ fun PeopleListScreen(
   state: PeopleListUiState,
   archived: Boolean,
   onToggleArchivedList: () -> Unit,
-  onFilterToggled: (ChannelGroup) -> Unit,
+  onFilterToggled: (ChannelType) -> Unit,
   onPersonClick: (PersonEntity) -> Unit,
   onQuickNote: () -> Unit,
   onOpenSettings: () -> Unit,
@@ -248,7 +249,7 @@ private fun Header(archived: Boolean, total: Int, isLoading: Boolean, onNewPerso
 }
 
 @Composable
-private fun FilterRow(selected: Set<ChannelGroup>, onToggle: (ChannelGroup) -> Unit) {
+private fun FilterRow(selected: Set<ChannelType>, onToggle: (ChannelType) -> Unit) {
   val scheme = MaterialTheme.colorScheme
   val haptics = rememberConversesHaptics()
   Row(
@@ -258,7 +259,7 @@ private fun FilterRow(selected: Set<ChannelGroup>, onToggle: (ChannelGroup) -> U
       .padding(top = 12.dp, bottom = 14.dp),
     horizontalArrangement = Arrangement.spacedBy(8.dp),
   ) {
-    ChannelGroup.entries.forEach { group ->
+    ChannelType.entries.forEach { group ->
       val isSelected = group in selected
       FilterChip(
         selected = isSelected,

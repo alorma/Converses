@@ -2,16 +2,10 @@ package com.alorma.contactnotes.ui.person
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.Chat
-import androidx.compose.material.icons.automirrored.rounded.Send
 import androidx.compose.material.icons.rounded.AlternateEmail
 import androidx.compose.material.icons.rounded.Call
 import androidx.compose.material.icons.rounded.Forum
 import androidx.compose.material.icons.rounded.Group
-import androidx.compose.material.icons.rounded.HeadsetMic
-import androidx.compose.material.icons.rounded.Lock
-import androidx.compose.material.icons.rounded.Mail
-import androidx.compose.material.icons.rounded.PhotoCamera
-import androidx.compose.material.icons.rounded.Work
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
@@ -28,16 +22,11 @@ import java.util.Locale
 
 fun ChannelType.icon(): ImageVector = when (this) {
   ChannelType.IN_PERSON -> Icons.Rounded.Group
-  ChannelType.WHATSAPP -> Icons.AutoMirrored.Rounded.Chat
-  ChannelType.TELEGRAM -> Icons.AutoMirrored.Rounded.Send
-  ChannelType.X -> Icons.Rounded.AlternateEmail
-  ChannelType.INSTAGRAM -> Icons.Rounded.PhotoCamera
   ChannelType.PHONE -> Icons.Rounded.Call
-  ChannelType.EMAIL -> Icons.Rounded.Mail
-  ChannelType.DISCORD -> Icons.Rounded.HeadsetMic
-  ChannelType.SIGNAL -> Icons.Rounded.Lock
-  ChannelType.LINKEDIN -> Icons.Rounded.Work
-  ChannelType.REDDIT -> Icons.Rounded.Forum
+  // Provisional: pendent de les icones de disseny per a Xat, Social i Altres.
+  ChannelType.CHAT -> Icons.AutoMirrored.Rounded.Chat
+  ChannelType.SOCIAL -> Icons.Rounded.AlternateEmail
+  ChannelType.OTHER -> Icons.Rounded.Forum
 }
 
 fun entryDate(epochMillis: Long, zone: ZoneId = ZoneId.systemDefault()): LocalDate =

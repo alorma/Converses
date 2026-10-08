@@ -64,7 +64,7 @@ class FakeDb {
   fun addEntry(
     personId: Long,
     kind: EntryKind = EntryKind.SAID,
-    channel: ChannelType = ChannelType.WHATSAPP,
+    channel: ChannelType = ChannelType.CHAT,
     text: String = "text",
     occurredAt: Long = 10_000,
   ): EntryEntity {

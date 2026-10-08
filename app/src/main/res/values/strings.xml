@@ -84,20 +84,10 @@
     <string name="quick_note">Quick note</string>
     <string name="yesterday">Yesterday</string>
 
-    <string name="filter_chat">Chat</string>
-    <string name="filter_social">Social</string>
-    <string name="filter_in_person">In person</string>
-    <string name="filter_phone">Phone</string>
 
-    <string name="channel_discord">Discord</string>
-    <string name="channel_telegram">Telegram</string>
-    <string name="channel_whatsapp">WhatsApp</string>
-    <string name="channel_reddit">Reddit</string>
-    <string name="channel_email">Email</string>
-    <string name="channel_signal">Signal</string>
-    <string name="channel_linkedin">LinkedIn</string>
-    <string name="channel_x">X</string>
-    <string name="channel_instagram">Instagram</string>
+    <string name="channel_chat">Chat</string>
+    <string name="channel_social">Social</string>
+    <string name="channel_other">Other</string>
     <string name="channel_phone">Phone</string>
     <string name="channel_in_person">In person</string>
     <string name="more_options">More options</string>
