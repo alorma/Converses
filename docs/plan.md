@@ -8,7 +8,7 @@ Converses és una app Android per recordar què has dit, què t'han dit i què h
 
 - **Referència visual:** el llenç de disseny «Converses» i el design system «Converses Design System» (tokens, components i pautes).
 - **Abast de la v1:** onboarding, llistat, Arxivades, detall amb cronologia, nova entrada (full i nota ràpida), crear i editar persona, persona protegida, bloqueig de l'app, accions d'entrada, exportar notes, arxivar, esborrar i Ajustos. **La v1 no té Pro.**
-- **Fora de la v1:** vincle amb l'agenda (descartat), cerca, còpies de seguretat pròpies, widgets i etiquetes.
+- **Fora de la v1:** vincle amb l'agenda (descartat), cerca (ara a la iteració 2), còpies de seguretat pròpies, widgets i etiquetes.
 
 ## Regla de la base de dades
 
@@ -66,16 +66,22 @@ Sense data: es va sincronitzant amb l'app a mesura que convé i no bloqueja res.
 
 ## Iteració 2 (després de la publicació)
 
-El detall és a `docs/backlog.md`. Els punts 6 i 8 necessiten migració (vegeu «Regla de la base de dades»); el 11 no.
+El detall és a `docs/backlog.md`. Els punts 6 i 8 necessiten migració (vegeu «Regla de la base de dades»); el 11 no. Els punts 12–17 vénen del feedback de la beta (issues #40–#45); només el 17 pot tocar Room.
 
 - **Follow-ups / entrades pendents o planificades (6, issue #5):** flag `pending` a `EntryEntity` i interruptor a `EntryForm`, sota de «Quan». Primera migració (v1 → v2). És Pro.
 - **Gestor de canals (8):** l'enum `ChannelType` passa a una taula de canals. Absorbeix «Empresa» (7). Ampliació prevista: canals **amb valor** (per exemple, un número o un usuari per persona) i canals propis. És Pro.
 - **Importar text a la nota ràpida, «share invers» (11, issue #30):** compartir text des d'altres apps (`ACTION_SEND`), seleccionar text (`ACTION_PROCESS_TEXT`) i un botó «Enganxa» al porta-retalls; la nota ràpida s'obre amb el text posat i només cal triar la persona. Sense canvis a Room, no cal migració. És gratis.
+- **Feedback de la beta, per ordre (12–17):**
+  - **12 · Nota ràpida (bug, #40):** el xip «Persona» de «Qui» sense persona obre el selector en comptes de ser desactivat.
+  - **13 · Filtres de la llista (#42):** ordre fix En persona, Telèfon, Xat, Social, amb els primers xips sencers.
+  - **14 · Accions del detall (#44, a avaluar):** FAB només per a «Nota» i Exportar/Arxivar a la `topBar`, o barra flotant amb les tres. Pendent de decidir.
+  - **15 · «Quant a» als Ajustos (#43):** autor, versió, repositori i llicències, privadesa i feedback.
+  - **16 · Idiomes (#45):** mostrar els disponibles i l'actiu a Ajustos; valorar gallec i italià.
+  - **17 · Cerca (#41):** nom i text de les entrades; les protegides només pel nom. `LIKE` o FTS (FTS exigeix migració).
 
 ## Després de la v1
 
 - **Pro** (pagament únic): vegeu `docs/pro.md`.
-- **Cerca:** pel nom de la persona i dins el text de les entrades. Les protegides només es poden trobar pel nom.
 - **Exportar i importar tot:** un fitxer (JSON o ZIP xifrat) per canviar de mòbil sense el backup de Google.
 - **Etiquetes** i la vista de **dades** de totes les persones.
 - **Widgets:** de nota ràpida i, més endavant, altres (per exemple, persones recents).
