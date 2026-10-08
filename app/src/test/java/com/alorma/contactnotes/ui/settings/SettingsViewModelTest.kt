@@ -34,6 +34,8 @@ private class FakeSettingsRepository : SettingsRepository {
   override suspend fun setRelockAfterSeconds(seconds: Int) = state.update { it.copy(relockAfterSeconds = seconds) }
 
   override suspend fun setOnboardingDone(done: Boolean) = state.update { it.copy(onboardingDone = done) }
+
+  override suspend fun setChannelsNoticePending(pending: Boolean) = state.update { it.copy(channelsNoticePending = pending) }
 }
 
 @OptIn(ExperimentalCoroutinesApi::class)

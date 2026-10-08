@@ -4,6 +4,7 @@ import androidx.room.testing.MigrationTestHelper
 import androidx.sqlite.db.SupportSQLiteDatabase
 import androidx.test.platform.app.InstrumentationRegistry
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 
@@ -36,7 +37,7 @@ class MigrationTest {
         .forEach { db.insertEntry(1, it) }
     }
 
-    val db = helper.runMigrationsAndValidate(TEST_DB, 2, true, MIGRATION_1_2)
+    val db = helper.runMigrationsAndValidate(TEST_DB, 2, true, Migration1To2())
 
     assertEquals(
       listOf("IN_PERSON", "CHAT", "CHAT", "SOCIAL", "SOCIAL", "PHONE", "CHAT", "CHAT", "CHAT", "SOCIAL", "SOCIAL"),
@@ -53,7 +54,7 @@ class MigrationTest {
       db.insertChannel(2, "SIGNAL")
     }
 
-    val db = helper.runMigrationsAndValidate(TEST_DB, 2, true, MIGRATION_1_2)
+    val db = helper.runMigrationsAndValidate(TEST_DB, 2, true, Migration1To2())
 
     assertEquals(listOf("CHAT", "SOCIAL", "IN_PERSON"), db.strings("SELECT type FROM channel WHERE personId = 1 ORDER BY id"))
     assertEquals(listOf("CHAT"), db.strings("SELECT type FROM channel WHERE personId = 2"))
@@ -67,11 +68,21 @@ class MigrationTest {
       db.insertEntry(1, "PHONE")
     }
 
-    val db = helper.runMigrationsAndValidate(TEST_DB, 2, true, MIGRATION_1_2)
+    val db = helper.runMigrationsAndValidate(TEST_DB, 2, true, Migration1To2())
 
     assertEquals(listOf("PHONE"), db.strings("SELECT type FROM channel"))
     assertEquals(listOf("PHONE"), db.strings("SELECT channelType FROM entry"))
     assertEquals(listOf("t"), db.strings("SELECT text FROM entry"))
+  }
+
+  @Test
+  fun migrate1To2NotifiesWhenItHasRun() {
+    helper.createDatabase(TEST_DB, 1).close()
+    var migrated = false
+
+    helper.runMigrationsAndValidate(TEST_DB, 2, true, Migration1To2 { migrated = true })
+
+    assertTrue(migrated)
   }
 
   private companion object {
