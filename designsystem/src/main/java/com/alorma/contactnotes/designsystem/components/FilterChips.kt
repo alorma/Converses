@@ -29,10 +29,14 @@ fun ConversesFilterChip(
   val scheme = MaterialTheme.colorScheme
   val selectedContainer = if (tonal) scheme.primaryContainer else scheme.primary
   val selectedContent = if (tonal) scheme.onPrimaryContainer else scheme.onPrimary
+  val haptics = rememberConversesHaptics()
   val leading = icon ?: if (selected) Icons.Rounded.Check else null
   FilterChip(
     selected = selected,
-    onClick = onClick,
+    onClick = {
+      haptics.segmentTick()
+      onClick()
+    },
     modifier = modifier,
     label = { Text(label) },
     leadingIcon = leadingContent ?: leading?.let { vector ->

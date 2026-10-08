@@ -61,6 +61,7 @@ import com.alorma.contactnotes.R
 import com.alorma.contactnotes.data.db.PersonEntity
 import com.alorma.contactnotes.data.db.PersonListItem
 import com.alorma.contactnotes.designsystem.components.Avatar
+import com.alorma.contactnotes.designsystem.components.rememberConversesHaptics
 import com.alorma.contactnotes.designsystem.components.DashedActionRow
 import com.alorma.contactnotes.designsystem.components.ConversesFloatingToolbar
 import com.alorma.contactnotes.designsystem.components.GroupedListDefaults
@@ -249,6 +250,7 @@ private fun Header(archived: Boolean, total: Int, isLoading: Boolean, onNewPerso
 @Composable
 private fun FilterRow(selected: Set<ChannelGroup>, onToggle: (ChannelGroup) -> Unit) {
   val scheme = MaterialTheme.colorScheme
+  val haptics = rememberConversesHaptics()
   Row(
     modifier = Modifier
       .fillMaxWidth()
@@ -260,7 +262,10 @@ private fun FilterRow(selected: Set<ChannelGroup>, onToggle: (ChannelGroup) -> U
       val isSelected = group in selected
       FilterChip(
         selected = isSelected,
-        onClick = { onToggle(group) },
+        onClick = {
+          haptics.segmentTick()
+          onToggle(group)
+        },
         label = {
           Text(
             text = stringResource(group.label()),

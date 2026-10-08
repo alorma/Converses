@@ -46,6 +46,7 @@ import com.alorma.contactnotes.data.db.EntryKind
 import com.alorma.contactnotes.data.db.PersonEntity
 import com.alorma.contactnotes.designsystem.components.ConversesToggleGroup
 import com.alorma.contactnotes.designsystem.components.ToggleOption
+import com.alorma.contactnotes.designsystem.components.rememberConversesHaptics
 import com.alorma.contactnotes.ui.people.label
 import com.alorma.contactnotes.ui.person.PersonInitialAvatar
 import com.alorma.contactnotes.ui.person.channelName
@@ -221,6 +222,7 @@ fun ChannelChips(
   modifier: Modifier = Modifier,
 ) {
   val scheme = MaterialTheme.colorScheme
+  val haptics = rememberConversesHaptics()
   Row(
     modifier = modifier.horizontalScroll(rememberScrollState()),
     horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -229,7 +231,10 @@ fun ChannelChips(
       val isSelected = channel == selected
       FilterChip(
         selected = isSelected,
-        onClick = { onSelected(channel) },
+        onClick = {
+          if (!isSelected) haptics.segmentTick()
+          onSelected(channel)
+        },
         modifier = Modifier.height(36.dp),
         label = { Text(channelName(channel)) },
         leadingIcon = if (isSelected) {

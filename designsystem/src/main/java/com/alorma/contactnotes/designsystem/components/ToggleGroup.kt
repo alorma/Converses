@@ -54,6 +54,7 @@ fun <T> ConversesToggleGroup(
   prominent: Boolean = false,
 ) {
   val scheme = MaterialTheme.colorScheme
+  val haptics = rememberConversesHaptics()
   Row(
     modifier = modifier.fillMaxWidth().selectableGroup(),
     horizontalArrangement = Arrangement.spacedBy(ButtonGroupDefaults.ConnectedSpaceBetween),
@@ -67,7 +68,10 @@ fun <T> ConversesToggleGroup(
       val checked = option.value == selected
       ToggleButton(
         checked = checked,
-        onCheckedChange = { onSelect(option.value) },
+        onCheckedChange = {
+          if (!checked) haptics.segmentTick()
+          onSelect(option.value)
+        },
         enabled = option.enabled,
         modifier = Modifier
           .weight(1f)
