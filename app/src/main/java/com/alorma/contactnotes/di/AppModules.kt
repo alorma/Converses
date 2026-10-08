@@ -69,7 +69,7 @@ val settingsModule = module {
 }
 
 val viewModelModule = module {
-  viewModel { (archived: Boolean) -> PeopleListViewModel(archived, get()) }
+  viewModel { (archived: Boolean) -> PeopleListViewModel(archived, get(), get()) }
   viewModelOf(::SettingsViewModel)
   viewModel { (personId: Long) -> PersonViewModel(personId, get()) }
   viewModel { PersonLockViewModel() }
