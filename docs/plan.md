@@ -55,6 +55,7 @@ Converses és una app Android per recordar què has dit, què t'han dit i què h
 
 - [ ] **Snackbar de desfer:** afinar posició i marges (més endavant).
 - [ ] **Font 2×:** l'avatar petit del xip de filtre de la cronologia es veu mal alineat; els títols grans (44/40 sp) podrien tallar-se (`autoSize` amb mínim de 28 sp o `maxLines = 2`). Acceptat tal com està.
+- [ ] **Transicions entre pantalles:** no agraden els fades actuals (feedback). Revisar-les a `ui/AppNavigation.kt` (`transitionSpec` / `popTransitionSpec` / `predictivePopTransitionSpec` de `NavDisplay`) i triar-ne un altre estil (p. ex. lliscament horitzontal o eix compartit de Material).
 - [ ] **CI:** els tests de migració (`MigrationTestHelper`) són instrumentats i el CI no en corre cap; decidir-ho quan arribi la primera migració.
 
 ### Design system (feina de Bernat a Claude Design)
