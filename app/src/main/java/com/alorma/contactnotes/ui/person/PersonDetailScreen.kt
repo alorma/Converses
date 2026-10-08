@@ -191,6 +191,7 @@ fun PersonDetailRoute(
       },
       onToggleArchived = {
         menuExpanded = false
+        haptics.confirm()
         viewModel.setArchived(!person.archived) { if (!person.archived) onBack() }
       },
       snackbarHostState = snackbarHostState,
@@ -219,6 +220,7 @@ fun PersonDetailRoute(
           onDismiss = ::closeAction,
           onEdit = { action = EntryAction.Edit },
           onCopy = {
+            haptics.confirm()
             scope.launch { clipboard.setClipEntry(ClipEntry(ClipData.newPlainText(person.name, actionEntry.text))) }
             closeAction()
           },
@@ -259,6 +261,7 @@ fun PersonDetailRoute(
           people = otherPeople,
           onDismiss = ::closeAction,
           onSelect = {
+            haptics.confirm()
             viewModel.moveEntry(actionEntry, it.id)
             closeAction()
           },
