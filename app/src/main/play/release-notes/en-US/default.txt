@@ -1,1 +1,4 @@
-First release of Converses. Keep track of what you said, what people told you and what happened with each person, whether in chat, on social networks or in person. Quick notes, a timeline per person, a color for each one and optional biometric lock for private people. Your data stays on your device.
+Version 1.2.0:
+• The header finally stopped running away when you scroll. Title and filters now stay put, as they should have since day one.
+• The app is on a diet: 1.6 MB of font gone, and nobody will miss it.
+• A few small fixes you won't notice, which is exactly the point.
