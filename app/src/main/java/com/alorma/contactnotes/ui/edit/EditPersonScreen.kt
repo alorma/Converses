@@ -664,6 +664,7 @@ internal fun DeletePersonDialog(
   onConfirm: (exportFirst: Boolean) -> Unit,
 ) {
   var exportFirst by remember { mutableStateOf(true) }
+  val haptics = rememberConversesHaptics()
   AlertDialog(
     onDismissRequest = onDismiss,
     icon = {
@@ -713,7 +714,10 @@ internal fun DeletePersonDialog(
     },
     confirmButton = {
       Button(
-        onClick = { onConfirm(exportFirst) },
+        onClick = {
+          haptics.confirm()
+          onConfirm(exportFirst)
+        },
         colors = ButtonDefaults.buttonColors(
           containerColor = MaterialTheme.colorScheme.error,
           contentColor = MaterialTheme.colorScheme.onError,

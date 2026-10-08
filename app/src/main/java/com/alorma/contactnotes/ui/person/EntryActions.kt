@@ -1,6 +1,7 @@
 package com.alorma.contactnotes.ui.person
 
 import androidx.compose.material.icons.automirrored.rounded.Logout
+import com.alorma.contactnotes.designsystem.components.rememberConversesHaptics
 import com.alorma.contactnotes.data.db.shape
 import com.alorma.contactnotes.data.db.color
 import androidx.compose.foundation.clickable
@@ -204,12 +205,18 @@ fun MoveEntryDialog(people: List<PersonEntity>, onDismiss: () -> Unit, onSelect:
 
 @Composable
 fun ConfirmDeleteDialog(title: String, text: String, onDismiss: () -> Unit, onConfirm: () -> Unit) {
+  val haptics = rememberConversesHaptics()
   AlertDialog(
     onDismissRequest = onDismiss,
     title = { Text(title) },
     text = { Text(text) },
     confirmButton = {
-      TextButton(onClick = onConfirm) {
+      TextButton(
+        onClick = {
+          haptics.confirm()
+          onConfirm()
+        },
+      ) {
         Text(stringResource(R.string.delete_button), color = MaterialTheme.colorScheme.error, fontWeight = FontWeight.Bold)
       }
     },
