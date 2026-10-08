@@ -389,7 +389,7 @@ fun PersonDetailScreen(
             contentPadding = PaddingValues(vertical = 8.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp),
           ) {
-            items(EntryKind.entries.filter { state.countOf(it) > 0 }, key = { it.name }) { kind ->
+            items(EntryKind.entries, key = { it.name }) { kind ->
               ConversesFilterChip(
                 label = whoFilterLabel(kind, firstName),
                 selected = kind in state.selectedKinds,
