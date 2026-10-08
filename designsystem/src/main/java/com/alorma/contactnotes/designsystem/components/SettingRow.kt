@@ -59,14 +59,24 @@ fun SettingSwitchRow(
   modifier: Modifier = Modifier,
   subtitle: String? = null,
   icon: ImageVector? = null,
+  /** `false` quan el canvi no és immediat (cal desbloquejar abans) i qui crida vibra en aplicar-lo. */
+  haptic: Boolean = true,
 ) {
+  val haptics = rememberConversesHaptics()
   SettingRow(
     title = title,
     shape = shape,
     subtitle = subtitle,
     icon = icon,
     modifier = modifier,
-    contentModifier = Modifier.toggleable(value = checked, role = Role.Switch, onValueChange = onCheckedChange),
+    contentModifier = Modifier.toggleable(
+      value = checked,
+      role = Role.Switch,
+      onValueChange = {
+        if (haptic) haptics.toggle(it)
+        onCheckedChange(it)
+      },
+    ),
     trailing = { Switch(checked = checked, onCheckedChange = null) },
   )
 }

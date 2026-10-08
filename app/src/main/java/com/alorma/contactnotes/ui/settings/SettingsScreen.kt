@@ -78,6 +78,7 @@ import com.alorma.contactnotes.designsystem.components.ConversesToggleGroup
 import com.alorma.contactnotes.designsystem.components.GroupedListDefaults
 import com.alorma.contactnotes.designsystem.components.SettingRow
 import com.alorma.contactnotes.designsystem.components.SettingSwitchRow
+import com.alorma.contactnotes.designsystem.components.rememberConversesHaptics
 import com.alorma.contactnotes.designsystem.components.groupedItemShape
 import com.alorma.contactnotes.designsystem.components.ToggleOption
 import com.alorma.contactnotes.designsystem.theme.ScreenTitleStyle
@@ -105,6 +106,7 @@ fun SettingsScreen(
   val authTitle = stringResource(R.string.app_lock_prompt_title)
   val authSubtitle = stringResource(R.string.unlock_subtitle)
 
+  val haptics = rememberConversesHaptics()
   SettingsContent(
     settings = settings,
     showPersonColor = rememberFeatureEnabled<PersonColorFeature>(),
@@ -118,6 +120,7 @@ fun SettingsScreen(
     onAppLockChange = { enabled ->
       activity.promptUnlock(authTitle, authSubtitle) {
         viewModel.onAppLock(enabled)
+        haptics.toggle(enabled)
         if (enabled) appLock.unlock()
       }
     },
@@ -236,6 +239,7 @@ fun SettingsContent(
             checked = settings.appLock,
             shape = groupedItemShape(0, lockCount),
             onCheckedChange = onAppLockChange,
+            haptic = false,
           )
           if (settings.appLock) {
             RelockRow(
