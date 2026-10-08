@@ -46,10 +46,10 @@ class SettingsViewModelTest {
     val vm = SettingsViewModel(repository)
     backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { vm.settings.collect {} }
 
-    assertTrue(vm.settings.value.dynamicColor)
+    assertFalse(vm.settings.value.dynamicColor)
 
     vm.onThemeMode(ThemeMode.Dark)
-    vm.onDynamicColor(false)
+    vm.onDynamicColor(true)
     vm.onPersonColorTheme(false)
     vm.onHapticFeedback(false)
     vm.onAppLock(true)
@@ -57,7 +57,7 @@ class SettingsViewModelTest {
 
     val settings = vm.settings.value
     assertEquals(ThemeMode.Dark, settings.themeMode)
-    assertFalse(settings.dynamicColor)
+    assertTrue(settings.dynamicColor)
     assertFalse(settings.personColorTheme)
     assertFalse(settings.hapticFeedback)
     assertTrue(settings.appLock)

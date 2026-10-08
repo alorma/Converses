@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.map
 
 data class AppSettings(
   val themeMode: ThemeMode = ThemeMode.System,
-  val dynamicColor: Boolean = true,
+  val dynamicColor: Boolean = false,
   val personColorTheme: Boolean = true,
   val hapticFeedback: Boolean = true,
   val appLock: Boolean = false,

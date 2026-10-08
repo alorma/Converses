@@ -139,8 +139,8 @@ Totes les claus `personId` tenen `onDelete = CASCADE`, i hi ha un índex a `entr
 
 ### Tema
 
-- **Color dinàmic (per defecte):** la llavor és el `primary` de `dynamicLightColorScheme`, amb l'esquema MaterialKolor `Neutral`.
-- **Color dinàmic desactivat (Grafit):** grisos purs, amb llavor negra i l'esquema MaterialKolor `Monochrome` (`primary` negre en clar i blanc en fosc). No hi ha selector de color: a Ajustos, «Color dinàmic» és l'última fila d'Aparença (sense el flag de Pro) i el subtítol és sempre «Pren el to del fons de pantalla». Proves: `GraphiteThemeTest` (grisos purs i contrast ≥ 4,5:1). Les previews i les captures fan servir aquest tema.
+- **Color dinàmic (opcional, desactivat per defecte; qui ja el tenia guardat el conserva):** la llavor és el `primary` de `dynamicLightColorScheme`, amb l'esquema MaterialKolor `Neutral`.
+- **Color dinàmic desactivat (Grafit, per defecte):** grisos purs, amb llavor negra i l'esquema MaterialKolor `Monochrome` (`primary` negre en clar i blanc en fosc). No hi ha selector de color: a Ajustos, «Color dinàmic» és l'última fila d'Aparença (sense el flag de Pro) i el subtítol és sempre «Pren el to del fons de pantalla». Proves: `GraphiteThemeTest` (grisos purs i contrast ≥ 4,5:1). Les previews i les captures fan servir aquest tema.
 - **Mode:** clar, fosc o sistema.
 - **Error fix:** clar `#BA1A1A` sobre `#FFDAD6`; fosc `#FFB4AB` sobre `#93000A`. **Èxit** (només a l'onboarding): `SuccessColors`, fixos.
 - **Avatars:** 7 pastels i 4 formes (`Cookie9Sided`, `Clover4Leaf`, `Flower`, `Sunny`). A la v1 tots són estàndard: Galeta i color automàtic pel nom (`AvatarColor.forName`, hash FNV-1a del nom normalitzat). Inicials en `#1E1D24` (primera lletra del primer i de l'últim mot), cadenat si la persona és protegida.
