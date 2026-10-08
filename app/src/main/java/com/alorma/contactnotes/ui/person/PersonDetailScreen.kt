@@ -84,6 +84,7 @@ import com.alorma.contactnotes.designsystem.components.EmptyState
 import com.alorma.contactnotes.designsystem.components.GroupedList
 import com.alorma.contactnotes.designsystem.components.GroupedListDefaults
 import com.alorma.contactnotes.designsystem.components.TimelineRow
+import com.alorma.contactnotes.designsystem.components.rememberConversesHaptics
 import com.alorma.contactnotes.designsystem.theme.PersonNameStyle
 import com.alorma.contactnotes.designsystem.theme.PersonTheme
 import com.alorma.contactnotes.designsystem.theme.SectionTitleStyle
@@ -148,6 +149,7 @@ fun PersonDetailRoute(
   var action by rememberSaveable { mutableStateOf(EntryAction.None) }
   val actionEntry = state.entries.firstOrNull { it.id == actionEntryId }
   val clipboard = LocalClipboard.current
+  val haptics = rememberConversesHaptics()
   val scope = androidx.compose.runtime.rememberCoroutineScope()
   val snackbarHostState = remember { SnackbarHostState() }
   val deletedMessage = stringResource(R.string.entry_deleted)
@@ -223,6 +225,7 @@ fun PersonDetailRoute(
           onMove = { action = EntryAction.Move },
           onDelete = {
             val deleted = actionEntry
+            haptics.confirm()
             viewModel.deleteEntry(deleted)
             closeAction()
             scope.launch {
