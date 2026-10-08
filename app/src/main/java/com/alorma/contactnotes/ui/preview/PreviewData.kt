@@ -1,6 +1,5 @@
 package com.alorma.contactnotes.ui.preview
 
-import com.alorma.contactnotes.data.db.ChannelEntity
 import com.alorma.contactnotes.data.db.ChannelType
 import com.alorma.contactnotes.data.db.EntryEntity
 import com.alorma.contactnotes.data.db.EntryKind
@@ -64,10 +63,7 @@ internal object PreviewData {
     updatedAt = at(2, 1, 9),
   )
 
-  val martaChannels = listOf(
-    ChannelEntity(id = 1, personId = 1, type = ChannelType.CHAT),
-    ChannelEntity(id = 2, personId = 1, type = ChannelType.IN_PERSON),
-  )
+  val martaChannels = listOf(ChannelType.IN_PERSON, ChannelType.CHAT)
 
   val martaFacts = listOf(
     PinnedFactEntity(id = 1, personId = 1, label = "Birthday", value = "14 March", position = 0),
@@ -114,15 +110,12 @@ internal object PreviewData {
         text = "He wants to set up a game on Friday.",
         occurredAt = at(3, 2, 18),
       ),
-      channels = listOf(
-        ChannelEntity(id = 3, personId = 3, type = ChannelType.CHAT),
-        ChannelEntity(id = 4, personId = 3, type = ChannelType.SOCIAL),
-      ),
+      channels = listOf(ChannelType.CHAT, ChannelType.SOCIAL),
     ),
     PersonListItem(
       person = laia,
       lastEntry = null,
-      channels = listOf(ChannelEntity(id = 5, personId = 4, type = ChannelType.PHONE)),
+      channels = listOf(ChannelType.PHONE),
     ),
   )
 }

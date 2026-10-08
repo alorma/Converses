@@ -61,7 +61,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.alorma.contactnotes.R
-import com.alorma.contactnotes.data.db.ChannelEntity
+import com.alorma.contactnotes.data.db.ChannelType
 import com.alorma.contactnotes.data.db.EntryEntity
 import com.alorma.contactnotes.data.db.EntryKind
 import com.alorma.contactnotes.data.db.PersonEntity
@@ -194,7 +194,7 @@ fun PersonDetailRoute(
     if (showNewEntry) {
       NewEntrySheet(
         person = person,
-        channels = state.channels.map { it.type },
+        channels = state.channels,
         initialKind = newEntryKind,
         focusText = newEntryFocus,
         onDismiss = { showNewEntry = false },
@@ -243,7 +243,7 @@ fun PersonDetailRoute(
         )
         EntryAction.Edit -> NewEntrySheet(
           person = person,
-          channels = state.channels.map { it.type },
+          channels = state.channels,
           initial = actionEntry,
           onDismiss = ::closeAction,
           onSave = { kind, channel, text, at ->
@@ -484,12 +484,12 @@ private fun Header(person: PersonEntity) {
 }
 
 @Composable
-private fun ChannelRow(channels: List<ChannelEntity>) {
+private fun ChannelRow(channels: List<ChannelType>) {
   LazyRow(
     contentPadding = PaddingValues(vertical = 16.dp),
     horizontalArrangement = Arrangement.spacedBy(8.dp),
   ) {
-    items(channels.map { it.type }.distinct().sorted(), key = { it.name }) { type ->
+    items(channels, key = { it.name }) { type ->
       ConversesChannelChip(label = channelName(type), icon = type.icon(), onClick = null, onLongClick = null)
     }
   }

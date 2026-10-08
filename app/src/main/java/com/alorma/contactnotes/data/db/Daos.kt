@@ -71,12 +71,6 @@ abstract class PersonDao {
 }
 
 @Dao
-interface ChannelDao {
-  @Query("SELECT * FROM channel WHERE personId = :personId ORDER BY id")
-  fun observeForPerson(personId: Long): Flow<List<ChannelEntity>>
-}
-
-@Dao
 interface EntryDao {
   @Insert
   suspend fun insert(entry: EntryEntity): Long
@@ -89,6 +83,10 @@ interface EntryDao {
 
   @Query("SELECT * FROM entry WHERE id = :id")
   suspend fun get(id: Long): EntryEntity?
+
+  /** Grups de canal de les entrades de la persona (derivats, no desats). */
+  @Query("SELECT DISTINCT channelType FROM entry WHERE personId = :personId")
+  fun observeChannelTypes(personId: Long): Flow<List<ChannelType>>
 
   @Query(
     "DELETE FROM entry WHERE personId = :personId AND channelType = :channelType AND occurredAt >= :from AND occurredAt < :to",

@@ -1,7 +1,6 @@
 package com.alorma.contactnotes.testing
 
 import com.alorma.contactnotes.data.ConversesRepository
-import com.alorma.contactnotes.data.db.ChannelDao
 import com.alorma.contactnotes.data.db.ChannelEntity
 import com.alorma.contactnotes.data.db.ChannelType
 import com.alorma.contactnotes.data.db.EntryDao
@@ -31,7 +30,7 @@ class FakeDb {
 
   fun nextId(): Long = next++
 
-  val repository = ConversesRepository(FakePersonDao(this), FakeChannelDao(this), FakeEntryDao(this), FakePinnedFactDao(this))
+  val repository = ConversesRepository(FakePersonDao(this), FakeEntryDao(this), FakePinnedFactDao(this))
 
   fun addPerson(
     name: String,
@@ -107,20 +106,15 @@ class FakePersonDao(private val db: FakeDb) : PersonDao() {
   override suspend fun get(id: Long): PersonEntity? = db.person(id)
 
   override fun observeList(archived: Boolean): Flow<List<PersonListItem>> =
-    combine(db.people, db.entries, db.channels) { people, entries, channels ->
+    combine(db.people, db.entries) { people, entries ->
       people.filter { it.archived == archived }.map { person ->
         val last = entries.filter { it.personId == person.id }.maxWithOrNull(compareBy({ it.occurredAt }, { it.id }))
-        PersonListItem(person, last, channels.filter { it.personId == person.id })
+        PersonListItem(person, last, entries.filter { it.personId == person.id }.map { it.channelType })
       }.sortedByDescending { it.lastEntry?.occurredAt ?: it.person.createdAt }
     }
 
   override suspend fun countAliasConflicts(alias: String, excludeId: Long): Int =
     db.people.value.count { !it.archived && it.id != excludeId && it.alias.equals(alias, ignoreCase = true) }
-}
-
-class FakeChannelDao(private val db: FakeDb) : ChannelDao {
-  override fun observeForPerson(personId: Long): Flow<List<ChannelEntity>> =
-    db.channels.map { list -> list.filter { it.personId == personId }.sortedBy { it.id } }
 }
 
 class FakeEntryDao(private val db: FakeDb) : EntryDao {
@@ -139,6 +133,9 @@ class FakeEntryDao(private val db: FakeDb) : EntryDao {
   }
 
   override suspend fun get(id: Long): EntryEntity? = db.entries.value.firstOrNull { it.id == id }
+
+  override fun observeChannelTypes(personId: Long): Flow<List<ChannelType>> =
+    db.entries.map { list -> list.filter { it.personId == personId }.map { it.channelType }.distinct() }
 
   private fun inRange(e: EntryEntity, personId: Long, channelType: ChannelType, from: Long, to: Long) =
     e.personId == personId && e.channelType == channelType && e.occurredAt >= from && e.occurredAt < to

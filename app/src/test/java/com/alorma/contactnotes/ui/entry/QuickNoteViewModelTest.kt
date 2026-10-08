@@ -40,8 +40,6 @@ class QuickNoteViewModelTest {
   @Test
   fun selectingAPersonLoadsItsChannelsAndTheChannelOfTheLastEntry() = runTest {
     val marta = db.addPerson("Marta")
-    db.addChannel(marta.id, ChannelType.CHAT)
-    db.addChannel(marta.id, ChannelType.SOCIAL)
     db.addEntry(marta.id, channel = ChannelType.SOCIAL, occurredAt = 9_000)
     db.addEntry(marta.id, channel = ChannelType.CHAT, occurredAt = 1_000)
     val vm = viewModel()
@@ -58,7 +56,6 @@ class QuickNoteViewModelTest {
   fun selectingAProtectedPersonLeavesItPendingAndKeepsTheCurrentSelection() = runTest {
     val marta = db.addPerson("Marta")
     val luna = db.addPerson("Luna", isProtected = true)
-    db.addChannel(luna.id, ChannelType.CHAT)
     db.addEntry(luna.id)
     val vm = viewModel(marta.id)
 
@@ -72,7 +69,6 @@ class QuickNoteViewModelTest {
   @Test
   fun aPendingProtectedPersonExposesNoChannelsNorLastChannelUntilItIsUnlocked() = runTest {
     val luna = db.addPerson("Luna", isProtected = true)
-    db.addChannel(luna.id, ChannelType.CHAT)
     db.addEntry(luna.id, channel = ChannelType.CHAT)
     val vm = viewModel()
 
@@ -87,9 +83,8 @@ class QuickNoteViewModelTest {
   @Test
   fun unlockingSelectsTheProtectedPersonAndLoadsItsChannels() = runTest {
     val luna = db.addPerson("Luna", isProtected = true)
-    db.addChannel(luna.id, ChannelType.CHAT)
-    db.addChannel(luna.id, ChannelType.SOCIAL)
-    db.addEntry(luna.id, channel = ChannelType.SOCIAL)
+    db.addEntry(luna.id, channel = ChannelType.CHAT, occurredAt = 1_000)
+    db.addEntry(luna.id, channel = ChannelType.SOCIAL, occurredAt = 2_000)
     val vm = viewModel()
     vm.select(luna)
 

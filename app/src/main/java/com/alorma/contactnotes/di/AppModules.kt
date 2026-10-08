@@ -46,7 +46,6 @@ val databaseModule = module {
       .build()
   }
   single { get<ConversesDatabase>().personDao() }
-  single { get<ConversesDatabase>().channelDao() }
   single { get<ConversesDatabase>().entryDao() }
   single { get<ConversesDatabase>().pinnedFactDao() }
   singleOf(::ConversesRepository)

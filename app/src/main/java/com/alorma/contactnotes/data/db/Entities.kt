@@ -98,5 +98,7 @@ data class KindCount(val kind: EntryKind, val count: Int)
 data class PersonListItem(
   @Embedded val person: PersonEntity,
   @Embedded(prefix = "last_") val lastEntry: EntryEntity?,
-  @Relation(parentColumn = "id", entityColumn = "personId") val channels: List<ChannelEntity>,
+  /** Grups de canal de les seves entrades (amb repeticions); la taula `channel` ja no s'usa. */
+  @Relation(parentColumn = "id", entityColumn = "personId", entity = EntryEntity::class, projection = ["channelType"])
+  val channels: List<ChannelType>,
 )

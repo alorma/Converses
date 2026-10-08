@@ -17,7 +17,7 @@ import kotlinx.coroutines.launch
 /** Sense cap canal marcat es mostren totes les persones; amb canals marcats, les que en tenen algun (OR). */
 fun List<PersonListItem>.filterBy(types: Set<ChannelType>): List<PersonListItem> {
   if (types.isEmpty()) return this
-  return filter { item -> item.channels.any { it.type in types } }
+  return filter { item -> item.channels.any { it in types } }
 }
 
 data class PeopleListUiState(
