@@ -1,4 +1,4 @@
 Versión 1.5.0:
-• Los canales son más simples: En persona, Teléfono, Chat, Social y Otros. Los que tenías se han fusionado en el grupo que toca, y la app te lo cuenta una vez.
+• Los canales son más simples: En persona, Teléfono, Chat, Social y Otros. Las entradas que tenías han pasado al grupo que toca, y la app te lo cuenta una vez.
 • Los canales de una persona ahora salen de tus conversaciones, así que al añadir a alguien ya no te pregunta dónde habláis.
 • Una pequeña etiqueta «beta» junto al título y unas cuantas correcciones que no notarás, que es la idea.

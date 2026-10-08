@@ -1,4 +1,4 @@
 Version 1.5.0:
-• Channels got simpler: In person, Phone, Chat, Social and Other. Your old ones were merged into the right group, and the app tells you once.
+• Channels got simpler: In person, Phone, Chat, Social and Other. Your old entries moved into the right group, and the app tells you once.
 • A person's channels now come from your conversations, so adding someone no longer asks where you talk.
 • A small "beta" tag next to the title, and a few fixes you won't notice, which is the point.

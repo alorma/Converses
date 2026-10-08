@@ -4,7 +4,7 @@
     <string name="people_title">Converses</string>
     <string name="beta_badge" translatable="false">BETA</string>
     <string name="channels_notice_title">We\'ve simplified channels</string>
-    <string name="channels_notice_body">There are now five groups: In person, Phone, Chat, Social and Other. Your existing channels were merged into the matching group.</string>
+    <string name="channels_notice_body">There are now five groups: In person, Phone, Chat, Social and Other. Your entries now use them, and each person\'s channels come from their conversations.</string>
     <string name="channels_notice_action">Got it</string>
     <string name="beta_description">Beta version</string>
     <plurals name="people_count">

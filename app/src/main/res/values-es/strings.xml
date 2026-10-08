@@ -3,7 +3,7 @@
 
     <string name="people_title">Converses</string>
     <string name="channels_notice_title">Hemos simplificado los canales</string>
-    <string name="channels_notice_body">Ahora hay cinco grupos: En persona, Teléfono, Chat, Social y Otros. Tus canales anteriores se han fusionado en el grupo que les corresponde.</string>
+    <string name="channels_notice_body">Ahora hay cinco grupos: En persona, Teléfono, Chat, Social y Otros. Tus entradas ya los usan, y los canales de cada persona salen de sus conversaciones.</string>
     <string name="channels_notice_action">Entendido</string>
     <string name="beta_description">Versión beta</string>
     <plurals name="people_count">
