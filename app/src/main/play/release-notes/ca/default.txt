@@ -1,1 +1,4 @@
-Primera versió de Converses. Recorda què has dit, què t'han dit i què ha passat amb cada persona, per xat, per xarxes socials o en persona. Notes ràpides, una cronologia per persona, un color per a cadascuna i bloqueig biomètric opcional per a les persones privades. Les teves dades es queden al dispositiu.
+Versió 1.2.0:
+• La capçalera per fi ha deixat de fugir quan fas scroll. El títol i els filtres es queden quiets, com havia de ser des del primer dia.
+• L'app ha anat a dieta: 1,6 MB de lletra menys, i ningú no ho trobarà a faltar.
+• Unes quantes correccions petites que no notaràs, que és exactament la idea.

@@ -1,1 +1,4 @@
-Primera versión de Converses. Recuerda lo que dijiste, lo que te dijeron y lo que pasó con cada persona, por chat, por redes sociales o en persona. Notas rápidas, una cronología por persona, un color para cada una y bloqueo biométrico opcional para las personas privadas. Tus datos se quedan en tu dispositivo.
+Versión 1.2.0:
+• La cabecera por fin ha dejado de huir al hacer scroll. El título y los filtros se quedan quietos, como debió ser desde el primer día.
+• La app se ha puesto a dieta: 1,6 MB de letra menos, y nadie los echará de menos.
+• Unas cuantas correcciones pequeñas que no notarás, que es justo la idea.
