@@ -182,3 +182,19 @@ internal fun CollapsibleFactsPreview() {
     }
   }
 }
+
+@Preview
+@Composable
+internal fun NoticeBannerPreview() {
+  ConversesPreviewSurface {
+    Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+      BetaBadge(text = "BETA", contentDescription = "Beta version")
+      NoticeBanner(
+        title = "We've simplified channels",
+        body = "There are now five groups: In person, Phone, Chat, Social and Other. Your existing channels were merged into the matching group.",
+        actionLabel = "Got it",
+        onAction = {},
+      )
+    }
+  }
+}
