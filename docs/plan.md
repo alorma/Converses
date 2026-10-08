@@ -28,6 +28,7 @@ Converses és una app Android per recordar què has dit, què t'han dit i què h
 | Versió gratuïta (flags, avatar estàndard, redisseny de l'editor) | Fet |
 | Menú de debug | Fet |
 | M5 · Publicació | Publicada a beta; fitxa de Play feta, queda provar `release.yml` amb Gradle Play Publisher (a `internal`) |
+| Canals en 5 grups (backlog 13, issue #42) | Fet (PR #47); es publica a la 1.5.0 |
 | Iteració 2 | Després de la publicació |
 | Pro | Planificat (`docs/pro.md`) |
 
@@ -58,7 +59,7 @@ Converses és una app Android per recordar què has dit, què t'han dit i què h
 - Descartat: portar l'estat d'snackbar d'`alorma/Caducity` (cua, `CompositionLocal`, animació); amb el `Scaffold` l'`SnackbarHost` de M3 ja posiciona i apila bé.
 - [ ] **Font 2×:** l'avatar petit del xip de filtre de la cronologia es veu mal alineat; els títols grans (44/40 sp) podrien tallar-se (`autoSize` amb mínim de 28 sp o `maxLines = 2`). Acceptat tal com està.
 - [x] **Transicions entre pantalles:** substituït el fade pla de 700 ms de Nav3 per transicions suaus properes a les natives d'Android a `ui/AppNavigation.kt` (`nativeTransition`): endavant, la pantalla nova llisca poc (1/12 de l'amplada) amb fade; enrere, només la que surt es redueix (0.9) i fa fade, com el back predictiu. El gest de back predictiu (`predictiveBack`) segueix el dit: la pantalla es redueix i es mou cap al costat del gest, i fa fade només al final. Les modals (QuickNote, EditPerson) entren en vertical i no mouen la pantalla de sota.
-- [ ] **CI:** els tests de migració (`MigrationTestHelper`) són instrumentats i el CI no en corre cap; decidir-ho quan arribi la primera migració.
+- [ ] **CI:** els tests de migració (`MigrationTestHelper`) són instrumentats i el CI no en corre cap; la primera migració (v1 → v2) ja és feta i els seus tests només s'han corregut en local; decidir si el CI els ha de córrer (cal un emulador).
 
 ### Design system (feina de Bernat a Claude Design)
 
@@ -66,16 +67,16 @@ Sense data: es va sincronitzant amb l'app a mesura que convé i no bloqueja res.
 
 ## Iteració 2 (després de la publicació)
 
-El detall és a `docs/backlog.md`. Els punts 6, 8 i 13 necessiten migració (vegeu «Regla de la base de dades»); el 11 no. Els punts 12, 14 i 15 vénen del feedback de la beta (issues #40, #43 i #44; el #45 s'ha descartat) i són tasques independents; el 13 (canals) va primer i porta la migració v1 → v2.
+El detall és a `docs/backlog.md`. Els punts 6 i 8 necessiten migració (la v3; vegeu «Regla de la base de dades»); el 11 no. Els punts 12, 14 i 15 vénen del feedback de la beta (issues #40, #43 i #44; el #45 s'ha descartat) i són tasques independents. Els canals en 5 grups (punt 13, issue #42, migració v1 → v2) ja estan fets i van a la 1.5.0.
 
-- **Refactor dels canals (13, issue #42), la primera tasca:** `ChannelType` passa a En persona, Telèfon, Xat, Social i Altres; els canals actuals es migren al seu grup (migració v1 → v2, equivalències a decidir a la tasca), avís genèric als usuaris i badge «beta» al títol de la llista. Gratis.
-- **Follow-ups / entrades pendents o planificades (6, issue #5):** flag `pending` a `EntryEntity` i interruptor a `EntryForm`, sota de «Quan». Primera migració (v1 → v2). És Pro.
-- **Sub-canals (8):** dins dels 5 grups, amb nom lliure (únic per persona) i valor opcional. Absorbeix «Empresa» (7). És Pro. Depèn del 13.
+- **Follow-ups / entrades pendents o planificades (6, issue #5):** flag `pending` a `EntryEntity` i interruptor a `EntryForm`, sota de «Quan». Migració v2 → v3. És Pro.
+- **Sub-canals (8):** dins dels 5 grups, amb nom lliure (únic per persona) i valor opcional. Absorbeix «Empresa» (7). És Pro. Reaprofita la taula `channel`, que ja no s'usa.
 - **Importar text a la nota ràpida, «share invers» (11, issue #30):** compartir text des d'altres apps (`ACTION_SEND`), seleccionar text (`ACTION_PROCESS_TEXT`) i un botó «Enganxa» al porta-retalls; la nota ràpida s'obre amb el text posat i només cal triar la persona. Sense canvis a Room, no cal migració. És gratis.
-- **Feedback de la beta, tasques independents (després del 13):**
+- **Feedback de la beta, tasques independents:**
   - **12 · Nota ràpida (bug, #40):** el xip «Persona» de «Qui» sense persona obre el selector en comptes de ser desactivat.
   - **14 · Accions del detall (#44):** FAB estès només per a «Nota»; a la `topBar`, icones Editar i Compartir i un «⋮» amb Arxivar.
   - **15 · Ampliar «Quant a» als Ajustos (#43):** la secció ja existeix (privadesa i versió); s'hi afegeixen autor, repositori i feedback, sense llicències de moment. Dades per decidir.
+  - **16 · Neteja:** treure l'avís dels canals (banner, flag i callback de la migració) quan la v1 sigui residual a la Play Console; la migració i el seu test no es treuen mai.
 
 ## Després de la v1
 

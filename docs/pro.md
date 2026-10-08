@@ -18,7 +18,7 @@ Mai es cobra per **accedir, protegir o treure** les dades pròpies. Al Pro hi va
 - Persones, entrades, cronologia, «Qui» i «Quan».
 - Persones protegides i bloqueig de l'app.
 - Exportar notes.
-- Els 5 grups de canals: En persona, Telèfon, Xat, Social i Altres (backlog 13).
+- Els 5 grups de canals: En persona, Telèfon, Xat, Social i Altres.
 
 ## Pro (fora de la v1 gratuïta)
 
@@ -44,7 +44,7 @@ Mai es cobra per **accedir, protegir o treure** les dades pròpies. Al Pro hi va
 ## Decidit
 
 - **Canal «Empresa»** (backlog 7): ja no és un canal del sistema; és un sub-canal d'«Altres» (Pro).
-- Els canals que els usuaris de la beta tenien (WhatsApp, Telegram…) es migren al seu grup en una sola entrada; no es mantenen gratis (backlog 13).
+- Els canals que els usuaris de la beta tenien (WhatsApp, Telegram…) es migren al seu grup en una sola entrada; no es mantenen gratis.
 
 ## Proves
 
