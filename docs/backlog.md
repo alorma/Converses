@@ -10,7 +10,7 @@ Actualitzat el 8 d'oct. de 2026. Només hi ha el que encara no està fet.
 | 11 | Feature (Iteració 2) | Importar text a la nota ràpida (compartir, seleccionar text i enganxar) | [#30](https://github.com/alorma/Converses/issues/30) |
 | 13 | Tasca gran (gratis, la primera) | Refactor dels canals a 5 grups (migració v1 → v2) | [#42](https://github.com/alorma/Converses/issues/42) |
 | 12 | Bug | Nota ràpida: el xip «Persona» desactivat confon | [#40](https://github.com/alorma/Converses/issues/40) |
-| 14 | Millora (a avaluar) | Detall de persona: les 3 accions visibles, sense el split FAB | [#44](https://github.com/alorma/Converses/issues/44) |
+| 14 | Millora | Detall de persona: les 3 accions visibles, sense el split FAB | [#44](https://github.com/alorma/Converses/issues/44) |
 | 15 | Millora | Ajustos: secció «Quant a» | [#43](https://github.com/alorma/Converses/issues/43) |
 | 16 | Millora | Idiomes: mostrar els disponibles a Ajustos i valorar gallec i italià | [#45](https://github.com/alorma/Converses/issues/45) |
 | 17 | Feature | Cerca d'entrades per paraula clau | [#41](https://github.com/alorma/Converses/issues/41) |
@@ -109,16 +109,22 @@ Els 11 valors de `ChannelType` passen a **5 grups fixos**: **En persona, Telèfo
 - Textos a `strings.xml` (en, ca, es), captures i actualitzar `docs/plan.md` i `docs/pro.md`.
 - Pot compartir la migració v1 → v2 amb el 6 (follow-ups) si van junts.
 
-## 14 · Millora (a avaluar): accions del detall de persona
+## 14 · Millora: accions del detall de persona
 
 Issue: [#44](https://github.com/alorma/Converses/issues/44)
 
-Ara hi ha un split FAB amb **Nota** i un menú amb **Exportar notes** i **Arxivar**. Només són tres accions.
+Ara hi ha un split FAB amb **Nota** i un menú amb **Exportar notes** i **Arxivar**; l'usuari proposa tenir-les visibles.
 
-- A. FAB només per a **Nota**; Exportar i Arxivar a la `topBar` (accions o menú «⋮»). Recomanada: escala millor quan `docs/pro.md` hi afegeixi accions.
-- B. Barra flotant amb les tres accions visibles, al slot `floatingActionButton`.
+**Decidit**
+- **FAB estès només per a «Nota»** (adéu al split button).
+- **`topBar`:** Enrere a l'esquerra; a la dreta, icones **Editar** i **Compartir** (exportar notes), i un «⋮» amb **Arxivar / Desarxivar**. Arxivar és l'acció menys freqüent i el menú deixa lloc a accions Pro futures.
 
-Pendent de decidir. Seguir les regles del `Scaffold` del `CLAUDE.md`. Sense Room.
+**Què cal fer**
+- `PersonDetailScreen.kt`: treure `ConversesSplitButton` del slot `floatingActionButton` i posar-hi un FAB estès; afegir les accions i el menú a la `topBar`.
+- `contentDescription` i tooltip a les icones (la de compartir diu «Exportar notes»).
+- Quan la persona és arxivada, l'entrada del menú passa a «Desarxivar».
+- `ConversesSplitButton` es queda a `:designsystem`, encara que l'app no el faci servir.
+- Persones protegides: l'exportació no canvia. Sense Room. Actualitzar les captures del detall.
 
 ## 15 · Millora: «Quant a» als Ajustos
 
