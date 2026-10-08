@@ -19,14 +19,14 @@ Converses és una app Android per recordar què has dit, què t'han dit i què h
 | Fase | Estat |
 | --- | --- |
 | 0 · Base (projecte, dades, pantalles) | Fet |
-| M1 · Polit visual | Fet (falta sincronitzar el design system) |
+| M1 · Polit visual | Fet (el design system es va sincronitzant a part) |
 | M2 · Fluxos que falten | Fet |
-| M3 · Privacitat | Fet (falta provar el bloqueig desactivat sol a dispositiu) |
+| M3 · Privacitat | Fet |
 | Backlog de disseny (tandes 1–3) i de bugs | Fet |
-| Onboarding (tanda 4) | Fet (falten detalls i proves manuals) |
+| Onboarding (tanda 4) | Fet |
 | M4 · Qualitat | Fet (amb excepcions acceptades) |
-| Versió gratuïta (flags, avatar estàndard, redisseny de l'editor) | Fet (falta la prova final de «res de Pro visible») |
-| Menú de debug | Fet (falta provar-lo a l'emulador) |
+| Versió gratuïta (flags, avatar estàndard, redisseny de l'editor) | Fet |
+| Menú de debug | Fet |
 | M5 · Publicació | Publicada a beta; fitxa de Play feta, queda provar `release.yml` amb Gradle Play Publisher (a `internal`) |
 | Iteració 2 | Després de la publicació |
 | Pro | Planificat (`docs/pro.md`) |
@@ -38,36 +38,36 @@ Converses és una app Android per recordar què has dit, què t'han dit i què h
 - [x] **Mida de la font:** `roboto_flex.ttf` passa d'1,7 MB a 151 KB: subconjunt llatí (en/ca/es) i eixos limitats als que fa servir `Type.kt` (opsz 14–72, wght 400–800, wdth 100–118; la resta fixos). Es regenera amb `designsystem/fonts/subset.sh <original>`. Els caràcters fora del llatí (noms en altres alfabets) cauen a la font del sistema.
 - [x] **Provar el release sencer:** l'APK de release (R8) provat a l'emulador: llistat, crear persona, detall, nova entrada, nota ràpida amb persona, persona protegida (PIN amb `BiometricPrompt`), Ajustos (tema, color dinàmic, idioma) i exportar. Sense crashs ni regles de Koin, `NavKey` o Room: les regles de les llibreries n'hi ha prou.
 - [x] **`isShrinkResources`:** no cal; amb `optimization { enable = true }` AGP 9 ja redueix els recursos (`resources.txt` al mapping).
-- [ ] **Símbols natius:** `ndk { debugSymbolLevel = "SYMBOL_TABLE" }` és al `buildTypes.release`, però en local l'AAB no porta `debugsymbols` (`libandroidx.graphics.path.so` ja ve sense símbols i AGP no n'ha extret de l'altra, potser per falta de NDK). Comprovar si el CI ho genera i si Play deixa d'avisar; no bloqueja.
+- [ ] **Símbols natius:** `ndk { debugSymbolLevel = "SYMBOL_TABLE" }` és al `buildTypes.release` i funciona: amb l'NDK 28.2.13676358 (el que demana AGP 9.4) instal·lat, l'AAB porta els `debugsymbols` de `libdatastore_shared_counter.so` en les quatre arquitectures. `libandroidx.graphics.path.so` ja ve sense símbols i no es pot arreglar. Falta comprovar-ho al CI: només el `release.yml` construeix l'AAB; mirar a la primera release que l'AAB els porti i que Play deixi d'avisar. No bloqueja.
 - [x] **Fitxa de Play per a producció:** textos, icona, gràfic de funcions i 5 captures en en/ca/es a `app/src/main/play`, publicats amb `publish-listing.yml`; formulari de seguretat de les dades fet.
 
 ### Proves manuals
 
 - [x] **Res de Pro visible** amb tots els flags apagats (llista de «Proves» a `docs/pro.md`) i els dos modes amb el «Pro mode» del menú de debug.
 - [x] **Onboarding:** primera obertura i no tornar a sortir després de Comença/Omet; enrere al pas 1 surt sense marcar-lo; lliscar llança l'animació de la pàgina d'arribada; amb les animacions del sistema desactivades es veu l'estat final; clar i fosc; ca/es/en amb font gran; les animacions infinites del pas 1 s'aturen en sortir de la pàgina.
-- [ ] **Menú de debug:** arrossegar el botó, tornar a mostrar l'onboarding, `FLAG_SECURE` al full.
-- [ ] **Bloqueig desactivat sol** (dispositiu real): quan el dispositiu es queda sense bloqueig de pantalla, les protegides continuen protegides i el desbloqueig ofereix «Configura la seguretat».
+- [x] **Menú de debug:** arrossegar el botó, tornar a mostrar l'onboarding, `FLAG_SECURE` al full.
+- [x] **Bloqueig desactivat sol** (dispositiu real): quan el dispositiu es queda sense bloqueig de pantalla, les protegides continuen protegides i el desbloqueig ofereix «Configura la seguretat».
 - [x] **Bloqueig d'una protegida** a dispositiu real: massa intents i empremta.
-- [ ] **Color de la persona** amb `PersonColorFeature` encès (emulador).
+- [x] **Color de la persona** amb `PersonColorFeature` encès (emulador).
 - [x] **TalkBack real:** l'ordre de lectura i els fulls.
 
 ### Petites millores
 
-- [ ] **Onboarding:** «pop» del botó «Comença» al pas 3 i test del runner de `OnboardingFlag`.
-- [ ] **Snackbar de desfer:** afinar posició i marges si no queda bé.
+- [ ] **Snackbar de desfer:** afinar posició i marges (més endavant).
 - [ ] **Font 2×:** l'avatar petit del xip de filtre de la cronologia es veu mal alineat; els títols grans (44/40 sp) podrien tallar-se (`autoSize` amb mínim de 28 sp o `maxLines = 2`). Acceptat tal com està.
 - [ ] **CI:** els tests de migració (`MigrationTestHelper`) són instrumentats i el CI no en corre cap; decidir-ho quan arribi la primera migració.
 
 ### Design system (feina de Bernat a Claude Design)
 
-- [ ] Sincronitzar el design system amb l'app: colors d'error fixos; split button de 56 dp i el seu menú (radi 24, elements de 52 dp); full d'accions; full de nova entrada (camp sense línia, ordre Qui → Text → On → Quan) i nota ràpida; full de triar persona i fila discontínua «Afegeix una persona»; pantalla de bloqueig amb els quatre estats; avatar protegit; filtre de canal i tema d'Ajustos com a `ButtonGroup` connectat; files d'Ajustos amb radis 24/6; pastilles de canal «On hi parles»; estats buits i snackbar; barra flotant amb tres destinacions; fila «Quan» i full «Quan va ser?»; selector «Qui» i marcadors; verd d'èxit de l'onboarding; avatar estàndard i full «Avatar».
+Sense data: es va sincronitzant amb l'app a mesura que convé i no bloqueja res. Canvis acumulats a l'app: colors d'error fixos; split button de 56 dp i el seu menú; full d'accions; full de nova entrada i nota ràpida; full de triar persona; pantalla de bloqueig amb els quatre estats; avatar protegit; filtre de canal i tema d'Ajustos com a `ButtonGroup` connectat; files d'Ajustos; pastilles de canal; estats buits i snackbar; barra flotant amb tres destinacions; fila «Quan» i full «Quan va ser?»; selector «Qui» i marcadors; verd d'èxit de l'onboarding; avatar estàndard i full «Avatar».
 
 ## Iteració 2 (després de la publicació)
 
-El detall és a `docs/backlog.md`. Totes dues necessiten migració (vegeu «Regla de la base de dades»).
+El detall és a `docs/backlog.md`. Els punts 6 i 8 necessiten migració (vegeu «Regla de la base de dades»); el 11 no.
 
-- **Follow-ups / entrades pendents (6, issue #5):** flag `pending` a `EntryEntity` i interruptor a `EntryForm`, sota de «Quan». Primera migració (v1 → v2). És Pro.
-- **Gestor de canals (8):** l'enum `ChannelType` passa a una taula de canals. Absorbeix «Empresa» (7). És Pro.
+- **Follow-ups / entrades pendents o planificades (6, issue #5):** flag `pending` a `EntryEntity` i interruptor a `EntryForm`, sota de «Quan». Primera migració (v1 → v2). És Pro.
+- **Gestor de canals (8):** l'enum `ChannelType` passa a una taula de canals. Absorbeix «Empresa» (7). Ampliació prevista: canals **amb valor** (per exemple, un número o un usuari per persona) i canals propis. És Pro.
+- **Importar text a la nota ràpida, «share invers» (11, issue #30):** compartir text des d'altres apps (`ACTION_SEND`), seleccionar text (`ACTION_PROCESS_TEXT`) i un botó «Enganxa» al porta-retalls; la nota ràpida s'obre amb el text posat i només cal triar la persona. Sense canvis a Room, no cal migració. És gratis.
 
 ## Després de la v1
 
@@ -75,7 +75,8 @@ El detall és a `docs/backlog.md`. Totes dues necessiten migració (vegeu «Regl
 - **Cerca:** pel nom de la persona i dins el text de les entrades. Les protegides només es poden trobar pel nom.
 - **Exportar i importar tot:** un fitxer (JSON o ZIP xifrat) per canviar de mòbil sense el backup de Google.
 - **Etiquetes** i la vista de **dades** de totes les persones.
-- **Widget** de nota ràpida.
+- **Widgets:** de nota ràpida i, més endavant, altres (per exemple, persones recents).
+- **App per a Wear OS:** nota ràpida des del rellotge. Cal veure què comparteix amb el mòbil i com es sincronitzen les dades, perquè les protegides no han de sortir del telèfon.
 - **Recordatoris** a partir de les dades (per exemple, l'aniversari).
 - **Splash que segueixi el tema triat a l'app:** ara segueix el mode del sistema. Es resoldria amb `core-splashscreen` (`installSplashScreen()`, `postSplashScreenTheme` i `setKeepOnScreenCondition`). Sense pressa.
 
