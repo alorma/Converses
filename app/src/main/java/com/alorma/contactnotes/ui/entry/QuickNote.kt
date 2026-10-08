@@ -4,6 +4,9 @@ import com.alorma.contactnotes.data.db.shape
 import com.alorma.contactnotes.data.db.color
 import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.consumeWindowInsets
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -27,6 +30,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -262,27 +266,42 @@ fun QuickNoteContent(
     ?: available.first()
 
   PersonTheme(selected?.color) {
-    Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.surface) {
+    Scaffold(
+      containerColor = MaterialTheme.colorScheme.surface,
+      contentWindowInsets = WindowInsets.navigationBars,
+      topBar = {
+        // Tancar, desar i títol fixos a dalt: no fan scroll amb el formulari
+        Column(
+          modifier = Modifier
+            .fillMaxWidth()
+            .background(MaterialTheme.colorScheme.surface)
+            .windowInsetsPadding(WindowInsets.statusBars)
+            .padding(start = 16.dp, end = 16.dp, top = 8.dp),
+          verticalArrangement = Arrangement.spacedBy(16.dp),
+        ) {
+          Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+            FilledTonalIconButton(onClick = onClose) {
+              Icon(Icons.Rounded.Close, contentDescription = stringResource(R.string.close))
+            }
+            Button(
+              onClick = { if (selected != null) onSave(selected, channel) },
+              enabled = form.canSave && selected != null,
+            ) { Text(stringResource(R.string.save), fontWeight = FontWeight.Bold) }
+          }
+          Text(stringResource(R.string.quick_note), style = ScreenTitleStyle, modifier = Modifier.padding(start = 4.dp))
+        }
+      },
+    ) { padding ->
       Column(
         modifier = Modifier
           .fillMaxSize()
-          .windowInsetsPadding(WindowInsets.statusBars)
+          .padding(padding)
+          .consumeWindowInsets(padding)
           .imePadding()
           .verticalScroll(rememberScrollState())
-          .padding(horizontal = 16.dp, vertical = 8.dp),
+          .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 8.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
       ) {
-        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-          FilledTonalIconButton(onClick = onClose) {
-            Icon(Icons.Rounded.Close, contentDescription = stringResource(R.string.close))
-          }
-          Button(
-            onClick = { if (selected != null) onSave(selected, channel) },
-            enabled = form.canSave && selected != null,
-          ) { Text(stringResource(R.string.save), fontWeight = FontWeight.Bold) }
-        }
-        Text(stringResource(R.string.quick_note), style = ScreenTitleStyle, modifier = Modifier.padding(start = 4.dp))
-
         EntryForm(
           state = form,
           person = selected,
