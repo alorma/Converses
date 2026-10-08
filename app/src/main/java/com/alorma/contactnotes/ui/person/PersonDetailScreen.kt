@@ -4,6 +4,7 @@ import com.alorma.contactnotes.data.db.shape
 import com.alorma.contactnotes.data.db.color
 import android.content.ClipData
 import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -278,6 +279,26 @@ fun PersonDetailScreen(
   Scaffold(
     containerColor = MaterialTheme.colorScheme.surface,
     contentWindowInsets = WindowInsets.navigationBars,
+    topBar = {
+      Row(
+        modifier = Modifier
+          .fillMaxWidth()
+          .background(MaterialTheme.colorScheme.surface)
+          .windowInsetsPadding(WindowInsets.statusBars)
+          .padding(horizontal = ScreenMargin),
+        verticalAlignment = Alignment.CenterVertically,
+      ) {
+        IconButton(onClick = onBack) {
+          Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = stringResource(R.string.back))
+        }
+        Spacer(Modifier.weight(1f))
+        if (person != null) {
+          IconButton(onClick = onEditPerson) {
+            Icon(Icons.Rounded.Edit, contentDescription = stringResource(R.string.edit_person))
+          }
+        }
+      }
+    },
     snackbarHost = { SnackbarHost(snackbarHostState, modifier = Modifier.padding(horizontal = 4.dp)) },
     floatingActionButton = {
       if (person != null) {
@@ -313,23 +334,10 @@ fun PersonDetailScreen(
         contentPadding = PaddingValues(
           start = ScreenMargin,
           end = ScreenMargin,
+          top = padding.calculateTopPadding(),
           bottom = 96.dp + padding.calculateBottomPadding(),
         ),
       ) {
-        item(key = "back") {
-          Row(
-            modifier = Modifier.fillMaxWidth().windowInsetsPadding(WindowInsets.statusBars),
-            verticalAlignment = Alignment.CenterVertically,
-          ) {
-            IconButton(onClick = onBack) {
-              Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = stringResource(R.string.back))
-            }
-            Spacer(Modifier.weight(1f))
-            IconButton(onClick = onEditPerson) {
-              Icon(Icons.Rounded.Edit, contentDescription = stringResource(R.string.edit_person))
-            }
-          }
-        }
         item(key = "header") { Header(person) }
         if (state.channels.isNotEmpty()) {
           item(key = "channels") { ChannelRow(state.channels) }
