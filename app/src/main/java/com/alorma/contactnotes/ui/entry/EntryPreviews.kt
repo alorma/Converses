@@ -15,7 +15,7 @@ import com.alorma.contactnotes.designsystem.preview.ConversesPreviewTheme
 import com.alorma.contactnotes.designsystem.theme.PersonTheme
 import com.alorma.contactnotes.ui.preview.PreviewData
 
-private val Channels = PreviewData.martaChannels.map { it.type }
+private val Channels = PreviewData.martaChannels
 
 @Composable
 private fun QuickNotePreview(state: QuickNoteUiState, form: EntryFormState) {

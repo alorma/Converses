@@ -136,7 +136,7 @@ class QuickNoteViewModel(
           people = people,
           selected = selected,
           pending = pending,
-          channels = channels.map { it.type },
+          channels = channels,
           lastChannel = last,
         )
       }

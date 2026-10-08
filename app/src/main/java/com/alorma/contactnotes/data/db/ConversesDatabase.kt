@@ -14,7 +14,6 @@ import androidx.room.RoomDatabase
 )
 abstract class ConversesDatabase : RoomDatabase() {
   abstract fun personDao(): PersonDao
-  abstract fun channelDao(): ChannelDao
   abstract fun entryDao(): EntryDao
   abstract fun pinnedFactDao(): PinnedFactDao
 }

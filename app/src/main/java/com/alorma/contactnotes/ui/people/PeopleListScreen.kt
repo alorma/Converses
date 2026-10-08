@@ -399,7 +399,7 @@ private fun PersonRow(item: PersonListItem, onClick: () -> Unit) {
           color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
       } else {
-        val channels = item.channels.map { it.type }.distinct().sorted()
+        val channels = item.channels.distinct().sorted()
         if (channels.isNotEmpty()) {
           Text(
             text = channels.map { channelName(it).uppercase() }.joinToString(" · "),

@@ -27,9 +27,9 @@ class PeopleListViewModelTest {
     val chat = db.addPerson("Chat", createdAt = 3)
     val social = db.addPerson("Social", createdAt = 2)
     val inPerson = db.addPerson("InPerson", createdAt = 1)
-    db.addChannel(chat.id, ChannelType.CHAT)
-    db.addChannel(social.id, ChannelType.SOCIAL)
-    db.addChannel(inPerson.id, ChannelType.IN_PERSON)
+    db.addEntry(chat.id, channel = ChannelType.CHAT)
+    db.addEntry(social.id, channel = ChannelType.SOCIAL)
+    db.addEntry(inPerson.id, channel = ChannelType.IN_PERSON)
     val vm = PeopleListViewModel(archived = false, repository = db.repository, settings = settings)
     backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { vm.uiState.collect {} }
 
@@ -50,8 +50,8 @@ class PeopleListViewModelTest {
   fun filteringBySocialExcludesOtherChannels() = runTest {
     val onX = db.addPerson("OnSocial", createdAt = 2)
     val onInstagram = db.addPerson("OnOther", createdAt = 1)
-    db.addChannel(onX.id, ChannelType.SOCIAL)
-    db.addChannel(onInstagram.id, ChannelType.OTHER)
+    db.addEntry(onX.id, channel = ChannelType.SOCIAL)
+    db.addEntry(onInstagram.id, channel = ChannelType.OTHER)
     val vm = PeopleListViewModel(archived = false, repository = db.repository, settings = settings)
     backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { vm.uiState.collect {} }
 
@@ -62,7 +62,7 @@ class PeopleListViewModelTest {
   @Test
   fun protectedPeopleOnlyShowUpWithoutFilterBecauseTheirChannelsAreHidden() = runTest {
     val secret = db.addPerson("Luna", isProtected = true)
-    db.addChannel(secret.id, ChannelType.CHAT)
+    db.addEntry(secret.id, channel = ChannelType.CHAT)
     val vm = PeopleListViewModel(archived = false, repository = db.repository, settings = settings)
     backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { vm.uiState.collect {} }
 

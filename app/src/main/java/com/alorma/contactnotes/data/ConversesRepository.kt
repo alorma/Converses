@@ -1,7 +1,5 @@
 package com.alorma.contactnotes.data
 
-import com.alorma.contactnotes.data.db.ChannelDao
-import com.alorma.contactnotes.data.db.ChannelEntity
 import com.alorma.contactnotes.data.db.ChannelType
 import com.alorma.contactnotes.data.db.EntryDao
 import com.alorma.contactnotes.data.db.EntryEntity
@@ -18,7 +16,6 @@ import kotlinx.coroutines.flow.map
 
 class ConversesRepository(
   private val personDao: PersonDao,
-  private val channelDao: ChannelDao,
   private val entryDao: EntryDao,
   private val pinnedFactDao: PinnedFactDao,
 ) {
@@ -31,7 +28,9 @@ class ConversesRepository(
 
   fun observePerson(id: Long): Flow<PersonEntity?> = personDao.observe(id)
 
-  fun observeChannels(personId: Long): Flow<List<ChannelEntity>> = channelDao.observeForPerson(personId)
+  /** Grups de canal usats a les entrades de la persona, sempre en l'ordre fix de [ChannelType]. */
+  fun observeChannels(personId: Long): Flow<List<ChannelType>> =
+    entryDao.observeChannelTypes(personId).map { it.distinct().sorted() }
 
   fun observePinnedFacts(personId: Long): Flow<List<PinnedFactEntity>> =
     pinnedFactDao.observeForPerson(personId)

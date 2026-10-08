@@ -19,10 +19,8 @@ class ConversesRepositoryTest {
   fun protectedPeopleDoNotExposeTheirLastEntryNorChannels() = runTest {
     val open = db.addPerson("Marta")
     val secret = db.addPerson("Luna", isProtected = true)
-    db.addChannel(open.id, ChannelType.CHAT)
-    db.addChannel(secret.id, ChannelType.SOCIAL)
-    db.addEntry(open.id, text = "hola")
-    db.addEntry(secret.id, text = "secret")
+    db.addEntry(open.id, channel = ChannelType.CHAT, text = "hola")
+    db.addEntry(secret.id, channel = ChannelType.SOCIAL, text = "secret")
 
     val list = repository.observePeople().first().associateBy { it.person.id }
 
