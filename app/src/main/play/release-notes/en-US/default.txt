@@ -1,0 +1,3 @@
+  First release of Converses. Keep track of what you said, what people told you and what happened with each      
+  person, whether in chat, on social networks or in person. Quick notes, a timeline per person, a color for each 
+  one and optional biometric lock for private people. Your data stays on your device.                            

@@ -1,6 +1,6 @@
 name: Release
 
-# Builds the signed release APK and AAB from main, uploads the AAB to Google Play, publishes a GitHub release
+# Builds the signed release APK and AAB from main, uploads the AAB and its release notes to Google Play, publishes a GitHub release
 # tagged with the version in version.properties and bumps the minor version (as a snapshot) for the next cycle.
 # Manual trigger only
 on:
@@ -15,8 +15,9 @@ on:
 permissions:
   contents: write
 
+# Google Play només admet una edició oberta a la vegada: comparteix grup amb publish-listing.yml
 concurrency:
-  group: ${{ github.workflow }}
+  group: play-publish
   cancel-in-progress: false
 
 jobs:
@@ -80,15 +81,15 @@ jobs:
           if-no-files-found: error
           retention-days: 30
 
+      # Gradle Play Publisher: puja l'AAB i, de app/src/main/play/release-notes, les notes de cada idioma.
+      # El mapping de R8 va dins l'AAB
       - name: Upload to Google Play
-        uses: r0adkll/upload-google-play@v1
-        with:
-          serviceAccountJsonPlainText: ${{ secrets.SERVICE_ACCOUNT_JSON }}
-          packageName: com.alorma.contactnotes
-          releaseFiles: app/build/outputs/bundle/release/app-release.aab
-          track: ${{ inputs.track }}
-          releaseName: ${{ steps.version.outputs.version }}
-          mappingFile: app/build/outputs/mapping/release/mapping.txt
+        run: ./gradlew :app:publishReleaseBundle --track "${{ inputs.track }}" --release-name "${{ steps.version.outputs.version }}"
+        env:
+          ANDROID_PUBLISHER_CREDENTIALS: ${{ secrets.SERVICE_ACCOUNT_JSON }}
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
 
       - name: Create tag and GitHub release
         env:

@@ -1,5 +1,6 @@
 [versions]
 agp = "9.4.1"
+playPublisher = "4.1.1"
 kotlin = "2.4.20"
 composeBom = "2026.09.00"
 activityCompose = "1.13.0"
@@ -71,3 +72,4 @@ kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", versi
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 compose-screenshot = { id = "com.android.compose.screenshot", version.ref = "composeScreenshot" }
 version = { id = "io.github.alorma.version", version.ref = "versionPlugin" }
+play-publisher = { id = "com.github.triplet.play", version.ref = "playPublisher" }
