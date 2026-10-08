@@ -1,4 +1,4 @@
-Versió 1.3.0:
+Versió 1.4.0:
 • El mòbil ara vibra quan deses o confirmes. Si t'emprenya, hi ha un ajust per fer-lo callar.
 • Les pantalles llisquen com en una app d'Android de debò, i el gest de tornar ensenya on vas.
 • Els filtres de canal ara són xips combinables, i els estats buits tenen una forma que pots tocar.
