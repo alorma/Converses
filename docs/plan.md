@@ -53,7 +53,8 @@ Converses és una app Android per recordar què has dit, què t'han dit i què h
 
 ### Petites millores
 
-- [ ] **Snackbar de desfer:** afinar posició i marges (més endavant).
+- [x] **Snackbar de desfer:** el detall de persona usa `Scaffold` (split button al slot `floatingActionButton`, snackbar a `snackbarHost` amb 16 dp de marge), així l'snackbar s'apila sol sobre el botó sense `snackbarLift`.
+- [ ] **`Scaffold` a la resta de pantalles** (llista, Arxivades, Ajustos, editor…): cap l'usa encara; la barra flotant de navegació no pot ser `bottomBar` perquè reserva espai. Després, valorar l'estat d'snackbar d'`alorma/Caducity` (cua, `CompositionLocal`, animació d'escala + fade).
 - [ ] **Font 2×:** l'avatar petit del xip de filtre de la cronologia es veu mal alineat; els títols grans (44/40 sp) podrien tallar-se (`autoSize` amb mínim de 28 sp o `maxLines = 2`). Acceptat tal com està.
 - [x] **Transicions entre pantalles:** substituït el fade pla de 700 ms de Nav3 per transicions suaus properes a les natives d'Android a `ui/AppNavigation.kt` (`nativeTransition`): endavant, la pantalla nova llisca poc (1/12 de l'amplada) amb fade; enrere, només la que surt es redueix (0.9) i fa fade, com el back predictiu. El gest de back predictiu (`predictiveBack`) segueix el dit: la pantalla es redueix i es mou cap al costat del gest, i fa fade només al final. Les modals (QuickNote, EditPerson) entren en vertical i no mouen la pantalla de sota.
 - [ ] **CI:** els tests de migració (`MigrationTestHelper`) són instrumentats i el CI no en corre cap; decidir-ho quan arribi la primera migració.

@@ -38,6 +38,7 @@ import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -94,7 +95,6 @@ import org.koin.core.parameter.parametersOf
 
 private val ScreenMargin = 16.dp
 private const val UndoWindowMillis = 5_000L
-private val SnackbarLift = 64.dp
 
 private sealed interface TimelineItem {
   data class Day(val date: LocalDate) : TimelineItem
@@ -275,8 +275,35 @@ fun PersonDetailScreen(
   snackbarHostState: SnackbarHostState,
 ) {
   val person = state.person
-  Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.surface) {
-    if (person == null) return@Surface
+  Scaffold(
+    containerColor = MaterialTheme.colorScheme.surface,
+    contentWindowInsets = WindowInsets.navigationBars,
+    snackbarHost = { SnackbarHost(snackbarHostState, modifier = Modifier.padding(horizontal = 4.dp)) },
+    floatingActionButton = {
+      if (person != null) {
+        ConversesSplitButton(
+          label = stringResource(R.string.note_button),
+          icon = Icons.Rounded.EditNote,
+          onClick = onNewEntry,
+          menuExpanded = menuExpanded,
+          onMenuExpandedChange = onMenuExpandedChange,
+          menuContentDescription = stringResource(R.string.more_options),
+        ) {
+          ConversesMenuItem(
+            text = stringResource(R.string.menu_export),
+            icon = Icons.Rounded.IosShare,
+            onClick = onExport,
+          )
+          ConversesMenuItem(
+            text = stringResource(if (person.archived) R.string.menu_unarchive else R.string.menu_archive),
+            icon = if (person.archived) Icons.Rounded.Unarchive else Icons.Rounded.Archive,
+            onClick = onToggleArchived,
+          )
+        }
+      }
+    },
+  ) { padding ->
+    if (person == null) return@Scaffold
     val items = remember(state.entries) { state.entries.toTimelineItems() }
     val firstName = remember(person.name) { firstName(person.name) }
 
@@ -286,7 +313,7 @@ fun PersonDetailScreen(
         contentPadding = PaddingValues(
           start = ScreenMargin,
           end = ScreenMargin,
-          bottom = 96.dp + WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding(),
+          bottom = 96.dp + padding.calculateBottomPadding(),
         ),
       ) {
         item(key = "back") {
@@ -388,42 +415,6 @@ fun PersonDetailScreen(
             modifier = Modifier.fillMaxWidth().padding(start = 4.dp, top = 24.dp),
           )
         }
-      }
-
-      val snackbarLift by animateDpAsState(
-        targetValue = if (snackbarHostState.currentSnackbarData != null) SnackbarLift else 0.dp,
-        label = "snackbarLift",
-      )
-      SnackbarHost(
-        hostState = snackbarHostState,
-        modifier = Modifier
-          .align(Alignment.BottomCenter)
-          .windowInsetsPadding(WindowInsets.navigationBars)
-          .padding(16.dp),
-      )
-
-      ConversesSplitButton(
-        label = stringResource(R.string.note_button),
-        icon = Icons.Rounded.EditNote,
-        onClick = onNewEntry,
-        menuExpanded = menuExpanded,
-        onMenuExpandedChange = onMenuExpandedChange,
-        menuContentDescription = stringResource(R.string.more_options),
-        modifier = Modifier
-          .align(Alignment.BottomEnd)
-          .windowInsetsPadding(WindowInsets.navigationBars)
-          .padding(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 16.dp + snackbarLift),
-      ) {
-        ConversesMenuItem(
-          text = stringResource(R.string.menu_export),
-          icon = Icons.Rounded.IosShare,
-          onClick = onExport,
-        )
-        ConversesMenuItem(
-          text = stringResource(if (person.archived) R.string.menu_unarchive else R.string.menu_archive),
-          icon = if (person.archived) Icons.Rounded.Unarchive else Icons.Rounded.Archive,
-          onClick = onToggleArchived,
-        )
       }
     }
   }
