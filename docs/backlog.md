@@ -12,9 +12,8 @@ Actualitzat el 8 d'oct. de 2026. Només hi ha el que encara no està fet.
 | 12 | Bug | Nota ràpida: el xip «Persona» desactivat confon | [#40](https://github.com/alorma/Converses/issues/40) |
 | 14 | Millora | Detall de persona: les 3 accions visibles, sense el split FAB | [#44](https://github.com/alorma/Converses/issues/44) |
 | 15 | Millora | Ajustos: secció «Quant a» | [#43](https://github.com/alorma/Converses/issues/43) |
-| 17 | Feature | Cerca d'entrades per paraula clau | [#41](https://github.com/alorma/Converses/issues/41) |
 
-Els punts 6, 7, 8 i 11 són de l'**Iteració 2**; el 6 i el 8 són Pro, i l'11 i el 13 són gratis (vegeu `docs/pro.md`). El punt 13 (refactor dels canals) és la tasca gran i la primera a fer. Els punts 12, 14, 15 i 17 vénen del feedback de la beta (issues #40, #41, #43 i #44; el #45 s'ha descartat) i són tasques independents, després del 13. **Qualsevol canvi de la base de dades ha d'incloure una migració i el seu test** (la v1 ja és a Google Play); l'11 no toca Room. El 13 requereix la migració v1 → v2; de la resta, només el 17 pot tocar Room (si s'opta per FTS). La numeració és la del backlog original, perquè els issues i les referències no canviïn; els punts resolts (1–5, 9, 10) són a l'historial de git.
+Els punts 6, 7, 8 i 11 són de l'**Iteració 2**; el 6 i el 8 són Pro, i l'11 i el 13 són gratis (vegeu `docs/pro.md`). El punt 13 (refactor dels canals) és la tasca gran i la primera a fer. Els punts 12, 14 i 15 vénen del feedback de la beta (issues #40, #43 i #44; el #45 s'ha descartat i la cerca, #41, queda per més endavant (vegeu `docs/plan.md`)) i són tasques independents, després del 13. **Qualsevol canvi de la base de dades ha d'incloure una migració i el seu test** (la v1 ja és a Google Play); l'11 no toca Room. El 13 requereix la migració v1 → v2; la resta no toca Room. La numeració és la del backlog original, perquè els issues i les referències no canviïn; els punts resolts (1–5, 9, 10) són a l'historial de git.
 
 ---
 
@@ -144,13 +143,3 @@ Ajustos **ja té** una secció «Quant a» (`settings_about`) amb la política d
 **Dades a decidir:** nom i enllaç de l'autor, si el repositori és públic, i el canal del feedback (`mailto:` o issues de GitHub; el correu quedaria exposat).
 
 Textos a `strings.xml` (en, ca, es) i captures d'Ajustos. Sense Room.
-
-## 17 · Feature: cerca
-
-Issue: [#41](https://github.com/alorma/Converses/issues/41)
-
-Cerca pel nom de la persona i dins el text de les entrades, amb els resultats etiquetats per persona; tocar-ne un obre el detall a aquella entrada.
-
-- **Protegides:** només es troben pel nom; el text de les seves entrades no es cerca ni es mostra abans de desbloquejar.
-- **Tècnica:** consultes `LIKE` (sense canvi d'esquema, la recomanada per començar) o Room FTS (més ràpid amb molts registres, però exigeix taula nova, versió, migració i test; coordinar-ho amb la migració del 13 o amb el 6).
-- Surt de «Després de la v1» del pla: ara és a la iteració 2.
