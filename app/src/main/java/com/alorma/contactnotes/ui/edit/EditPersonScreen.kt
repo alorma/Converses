@@ -146,6 +146,7 @@ fun EditPersonScreen(
   val canAuthenticate = remember { activity.canUnlockWithDevice() }
   val authTitle = stringResource(R.string.protected_person)
   val authSubtitle = stringResource(R.string.unlock_subtitle)
+  val haptics = rememberConversesHaptics()
   val secureWindow: SecureWindow = koinInject()
   val secure = state.loaded && (state.baseline.isProtected || state.isProtected)
   DisposableEffect(secure) {
@@ -160,7 +161,12 @@ fun EditPersonScreen(
     onClose = onClose,
     onSaved = onSaved,
     onDeleted = onDeleted,
-    onProtectedChange = { value -> activity.promptUnlock(authTitle, authSubtitle) { viewModel.onProtected(value) } },
+    onProtectedChange = { value ->
+      activity.promptUnlock(authTitle, authSubtitle) {
+        viewModel.onProtected(value)
+        haptics.toggle(value)
+      }
+    },
     customAvatar = rememberFeatureEnabled<CustomAvatarFeature>(),
     focus = focus,
   )
