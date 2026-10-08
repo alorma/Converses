@@ -61,19 +61,19 @@ class ConversesRepositoryTest {
   }
 
   @Test
-  fun savePersonCreatesAndThenReplacesChannelsAndFacts() = runTest {
+  fun savePersonCreatesAndThenReplacesFactsLeavingChannelRowsAlone() = runTest {
     val draft = db.addPerson("Draft").copy(id = 0)
     db.people.value = emptyList()
     val id = repository.savePerson(
       draft,
-      listOf(com.alorma.contactnotes.data.db.ChannelEntity(personId = 0, type = ChannelType.PHONE)),
       listOf(com.alorma.contactnotes.data.db.PinnedFactEntity(personId = 0, label = "a", value = "b", position = 0)),
     )
-    assertEquals(1, repository.observeChannels(id).first().size)
+    db.addChannel(id, ChannelType.PHONE)
+    assertEquals(1, repository.observePinnedFacts(id).first().size)
 
-    repository.savePerson(db.person(id)!!, emptyList(), emptyList())
-    assertTrue(repository.observeChannels(id).first().isEmpty())
+    repository.savePerson(db.person(id)!!, emptyList())
     assertTrue(repository.observePinnedFacts(id).first().isEmpty())
+    assertEquals(1, db.channels.value.size)
   }
 
   @Test

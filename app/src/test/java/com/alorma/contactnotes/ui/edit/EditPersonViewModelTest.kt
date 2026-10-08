@@ -89,8 +89,6 @@ class EditPersonViewModelTest {
     val (first, second) = vm.state.value.facts
     vm.onFactChange(first.key, " Birthday ", " 14 March ")
     vm.onFactChange(second.key, "", "")
-    vm.onToggleChannel(ChannelType.CHAT)
-    vm.onToggleChannel(ChannelType.IN_PERSON)
 
     var savedId = -1L
     vm.save { savedId = it }
@@ -102,20 +100,20 @@ class EditPersonViewModelTest {
     assertNull(person.avatarColor)
     val facts = db.repository.observePinnedFacts(savedId).first()
     assertEquals(listOf("Birthday" to "14 March"), facts.map { it.label to it.value })
-    val channels = db.repository.observeChannels(savedId).first()
-    assertEquals(listOf(ChannelType.IN_PERSON, ChannelType.CHAT), channels.map { it.type })
+    assertTrue(db.channels.value.isEmpty())
   }
 
   @Test
-  fun togglingAChannelSelectsAndDeselectsIt() {
-    val vm = viewModel()
+  fun savingAnExistingPersonLeavesItsStoredChannelRowsUntouched() = runTest {
+    val marta = db.addPerson("Marta")
+    db.addChannel(marta.id, ChannelType.CHAT)
+    val vm = viewModel(marta.id)
+    vm.state.first { it.loaded }
+    vm.onName("Marta Soler")
 
-    vm.onToggleChannel(ChannelType.CHAT)
-    vm.onToggleChannel(ChannelType.SOCIAL)
-    assertEquals(setOf(ChannelType.CHAT, ChannelType.SOCIAL), vm.state.value.channels)
+    vm.save {}
 
-    vm.onToggleChannel(ChannelType.CHAT)
-    assertEquals(setOf(ChannelType.SOCIAL), vm.state.value.channels)
+    assertEquals(listOf(ChannelType.CHAT), db.channels.value.map { it.type })
   }
 
   @Test

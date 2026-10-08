@@ -65,7 +65,6 @@
     <string name="app_lock_prompt_title">Desbloquea Converses</string>
     <string name="today">Hoy</string>
     <string name="person_since">Desde %1$s</string>
-    <string name="empty_channels_cta">Dónde habláis</string>
     <string name="empty_facts_title">Añade un dato</string>
     <string name="empty_facts_hint">Trabajo, familia, cumpleaños, de dónde es…</string>
     <string name="empty_timeline_title">Todavía no hay nada</string>
@@ -144,12 +143,6 @@
     <string name="move_up">Mover arriba</string>
     <string name="move_down">Mover abajo</string>
     <string name="reorder">Reordenar</string>
-    <string name="channels_title">Dónde habláis</string>
-    <string name="channels_count_none">Ninguno</string>
-    <plurals name="channels_count">
-        <item quantity="one">%d elegido</item>
-        <item quantity="other">%d elegidos</item>
-    </plurals>
     <string name="protected_person">Persona protegida</string>
     <string name="protected_person_summary">Hace falta la huella para verla. En el listado no se muestra el último comentario.</string>
     <string name="protected_unavailable">Hace falta una huella o un bloqueo de pantalla en el dispositivo</string>

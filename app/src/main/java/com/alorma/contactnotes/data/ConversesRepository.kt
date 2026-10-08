@@ -41,11 +41,7 @@ class ConversesRepository(
 
   fun observeCounts(personId: Long): Flow<List<KindCount>> = entryDao.observeCounts(personId)
 
-  suspend fun savePerson(
-    person: PersonEntity,
-    channels: List<ChannelEntity>,
-    facts: List<PinnedFactEntity>,
-  ): Long = personDao.save(person, channels, facts)
+  suspend fun savePerson(person: PersonEntity, facts: List<PinnedFactEntity>): Long = personDao.save(person, facts)
 
   suspend fun deletePerson(person: PersonEntity) = personDao.delete(person)
 

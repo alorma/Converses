@@ -20,33 +20,21 @@ abstract class PersonDao {
   abstract suspend fun delete(person: PersonEntity)
 
   @Insert
-  protected abstract suspend fun insertChannels(channels: List<ChannelEntity>)
-
-  @Query("DELETE FROM channel WHERE personId = :personId")
-  protected abstract suspend fun deleteChannels(personId: Long)
-
-  @Insert
   protected abstract suspend fun insertFacts(facts: List<PinnedFactEntity>)
 
   @Query("DELETE FROM pinned_fact WHERE personId = :personId")
   protected abstract suspend fun deleteFacts(personId: Long)
 
-  /** Crea o actualitza la persona amb els seus canals i dades fixades en una sola transacció. */
+  /** Crea o actualitza la persona amb les seves dades fixades en una sola transacció. La taula `channel` no es toca. */
   @Transaction
-  open suspend fun save(
-    person: PersonEntity,
-    channels: List<ChannelEntity>,
-    facts: List<PinnedFactEntity>,
-  ): Long {
+  open suspend fun save(person: PersonEntity, facts: List<PinnedFactEntity>): Long {
     val id = if (person.id == 0L) {
       insert(person)
     } else {
       update(person)
-      deleteChannels(person.id)
       deleteFacts(person.id)
       person.id
     }
-    insertChannels(channels.map { it.copy(id = 0, personId = id) })
     insertFacts(facts.mapIndexed { index, fact -> fact.copy(id = 0, personId = id, position = index) })
     return id
   }
