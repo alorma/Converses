@@ -77,15 +77,6 @@ internal fun PersonDetailScreenSingleFactPreview() {
   )
 }
 
-/** Persona amb canals però sense dades ni entrades. */
-@Preview
-@Composable
-internal fun PersonDetailScreenEmptyWithChannelsPreview() {
-  PersonDetailScreenPreview(
-    PersonDetailUiState(person = PreviewData.marta, channels = PreviewData.martaChannels, isLoading = false),
-  )
-}
-
 internal class AvatarColorProvider : PreviewParameterProvider<AvatarColor> {
   override val values: Sequence<AvatarColor> = AvatarColor.entries.asSequence()
 }
