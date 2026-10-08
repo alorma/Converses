@@ -1,5 +1,6 @@
 package com.alorma.contactnotes.ui.person
 
+import androidx.compose.material.icons.automirrored.rounded.Logout
 import com.alorma.contactnotes.data.db.shape
 import com.alorma.contactnotes.data.db.color
 import androidx.compose.foundation.clickable
@@ -16,7 +17,6 @@ import androidx.compose.material.icons.rounded.ContentCopy
 import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.DeleteSweep
 import androidx.compose.material.icons.rounded.Edit
-import androidx.compose.material.icons.rounded.Logout
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -118,7 +118,7 @@ fun EntryActionsContent(
     )
     ActionRow(Icons.Rounded.Edit, stringResource(R.string.entry_edit), null, 0, 3, onEdit)
     ActionRow(Icons.Rounded.ContentCopy, stringResource(R.string.entry_copy), null, 1, 3, onCopy)
-    ActionRow(Icons.Rounded.Logout, stringResource(R.string.entry_move), null, 2, 3, onMove)
+    ActionRow(Icons.AutoMirrored.Rounded.Logout, stringResource(R.string.entry_move), null, 2, 3, onMove)
     val canDeleteDay = dayCount > 1
     val isToday = entryDate(entry.occurredAt) == LocalDate.now()
     Column(modifier = Modifier.padding(top = 12.dp), verticalArrangement = Arrangement.spacedBy(2.dp)) {
