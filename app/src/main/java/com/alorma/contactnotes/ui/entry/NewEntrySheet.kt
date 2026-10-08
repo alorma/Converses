@@ -44,7 +44,8 @@ import com.alorma.contactnotes.ui.people.initialsOf
 @Composable
 fun NewEntrySheet(
   person: PersonEntity,
-  channels: List<ChannelType>,
+  /** Grup preseleccionat en una entrada nova (p. ex. el de l'última entrada). */
+  defaultChannel: ChannelType?,
   onDismiss: () -> Unit,
   initial: EntryEntity? = null,
   initialKind: EntryKind = EntryKind.SAID,
@@ -52,8 +53,7 @@ fun NewEntrySheet(
   onSave: (kind: EntryKind, channel: ChannelType, text: String, occurredAt: Long?) -> Unit,
 ) {
   val form = rememberEntryFormState(initial, initialKind)
-  val available = availableChannels(channels + listOfNotNull(initial?.channelType))
-  val channel = form.channel?.takeIf { it in available } ?: available.first()
+  val channel = form.channel ?: defaultChannel ?: ChannelType.entries.first()
 
   ModalBottomSheet(
     onDismissRequest = onDismiss,
@@ -63,7 +63,6 @@ fun NewEntrySheet(
     NewEntrySheetContent(
       person = person,
       form = form,
-      available = available,
       channel = channel,
       isNew = initial == null,
       focusText = focusText,
@@ -78,7 +77,6 @@ fun NewEntrySheet(
 fun NewEntrySheetContent(
   person: PersonEntity,
   form: EntryFormState,
-  available: List<ChannelType>,
   channel: ChannelType,
   isNew: Boolean,
   onDismiss: () -> Unit,
@@ -115,7 +113,6 @@ fun NewEntrySheetContent(
       EntryForm(
         state = form,
         person = person,
-        channels = available,
         channel = channel,
         onChannelChange = { form.channel = it },
         focusText = focusText,
