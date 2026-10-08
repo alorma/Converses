@@ -37,7 +37,6 @@ import com.alorma.contactnotes.designsystem.components.AvatarColor
 import com.alorma.contactnotes.ui.person.AvatarColorProvider
 import com.alorma.contactnotes.ui.person.PersonDetailScreenEmptyPreview
 import com.alorma.contactnotes.ui.person.PersonDetailScreenSingleFactPreview
-import com.alorma.contactnotes.ui.person.PersonDetailScreenEmptyWithChannelsPreview
 import com.alorma.contactnotes.ui.person.PersonDetailScreenThemedPreview
 import com.alorma.contactnotes.ui.person.PersonDetailScreenFilteredEmptyPreview
 import com.alorma.contactnotes.ui.person.PersonDetailScreenLoadedPreview
@@ -106,13 +105,6 @@ class ScreensScreenshotTests {
   @Composable
   fun personDetailEmpty() {
     PersonDetailScreenEmptyPreview()
-  }
-
-  @ScreenPreviews
-  @PreviewTest
-  @Composable
-  fun personDetailEmptyWithChannels() {
-    PersonDetailScreenEmptyWithChannelsPreview()
   }
 
   @ScreenPreviews
