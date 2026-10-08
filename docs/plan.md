@@ -27,7 +27,7 @@ Converses és una app Android per recordar què has dit, què t'han dit i què h
 | M4 · Qualitat | Fet (amb excepcions acceptades) |
 | Versió gratuïta (flags, avatar estàndard, redisseny de l'editor) | Fet (falta la prova final de «res de Pro visible») |
 | Menú de debug | Fet (falta provar-lo a l'emulador) |
-| M5 · Publicació | Publicada a beta; només queda la fitxa de Play per a producció |
+| M5 · Publicació | Publicada a beta; fitxa de Play feta, queda provar `release.yml` amb Gradle Play Publisher (a `internal`) |
 | Iteració 2 | Després de la publicació |
 | Pro | Planificat (`docs/pro.md`) |
 
@@ -39,7 +39,7 @@ Converses és una app Android per recordar què has dit, què t'han dit i què h
 - [x] **Provar el release sencer:** l'APK de release (R8) provat a l'emulador: llistat, crear persona, detall, nova entrada, nota ràpida amb persona, persona protegida (PIN amb `BiometricPrompt`), Ajustos (tema, color dinàmic, idioma) i exportar. Sense crashs ni regles de Koin, `NavKey` o Room: les regles de les llibreries n'hi ha prou.
 - [x] **`isShrinkResources`:** no cal; amb `optimization { enable = true }` AGP 9 ja redueix els recursos (`resources.txt` al mapping).
 - [ ] **Símbols natius:** `ndk { debugSymbolLevel = "SYMBOL_TABLE" }` és al `buildTypes.release`, però en local l'AAB no porta `debugsymbols` (`libandroidx.graphics.path.so` ja ve sense símbols i AGP no n'ha extret de l'altra, potser per falta de NDK). Comprovar si el CI ho genera i si Play deixa d'avisar; no bloqueja.
-- [ ] **Fitxa de Play per a producció:** la fitxa (textos, icona, gràfic de funcions i 5 captures en en/ca/es) és a `app/src/main/play` i es puja amb `publish-listing.yml`. Falta executar-lo, revisar-la a la Play Console i omplir el formulari de seguretat de les dades (només a mà).
+- [x] **Fitxa de Play per a producció:** textos, icona, gràfic de funcions i 5 captures en en/ca/es a `app/src/main/play`, publicats amb `publish-listing.yml`; formulari de seguretat de les dades fet.
 
 ### Proves manuals
 
