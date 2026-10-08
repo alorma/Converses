@@ -1,4 +1,4 @@
-Versión 1.3.0:
+Versión 1.4.0:
 • El móvil ahora vibra al guardar o confirmar. Si te molesta, hay un ajuste para hacerlo callar.
 • Las pantallas se deslizan como en una app de Android de verdad, y el gesto de volver enseña adónde vas.
 • Los filtros de canal ahora son chips combinables, y los estados vacíos tienen una forma que puedes tocar.
