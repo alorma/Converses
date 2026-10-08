@@ -89,11 +89,11 @@ Una sola activitat (`MainActivity`, una `FragmentActivity` pel `BiometricPrompt`
 
 | Peça | Llibreria i versió | Notes |
 | --- | --- | --- |
-| UI | `material3` 1.5.0-alpha29 (BOM Compose 2026.09.00) | Les API d'Expressive no són públiques a la 1.4.0 estable |
+| UI | `material3` 1.5.0-beta01 (BOM Compose 2026.09.00) | Les API d'Expressive no són públiques a la 1.4.0 estable |
 | Formes | `graphics-shapes` 1.1.0 | Formes dels avatars |
 | Color | `material-kolor` 5.0.1 | `Neutral` amb color dinàmic, `Monochrome` (Grafit) sense |
 | Navegació | Navigation 3 1.2.0 + `lifecycle-viewmodel-navigation3` | Rutes tipades amb `NavKey` serialitzables |
-| Dades | Room 2.8.4 + KSP 2.3.12 | Versió 1 publicada; tot canvi necessita migració |
+| Dades | Room 2.8.5 + KSP 2.3.12 | Versió 1 publicada; tot canvi necessita migració |
 | DI | Koin 4.2.2 | |
 | Preferències | DataStore Preferences 1.2.1 | `SettingsRepository` i `FeatureFlagStore` |
 | Ajustos UI | Compose-Settings `ui-tiles-expressive` 3.3.0 | Només `SettingsGroup`; les files són pròpies (`SettingRow`) |
