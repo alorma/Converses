@@ -8,6 +8,7 @@ plugins {
   alias(libs.plugins.room)
   alias(libs.plugins.compose.screenshot)
   alias(libs.plugins.version)
+  alias(libs.plugins.play.publisher)
 }
 
 room {
