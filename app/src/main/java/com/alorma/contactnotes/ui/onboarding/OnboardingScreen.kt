@@ -32,6 +32,7 @@ import androidx.compose.material.icons.automirrored.rounded.ArrowForward
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -92,49 +93,51 @@ fun OnboardingContent(onFinish: () -> Unit, initialPage: Int = 0, forceReducedMo
     scope.launch { pagerState.animateScrollToPage(pagerState.currentPage - 1) }
   }
 
-  Column(
-    modifier = Modifier
-      .fillMaxSize()
-      .background(MaterialTheme.colorScheme.surface)
-      .statusBarsPadding(),
-  ) {
-    Box(modifier = Modifier.fillMaxWidth().height(64.dp), contentAlignment = Alignment.CenterEnd) {
-      if (!isLast) {
-        TextButton(onClick = onFinish, modifier = Modifier.padding(end = 12.dp)) {
-          Text(
-            text = stringResource(R.string.onb_skip),
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            fontSize = 15.sp,
-          )
-        }
-      }
-    }
-
-    HorizontalPager(state = pagerState, modifier = Modifier.weight(1f)) { page ->
-      OnboardingPageContent(page = Pages[page], active = pagerState.settledPage == page, reduced = reducedMotion)
-    }
-
-    Row(
-      modifier = Modifier
-        .fillMaxWidth()
-        .navigationBarsPadding()
-        .padding(start = 28.dp, end = 28.dp, bottom = 32.dp, top = 12.dp),
-      verticalAlignment = Alignment.CenterVertically,
-      horizontalArrangement = Arrangement.SpaceBetween,
-    ) {
-      PageIndicator(pagerState = pagerState)
-      Button(
-        onClick = {
-          if (isLast) onFinish() else scope.launch { pagerState.animateScrollToPage(pagerState.currentPage + 1) }
-        },
-        modifier = Modifier.height(56.dp),
-        shape = CircleShape,
+  Scaffold(
+    containerColor = MaterialTheme.colorScheme.surface,
+    topBar = {
+      Box(
+        modifier = Modifier.fillMaxWidth().statusBarsPadding().height(64.dp),
+        contentAlignment = Alignment.CenterEnd,
       ) {
-        Text(stringResource(if (isLast) R.string.onb_start else R.string.onb_next), fontSize = 16.sp)
         if (!isLast) {
-          Icon(Icons.AutoMirrored.Rounded.ArrowForward, contentDescription = null, modifier = Modifier.padding(start = 8.dp))
+          TextButton(onClick = onFinish, modifier = Modifier.padding(end = 12.dp)) {
+            Text(
+              text = stringResource(R.string.onb_skip),
+              color = MaterialTheme.colorScheme.onSurfaceVariant,
+              fontSize = 15.sp,
+            )
+          }
         }
       }
+    },
+    bottomBar = {
+      Row(
+        modifier = Modifier
+          .fillMaxWidth()
+          .navigationBarsPadding()
+          .padding(start = 28.dp, end = 28.dp, bottom = 32.dp, top = 12.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween,
+      ) {
+        PageIndicator(pagerState = pagerState)
+        Button(
+          onClick = {
+            if (isLast) onFinish() else scope.launch { pagerState.animateScrollToPage(pagerState.currentPage + 1) }
+          },
+          modifier = Modifier.height(56.dp),
+          shape = CircleShape,
+        ) {
+          Text(stringResource(if (isLast) R.string.onb_start else R.string.onb_next), fontSize = 16.sp)
+          if (!isLast) {
+            Icon(Icons.AutoMirrored.Rounded.ArrowForward, contentDescription = null, modifier = Modifier.padding(start = 8.dp))
+          }
+        }
+      }
+    },
+  ) { padding ->
+    HorizontalPager(state = pagerState, modifier = Modifier.fillMaxSize().padding(padding)) { page ->
+      OnboardingPageContent(page = Pages[page], active = pagerState.settledPage == page, reduced = reducedMotion)
     }
   }
 }

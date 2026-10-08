@@ -17,6 +17,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material.icons.Icons
@@ -32,7 +34,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.Surface
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -117,7 +119,7 @@ fun PersonLockedScreen(
         onRetry = { begin() },
         onSetup = { activity.openSecuritySetup() },
       )
-    } ?: Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.surface) {}
+    } ?: Scaffold(containerColor = MaterialTheme.colorScheme.surface) {}
   }
 }
 
@@ -131,11 +133,19 @@ fun PersonLockedContent(
   onRetry: () -> Unit,
   onSetup: () -> Unit,
 ) {
-  Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.surface) {
-    Column(modifier = Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.safeDrawing)) {
-      IconButton(onClick = onBack, modifier = Modifier.padding(8.dp)) {
+  Scaffold(
+    containerColor = MaterialTheme.colorScheme.surface,
+    contentWindowInsets = WindowInsets.safeDrawing,
+    topBar = {
+      IconButton(
+        onClick = onBack,
+        modifier = Modifier.windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal)).padding(8.dp),
+      ) {
         Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = stringResource(R.string.back))
       }
+    },
+  ) { padding ->
+    Column(modifier = Modifier.fillMaxSize().padding(padding)) {
       Column(
         modifier = Modifier.weight(1f).fillMaxWidth().padding(horizontal = 32.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
