@@ -89,6 +89,12 @@ import androidx.compose.material3.FilterChip
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.foundation.relocation.BringIntoViewRequester
+import androidx.compose.foundation.relocation.bringIntoViewRequester
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
@@ -132,6 +138,7 @@ fun EditPersonScreen(
   onClose: () -> Unit,
   onSaved: (Long) -> Unit,
   onDeleted: () -> Unit,
+  focus: EditFocus? = null,
   viewModel: EditPersonViewModel = koinViewModel(parameters = { parametersOf(personId) }),
 ) {
   val state by viewModel.state.collectAsStateWithLifecycle()
@@ -155,6 +162,7 @@ fun EditPersonScreen(
     onDeleted = onDeleted,
     onProtectedChange = { value -> activity.promptUnlock(authTitle, authSubtitle) { viewModel.onProtected(value) } },
     customAvatar = rememberFeatureEnabled<CustomAvatarFeature>(),
+    focus = focus,
   )
 }
 
@@ -168,6 +176,7 @@ fun EditPersonContent(
   onDeleted: () -> Unit,
   onProtectedChange: (Boolean) -> Unit,
   customAvatar: Boolean = true,
+  focus: EditFocus? = null,
 ) {
   var showDelete by remember { mutableStateOf(false) }
   var showAvatarSheet by remember { mutableStateOf(false) }
@@ -196,6 +205,20 @@ fun EditPersonContent(
       },
     ) { padding ->
       if (!state.loaded) return@Scaffold
+      // Els espais buits del detall obren l'editor amb el focus a una secció; ho fem un sol cop (també en girar la pantalla)
+      var focusHandled by rememberSaveable { mutableStateOf(false) }
+      val focusFactIndex = rememberSaveable { state.facts.size }
+      val channelsBring = remember { BringIntoViewRequester() }
+      LaunchedEffect(Unit) {
+        if (focusHandled || focus == null) return@LaunchedEffect
+        focusHandled = true
+        when (focus) {
+          EditFocus.NEW_FACT -> actions.onAddFact()
+          EditFocus.CHANNELS -> {
+            channelsBring.bringIntoView()
+          }
+        }
+      }
       Column(
         modifier = Modifier
           .fillMaxSize()
@@ -252,9 +275,13 @@ fun EditPersonContent(
         }
 
         SectionHeader(title = stringResource(R.string.facts_title))
-        FactsEditor(state.facts, actions)
+        FactsEditor(state.facts, actions, focusIndex = focusFactIndex.takeIf { focus == EditFocus.NEW_FACT })
 
-        ChannelsCard(selected = state.channels, onToggle = actions::onToggleChannel)
+        ChannelsCard(
+          selected = state.channels,
+          onToggle = actions::onToggleChannel,
+          modifier = Modifier.bringIntoViewRequester(channelsBring),
+        )
 
         FieldCard(index = 0, count = 1) {
           Row(
@@ -413,7 +440,7 @@ private fun AddRow(text: String) {
 }
 
 @Composable
-private fun FactsEditor(facts: List<FactDraft>, actions: EditPersonActions) {
+private fun FactsEditor(facts: List<FactDraft>, actions: EditPersonActions, focusIndex: Int? = null) {
   var dragKey by remember { mutableStateOf<Long?>(null) }
   var dragOffset by remember { mutableFloatStateOf(0f) }
   val heights = remember { mutableStateMapOf<Long, Int>() }
@@ -427,11 +454,20 @@ private fun FactsEditor(facts: List<FactDraft>, actions: EditPersonActions) {
     facts.forEachIndexed { index, fact ->
       key(fact.key) {
       val dragging = dragKey == fact.key
+      val bring = remember { BringIntoViewRequester() }
+      val labelFocus = remember { FocusRequester() }
+      if (index == focusIndex) {
+        LaunchedEffect(Unit) {
+          bring.bringIntoView()
+          labelFocus.requestFocus()
+        }
+      }
       FieldCard(
         index = index,
         count = count,
         dragging = dragging,
         modifier = Modifier
+          .bringIntoViewRequester(bring)
           .onSizeChanged { heights[fact.key] = it.height }
           .zIndex(if (dragging) 1f else 0f)
           .graphicsLayer { translationY = if (dragging) dragOffset else 0f }
@@ -492,6 +528,7 @@ private fun FactsEditor(facts: List<FactDraft>, actions: EditPersonActions) {
               onValueChange = { actions.onFactChange(fact.key, it, fact.value) },
               placeholder = stringResource(R.string.fact_label_hint),
               small = true,
+              modifier = Modifier.focusRequester(labelFocus),
             )
             InlineField(
               value = fact.value,
@@ -514,7 +551,13 @@ private fun FactsEditor(facts: List<FactDraft>, actions: EditPersonActions) {
 }
 
 @Composable
-private fun InlineField(value: String, onValueChange: (String) -> Unit, placeholder: String, small: Boolean) {
+private fun InlineField(
+  value: String,
+  onValueChange: (String) -> Unit,
+  placeholder: String,
+  small: Boolean,
+  modifier: Modifier = Modifier,
+) {
   val style = if (small) {
     MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurfaceVariant)
   } else {
@@ -525,7 +568,7 @@ private fun InlineField(value: String, onValueChange: (String) -> Unit, placehol
     onValueChange = onValueChange,
     textStyle = style,
     cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
-    modifier = Modifier.fillMaxWidth().padding(vertical = 2.dp),
+    modifier = modifier.fillMaxWidth().padding(vertical = 2.dp),
     decorationBox = { inner ->
       Box {
         if (value.isEmpty()) Text(placeholder, style = style.copy(color = MaterialTheme.colorScheme.outline))
@@ -537,34 +580,39 @@ private fun InlineField(value: String, onValueChange: (String) -> Unit, placehol
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-private fun ChannelsCard(selected: Set<ChannelType>, onToggle: (ChannelType) -> Unit) {
-  Surface(
-    shape = MaterialTheme.shapes.extraLarge,
-    color = GroupedListDefaults.containerColor,
-    modifier = Modifier.fillMaxWidth(),
-  ) {
-    Column(
-      modifier = Modifier.padding(start = 14.dp, top = 14.dp, end = 14.dp, bottom = 16.dp),
-      verticalArrangement = Arrangement.spacedBy(10.dp),
+private fun ChannelsCard(
+  selected: Set<ChannelType>,
+  onToggle: (ChannelType) -> Unit,
+  modifier: Modifier = Modifier,
+) {
+  Column(modifier = modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+    Row(
+      modifier = Modifier.fillMaxWidth().padding(start = 4.dp, top = 8.dp, end = 4.dp),
+      verticalAlignment = Alignment.CenterVertically,
     ) {
-      Row(verticalAlignment = Alignment.CenterVertically) {
-        Text(
-          text = stringResource(R.string.channels_title),
-          style = MaterialTheme.typography.titleSmall,
-          fontWeight = FontWeight.Bold,
-          color = MaterialTheme.colorScheme.onSurfaceVariant,
-          modifier = Modifier.weight(1f),
-        )
-        Text(
-          text = if (selected.isEmpty()) {
-            stringResource(R.string.channels_count_none)
-          } else {
-            pluralStringResource(R.plurals.channels_count, selected.size, selected.size)
-          },
-          style = MaterialTheme.typography.labelMedium,
-          color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
-      }
+      Text(
+        text = stringResource(R.string.channels_title),
+        style = MaterialTheme.typography.titleMedium,
+        fontWeight = FontWeight.Bold,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+        modifier = Modifier.weight(1f),
+      )
+      Text(
+        text = if (selected.isEmpty()) {
+          stringResource(R.string.channels_count_none)
+        } else {
+          pluralStringResource(R.plurals.channels_count, selected.size, selected.size)
+        },
+        style = MaterialTheme.typography.labelMedium,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+      )
+    }
+    Surface(
+      shape = MaterialTheme.shapes.extraLarge,
+      color = GroupedListDefaults.containerColor,
+      modifier = Modifier.fillMaxWidth(),
+    ) {
+      Column(modifier = Modifier.padding(14.dp)) {
       FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
         ChannelType.entries.forEach { type ->
           val isSelected = type in selected
@@ -591,6 +639,7 @@ private fun ChannelsCard(selected: Set<ChannelType>, onToggle: (ChannelType) -> 
             border = if (isSelected) null else BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
           )
         }
+      }
       }
     }
   }

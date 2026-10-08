@@ -24,6 +24,8 @@ private fun PersonDetailScreenPreview(state: PersonDetailUiState) {
         onBack = {},
         onKindToggled = {},
         onNewEntry = {},
+        onNewEntryAs = {},
+        onEditFocus = {},
         onEntryMenu = {},
         onEditPerson = {},
         onExport = {},
@@ -55,6 +57,15 @@ internal fun PersonDetailScreenLoadedPreview() {
 @Composable
 internal fun PersonDetailScreenEmptyPreview() {
   PersonDetailScreenPreview(PersonDetailUiState(person = PreviewData.marta, isLoading = false))
+}
+
+/** Persona amb canals però sense dades ni entrades. */
+@Preview
+@Composable
+internal fun PersonDetailScreenEmptyWithChannelsPreview() {
+  PersonDetailScreenPreview(
+    PersonDetailUiState(person = PreviewData.marta, channels = PreviewData.martaChannels, isLoading = false),
+  )
 }
 
 internal class AvatarColorProvider : PreviewParameterProvider<AvatarColor> {

@@ -58,7 +58,13 @@
     <string name="app_lock_title">Converses està bloquejada</string>
     <string name="app_lock_prompt_title">Desbloqueja Converses</string>
     <string name="today">Avui</string>
-    <string name="profile_created">Fitxa creada: %1$s</string>
+    <string name="person_since">Des de %1$s</string>
+    <string name="empty_channels_cta">On hi parles</string>
+    <string name="empty_facts_title">Afegeix una dada</string>
+    <string name="empty_facts_hint">Feina, família, aniversari, d\'on és…</string>
+    <string name="empty_timeline_title">Encara no hi ha res</string>
+    <string name="empty_timeline_body">Què t\'ha explicat %1$s? Què li has dit tu? Comença per aquí.</string>
+    <string name="empty_timeline_new_entry">Nova entrada: %1$s</string>
     <string name="facts_title">Dades</string>
     <string name="timeline">Cronologia</string>
     <string name="archived_empty_description">Les persones arxivades apareixeran aquí.</string>

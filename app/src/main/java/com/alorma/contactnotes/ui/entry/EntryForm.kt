@@ -23,6 +23,10 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.Saver
@@ -81,10 +85,10 @@ class EntryFormState(
 }
 
 @Composable
-fun rememberEntryFormState(initial: EntryEntity? = null): EntryFormState =
+fun rememberEntryFormState(initial: EntryEntity? = null, initialKind: EntryKind = EntryKind.SAID): EntryFormState =
   rememberSaveable(initial?.id, saver = EntryFormState.Saver) {
     EntryFormState(
-      kind = initial?.kind ?: EntryKind.SAID,
+      kind = initial?.kind ?: initialKind,
       channel = initial?.channelType,
       text = initial?.text.orEmpty(),
       whenChoice = initial?.let { WhenChoice.Stored(it.occurredAt) } ?: WhenChoice.Now,
@@ -107,13 +111,18 @@ fun EntryForm(
   channel: ChannelType,
   onChannelChange: (ChannelType) -> Unit,
   modifier: Modifier = Modifier,
+  focusText: Boolean = false,
   header: @Composable () -> Unit = {},
   saveButton: @Composable () -> Unit = {},
 ) {
   Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(14.dp)) {
     header()
     FormSection(title = stringResource(R.string.entry_who_title)) { WhoSelector(state, person) }
-    EntryTextField(state, placeholder = entryHint(state.kind, person?.name?.let(::firstName).orEmpty()))
+    EntryTextField(
+      state,
+      placeholder = entryHint(state.kind, person?.name?.let(::firstName).orEmpty()),
+      requestFocus = focusText,
+    )
     FormSection(title = stringResource(R.string.entry_where_title)) {
       ChannelChips(channels = channels, selected = channel, onSelected = onChannelChange)
     }
@@ -177,12 +186,19 @@ fun WhoSelector(state: EntryFormState, person: PersonEntity?, modifier: Modifier
 }
 
 @Composable
-fun EntryTextField(state: EntryFormState, placeholder: String, modifier: Modifier = Modifier) {
+fun EntryTextField(
+  state: EntryFormState,
+  placeholder: String,
+  modifier: Modifier = Modifier,
+  requestFocus: Boolean = false,
+) {
   val container = MaterialTheme.colorScheme.surfaceContainerHigh
+  val focusRequester = remember { FocusRequester() }
+  if (requestFocus) LaunchedEffect(Unit) { focusRequester.requestFocus() }
   TextField(
     value = state.text,
     onValueChange = { state.text = it },
-    modifier = modifier.fillMaxWidth().heightIn(min = 120.dp),
+    modifier = modifier.fillMaxWidth().heightIn(min = 120.dp).focusRequester(focusRequester),
     textStyle = MaterialTheme.typography.bodyLarge.copy(fontSize = 17.sp),
     placeholder = { Text(placeholder, fontSize = 17.sp) },
     shape = RoundedCornerShape(24.dp),

@@ -63,6 +63,7 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.alorma.contactnotes.R
 import com.alorma.contactnotes.data.db.ChannelEntity
@@ -77,6 +78,8 @@ import com.alorma.contactnotes.designsystem.components.ConversesChannelChip
 import com.alorma.contactnotes.designsystem.components.ConversesFilterChip
 import com.alorma.contactnotes.designsystem.components.ConversesMenuItem
 import com.alorma.contactnotes.designsystem.components.ConversesSplitButton
+import com.alorma.contactnotes.designsystem.components.DashedHintRow
+import com.alorma.contactnotes.designsystem.components.DashedPill
 import com.alorma.contactnotes.designsystem.components.EmptyState
 import com.alorma.contactnotes.designsystem.components.GroupedList
 import com.alorma.contactnotes.designsystem.components.GroupedListDefaults
@@ -84,6 +87,7 @@ import com.alorma.contactnotes.designsystem.components.TimelineRow
 import com.alorma.contactnotes.designsystem.theme.PersonNameStyle
 import com.alorma.contactnotes.designsystem.theme.PersonTheme
 import com.alorma.contactnotes.designsystem.theme.SectionTitleStyle
+import com.alorma.contactnotes.ui.edit.EditFocus
 import com.alorma.contactnotes.ui.entry.NewEntrySheet
 import com.alorma.contactnotes.ui.people.initialsOf
 import com.alorma.contactnotes.ui.people.label
@@ -121,7 +125,7 @@ private enum class EntryAction { None, Menu, Edit, Move, ConfirmDeleteDay }
 fun PersonDetailRoute(
   personId: Long,
   onBack: () -> Unit,
-  onEdit: () -> Unit,
+  onEdit: (EditFocus?) -> Unit,
   viewModel: PersonDetailViewModel = koinViewModel(parameters = { parametersOf(personId) }),
 ) {
   val state by viewModel.uiState.collectAsStateWithLifecycle()
@@ -136,6 +140,9 @@ fun PersonDetailRoute(
 
   val person = state.person ?: return
   var showNewEntry by rememberSaveable { mutableStateOf(false) }
+  // Quan s'obre des de l'entrada fantasma, ve amb el «Qui» triat i el focus al text
+  var newEntryKind by rememberSaveable { mutableStateOf(EntryKind.SAID) }
+  var newEntryFocus by rememberSaveable { mutableStateOf(false) }
   var menuExpanded by remember { mutableStateOf(false) }
   var actionEntryId by rememberSaveable { mutableStateOf<Long?>(null) }
   var action by rememberSaveable { mutableStateOf(EntryAction.None) }
@@ -160,12 +167,22 @@ fun PersonDetailRoute(
       onMenuExpandedChange = { menuExpanded = it },
       onBack = onBack,
       onKindToggled = viewModel::onKindToggled,
-      onNewEntry = { showNewEntry = true },
+      onNewEntry = {
+        newEntryKind = EntryKind.SAID
+        newEntryFocus = false
+        showNewEntry = true
+      },
+      onNewEntryAs = { kind ->
+        newEntryKind = kind
+        newEntryFocus = true
+        showNewEntry = true
+      },
+      onEditFocus = { onEdit(it) },
       onEntryMenu = { entry ->
         actionEntryId = entry.id
         action = EntryAction.Menu
       },
-      onEditPerson = onEdit,
+      onEditPerson = { onEdit(null) },
       onExport = {
         menuExpanded = false
         viewModel.export()
@@ -181,6 +198,8 @@ fun PersonDetailRoute(
       NewEntrySheet(
         person = person,
         channels = state.channels.map { it.type },
+        initialKind = newEntryKind,
+        focusText = newEntryFocus,
         onDismiss = { showNewEntry = false },
         onSave = { kind, channel, text, at ->
           viewModel.addEntry(kind, channel, text, at)
@@ -269,6 +288,8 @@ fun PersonDetailScreen(
   onBack: () -> Unit,
   onKindToggled: (EntryKind) -> Unit,
   onNewEntry: () -> Unit,
+  onNewEntryAs: (EntryKind) -> Unit,
+  onEditFocus: (EditFocus) -> Unit,
   onEntryMenu: (EntryEntity) -> Unit,
   onEditPerson: () -> Unit,
   onExport: () -> Unit,
@@ -327,6 +348,7 @@ fun PersonDetailScreen(
     if (person == null) return@Scaffold
     val items = remember(state.entries) { state.entries.toTimelineItems() }
     val firstName = remember(person.name) { firstName(person.name) }
+    val noEntries = EntryKind.entries.sumOf { state.countOf(it) } == 0
 
     Box(modifier = Modifier.fillMaxSize()) {
       LazyColumn(
@@ -339,20 +361,32 @@ fun PersonDetailScreen(
         ),
       ) {
         item(key = "header") { Header(person) }
-        if (state.channels.isNotEmpty()) {
-          item(key = "channels") { ChannelRow(state.channels) }
+        item(key = "channels") {
+          if (state.channels.isNotEmpty()) {
+            ChannelRow(state.channels)
+          } else {
+            DashedPill(
+              label = stringResource(R.string.empty_channels_cta),
+              onClick = { onEditFocus(EditFocus.CHANNELS) },
+              modifier = Modifier.padding(vertical = 16.dp),
+            )
+          }
         }
-        if (state.facts.isNotEmpty()) {
-          item(key = "facts") { PinnedFacts(state.facts) }
+        item(key = "facts") {
+          PinnedFacts(state.facts, onAddFirst = { onEditFocus(EditFocus.NEW_FACT) })
         }
         item(key = "timeline-header") {
           SectionHeader(
             title = stringResource(R.string.timeline),
             topPadding = 24.dp,
-            trailing = pluralStringResource(R.plurals.entry_count, state.entries.size, state.entries.size),
+            trailing = if (noEntries) {
+              null
+            } else {
+              pluralStringResource(R.plurals.entry_count, state.entries.size, state.entries.size)
+            },
           )
         }
-        item(key = "kind-filters") {
+        if (!noEntries) item(key = "kind-filters") {
           LazyRow(
             contentPadding = PaddingValues(vertical = 8.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -369,22 +403,23 @@ fun PersonDetailScreen(
             }
           }
         }
-        if (items.isEmpty()) {
+        if (noEntries) {
+          item(key = "ghost") {
+            GhostEntry(person = person, firstName = firstName, onNewEntryAs = onNewEntryAs)
+          }
+        } else if (items.isEmpty()) {
           item(key = "empty") {
-            val noEntries = EntryKind.entries.sumOf { state.countOf(it) } == 0
             val kindsLabel = EntryKind.entries
               .filter { it in state.selectedKinds }
               .map { whoFilterLabel(it, firstName) }
               .joinToString(" · ")
             EmptyState(
               icon = Icons.Rounded.ChatBubbleOutline,
-              title = if (noEntries || kindsLabel.isEmpty()) {
+              title = if (kindsLabel.isEmpty()) {
                 stringResource(R.string.timeline_empty)
               } else {
                 stringResource(R.string.timeline_filtered_empty, kindsLabel)
               },
-              actionLabel = if (noEntries) stringResource(R.string.note_button) else null,
-              onAction = if (noEntries) onNewEntry else null,
             )
           }
         }
@@ -415,14 +450,6 @@ fun PersonDetailScreen(
             }
           }
         }
-        item(key = "created") {
-          Text(
-            text = stringResource(R.string.profile_created, formatMonthYear(person.createdAt)),
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.fillMaxWidth().padding(start = 4.dp, top = 24.dp),
-          )
-        }
       }
     }
   }
@@ -443,6 +470,11 @@ private fun Header(person: PersonEntity) {
           color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
       }
+      Text(
+        text = stringResource(R.string.person_since, formatMonthYear(person.createdAt)),
+        fontSize = 14.sp,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+      )
     }
     Avatar(
       initials = initialsOf(person.name),
@@ -466,9 +498,17 @@ private fun ChannelRow(channels: List<ChannelEntity>) {
 }
 
 @Composable
-private fun PinnedFacts(facts: List<PinnedFactEntity>) {
+private fun PinnedFacts(facts: List<PinnedFactEntity>, onAddFirst: () -> Unit) {
   Column(modifier = Modifier.padding(bottom = 8.dp)) {
     SectionHeader(title = stringResource(R.string.facts_title), topPadding = 0.dp)
+    if (facts.isEmpty()) {
+      DashedHintRow(
+        title = stringResource(R.string.empty_facts_title),
+        hint = stringResource(R.string.empty_facts_hint),
+        onClick = onAddFirst,
+      )
+      return@Column
+    }
     GroupedList(items = facts, modifier = Modifier.fillMaxWidth()) { fact ->
       val stacked = LocalDensity.current.fontScale >= 1.5f
       val label: @Composable (Modifier) -> Unit = { modifier ->
