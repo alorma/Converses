@@ -12,6 +12,7 @@ import com.alorma.contactnotes.ui.people.colorNameRes
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -49,6 +50,7 @@ import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
@@ -168,32 +170,46 @@ fun EditPersonContent(
   var showAvatarSheet by remember { mutableStateOf(false) }
 
   PersonTheme(state.color ?: AvatarColor.forName(state.name)) {
-    Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.surface) {
-      if (!state.loaded) return@Surface
+    Scaffold(
+      containerColor = MaterialTheme.colorScheme.surface,
+      contentWindowInsets = WindowInsets.navigationBars,
+      topBar = {
+        // Tancar, desar i títol fixos a dalt: no fan scroll amb el formulari
+        if (state.loaded) Column(
+          modifier = Modifier
+            .fillMaxWidth()
+            .background(MaterialTheme.colorScheme.surface)
+            .windowInsetsPadding(WindowInsets.statusBars)
+            .padding(start = 16.dp, end = 16.dp, top = 8.dp),
+          verticalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+          Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+            FilledTonalIconButton(onClick = onClose) {
+              Icon(Icons.Rounded.Close, contentDescription = stringResource(R.string.close))
+            }
+            Button(onClick = { actions.save(onSaved) }, enabled = state.canSave) {
+              Text(stringResource(R.string.save), fontWeight = FontWeight.Bold)
+            }
+          }
+          Text(
+            text = stringResource(if (state.isNew) R.string.new_person else R.string.edit_person),
+            style = ScreenTitleStyle,
+            modifier = Modifier.padding(start = 4.dp),
+          )
+        }
+      },
+    ) { padding ->
+      if (!state.loaded) return@Scaffold
       Column(
         modifier = Modifier
           .fillMaxSize()
-          .windowInsetsPadding(WindowInsets.statusBars)
-          .windowInsetsPadding(WindowInsets.navigationBars)
+          .padding(padding)
+          .consumeWindowInsets(padding)
           .imePadding()
           .verticalScroll(rememberScrollState())
-          .padding(horizontal = 16.dp, vertical = 8.dp),
+          .padding(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 8.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
       ) {
-        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-          FilledTonalIconButton(onClick = onClose) {
-            Icon(Icons.Rounded.Close, contentDescription = stringResource(R.string.close))
-          }
-          Button(onClick = { actions.save(onSaved) }, enabled = state.canSave) {
-            Text(stringResource(R.string.save), fontWeight = FontWeight.Bold)
-          }
-        }
-        Text(
-          text = stringResource(if (state.isNew) R.string.new_person else R.string.edit_person),
-          style = ScreenTitleStyle,
-          modifier = Modifier.padding(start = 4.dp),
-        )
-
         Column(verticalArrangement = Arrangement.spacedBy(GroupedListDefaults.ItemSpacing)) {
           FieldCard(index = 0, count = if (state.aliasTaken) 3 else 2) {
             Row(
