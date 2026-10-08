@@ -1,4 +1,4 @@
 Versió 1.5.0:
-• Els canals s'han simplificat: En persona, Telèfon, Xat, Social i Altres. Els que tenies s'han fusionat al grup que toca, i l'app t'ho diu una vegada.
+• Els canals s'han simplificat: En persona, Telèfon, Xat, Social i Altres. Les entrades que tenies han passat al grup que toca, i l'app t'ho diu una vegada.
 • Els canals d'una persona ara surten de les teves converses, així que en afegir algú ja no et pregunta on parleu.
 • Una petita etiqueta «beta» al costat del títol i unes quantes correccions que no notaràs, que és la idea.

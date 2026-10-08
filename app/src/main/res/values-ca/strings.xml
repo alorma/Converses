@@ -3,7 +3,7 @@
 
     <string name="people_title">Converses</string>
     <string name="channels_notice_title">Hem simplificat els canals</string>
-    <string name="channels_notice_body">Ara hi ha cinc grups: En persona, Telèfon, Xat, Social i Altres. Els canals que tenies s\'han fusionat dins del grup que els correspon.</string>
+    <string name="channels_notice_body">Ara hi ha cinc grups: En persona, Telèfon, Xat, Social i Altres. Les teves entrades ja els fan servir, i els canals de cada persona surten de les converses.</string>
     <string name="channels_notice_action">Entesos</string>
     <string name="beta_description">Versió beta</string>
     <plurals name="people_count">

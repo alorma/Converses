@@ -191,7 +191,7 @@ internal fun NoticeBannerPreview() {
       BetaBadge(text = "BETA", contentDescription = "Beta version")
       NoticeBanner(
         title = "We've simplified channels",
-        body = "There are now five groups: In person, Phone, Chat, Social and Other. Your existing channels were merged into the matching group.",
+        body = "There are now five groups: In person, Phone, Chat, Social and Other. Your entries now use them, and each person's channels come from their conversations.",
         actionLabel = "Got it",
         onAction = {},
       )
