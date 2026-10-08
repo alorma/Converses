@@ -36,6 +36,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import com.alorma.contactnotes.designsystem.components.AvatarColor
 import com.alorma.contactnotes.ui.person.AvatarColorProvider
 import com.alorma.contactnotes.ui.person.PersonDetailScreenEmptyPreview
+import com.alorma.contactnotes.ui.person.PersonDetailScreenSingleFactPreview
 import com.alorma.contactnotes.ui.person.PersonDetailScreenEmptyWithChannelsPreview
 import com.alorma.contactnotes.ui.person.PersonDetailScreenThemedPreview
 import com.alorma.contactnotes.ui.person.PersonDetailScreenFilteredEmptyPreview
@@ -91,6 +92,13 @@ class ScreensScreenshotTests {
   @Composable
   fun personDetailLoaded() {
     PersonDetailScreenLoadedPreview()
+  }
+
+  @ScreenPreviews
+  @PreviewTest
+  @Composable
+  fun personDetailSingleFact() {
+    PersonDetailScreenSingleFactPreview()
   }
 
   @ScreenPreviews

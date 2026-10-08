@@ -59,6 +59,24 @@ internal fun PersonDetailScreenEmptyPreview() {
   PersonDetailScreenPreview(PersonDetailUiState(person = PreviewData.marta, isLoading = false))
 }
 
+/** Persona amb una sola dada: la fila no es pot plegar. */
+@Preview
+@Composable
+internal fun PersonDetailScreenSingleFactPreview() {
+  PersonDetailScreenPreview(
+    PersonDetailUiState(
+      person = PreviewData.marta,
+      channels = PreviewData.martaChannels,
+      facts = PreviewData.martaFacts.take(1),
+      entries = PreviewData.martaEntries,
+      saidCount = 1,
+      heardCount = 1,
+      happenedCount = PreviewData.martaEntries.count { it.kind == EntryKind.HAPPENED },
+      isLoading = false,
+    ),
+  )
+}
+
 /** Persona amb canals però sense dades ni entrades. */
 @Preview
 @Composable

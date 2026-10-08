@@ -5,6 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import com.android.tools.screenshot.PreviewTest
 import com.alorma.contactnotes.designsystem.components.AvatarPreview
+import com.alorma.contactnotes.designsystem.components.CollapsibleFactsPreview
 import com.alorma.contactnotes.designsystem.components.ColorSwatchesPreview
 import com.alorma.contactnotes.designsystem.components.FilterChipPreview
 import com.alorma.contactnotes.designsystem.components.FloatingToolbarPreview
@@ -18,7 +19,19 @@ import com.alorma.contactnotes.designsystem.components.ToggleGroupPreview
 @Preview(name = "Dark", locale = "en", uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_NORMAL)
 annotation class ComponentPreviews
 
+/** Amb la lletra gran, perquè el text no es talli. */
+@Preview(name = "Light large font", locale = "en", fontScale = 1.3f)
+annotation class LargeFontComponentPreviews
+
 class ComponentsScreenshotTests {
+
+  @ComponentPreviews
+  @LargeFontComponentPreviews
+  @PreviewTest
+  @Composable
+  fun collapsibleFacts() {
+    CollapsibleFactsPreview()
+  }
 
   @ComponentPreviews
   @PreviewTest

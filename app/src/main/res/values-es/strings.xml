@@ -67,6 +67,9 @@
     <string name="empty_timeline_title">Todavía no hay nada</string>
     <string name="empty_timeline_body">¿Qué te ha contado %1$s? ¿Qué le has dicho tú? Empieza por aquí.</string>
     <string name="empty_timeline_new_entry">Nueva entrada: %1$s</string>
+    <string name="facts_less">Menos</string>
+    <string name="facts_show">Muestra los datos</string>
+    <string name="facts_hide">Oculta los datos</string>
     <string name="facts_title">Datos</string>
     <string name="timeline">Cronología</string>
     <string name="archived_empty_description">Las personas archivadas aparecerán aquí.</string>

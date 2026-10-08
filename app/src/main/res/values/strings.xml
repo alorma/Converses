@@ -67,6 +67,9 @@
     <string name="empty_timeline_title">Nothing here yet</string>
     <string name="empty_timeline_body">What did %1$s tell you? What did you tell them? Start here.</string>
     <string name="empty_timeline_new_entry">New entry: %1$s</string>
+    <string name="facts_less">Less</string>
+    <string name="facts_show">Show facts</string>
+    <string name="facts_hide">Hide facts</string>
     <string name="facts_title">Info</string>
     <string name="timeline">Timeline</string>
     <string name="archived_empty_description">Archived people will show up here.</string>

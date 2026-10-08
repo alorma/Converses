@@ -74,7 +74,9 @@ import com.alorma.contactnotes.data.db.PersonEntity
 import com.alorma.contactnotes.data.db.PinnedFactEntity
 import com.alorma.contactnotes.data.settings.SecureWindow
 import com.alorma.contactnotes.designsystem.components.Avatar
+import com.alorma.contactnotes.designsystem.components.CollapsibleFacts
 import com.alorma.contactnotes.designsystem.components.ConversesChannelChip
+import com.alorma.contactnotes.designsystem.components.FactItem
 import com.alorma.contactnotes.designsystem.components.ConversesFilterChip
 import com.alorma.contactnotes.designsystem.components.ConversesMenuItem
 import com.alorma.contactnotes.designsystem.components.ConversesSplitButton
@@ -303,6 +305,7 @@ fun PersonDetailScreen(
   snackbarHostState: SnackbarHostState,
 ) {
   val person = state.person
+  var factsExpanded by rememberSaveable { mutableStateOf(false) }
   Scaffold(
     containerColor = MaterialTheme.colorScheme.surface,
     contentWindowInsets = WindowInsets.navigationBars,
@@ -379,7 +382,12 @@ fun PersonDetailScreen(
           }
         }
         item(key = "facts") {
-          PinnedFacts(state.facts, onAddFirst = { onEditFocus(EditFocus.NEW_FACT) })
+          PinnedFacts(
+            facts = state.facts,
+            expanded = factsExpanded,
+            onToggle = { factsExpanded = !factsExpanded },
+            onAddFirst = { onEditFocus(EditFocus.NEW_FACT) },
+          )
         }
         item(key = "timeline-header") {
           SectionHeader(
@@ -504,39 +512,27 @@ private fun ChannelRow(channels: List<ChannelEntity>) {
 }
 
 @Composable
-private fun PinnedFacts(facts: List<PinnedFactEntity>, onAddFirst: () -> Unit) {
+private fun PinnedFacts(
+  facts: List<PinnedFactEntity>,
+  expanded: Boolean,
+  onToggle: () -> Unit,
+  onAddFirst: () -> Unit,
+) {
   Column(modifier = Modifier.padding(bottom = 8.dp)) {
-    SectionHeader(title = stringResource(R.string.facts_title), topPadding = 0.dp)
     if (facts.isEmpty()) {
       DashedHintRow(
         title = stringResource(R.string.empty_facts_title),
         hint = stringResource(R.string.empty_facts_hint),
         onClick = onAddFirst,
       )
-      return@Column
-    }
-    GroupedList(items = facts, modifier = Modifier.fillMaxWidth()) { fact ->
-      val stacked = LocalDensity.current.fontScale >= 1.5f
-      val label: @Composable (Modifier) -> Unit = { modifier ->
-        Text(
-          text = fact.label.uppercase(),
-          style = MaterialTheme.typography.labelLarge,
-          fontWeight = FontWeight.Bold,
-          color = MaterialTheme.colorScheme.onSurfaceVariant,
-          modifier = modifier,
-        )
-      }
-      if (stacked) {
-        Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 14.dp)) {
-          label(Modifier)
-          Text(text = fact.value, style = MaterialTheme.typography.bodyLarge)
-        }
-      } else {
-        Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 14.dp)) {
-          label(Modifier.width(104.dp))
-          Text(text = fact.value, style = MaterialTheme.typography.bodyLarge, modifier = Modifier.weight(1f))
-        }
-      }
+    } else {
+      CollapsibleFacts(
+        facts = facts.map { FactItem(it.label, it.value) },
+        expanded = expanded,
+        onToggle = onToggle,
+        lessLabel = stringResource(R.string.facts_less),
+        toggleDescription = stringResource(if (expanded) R.string.facts_hide else R.string.facts_show),
+      )
     }
   }
 }
