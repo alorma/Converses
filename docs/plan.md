@@ -135,7 +135,7 @@ Una sola activitat (`MainActivity`, una `FragmentActivity` pel `BiometricPrompt`
 | `entry` | `id`, `personId`, `kind` (`SAID`, `HEARD`, `HAPPENED`), `channelType`, `text`, `occurredAt` |
 | `pinned_fact` | `id`, `personId`, `label`, `value`, `position` |
 
-Totes les claus `personId` tenen `onDelete = CASCADE`, i hi ha un índex a `entry(personId, occurredAt)`. Canals (`ChannelType`, en aquest ordre): En persona · WhatsApp · Telegram · X · Instagram · Telèfon · Correu · Discord · Signal · LinkedIn · Reddit. Filtres del llistat: Chat = WhatsApp, Telegram, Signal, Discord, Correu; Social = X, Instagram, LinkedIn, Reddit.
+Totes les claus `personId` tenen `onDelete = CASCADE`, i hi ha un índex a `entry(personId, occurredAt)`. Canals (`ChannelType`, en aquest ordre): En persona · Telèfon · Xat · Social · Altres. Els filtres del llistat són aquests mateixos 5 valors. Migració v1 → v2 (`Migrations.kt`): WhatsApp, Telegram, Signal, Discord i Correu → Xat; X, Instagram, LinkedIn i Reddit → Social; es dedupliquen per persona.
 
 ### Tema
 

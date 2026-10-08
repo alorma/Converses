@@ -96,7 +96,9 @@ Els 11 valors de `ChannelType` passen a **5 grups fixos**: **En persona, Telèfo
 **Decisions**
 - Els canals que els usuaris de la beta ja tenen (WhatsApp, Telegram…) **es migren al seu grup com un de sol** i els antics s'eliminen. Mantenir-los gratis seria massa complex i aniria contra el Pro. Són uns 20 usuaris.
 - Cada grup usa la seva icona; sense icones d'apps concretes.
-- Les **equivalències** (quins canals van a Xat, Social o Altres, i Email en particular) es decideixen en fer la tasca.
+- **Equivalències (decidides):** WhatsApp, Telegram, Signal, Discord i Correu → Xat; X, Instagram, LinkedIn i Reddit → Social; En persona i Telèfon es mantenen; «Altres» no rep cap canal existent.
+
+**Estat:** fet el refactor de `ChannelType` i la migració (amb test instrumentat, pendent d'executar a l'emulador). Pendent de disseny: icones de Xat, Social i Altres (ara provisionals), avís genèric i badge «beta». Pendent: captures (etiqueta `update-screenshots` al PR).
 
 **Què cal fer**
 - **Migració de Room v1 → v2** amb el seu test (`MigrationTestHelper`), sense columnes noves: canvia el valor desat de `channel.type` i d'`entry.channelType`. Cal deduplicar els canals d'una persona que acabin al mateix grup. Test amb una persona amb diversos canals del mateix grup i entrades de cada tipus.
