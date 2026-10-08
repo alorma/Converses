@@ -69,9 +69,9 @@ private fun titleStyle(size: Int, lineHeight: Int) = TextStyle(
 
 /** Títols del handoff: Roboto Flex, pes 800, amplada 118, mida òptica 72. */
 val ListTitleStyle = titleStyle(size = 44, lineHeight = 48)
-val OnboardingTitleStyle = titleStyle(size = 28, lineHeight = 34)
+val OnboardingTitleStyle = titleStyle(size = 34, lineHeight = 40)
 val ScreenTitleStyle = titleStyle(size = 40, lineHeight = 44)
 val PersonNameStyle = titleStyle(size = 30, lineHeight = 36)
-val DialogTitleStyle = titleStyle(size = 28, lineHeight = 34)
+val DialogTitleStyle = titleStyle(size = 34, lineHeight = 40)
 val SheetTitleStyle = titleStyle(size = 24, lineHeight = 30)
 val SectionTitleStyle = titleStyle(size = 22, lineHeight = 28)

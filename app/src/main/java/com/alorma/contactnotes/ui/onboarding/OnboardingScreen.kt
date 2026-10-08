@@ -159,7 +159,7 @@ private fun OnboardingPageContent(page: OnboardingPage, active: Boolean, reduced
     ) {
       page.illustration(active, 0, reduced)
     }
-    Column(modifier = Modifier.padding(start = 28.dp, end = 28.dp, top = 12.dp)) {
+    Column(modifier = Modifier.padding(start = 28.dp, end = 28.dp, top = 20.dp)) {
       Text(
         text = stringResource(page.title),
         style = OnboardingTitleStyle,
@@ -173,8 +173,8 @@ private fun OnboardingPageContent(page: OnboardingPage, active: Boolean, reduced
       Text(
         text = stringResource(page.body),
         style = MaterialTheme.typography.bodyLarge,
-        fontSize = 16.sp,
-        lineHeight = 23.sp,
+        fontSize = 17.sp,
+        lineHeight = 24.65.sp,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
         modifier = Modifier.graphicsLayer {
           alpha = intro[1].value
