@@ -27,6 +27,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Archive
 import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material.icons.rounded.EditNote
+import androidx.compose.material.icons.rounded.Forum
 import androidx.compose.material.icons.rounded.Groups
 import androidx.compose.material.icons.rounded.Lock
 import androidx.compose.material.icons.rounded.PersonAdd
@@ -61,10 +62,10 @@ import com.alorma.contactnotes.data.db.PersonEntity
 import com.alorma.contactnotes.data.db.PersonListItem
 import com.alorma.contactnotes.designsystem.components.Avatar
 import com.alorma.contactnotes.designsystem.components.DashedActionRow
-import com.alorma.contactnotes.designsystem.components.EmptyState
 import com.alorma.contactnotes.designsystem.components.ConversesFloatingToolbar
 import com.alorma.contactnotes.designsystem.components.GroupedListDefaults
 import com.alorma.contactnotes.designsystem.components.ToolbarDestination
+import com.alorma.contactnotes.designsystem.components.WelcomeEmptyState
 import com.alorma.contactnotes.designsystem.components.groupedItems
 import com.alorma.contactnotes.designsystem.theme.ListTitleStyle
 import com.alorma.contactnotes.ui.person.channelName
@@ -180,20 +181,28 @@ fun PeopleListScreen(
       verticalArrangement = Arrangement.spacedBy(GroupedListDefaults.ItemSpacing),
     ) {
       if (!state.isLoading && state.people.isEmpty()) {
+        val noPeopleAtAll = !archived && state.filter.isEmpty()
         item(key = "empty") {
-          val noPeopleAtAll = !archived && state.filter.isEmpty()
-          EmptyState(
-            icon = if (archived) Icons.Rounded.Archive else Icons.Rounded.Groups,
-            title = stringResource(
-              when {
-                archived -> R.string.archived_empty
-                noPeopleAtAll -> R.string.people_empty
-                else -> R.string.people_empty_filter
-              },
-            ),
-            actionLabel = if (noPeopleAtAll) stringResource(R.string.add_first_person) else null,
-            onAction = if (noPeopleAtAll) onNewPerson else null,
-          )
+          if (noPeopleAtAll) {
+            WelcomeEmptyState(
+              icon = Icons.Rounded.Forum,
+              title = stringResource(R.string.people_empty),
+              description = stringResource(R.string.people_empty_description),
+              actionLabel = stringResource(R.string.add_person),
+              actionIcon = Icons.Rounded.PersonAdd,
+              onAction = onNewPerson,
+              modifier = Modifier.fillParentMaxSize(),
+            )
+          } else {
+            WelcomeEmptyState(
+              icon = if (archived) Icons.Rounded.Archive else Icons.Rounded.Groups,
+              title = stringResource(if (archived) R.string.archived_empty else R.string.people_empty_filter),
+              description = stringResource(
+                if (archived) R.string.archived_empty_description else R.string.people_empty_filter_description,
+              ),
+              modifier = Modifier.fillParentMaxSize(),
+            )
+          }
         }
       }
       groupedItems(state.people, key = { it.person.id }) { item ->
@@ -223,7 +232,7 @@ private fun Header(archived: Boolean, total: Int, isLoading: Boolean, onNewPerso
     Text(text = stringResource(if (archived) R.string.filter_archived else R.string.people_title), style = ListTitleStyle)
     if (!isLoading) {
       Text(
-        text = pluralStringResource(R.plurals.people_count, total, total),
+        text = if (total == 0 && !archived) stringResource(R.string.people_count_none) else pluralStringResource(R.plurals.people_count, total, total),
         style = MaterialTheme.typography.bodyLarge,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
       )
