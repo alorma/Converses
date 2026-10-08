@@ -66,14 +66,14 @@ Sense data: es va sincronitzant amb l'app a mesura que convé i no bloqueja res.
 
 ## Iteració 2 (després de la publicació)
 
-El detall és a `docs/backlog.md`. Els punts 6 i 8 necessiten migració (vegeu «Regla de la base de dades»); el 11 no. Els punts 12–17 vénen del feedback de la beta (issues #40–#45); només el 17 pot tocar Room.
+El detall és a `docs/backlog.md`. Els punts 6, 8 i 13 necessiten migració (vegeu «Regla de la base de dades»); el 11 no. Els punts 12–17 vénen del feedback de la beta (issues #40–#45); el 13 requereix migració i el 17 pot tocar Room.
 
 - **Follow-ups / entrades pendents o planificades (6, issue #5):** flag `pending` a `EntryEntity` i interruptor a `EntryForm`, sota de «Quan». Primera migració (v1 → v2). És Pro.
-- **Gestor de canals (8):** l'enum `ChannelType` passa a una taula de canals. Absorbeix «Empresa» (7). Ampliació prevista: canals **amb valor** (per exemple, un número o un usuari per persona) i canals propis. És Pro.
+- **Sub-canals (8):** dins dels 5 grups, amb nom lliure (únic per persona) i valor opcional. Absorbeix «Empresa» (7). És Pro. Depèn del 13.
 - **Importar text a la nota ràpida, «share invers» (11, issue #30):** compartir text des d'altres apps (`ACTION_SEND`), seleccionar text (`ACTION_PROCESS_TEXT`) i un botó «Enganxa» al porta-retalls; la nota ràpida s'obre amb el text posat i només cal triar la persona. Sense canvis a Room, no cal migració. És gratis.
 - **Feedback de la beta, per ordre (12–17):**
   - **12 · Nota ràpida (bug, #40):** el xip «Persona» de «Qui» sense persona obre el selector en comptes de ser desactivat.
-  - **13 · Filtres de la llista (#42):** ordre fix En persona, Telèfon, Xat, Social, amb els primers xips sencers.
+  - **13 · Canals a 5 grups (#42):** `ChannelType` passa a En persona, Telèfon, Xat, Social i Altres; els canals actuals es migren al seu grup (migració v1 → v2, equivalències a decidir a la tasca), avís genèric als usuaris i badge «beta» al títol de la llista. Gratis.
   - **14 · Accions del detall (#44, a avaluar):** FAB només per a «Nota» i Exportar/Arxivar a la `topBar`, o barra flotant amb les tres. Pendent de decidir.
   - **15 · «Quant a» als Ajustos (#43):** autor, versió, repositori i llicències, privadesa i feedback.
   - **16 · Idiomes (#45):** mostrar els disponibles i l'actiu a Ajustos; valorar gallec i italià.

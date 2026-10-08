@@ -5,17 +5,17 @@ Actualitzat el 8 d'oct. de 2026. Només hi ha el que encara no està fet.
 | # | Tipus | Tema | Issue |
 | --- | --- | --- | --- |
 | 6 | Feature (Iteració 2) | Follow-ups / entrades pendents | [#5](https://github.com/alorma/Converses/issues/5) |
-| 7 | Feature (Iteració 2) | Nou canal "Empresa" (queda dins el 8) | — |
-| 8 | Feature (Iteració 2) | Gestor de canals propis | — |
+| 7 | Feature (Iteració 2) | Nou canal "Empresa" (queda dins el 8, com a sub-canal d'Altres) | — |
+| 8 | Feature (Iteració 2, Pro) | Sub-canals amb nom i valor (dins dels 5 grups del 13) | — |
 | 11 | Feature (Iteració 2) | Importar text a la nota ràpida (compartir, seleccionar text i enganxar) | [#30](https://github.com/alorma/Converses/issues/30) |
 | 12 | Bug | Nota ràpida: el xip «Persona» desactivat confon | [#40](https://github.com/alorma/Converses/issues/40) |
-| 13 | Millora | Llista: ordenar els filtres de canal pels més usats | [#42](https://github.com/alorma/Converses/issues/42) |
+| 13 | Migració | Canals simplificats a 5 grups (En persona, Telèfon, Xat, Social, Altres); absorbeix el #42 | [#42](https://github.com/alorma/Converses/issues/42) |
 | 14 | Millora (a avaluar) | Detall de persona: les 3 accions visibles, sense el split FAB | [#44](https://github.com/alorma/Converses/issues/44) |
 | 15 | Millora | Ajustos: secció «Quant a» | [#43](https://github.com/alorma/Converses/issues/43) |
 | 16 | Millora | Idiomes: mostrar els disponibles a Ajustos i valorar gallec i italià | [#45](https://github.com/alorma/Converses/issues/45) |
 | 17 | Feature | Cerca d'entrades per paraula clau | [#41](https://github.com/alorma/Converses/issues/41) |
 
-Els punts 6, 7, 8 i 11 són de l'**Iteració 2**; el 6 i el 8 són Pro i l'11 és gratis (vegeu `docs/pro.md`). Els punts 12–17 vénen del feedback de la beta (issues #40–#45) i es treballen en aquest ordre: primer els petits (12, 13, 14), després el 15 i el 16, i la cerca (17) al final. **Qualsevol canvi de la base de dades ha d'incloure una migració i el seu test** (la v1 ja és a Google Play); l'11 no toca Room. Dels nous, només el 17 pot tocar Room (si s'opta per FTS). La numeració és la del backlog original, perquè els issues i les referències no canviïn; els punts resolts (1–5, 9, 10) són a l'historial de git.
+Els punts 6, 7, 8 i 11 són de l'**Iteració 2**; el 6 i el 8 són Pro, i l'11 i el 13 són gratis (vegeu `docs/pro.md`). Els punts 12–17 vénen del feedback de la beta (issues #40–#45) i es treballen en aquest ordre: primer el 12 i el 14 (petits), després el 13 (migració), el 15 i el 16, i la cerca (17) al final. **Qualsevol canvi de la base de dades ha d'incloure una migració i el seu test** (la v1 ja és a Google Play); l'11 no toca Room. Dels nous, el 13 requereix migració (v1 → v2) i el 17 pot tocar Room (si s'opta per FTS). La numeració és la del backlog original, perquè els issues i les referències no canviïn; els punts resolts (1–5, 9, 10) són a l'historial de git.
 
 ---
 
@@ -37,25 +37,20 @@ Poder marcar coses per fer-ne seguiment amb una persona ("li he de preguntar com
 
 ## 7 · Feature: nou canal "Empresa" (entrevistes de feina)
 
-- Afegir el valor a `enum class ChannelType` (`data/db/Entities.kt`); comprovar el converter de Room i, si l'esquema canvia, fer la migració.
-- Icona a `ChannelType.icon()` (p. ex. `Icons.Rounded.Business` o `Work`).
-- String a `ui/people/PeopleFormatting.kt` + `strings.xml` (en: "Company", ca/es: "Empresa").
-- Decidir a quin `ChannelFilter` (`ui/people/PeopleListViewModel.kt`) pertany.
+**Absorbit pel 8.** Ja no és un valor de l'enum: serà un sub-canal d'«Altres» creat per l'usuari (Pro). No es fa apart.
 
-**Recomanació:** no fer-lo apart. Si es fa el 8, «Empresa» és un canal creat per l'usuari i no cal tocar l'enum.
+## 8 · Feature (Pro): sub-canals
 
-## 8 · Feature: gestor de canals (crear canals globals propis)
+Depèn del 13 (els 5 grups). Dins de qualsevol grup, inclòs «Altres», l'usuari pot crear **sub-canals** amb un **nom lliure** i un **valor opcional** (número, usuari, enllaç).
 
-Permetre crear canals propis (Signal, LinkedIn, Empresa...) en lloc de dependre només de l'enum `ChannelType`.
-
-**Idea**
-- Pantalla de gestió de canals (des d'Ajustos): llistar, crear, reanomenar, triar icona, reordenar, esborrar/arxivar.
-- Els canals actuals es mantenen com a canals de sistema.
-
-**Impacte tècnic**
-- Passar de l'enum a una taula de canals a Room (id, nom, icona, sistema/usuari, ordre) amb **migració i test**: els canals i les entrades existents han d'apuntar als canals de sistema equivalents.
-- Afecta: detall de persona, `EntryForm` (xips d'«On»), `ChannelsCard` de l'editor, `ChannelFilter` i `PersonExporter.kt`.
-- Els noms creats per l'usuari no es tradueixen.
+- **Gratis:** els 5 grups. **Pro:** els sub-canals, de qualsevol grup.
+- **Nom únic per persona**, sense distingir majúscules: «WhatsApp» dues vegades és un error; «WhatsApp personal» i «WhatsApp feina» són vàlids. Validació a l'editor, sense índex a Room.
+- Taula nova a Room (persona, grup, nom, valor opcional) amb **migració i test**.
+- Sense icones pròpies de moment: cada sub-canal usa la del seu grup.
+- Si s'esborra un sub-canal, les entrades que hi apuntaven passen al grup (no es perd res).
+- Afecta: detall de persona, `EntryForm` («On»), `ChannelsCard` de l'editor, filtres (sub-xips en seleccionar un grup) i `PersonExporter.kt`.
+- Pregunta oberta: valor només informatiu o accionable (obrir WhatsApp, trucar, copiar). Si és accionable, mirar privadesa i permisos.
+- Les persones protegides no han de mostrar sub-canals ni valors abans de desbloquejar.
 
 ---
 
@@ -94,16 +89,25 @@ A la nota ràpida, sense persona triada, el xip «Persona» de «Qui» surt gris
 - Protegides: el selector no ha de mostrar res de les entrades abans de desbloquejar.
 - Sense Room, sense migració. Captura de la nota ràpida sense persona.
 
-## 13 · Millora: ordre dels filtres de canal
+## 13 · Migració: canals simplificats a 5 grups
 
-Issue: [#42](https://github.com/alorma/Converses/issues/42)
+Issue: [#42](https://github.com/alorma/Converses/issues/42) (els filtres surten amb els més usats tallats a la dreta)
 
-Els filtres de la llista surten **Xat · Social · En persona · Telèfon**, i els dos més usats queden a la dreta, mig tallats.
+Els 11 valors de `ChannelType` passen a **5 grups fixos**: **En persona, Telèfon, Xat, Social, Altres**. Els filtres tornen a ser un a un amb el grup i caben sense scroll, en aquest ordre. Els sub-canals (WhatsApp, Telegram…) són el 8 i són Pro.
 
-- Ordre fix nou: **En persona, Telèfon, Xat, Social** (`ChannelGroup.entries` a `ui/people/PeopleListViewModel.kt`, recorregut a `FilterRow` de `ui/people/PeopleListScreen.kt`).
-- Que els primers xips es vegin sencers sense fer scroll.
-- Decidit de moment: ordre fix. Opcional més endavant: que l'usuari triï l'ordre, o ordenar-los per ús real.
-- Sense Room. Actualitzar les captures.
+**Decisions**
+- Els canals que els usuaris de la beta ja tenen (WhatsApp, Telegram…) **es migren al seu grup com un de sol** i els antics s'eliminen. Mantenir-los gratis seria massa complex i aniria contra el Pro. Són uns 20 usuaris.
+- Cada grup usa la seva icona; sense icones d'apps concretes.
+- Les **equivalències** (quins canals van a Xat, Social o Altres, i Email en particular) es decideixen en fer la tasca.
+
+**Què cal fer**
+- **Migració de Room v1 → v2** amb el seu test (`MigrationTestHelper`), sense columnes noves: canvia el valor desat de `channel.type` i d'`entry.channelType`. Cal deduplicar els canals d'una persona que acabin al mateix grup. Test amb una persona amb diversos canals del mateix grup i entrades de cada tipus.
+- `ChannelType` es redueix a 5 valors; `ChannelGroup` (`ui/people/PeopleListViewModel.kt`) gairebé desapareix.
+- Afecta: detall de persona, `EntryForm` («On»), `ChannelsCard` de l'editor, `PeopleFormatting.kt`, `SampleData` i `PersonExporter.kt`.
+- **Avís genèric** a la primera obertura després de l'actualització («Hem simplificat els canals…»). Sense detall per persona.
+- **Badge «beta»** al títol de la primera pantalla (la llista de persones).
+- Textos a `strings.xml` (en, ca, es); actualitzar les captures i `docs/plan.md` i `docs/pro.md`.
+- Pot compartir la migració v1 → v2 amb el 6 (follow-ups) si van junts.
 
 ## 14 · Millora (a avaluar): accions del detall de persona
 
