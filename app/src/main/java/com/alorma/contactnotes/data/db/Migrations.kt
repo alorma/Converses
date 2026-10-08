@@ -4,23 +4,24 @@ import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 
 /**
- * v1 → v2: els 11 canals passen als 5 grups fixos (backlog 13). El tipus es desa com a text, així que
- * l'esquema no canvia; només es reescriuen els valors i es deduplica `channel` per persona.
+ * v1 → v2: els 11 canals passen als 5 grups fixos i la persona deixa de tenir canals propis (backlog 13).
+ * Les entrades guarden el canal pel nom de l'enum, així que es reescriuen al grup que toca (si hi quedés
+ * `WHATSAPP`, Room no el sabria llegir); la taula `channel` ja no s'usa i s'esborra.
  * [onMigrated] s'executa en acabar i serveix per marcar l'avís als usuaris que venen de la v1.
  */
 class Migration1To2(private val onMigrated: () -> Unit = {}) : Migration(1, 2) {
   override fun migrate(db: SupportSQLiteDatabase) {
-    val toGroup = """
-      CASE %1${'$'}s
+    db.execSQL(
+      """
+      UPDATE entry SET channelType = CASE channelType
         WHEN 'WHATSAPP' THEN 'CHAT' WHEN 'TELEGRAM' THEN 'CHAT' WHEN 'SIGNAL' THEN 'CHAT'
         WHEN 'DISCORD' THEN 'CHAT' WHEN 'EMAIL' THEN 'CHAT'
         WHEN 'X' THEN 'SOCIAL' WHEN 'INSTAGRAM' THEN 'SOCIAL' WHEN 'LINKEDIN' THEN 'SOCIAL' WHEN 'REDDIT' THEN 'SOCIAL'
-        ELSE %1${'$'}s
+        ELSE channelType
       END
-    """.trimIndent()
-    db.execSQL("UPDATE channel SET type = ${toGroup.format("type")}")
-    db.execSQL("UPDATE entry SET channelType = ${toGroup.format("channelType")}")
-    db.execSQL("DELETE FROM channel WHERE id NOT IN (SELECT MIN(id) FROM channel GROUP BY personId, type)")
+      """.trimIndent(),
+    )
+    db.execSQL("DROP TABLE channel")
     onMigrated()
   }
 }

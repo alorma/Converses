@@ -35,24 +35,6 @@ val PersonEntity.shape: AvatarShape get() = avatarShape ?: AvatarShape.Standard
 val PersonEntity.color: AvatarColor get() = avatarColor ?: AvatarColor.forName(name)
 
 @Entity(
-  tableName = "channel",
-  foreignKeys = [
-    ForeignKey(
-      entity = PersonEntity::class,
-      parentColumns = ["id"],
-      childColumns = ["personId"],
-      onDelete = ForeignKey.CASCADE,
-    ),
-  ],
-  indices = [Index("personId")],
-)
-data class ChannelEntity(
-  @PrimaryKey(autoGenerate = true) val id: Long = 0,
-  val personId: Long,
-  val type: ChannelType,
-)
-
-@Entity(
   tableName = "entry",
   foreignKeys = [
     ForeignKey(

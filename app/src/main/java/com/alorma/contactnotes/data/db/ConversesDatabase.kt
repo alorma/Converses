@@ -6,7 +6,6 @@ import androidx.room.RoomDatabase
 @Database(
   entities = [
     PersonEntity::class,
-    ChannelEntity::class,
     EntryEntity::class,
     PinnedFactEntity::class,
   ],

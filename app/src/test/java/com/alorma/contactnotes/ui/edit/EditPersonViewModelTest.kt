@@ -100,20 +100,6 @@ class EditPersonViewModelTest {
     assertNull(person.avatarColor)
     val facts = db.repository.observePinnedFacts(savedId).first()
     assertEquals(listOf("Birthday" to "14 March"), facts.map { it.label to it.value })
-    assertTrue(db.channels.value.isEmpty())
-  }
-
-  @Test
-  fun savingAnExistingPersonLeavesItsStoredChannelRowsUntouched() = runTest {
-    val marta = db.addPerson("Marta")
-    db.addChannel(marta.id, ChannelType.CHAT)
-    val vm = viewModel(marta.id)
-    vm.state.first { it.loaded }
-    vm.onName("Marta Soler")
-
-    vm.save {}
-
-    assertEquals(listOf(ChannelType.CHAT), db.channels.value.map { it.type })
   }
 
   @Test
