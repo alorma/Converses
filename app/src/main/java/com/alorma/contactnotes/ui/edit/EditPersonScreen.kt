@@ -96,8 +96,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.ui.hapticfeedback.HapticFeedbackType
-import androidx.compose.ui.platform.LocalHapticFeedback
+import com.alorma.contactnotes.designsystem.components.rememberConversesHaptics
 import androidx.compose.ui.semantics.CustomAccessibilityAction
 import androidx.compose.ui.semantics.customActions
 import androidx.compose.ui.semantics.semantics
@@ -446,7 +445,7 @@ private fun FactsEditor(facts: List<FactDraft>, actions: EditPersonActions, focu
   val heights = remember { mutableStateMapOf<Long, Int>() }
   val currentFacts by rememberUpdatedState(facts)
   val count = facts.size + 1
-  val haptics = LocalHapticFeedback.current
+  val haptics = rememberConversesHaptics()
   val moveUpLabel = stringResource(R.string.move_up)
   val moveDownLabel = stringResource(R.string.move_down)
 
@@ -491,7 +490,7 @@ private fun FactsEditor(facts: List<FactDraft>, actions: EditPersonActions, focu
               .pointerInput(fact.key) {
                 detectDragGestures(
                   onDragStart = {
-                    haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+                    haptics.longPress()
                     dragKey = fact.key
                     dragOffset = 0f
                   },
@@ -512,11 +511,11 @@ private fun FactsEditor(facts: List<FactDraft>, actions: EditPersonActions, focu
                     if (dragOffset > height / 2f && at < list.lastIndex) {
                       dragOffset -= heights[list[at + 1].key] ?: height
                       actions.onMoveFact(at, at + 1)
-                      haptics.performHapticFeedback(HapticFeedbackType.SegmentTick)
+                      haptics.segmentTick()
                     } else if (dragOffset < -height / 2f && at > 0) {
                       dragOffset += heights[list[at - 1].key] ?: height
                       actions.onMoveFact(at, at - 1)
-                      haptics.performHapticFeedback(HapticFeedbackType.SegmentTick)
+                      haptics.segmentTick()
                     }
                   },
                 )
