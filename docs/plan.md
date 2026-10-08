@@ -43,13 +43,13 @@ Converses és una app Android per recordar què has dit, què t'han dit i què h
 
 ### Proves manuals
 
-- [ ] **Res de Pro visible** amb tots els flags apagats (llista de «Proves» a `docs/pro.md`) i els dos modes amb el «Pro mode» del menú de debug.
-- [ ] **Onboarding:** primera obertura i no tornar a sortir després de Comença/Omet; enrere al pas 1 surt sense marcar-lo; lliscar llança l'animació de la pàgina d'arribada; amb les animacions del sistema desactivades es veu l'estat final; clar i fosc; ca/es/en amb font gran; les animacions infinites del pas 1 s'aturen en sortir de la pàgina.
+- [x] **Res de Pro visible** amb tots els flags apagats (llista de «Proves» a `docs/pro.md`) i els dos modes amb el «Pro mode» del menú de debug.
+- [x] **Onboarding:** primera obertura i no tornar a sortir després de Comença/Omet; enrere al pas 1 surt sense marcar-lo; lliscar llança l'animació de la pàgina d'arribada; amb les animacions del sistema desactivades es veu l'estat final; clar i fosc; ca/es/en amb font gran; les animacions infinites del pas 1 s'aturen en sortir de la pàgina.
 - [ ] **Menú de debug:** arrossegar el botó, tornar a mostrar l'onboarding, `FLAG_SECURE` al full.
 - [ ] **Bloqueig desactivat sol** (dispositiu real): quan el dispositiu es queda sense bloqueig de pantalla, les protegides continuen protegides i el desbloqueig ofereix «Configura la seguretat».
-- [ ] **Bloqueig d'una protegida** a dispositiu real: massa intents i empremta.
+- [x] **Bloqueig d'una protegida** a dispositiu real: massa intents i empremta.
 - [ ] **Color de la persona** amb `PersonColorFeature` encès (emulador).
-- [ ] **TalkBack real:** l'ordre de lectura i els fulls.
+- [x] **TalkBack real:** l'ordre de lectura i els fulls.
 
 ### Petites millores
 
