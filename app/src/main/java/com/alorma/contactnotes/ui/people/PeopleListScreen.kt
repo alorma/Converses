@@ -4,6 +4,9 @@ import com.alorma.contactnotes.data.db.shape
 import com.alorma.contactnotes.data.db.color
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -22,6 +25,7 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Archive
+import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material.icons.rounded.EditNote
 import androidx.compose.material.icons.rounded.Groups
 import androidx.compose.material.icons.rounded.Lock
@@ -29,11 +33,18 @@ import androidx.compose.material.icons.rounded.PersonAdd
 import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.FilledTonalIconButton
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -43,12 +54,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.alorma.contactnotes.R
 import com.alorma.contactnotes.data.db.PersonEntity
 import com.alorma.contactnotes.data.db.PersonListItem
 import com.alorma.contactnotes.designsystem.components.Avatar
-import com.alorma.contactnotes.designsystem.components.ConversesConnectedFilterRow
 import com.alorma.contactnotes.designsystem.components.DashedActionRow
 import com.alorma.contactnotes.designsystem.components.EmptyState
 import com.alorma.contactnotes.designsystem.components.ConversesFloatingToolbar
@@ -77,7 +88,7 @@ fun PeopleListRoute(
     state = state,
     archived = archived,
     onToggleArchivedList = onToggleArchivedList,
-    onFilterSelected = viewModel::onFilterSelected,
+    onFilterToggled = viewModel::onFilterToggled,
     onPersonClick = onPersonClick,
     onQuickNote = onQuickNote,
     onOpenSettings = onOpenSettings,
@@ -90,12 +101,21 @@ fun PeopleListScreen(
   state: PeopleListUiState,
   archived: Boolean,
   onToggleArchivedList: () -> Unit,
-  onFilterSelected: (ChannelFilter) -> Unit,
+  onFilterToggled: (ChannelGroup) -> Unit,
   onPersonClick: (PersonEntity) -> Unit,
   onQuickNote: () -> Unit,
   onOpenSettings: () -> Unit,
   onNewPerson: () -> Unit,
 ) {
+  val listState = rememberLazyListState()
+  // En canviar els xips la llista torna a dalt (no a la primera composició, perquè no perdi la posició en tornar del detall)
+  var lastFilter by remember { mutableStateOf(state.filter) }
+  LaunchedEffect(state.filter) {
+    if (state.filter != lastFilter) {
+      lastFilter = state.filter
+      listState.scrollToItem(0)
+    }
+  }
   Scaffold(
     containerColor = MaterialTheme.colorScheme.surface,
     contentWindowInsets = WindowInsets.navigationBars,
@@ -115,7 +135,7 @@ fun PeopleListScreen(
           onNewPerson = onNewPerson,
         )
         if (!archived) {
-          FilterRow(selected = state.filter, onSelected = onFilterSelected)
+          FilterRow(selected = state.filter, onToggle = onFilterToggled)
         }
       }
     },
@@ -149,6 +169,7 @@ fun PeopleListScreen(
     },
   ) { padding ->
     LazyColumn(
+      state = listState,
       modifier = Modifier.fillMaxSize(),
       contentPadding = PaddingValues(
         start = ScreenMargin,
@@ -160,7 +181,7 @@ fun PeopleListScreen(
     ) {
       if (!state.isLoading && state.people.isEmpty()) {
         item(key = "empty") {
-          val noPeopleAtAll = !archived && state.filter == ChannelFilter.All
+          val noPeopleAtAll = !archived && state.filter.isEmpty()
           EmptyState(
             icon = if (archived) Icons.Rounded.Archive else Icons.Rounded.Groups,
             title = stringResource(
@@ -217,13 +238,52 @@ private fun Header(archived: Boolean, total: Int, isLoading: Boolean, onNewPerso
 }
 
 @Composable
-private fun FilterRow(selected: ChannelFilter, onSelected: (ChannelFilter) -> Unit) {
-  ConversesConnectedFilterRow(
-    options = ChannelFilter.entries.map { it to stringResource(it.label()) },
-    selected = selected,
-    onSelect = onSelected,
-    modifier = Modifier.padding(vertical = 12.dp),
-  )
+private fun FilterRow(selected: Set<ChannelGroup>, onToggle: (ChannelGroup) -> Unit) {
+  val scheme = MaterialTheme.colorScheme
+  Row(
+    modifier = Modifier
+      .fillMaxWidth()
+      .horizontalScroll(rememberScrollState())
+      .padding(top = 12.dp, bottom = 14.dp),
+    horizontalArrangement = Arrangement.spacedBy(8.dp),
+  ) {
+    ChannelGroup.entries.forEach { group ->
+      val isSelected = group in selected
+      FilterChip(
+        selected = isSelected,
+        onClick = { onToggle(group) },
+        label = {
+          Text(
+            text = stringResource(group.label()),
+            fontSize = 14.sp,
+            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
+            maxLines = 1,
+          )
+        },
+        leadingIcon = if (isSelected) {
+          { Icon(Icons.Rounded.Check, contentDescription = null, modifier = Modifier.size(18.dp)) }
+        } else {
+          null
+        },
+        shape = RoundedCornerShape(8.dp),
+        colors = FilterChipDefaults.filterChipColors(
+          containerColor = Color.Transparent,
+          labelColor = scheme.onSurfaceVariant,
+          selectedContainerColor = scheme.primaryContainer,
+          selectedLabelColor = scheme.onPrimaryContainer,
+          selectedLeadingIconColor = scheme.onPrimaryContainer,
+        ),
+        border = FilterChipDefaults.filterChipBorder(
+          enabled = true,
+          selected = isSelected,
+          borderColor = scheme.outlineVariant,
+          selectedBorderColor = Color.Transparent,
+          borderWidth = 1.dp,
+          selectedBorderWidth = 0.dp,
+        ),
+      )
+    }
+  }
 }
 
 @Composable

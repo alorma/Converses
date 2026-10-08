@@ -62,7 +62,7 @@ Converses és una app Android per recordar què has dit, què t'han dit i què h
 
 ### Design system (feina de Bernat a Claude Design)
 
-Sense data: es va sincronitzant amb l'app a mesura que convé i no bloqueja res. Canvis acumulats a l'app: colors d'error fixos; split button de 56 dp i el seu menú; full d'accions; full de nova entrada i nota ràpida; full de triar persona; pantalla de bloqueig amb els quatre estats; avatar protegit; filtre de canal i tema d'Ajustos com a `ButtonGroup` connectat; files d'Ajustos; pastilles de canal; estats buits i snackbar; barra flotant amb tres destinacions; fila «Quan» i full «Quan va ser?»; selector «Qui» i marcadors; verd d'èxit de l'onboarding; avatar estàndard i full «Avatar».
+Sense data: es va sincronitzant amb l'app a mesura que convé i no bloqueja res. Canvis acumulats a l'app: colors d'error fixos; split button de 56 dp i el seu menú; full d'accions; full de nova entrada i nota ràpida; full de triar persona; pantalla de bloqueig amb els quatre estats; avatar protegit; tema d'Ajustos com a `ButtonGroup` connectat; filtre de canal com a `FilterChip` de multiselecció; files d'Ajustos; pastilles de canal; estats buits i snackbar; barra flotant amb tres destinacions; fila «Quan» i full «Quan va ser?»; selector «Qui» i marcadors; verd d'èxit de l'onboarding; avatar estàndard i full «Avatar».
 
 ## Iteració 2 (després de la publicació)
 
@@ -111,7 +111,7 @@ Una sola activitat (`MainActivity`, una `FragmentActivity` pel `BiometricPrompt`
 | Destinació | Ruta (`NavKey`) | Notes |
 | --- | --- | --- |
 | Onboarding | `OnboardingRoute` | Només el primer cop (`OnboardingFlag`); en acabar substitueix la pila per `PeopleRoute` |
-| Llistat | `PeopleRoute` | Filtres per canal, nova persona a la capçalera i fila final, barra flotant (Persones · Arxivades · Ajustos) |
+| Llistat | `PeopleRoute` | Xips de filtre per canal (multiselecció, OR entre grups; cap marcat = tothom), nova persona a la capçalera i fila final, barra flotant (Persones · Arxivades · Ajustos) |
 | Arxivades | `ArchivedRoute` | Sense filtres de canal ni fila d'afegir; desarxivar només des del detall |
 | Detall | `PersonRoute(id)` | Split button «Nota ▾», llapis d'editar, ⋮ a cada entrada, `FLAG_SECURE` si és protegida |
 | Desbloqueig | `PersonLockedRoute(id)` | `BiometricPrompt` automàtic; si va bé, substitueix la ruta pel detall |
@@ -167,7 +167,7 @@ Darrere de `PersonColorFeature`. Encès, cada persona porta el color de l'avatar
 
 ### Components propis (`designsystem`)
 
-`Avatar`, `GroupedList` / `groupedItems`, `TimelineRow` i `TimelineMarker`, `ConversesFilterChip` i `ConversesConnectedFilterRow`, `ConversesChannelChip`, `ConversesToggleGroup`, `ConversesFloatingToolbar` i `ToolbarDestination`, `ConversesSplitButton` i `ConversesMenuItem`, `SettingRow` / `SettingSwitchRow`, `DashedActionRow`, `EmptyState`, `ColorSwatches`, `ConversesLoadingIndicator`, `ConversesTheme`, `PersonTheme` i `AppColors`. A l'app: `PersonPickerSheet`, `ChannelsCard`, `AvatarSheet`.
+`Avatar`, `GroupedList` / `groupedItems`, `TimelineRow` i `TimelineMarker`, `ConversesFilterChip`, `ConversesChannelChip`, `ConversesToggleGroup`, `ConversesFloatingToolbar` i `ToolbarDestination`, `ConversesSplitButton` i `ConversesMenuItem`, `SettingRow` / `SettingSwitchRow`, `DashedActionRow`, `EmptyState`, `ColorSwatches`, `ConversesLoadingIndicator`, `ConversesTheme`, `PersonTheme` i `AppColors`. A l'app: `PersonPickerSheet`, `ChannelsCard`, `AvatarSheet`.
 
 ### Tests
 

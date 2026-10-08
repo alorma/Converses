@@ -11,12 +11,11 @@ import java.time.temporal.ChronoUnit
 import java.util.Locale
 
 @StringRes
-fun ChannelFilter.label(): Int = when (this) {
-  ChannelFilter.All -> R.string.filter_all
-  ChannelFilter.Chat -> R.string.filter_chat
-  ChannelFilter.Social -> R.string.filter_social
-  ChannelFilter.InPerson -> R.string.filter_in_person
-  ChannelFilter.Phone -> R.string.filter_phone
+fun ChannelGroup.label(): Int = when (this) {
+  ChannelGroup.Chat -> R.string.filter_chat
+  ChannelGroup.Social -> R.string.filter_social
+  ChannelGroup.InPerson -> R.string.filter_in_person
+  ChannelGroup.Phone -> R.string.filter_phone
 }
 
 @StringRes

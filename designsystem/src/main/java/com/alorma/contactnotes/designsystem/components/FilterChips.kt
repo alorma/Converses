@@ -1,18 +1,8 @@
 package com.alorma.contactnotes.designsystem.components
 
-import androidx.compose.foundation.horizontalScroll
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Check
-import androidx.compose.material3.ButtonGroupDefaults
-import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
-import androidx.compose.material3.ToggleButton
-import androidx.compose.material3.ToggleButtonDefaults
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
@@ -21,43 +11,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-
-/** Grup connectat de filtres amb selecció única, desplaçable en horitzontal. */
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
-@Composable
-fun <T> ConversesConnectedFilterRow(
-  options: List<Pair<T, String>>,
-  selected: T,
-  onSelect: (T) -> Unit,
-  modifier: Modifier = Modifier,
-) {
-  val scheme = MaterialTheme.colorScheme
-  Row(
-    modifier = modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).selectableGroup(),
-    horizontalArrangement = Arrangement.spacedBy(ButtonGroupDefaults.ConnectedSpaceBetween),
-  ) {
-    options.forEachIndexed { index, (value, label) ->
-      val shapes = when (index) {
-        0 -> ButtonGroupDefaults.connectedLeadingButtonShapes()
-        options.lastIndex -> ButtonGroupDefaults.connectedTrailingButtonShapes()
-        else -> ButtonGroupDefaults.connectedMiddleButtonShapes()
-      }
-      ToggleButton(
-        checked = value == selected,
-        onCheckedChange = { onSelect(value) },
-        shapes = shapes,
-        colors = ToggleButtonDefaults.colors(
-          containerColor = scheme.surfaceContainerHigh,
-          contentColor = scheme.onSurface,
-          checkedContainerColor = scheme.primary,
-          checkedContentColor = scheme.onPrimary,
-        ),
-      ) {
-        Text(label, maxLines = 1)
-      }
-    }
-  }
-}
 
 /**
  * Xip de filtre sense vora. Seleccionat en `primary`, o en `primaryContainer` si `tonal`.

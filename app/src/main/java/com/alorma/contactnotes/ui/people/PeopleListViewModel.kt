@@ -10,24 +10,26 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 
-enum class ChannelFilter(val types: Set<ChannelType>?) {
-  All(null),
+enum class ChannelGroup(val types: Set<ChannelType>) {
   Chat(setOf(ChannelType.WHATSAPP, ChannelType.TELEGRAM, ChannelType.SIGNAL, ChannelType.DISCORD, ChannelType.EMAIL)),
   Social(setOf(ChannelType.X, ChannelType.INSTAGRAM, ChannelType.LINKEDIN, ChannelType.REDDIT)),
   InPerson(setOf(ChannelType.IN_PERSON)),
   Phone(setOf(ChannelType.PHONE)),
 }
 
-fun List<PersonListItem>.filterBy(filter: ChannelFilter): List<PersonListItem> {
-  val types = filter.types ?: return this
+/** Sense cap grup marcat es mostren totes les persones; amb grups marcats, les que en tenen algun canal (OR). */
+fun List<PersonListItem>.filterBy(groups: Set<ChannelGroup>): List<PersonListItem> {
+  if (groups.isEmpty()) return this
+  val types = groups.flatMapTo(mutableSetOf()) { it.types }
   return filter { item -> item.channels.any { it.type in types } }
 }
 
 data class PeopleListUiState(
   val people: List<PersonListItem> = emptyList(),
   val total: Int = 0,
-  val filter: ChannelFilter = ChannelFilter.All,
+  val filter: Set<ChannelGroup> = emptySet(),
   val isLoading: Boolean = true,
 )
 
@@ -35,7 +37,7 @@ class PeopleListViewModel(
   private val archived: Boolean,
   repository: ConversesRepository,
 ) : ViewModel() {
-  private val filter = MutableStateFlow(ChannelFilter.All)
+  private val filter = MutableStateFlow(emptySet<ChannelGroup>())
 
   val uiState: StateFlow<PeopleListUiState> =
     combine(repository.observePeople(archived = archived), filter) { people, filter ->
@@ -47,7 +49,7 @@ class PeopleListViewModel(
       )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), PeopleListUiState())
 
-  fun onFilterSelected(selected: ChannelFilter) {
-    filter.value = selected
+  fun onFilterToggled(group: ChannelGroup) {
+    filter.update { if (group in it) it - group else it + group }
   }
 }

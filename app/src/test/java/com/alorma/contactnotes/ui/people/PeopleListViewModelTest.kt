@@ -32,13 +32,15 @@ class PeopleListViewModelTest {
 
     assertEquals(listOf("Chat", "Social", "InPerson"), names(vm))
 
-    vm.onFilterSelected(ChannelFilter.Chat)
+    vm.onFilterToggled(ChannelGroup.Chat)
     assertEquals(listOf("Chat"), names(vm))
-    vm.onFilterSelected(ChannelFilter.Social)
-    assertEquals(listOf("Social"), names(vm))
-    vm.onFilterSelected(ChannelFilter.InPerson)
-    assertEquals(listOf("InPerson"), names(vm))
+    vm.onFilterToggled(ChannelGroup.InPerson)
+    assertEquals(listOf("Chat", "InPerson"), names(vm))
     assertEquals(3, vm.uiState.value.total)
+
+    vm.onFilterToggled(ChannelGroup.Chat)
+    vm.onFilterToggled(ChannelGroup.InPerson)
+    assertEquals(listOf("Chat", "Social", "InPerson"), names(vm))
   }
 
   @Test
@@ -50,19 +52,19 @@ class PeopleListViewModelTest {
     val vm = PeopleListViewModel(archived = false, repository = db.repository)
     backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { vm.uiState.collect {} }
 
-    vm.onFilterSelected(ChannelFilter.Social)
+    vm.onFilterToggled(ChannelGroup.Social)
     assertEquals(listOf("OnX", "OnInstagram"), names(vm))
   }
 
   @Test
-  fun protectedPeopleOnlyShowUpInAllBecauseTheirChannelsAreHidden() = runTest {
+  fun protectedPeopleOnlyShowUpWithoutFilterBecauseTheirChannelsAreHidden() = runTest {
     val secret = db.addPerson("Luna", isProtected = true)
     db.addChannel(secret.id, ChannelType.WHATSAPP)
     val vm = PeopleListViewModel(archived = false, repository = db.repository)
     backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { vm.uiState.collect {} }
 
     assertEquals(listOf("Luna"), names(vm))
-    vm.onFilterSelected(ChannelFilter.Chat)
+    vm.onFilterToggled(ChannelGroup.Chat)
     assertEquals(emptyList<String>(), names(vm))
   }
 
@@ -73,7 +75,7 @@ class PeopleListViewModelTest {
     val vm = PeopleListViewModel(archived = true, repository = db.repository)
     backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { vm.uiState.collect {} }
 
-    vm.onFilterSelected(ChannelFilter.Phone)
+    vm.onFilterToggled(ChannelGroup.Phone)
 
     assertEquals(listOf("Archived"), names(vm))
     assertFalse(vm.uiState.value.isLoading)

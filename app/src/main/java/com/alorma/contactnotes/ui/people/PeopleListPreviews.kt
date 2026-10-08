@@ -12,7 +12,7 @@ private fun PeopleListScreenPreview(state: PeopleListUiState, archived: Boolean 
       state = state,
       archived = archived,
       onToggleArchivedList = {},
-      onFilterSelected = {},
+      onFilterToggled = {},
       onPersonClick = {},
       onQuickNote = {},
       onOpenSettings = {},
