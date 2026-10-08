@@ -69,6 +69,9 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
+import com.alorma.contactnotes.designsystem.components.ConversesTopBar
+import com.alorma.contactnotes.designsystem.components.rememberTopBarScrollBehavior
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.graphicsLayer
@@ -170,33 +173,26 @@ fun EditPersonContent(
   var showAvatarSheet by remember { mutableStateOf(false) }
 
   PersonTheme(state.color ?: AvatarColor.forName(state.name)) {
+    val scrollBehavior = rememberTopBarScrollBehavior()
     Scaffold(
+      modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
       containerColor = MaterialTheme.colorScheme.surface,
       contentWindowInsets = WindowInsets.navigationBars,
       topBar = {
-        // Tancar, desar i títol fixos a dalt: no fan scroll amb el formulari
-        if (state.loaded) Column(
-          modifier = Modifier
-            .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.surface)
-            .windowInsetsPadding(WindowInsets.statusBars)
-            .padding(start = 16.dp, end = 16.dp, top = 8.dp),
-          verticalArrangement = Arrangement.spacedBy(12.dp),
-        ) {
-          Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+        if (state.loaded) ConversesTopBar(
+          title = stringResource(if (state.isNew) R.string.new_person else R.string.edit_person),
+          scrollBehavior = scrollBehavior,
+          navigationIcon = {
             FilledTonalIconButton(onClick = onClose) {
               Icon(Icons.Rounded.Close, contentDescription = stringResource(R.string.close))
             }
-            Button(onClick = { actions.save(onSaved) }, enabled = state.canSave) {
+          },
+          actions = {
+            Button(onClick = { actions.save(onSaved) }, enabled = state.canSave, modifier = Modifier.padding(end = 8.dp)) {
               Text(stringResource(R.string.save), fontWeight = FontWeight.Bold)
             }
-          }
-          Text(
-            text = stringResource(if (state.isNew) R.string.new_person else R.string.edit_person),
-            style = ScreenTitleStyle,
-            modifier = Modifier.padding(start = 4.dp),
-          )
-        }
+          },
+        )
       },
     ) { padding ->
       if (!state.loaded) return@Scaffold
@@ -207,7 +203,7 @@ fun EditPersonContent(
           .consumeWindowInsets(padding)
           .imePadding()
           .verticalScroll(rememberScrollState())
-          .padding(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 8.dp),
+          .padding(start = 16.dp, end = 16.dp, bottom = 8.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
       ) {
         Column(verticalArrangement = Arrangement.spacedBy(GroupedListDefaults.ItemSpacing)) {

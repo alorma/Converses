@@ -44,6 +44,9 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
+import com.alorma.contactnotes.designsystem.components.ConversesTopBar
+import com.alorma.contactnotes.designsystem.components.rememberTopBarScrollBehavior
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -266,30 +269,28 @@ fun QuickNoteContent(
     ?: available.first()
 
   PersonTheme(selected?.color) {
+    val scrollBehavior = rememberTopBarScrollBehavior()
     Scaffold(
+      modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
       containerColor = MaterialTheme.colorScheme.surface,
       contentWindowInsets = WindowInsets.navigationBars,
       topBar = {
-        // Tancar, desar i títol fixos a dalt: no fan scroll amb el formulari
-        Column(
-          modifier = Modifier
-            .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.surface)
-            .windowInsetsPadding(WindowInsets.statusBars)
-            .padding(start = 16.dp, end = 16.dp, top = 8.dp),
-          verticalArrangement = Arrangement.spacedBy(16.dp),
-        ) {
-          Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+        ConversesTopBar(
+          title = stringResource(R.string.quick_note),
+          scrollBehavior = scrollBehavior,
+          navigationIcon = {
             FilledTonalIconButton(onClick = onClose) {
               Icon(Icons.Rounded.Close, contentDescription = stringResource(R.string.close))
             }
+          },
+          actions = {
             Button(
               onClick = { if (selected != null) onSave(selected, channel) },
               enabled = form.canSave && selected != null,
+              modifier = Modifier.padding(end = 8.dp),
             ) { Text(stringResource(R.string.save), fontWeight = FontWeight.Bold) }
-          }
-          Text(stringResource(R.string.quick_note), style = ScreenTitleStyle, modifier = Modifier.padding(start = 4.dp))
-        }
+          },
+        )
       },
     ) { padding ->
       Column(
