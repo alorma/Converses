@@ -1,6 +1,6 @@
 # Backlog: bugs i features pendents
 
-Actualitzat el 7 d'oct. de 2026. Només hi ha el que encara no està fet.
+Actualitzat el 8 d'oct. de 2026. Només hi ha el que encara no està fet.
 
 | # | Tipus | Tema | Issue |
 | --- | --- | --- | --- |
@@ -8,8 +8,14 @@ Actualitzat el 7 d'oct. de 2026. Només hi ha el que encara no està fet.
 | 7 | Feature (Iteració 2) | Nou canal "Empresa" (queda dins el 8) | — |
 | 8 | Feature (Iteració 2) | Gestor de canals propis | — |
 | 11 | Feature (Iteració 2) | Importar text a la nota ràpida (compartir, seleccionar text i enganxar) | [#30](https://github.com/alorma/Converses/issues/30) |
+| 12 | Bug | Nota ràpida: el xip «Persona» desactivat confon | [#40](https://github.com/alorma/Converses/issues/40) |
+| 13 | Millora | Llista: ordenar els filtres de canal pels més usats | [#42](https://github.com/alorma/Converses/issues/42) |
+| 14 | Millora (a avaluar) | Detall de persona: les 3 accions visibles, sense el split FAB | [#44](https://github.com/alorma/Converses/issues/44) |
+| 15 | Millora | Ajustos: secció «Quant a» | [#43](https://github.com/alorma/Converses/issues/43) |
+| 16 | Millora | Idiomes: mostrar els disponibles a Ajustos i valorar gallec i italià | [#45](https://github.com/alorma/Converses/issues/45) |
+| 17 | Feature | Cerca d'entrades per paraula clau | [#41](https://github.com/alorma/Converses/issues/41) |
 
-Tots són de l'**Iteració 2**, després de publicar l'app; el 6 i el 8 són Pro i l'11 és gratis (vegeu `docs/pro.md`). **Qualsevol canvi de la base de dades ha d'incloure una migració i el seu test** (la v1 ja és a Google Play); l'11 no toca Room. La numeració és la del backlog original, perquè els issues i les referències no canviïn; els punts resolts (1–5, 9, 10) són a l'historial de git.
+Els punts 6, 7, 8 i 11 són de l'**Iteració 2**; el 6 i el 8 són Pro i l'11 és gratis (vegeu `docs/pro.md`). Els punts 12–17 vénen del feedback de la beta (issues #40–#45) i es treballen en aquest ordre: primer els petits (12, 13, 14), després el 15 i el 16, i la cerca (17) al final. **Qualsevol canvi de la base de dades ha d'incloure una migració i el seu test** (la v1 ja és a Google Play); l'11 no toca Room. Dels nous, només el 17 pot tocar Room (si s'opta per FTS). La numeració és la del backlog original, perquè els issues i les referències no canviïn; els punts resolts (1–5, 9, 10) són a l'historial de git.
 
 ---
 
@@ -70,3 +76,77 @@ Portar text d'altres apps a la nota ràpida amb el mínim de passos: el text ja 
 - **Privacitat:** el bloqueig de l'app surt abans de la nota ràpida; una persona protegida demana l'empremta i la pantalla té `FLAG_SECURE`.
 - Fora d'abast: imatges i fitxers (`SEND_MULTIPLE`), Direct Share i xats exportats.
 - Sense canvis a Room, **no cal migració**. Textos nous a `values/`, `values-ca/` i `values-es/`; en acabar, afegir-ho a «Gratis per sempre» de `docs/pro.md` i actualitzar `docs/plan.md`.
+
+---
+
+## 12 · Bug: xip «Persona» desactivat a la nota ràpida
+
+Issue: [#40](https://github.com/alorma/Converses/issues/40)
+
+A la nota ràpida, sense persona triada, el xip «Persona» de «Qui» surt gris i desactivat (i truncat, «Pers…»). Sembla el lloc on afegir la persona; els usuaris el toquen i no passa res, perquè la persona es tria a la targeta «Amb qui» de dalt.
+
+**Decisió recomanada:** tocar el xip sense persona obre el selector de persones (el mateix full que la targeta «Amb qui»); en triar-ne una, el xip queda seleccionat.
+
+**Què cal fer**
+- `WhoSelector` d'`EntryForm` (`ui/entry/EntryForm.kt`): el xip deixa d'estar desactivat quan no hi ha persona i demana obrir el selector. L'etiqueta continua sortint de `whoLabel(...)` (`ui/person/WhoLabels.kt`).
+- La nota ràpida és qui obre el full; el nou entry sheet de la persona no canvia.
+- Etiqueta llegible: treure la icona del xip buit perquè «Persona» càpiga sense tallar-se.
+- Protegides: el selector no ha de mostrar res de les entrades abans de desbloquejar.
+- Sense Room, sense migració. Captura de la nota ràpida sense persona.
+
+## 13 · Millora: ordre dels filtres de canal
+
+Issue: [#42](https://github.com/alorma/Converses/issues/42)
+
+Els filtres de la llista surten **Xat · Social · En persona · Telèfon**, i els dos més usats queden a la dreta, mig tallats.
+
+- Ordre fix nou: **En persona, Telèfon, Xat, Social** (`ChannelGroup.entries` a `ui/people/PeopleListViewModel.kt`, recorregut a `FilterRow` de `ui/people/PeopleListScreen.kt`).
+- Que els primers xips es vegin sencers sense fer scroll.
+- Decidit de moment: ordre fix. Opcional més endavant: que l'usuari triï l'ordre, o ordenar-los per ús real.
+- Sense Room. Actualitzar les captures.
+
+## 14 · Millora (a avaluar): accions del detall de persona
+
+Issue: [#44](https://github.com/alorma/Converses/issues/44)
+
+Ara hi ha un split FAB amb **Nota** i un menú amb **Exportar notes** i **Arxivar**. Només són tres accions.
+
+**Opcions**
+- A. FAB només per a **Nota**; Exportar i Arxivar a la `topBar` (accions o menú «⋮»). Recomanada: escala millor quan `docs/pro.md` hi afegeixi accions.
+- B. Barra flotant amb les tres accions visibles, al slot `floatingActionButton`.
+
+Pendent de decidir. Seguir les regles del `Scaffold` del `CLAUDE.md`. Sense Room.
+
+## 15 · Millora: «Quant a» als Ajustos
+
+Issue: [#43](https://github.com/alorma/Converses/issues/43)
+
+Entrada «Quant a» als Ajustos, amb subpantalla (`ConversesTopBar`, mateixes regles de `Scaffold`):
+- Autor i una manera de contactar o seguir el projecte.
+- Nom de l'app i versió.
+- Enllaç al repositori (si és públic) i llicències de codi obert.
+- Política de privadesa / fitxa de Play, i enviar feedback.
+
+Pendent de decidir: dades i enllaços concrets. Textos a `strings.xml` (en, ca, es). Sense Room.
+
+## 16 · Millora: idiomes disponibles
+
+Issue: [#45](https://github.com/alorma/Converses/issues/45)
+
+L'app només està en ca/es/en (`res/xml/locales_config.xml`); un idioma no suportat cau en silenci al següent de la llista.
+
+**Dues parts independents**
+- A. A Ajustos, «Idioma de l'app»: llistar els suportats i marcar l'actiu (i si segueix el del sistema). Esmentar-los a la fitxa de Play.
+- B. Valorar afegir **gallec** i **italià** (suggerits per l'usuari). Cada idioma nou és un `values-xx/` complet i una entrada a `locales_config.xml`; es poden acceptar traduccions de la comunitat.
+
+Pendent de decidir: només la A ara i la B segons qui tradueixi. Sense Room.
+
+## 17 · Feature: cerca
+
+Issue: [#41](https://github.com/alorma/Converses/issues/41)
+
+Cerca pel nom de la persona i dins el text de les entrades, amb els resultats etiquetats per persona; tocar-ne un obre el detall a aquella entrada.
+
+- **Protegides:** només es troben pel nom; el text de les seves entrades no es cerca ni es mostra abans de desbloquejar.
+- **Tècnica:** consultes `LIKE` (sense canvi d'esquema, la recomanada per començar) o Room FTS (més ràpid amb molts registres, però exigeix taula nova, versió, migració i test). Si es tria FTS, coordinar-ho amb la migració del punt 6.
+- Surt de «Després de la v1» del pla: ara és a la iteració 2.
