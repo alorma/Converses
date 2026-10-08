@@ -3,7 +3,6 @@ package com.alorma.contactnotes.ui.person
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.alorma.contactnotes.data.ConversesRepository
-import com.alorma.contactnotes.data.db.ChannelEntity
 import com.alorma.contactnotes.data.db.ChannelType
 import com.alorma.contactnotes.data.db.EntryEntity
 import com.alorma.contactnotes.data.db.EntryKind
@@ -24,7 +23,7 @@ import kotlinx.coroutines.launch
 
 data class PersonDetailUiState(
   val person: PersonEntity? = null,
-  val channels: List<ChannelEntity> = emptyList(),
+  val channels: List<ChannelType> = emptyList(),
   val facts: List<PinnedFactEntity> = emptyList(),
   val entries: List<EntryEntity> = emptyList(),
   val selectedKinds: Set<EntryKind> = EntryKind.entries.toSet(),

@@ -2,6 +2,11 @@ package com.alorma.contactnotes.ui.people
 
 import com.alorma.contactnotes.data.db.shape
 import com.alorma.contactnotes.data.db.color
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
@@ -10,6 +15,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -60,9 +67,12 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.alorma.contactnotes.R
 import com.alorma.contactnotes.data.db.PersonEntity
 import com.alorma.contactnotes.data.db.PersonListItem
+import com.alorma.contactnotes.data.db.ChannelType
 import com.alorma.contactnotes.designsystem.components.Avatar
 import com.alorma.contactnotes.designsystem.components.rememberConversesHaptics
 import com.alorma.contactnotes.designsystem.components.DashedActionRow
+import com.alorma.contactnotes.designsystem.components.BetaBadge
+import com.alorma.contactnotes.designsystem.components.NoticeBanner
 import com.alorma.contactnotes.designsystem.components.ConversesFloatingToolbar
 import com.alorma.contactnotes.designsystem.components.GroupedListDefaults
 import com.alorma.contactnotes.designsystem.components.ToolbarDestination
@@ -91,6 +101,7 @@ fun PeopleListRoute(
     archived = archived,
     onToggleArchivedList = onToggleArchivedList,
     onFilterToggled = viewModel::onFilterToggled,
+    onChannelsNoticeDismissed = viewModel::onChannelsNoticeDismissed,
     onPersonClick = onPersonClick,
     onQuickNote = onQuickNote,
     onOpenSettings = onOpenSettings,
@@ -103,7 +114,8 @@ fun PeopleListScreen(
   state: PeopleListUiState,
   archived: Boolean,
   onToggleArchivedList: () -> Unit,
-  onFilterToggled: (ChannelGroup) -> Unit,
+  onFilterToggled: (ChannelType) -> Unit,
+  onChannelsNoticeDismissed: () -> Unit,
   onPersonClick: (PersonEntity) -> Unit,
   onQuickNote: () -> Unit,
   onOpenSettings: () -> Unit,
@@ -136,6 +148,19 @@ fun PeopleListScreen(
           isLoading = state.isLoading,
           onNewPerson = onNewPerson,
         )
+        AnimatedVisibility(
+          visible = state.showChannelsNotice,
+          enter = fadeIn() + expandVertically(),
+          exit = fadeOut() + shrinkVertically(),
+        ) {
+          NoticeBanner(
+            title = stringResource(R.string.channels_notice_title),
+            body = stringResource(R.string.channels_notice_body),
+            actionLabel = stringResource(R.string.channels_notice_action),
+            onAction = onChannelsNoticeDismissed,
+            modifier = Modifier.padding(bottom = 14.dp),
+          )
+        }
         if (!archived) {
           FilterRow(selected = state.filter, onToggle = onFilterToggled)
         }
@@ -223,6 +248,7 @@ fun PeopleListScreen(
   }
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun Header(archived: Boolean, total: Int, isLoading: Boolean, onNewPerson: () -> Unit, modifier: Modifier = Modifier) {
   Row(
@@ -230,7 +256,25 @@ private fun Header(archived: Boolean, total: Int, isLoading: Boolean, onNewPerso
     verticalAlignment = Alignment.Top,
   ) {
   Column(modifier = Modifier.weight(1f)) {
-    Text(text = stringResource(if (archived) R.string.filter_archived else R.string.people_title), style = ListTitleStyle)
+    // Amb lletra gran el badge baixa a la línia següent en comptes de partir el títol
+    FlowRow(
+      horizontalArrangement = Arrangement.spacedBy(8.dp),
+      verticalArrangement = Arrangement.spacedBy(2.dp),
+    ) {
+      Text(
+        text = stringResource(if (archived) R.string.filter_archived else R.string.people_title),
+        style = ListTitleStyle,
+        maxLines = 1,
+        softWrap = false,
+      )
+      if (!archived) {
+        BetaBadge(
+          text = stringResource(R.string.beta_badge),
+          contentDescription = stringResource(R.string.beta_description),
+          modifier = Modifier.padding(top = 7.dp),
+        )
+      }
+    }
     if (!isLoading) {
       Text(
         text = if (total == 0 && !archived) stringResource(R.string.people_count_none) else pluralStringResource(R.plurals.people_count, total, total),
@@ -248,7 +292,7 @@ private fun Header(archived: Boolean, total: Int, isLoading: Boolean, onNewPerso
 }
 
 @Composable
-private fun FilterRow(selected: Set<ChannelGroup>, onToggle: (ChannelGroup) -> Unit) {
+private fun FilterRow(selected: Set<ChannelType>, onToggle: (ChannelType) -> Unit) {
   val scheme = MaterialTheme.colorScheme
   val haptics = rememberConversesHaptics()
   Row(
@@ -258,7 +302,7 @@ private fun FilterRow(selected: Set<ChannelGroup>, onToggle: (ChannelGroup) -> U
       .padding(top = 12.dp, bottom = 14.dp),
     horizontalArrangement = Arrangement.spacedBy(8.dp),
   ) {
-    ChannelGroup.entries.forEach { group ->
+    ChannelType.entries.forEach { group ->
       val isSelected = group in selected
       FilterChip(
         selected = isSelected,
@@ -355,7 +399,7 @@ private fun PersonRow(item: PersonListItem, onClick: () -> Unit) {
           color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
       } else {
-        val channels = item.channels.map { it.type }.distinct().sorted()
+        val channels = item.channels.distinct().sorted()
         if (channels.isNotEmpty()) {
           Text(
             text = channels.map { channelName(it).uppercase() }.joinToString(" · "),

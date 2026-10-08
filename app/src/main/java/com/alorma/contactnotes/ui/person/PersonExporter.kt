@@ -29,7 +29,7 @@ class PersonExporter(
       appendLine(person.name + person.alias?.let { " (@$it)" }.orEmpty())
       if (channels.isNotEmpty()) {
         appendLine(
-          channels.map { it.type }.sorted().joinToString(" · ") { channelName(context, it) },
+          channels.joinToString(" · ") { channelName(context, it) },
         )
       }
       if (facts.isNotEmpty()) {

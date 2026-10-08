@@ -47,6 +47,34 @@ class PersonDetailViewModelTest {
   }
 
   @Test
+  fun channelsAreDerivedFromTheEntriesInTheFixedOrderWithoutRepeats() = runTest {
+    db.addEntry(person.id, channel = ChannelType.SOCIAL, occurredAt = at(1, 10))
+    db.addEntry(person.id, channel = ChannelType.CHAT, occurredAt = at(2, 10))
+    db.addEntry(person.id, channel = ChannelType.IN_PERSON, occurredAt = at(3, 10))
+    db.addEntry(person.id, channel = ChannelType.CHAT, occurredAt = at(4, 10))
+    val vm = viewModel()
+
+    assertEquals(listOf(ChannelType.IN_PERSON, ChannelType.CHAT, ChannelType.SOCIAL), vm.uiState.value.channels)
+  }
+
+  @Test
+  fun channelsStayEmptyWithoutEntries() = runTest {
+    val vm = viewModel()
+
+    assertTrue(vm.uiState.value.channels.isEmpty())
+  }
+
+  @Test
+  fun channelsFollowTheEntriesWhenOneIsAdded() = runTest {
+    val vm = viewModel()
+    assertTrue(vm.uiState.value.channels.isEmpty())
+
+    vm.addEntry(EntryKind.SAID, ChannelType.PHONE, "call", occurredAt = null)
+
+    assertEquals(listOf(ChannelType.PHONE), vm.uiState.value.channels)
+  }
+
+  @Test
   fun togglingAKindFiltersTheTimelineButNotTheCounts() = runTest {
     db.addEntry(person.id, EntryKind.SAID, text = "said")
     db.addEntry(person.id, EntryKind.HEARD, text = "heard")
@@ -89,7 +117,7 @@ class PersonDetailViewModelTest {
     val entry = db.addEntry(person.id, occurredAt = 7_000)
     val vm = viewModel()
 
-    vm.updateEntry(entry, EntryKind.HEARD, ChannelType.DISCORD, "edited", occurredAt = null)
+    vm.updateEntry(entry, EntryKind.HEARD, ChannelType.SOCIAL, "edited", occurredAt = null)
 
     val updated = vm.uiState.value.entries.single()
     assertEquals("edited", updated.text)
@@ -111,10 +139,10 @@ class PersonDetailViewModelTest {
 
   @Test
   fun deleteDayOnlyRemovesThatDayAndChannel() = runTest {
-    val target = db.addEntry(person.id, channel = ChannelType.WHATSAPP, text = "a", occurredAt = at(5, 9))
-    db.addEntry(person.id, channel = ChannelType.WHATSAPP, text = "b", occurredAt = at(5, 21))
-    db.addEntry(person.id, channel = ChannelType.DISCORD, text = "other channel", occurredAt = at(5, 12))
-    db.addEntry(person.id, channel = ChannelType.WHATSAPP, text = "other day", occurredAt = at(6, 9))
+    val target = db.addEntry(person.id, channel = ChannelType.CHAT, text = "a", occurredAt = at(5, 9))
+    db.addEntry(person.id, channel = ChannelType.CHAT, text = "b", occurredAt = at(5, 21))
+    db.addEntry(person.id, channel = ChannelType.SOCIAL, text = "other channel", occurredAt = at(5, 12))
+    db.addEntry(person.id, channel = ChannelType.CHAT, text = "other day", occurredAt = at(6, 9))
     val vm = viewModel()
 
     assertEquals(2, vm.countDay(target))

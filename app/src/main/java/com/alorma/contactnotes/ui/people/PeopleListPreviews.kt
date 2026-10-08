@@ -13,6 +13,7 @@ private fun PeopleListScreenPreview(state: PeopleListUiState, archived: Boolean 
       archived = archived,
       onToggleArchivedList = {},
       onFilterToggled = {},
+      onChannelsNoticeDismissed = {},
       onPersonClick = {},
       onQuickNote = {},
       onOpenSettings = {},
@@ -41,5 +42,18 @@ internal fun PeopleListScreenArchivedPreview() {
   PeopleListScreenPreview(
     PeopleListUiState(people = PreviewData.people.take(2), total = 2, isLoading = false),
     archived = true,
+  )
+}
+
+@Preview
+@Composable
+internal fun PeopleListScreenNoticePreview() {
+  PeopleListScreenPreview(
+    PeopleListUiState(
+      people = PreviewData.people,
+      total = PreviewData.people.size,
+      isLoading = false,
+      showChannelsNotice = true,
+    ),
   )
 }

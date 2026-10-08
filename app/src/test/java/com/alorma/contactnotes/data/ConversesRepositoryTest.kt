@@ -19,10 +19,8 @@ class ConversesRepositoryTest {
   fun protectedPeopleDoNotExposeTheirLastEntryNorChannels() = runTest {
     val open = db.addPerson("Marta")
     val secret = db.addPerson("Luna", isProtected = true)
-    db.addChannel(open.id, ChannelType.WHATSAPP)
-    db.addChannel(secret.id, ChannelType.DISCORD)
-    db.addEntry(open.id, text = "hola")
-    db.addEntry(secret.id, text = "secret")
+    db.addEntry(open.id, channel = ChannelType.CHAT, text = "hola")
+    db.addEntry(secret.id, channel = ChannelType.SOCIAL, text = "secret")
 
     val list = repository.observePeople().first().associateBy { it.person.id }
 
@@ -61,18 +59,16 @@ class ConversesRepositoryTest {
   }
 
   @Test
-  fun savePersonCreatesAndThenReplacesChannelsAndFacts() = runTest {
+  fun savePersonCreatesAndThenReplacesFacts() = runTest {
     val draft = db.addPerson("Draft").copy(id = 0)
     db.people.value = emptyList()
     val id = repository.savePerson(
       draft,
-      listOf(com.alorma.contactnotes.data.db.ChannelEntity(personId = 0, type = ChannelType.PHONE)),
       listOf(com.alorma.contactnotes.data.db.PinnedFactEntity(personId = 0, label = "a", value = "b", position = 0)),
     )
-    assertEquals(1, repository.observeChannels(id).first().size)
+    assertEquals(1, repository.observePinnedFacts(id).first().size)
 
-    repository.savePerson(db.person(id)!!, emptyList(), emptyList())
-    assertTrue(repository.observeChannels(id).first().isEmpty())
+    repository.savePerson(db.person(id)!!, emptyList())
     assertTrue(repository.observePinnedFacts(id).first().isEmpty())
   }
 
