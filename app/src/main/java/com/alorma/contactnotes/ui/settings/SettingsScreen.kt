@@ -55,6 +55,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
+import com.alorma.contactnotes.designsystem.components.ConversesTopBar
+import com.alorma.contactnotes.designsystem.components.rememberTopBarScrollBehavior
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -142,28 +145,22 @@ fun SettingsContent(
   onOpenPrivacyPolicy: () -> Unit,
   showPersonColor: Boolean = true,
 ) {
+  val scrollBehavior = rememberTopBarScrollBehavior()
   Scaffold(
+    modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
     containerColor = MaterialTheme.colorScheme.surface,
     contentWindowInsets = WindowInsets.navigationBars,
     topBar = {
-      // Fixa a dalt: la fletxa i el títol no fan scroll amb els grups
-      Column(
-        modifier = Modifier
-          .fillMaxWidth()
-          .background(MaterialTheme.colorScheme.surface)
-          .windowInsetsPadding(WindowInsets.statusBars)
-          .padding(horizontal = 16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp),
-      ) {
-        IconButton(onClick = onBack) {
-          Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = stringResource(R.string.back))
-        }
-        Text(
-          text = stringResource(R.string.settings_title),
-          style = ScreenTitleStyle,
-          modifier = Modifier.padding(start = 4.dp, bottom = 8.dp),
-        )
-      }
+      ConversesTopBar(
+        title = stringResource(R.string.settings_title),
+        scrollBehavior = scrollBehavior,
+        large = true,
+        navigationIcon = {
+          IconButton(onClick = onBack) {
+            Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = stringResource(R.string.back))
+          }
+        },
+      )
     },
   ) { padding ->
     Column(
@@ -171,7 +168,7 @@ fun SettingsContent(
         .fillMaxSize()
         .verticalScroll(rememberScrollState())
         .padding(padding)
-        .padding(start = 16.dp, end = 16.dp, top = 12.dp),
+        .padding(horizontal = 16.dp),
       verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
 
