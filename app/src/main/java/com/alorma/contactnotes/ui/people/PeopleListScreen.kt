@@ -15,6 +15,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -246,6 +248,7 @@ fun PeopleListScreen(
   }
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun Header(archived: Boolean, total: Int, isLoading: Boolean, onNewPerson: () -> Unit, modifier: Modifier = Modifier) {
   Row(
@@ -253,13 +256,22 @@ private fun Header(archived: Boolean, total: Int, isLoading: Boolean, onNewPerso
     verticalAlignment = Alignment.Top,
   ) {
   Column(modifier = Modifier.weight(1f)) {
-    Row(verticalAlignment = Alignment.Top) {
-      Text(text = stringResource(if (archived) R.string.filter_archived else R.string.people_title), style = ListTitleStyle)
+    // Amb lletra gran el badge baixa a la línia següent en comptes de partir el títol
+    FlowRow(
+      horizontalArrangement = Arrangement.spacedBy(8.dp),
+      verticalArrangement = Arrangement.spacedBy(2.dp),
+    ) {
+      Text(
+        text = stringResource(if (archived) R.string.filter_archived else R.string.people_title),
+        style = ListTitleStyle,
+        maxLines = 1,
+        softWrap = false,
+      )
       if (!archived) {
         BetaBadge(
           text = stringResource(R.string.beta_badge),
           contentDescription = stringResource(R.string.beta_description),
-          modifier = Modifier.padding(start = 8.dp, top = 7.dp),
+          modifier = Modifier.padding(top = 7.dp),
         )
       }
     }
