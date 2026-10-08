@@ -2,10 +2,10 @@ package com.alorma.contactnotes.ui.person
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.Chat
-import androidx.compose.material.icons.rounded.AlternateEmail
 import androidx.compose.material.icons.rounded.Call
-import androidx.compose.material.icons.rounded.Forum
 import androidx.compose.material.icons.rounded.Group
+import androidx.compose.material.icons.rounded.MoreHoriz
+import androidx.compose.material.icons.rounded.Public
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
@@ -23,10 +23,9 @@ import java.util.Locale
 fun ChannelType.icon(): ImageVector = when (this) {
   ChannelType.IN_PERSON -> Icons.Rounded.Group
   ChannelType.PHONE -> Icons.Rounded.Call
-  // Provisional: pendent de les icones de disseny per a Xat, Social i Altres.
   ChannelType.CHAT -> Icons.AutoMirrored.Rounded.Chat
-  ChannelType.SOCIAL -> Icons.Rounded.AlternateEmail
-  ChannelType.OTHER -> Icons.Rounded.Forum
+  ChannelType.SOCIAL -> Icons.Rounded.Public
+  ChannelType.OTHER -> Icons.Rounded.MoreHoriz
 }
 
 fun entryDate(epochMillis: Long, zone: ZoneId = ZoneId.systemDefault()): LocalDate =
