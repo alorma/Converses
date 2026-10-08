@@ -1,6 +1,6 @@
 # Converses — Pla i estat
 
-Actualitzat el 7 d'oct. de 2026 · @Bernat · **la v1 és publicada a Google Play (pista alpha).** Aquest document només recull l'estat actual, el que queda per fer i la referència tècnica; el detall de la feina ja feta és a l'historial de git.
+Actualitzat el 8 d'oct. de 2026 · @Bernat · **la v1 és publicada a Google Play (pista alpha).** Aquest document només recull l'estat actual, el que queda per fer i la referència tècnica; el detall de la feina ja feta és a l'historial de git.
 
 ## Resum
 
@@ -27,7 +27,7 @@ Converses és una app Android per recordar què has dit, què t'han dit i què h
 | M4 · Qualitat | Fet (amb excepcions acceptades) |
 | Versió gratuïta (flags, avatar estàndard, redisseny de l'editor) | Fet (falta la prova final de «res de Pro visible») |
 | Menú de debug | Fet (falta provar-lo a l'emulador) |
-| M5 · Publicació | Publicada a alpha; queden coses per a producció |
+| M5 · Publicació | Publicada a alpha; només queda la fitxa de Play per a producció |
 | Iteració 2 | Després de la publicació |
 | Pro | Planificat (`docs/pro.md`) |
 
@@ -35,10 +35,10 @@ Converses és una app Android per recordar què has dit, què t'han dit i què h
 
 ### Abans de producció (M5)
 
-- [ ] **Mida de la font:** Roboto Flex variable pesa ~1,7 MB. Opcions: (a) fonts descarregables de Google Fonts (`androidx.compose.ui.text.googlefonts`) amb Roboto com a alternativa, o (b) un subconjunt amb `fonttools` (llatí, eixos `wght` 400–800, `wdth` 100–118 i `opsz` limitats), d'uns 300–500 KB.
-- [ ] **Provar el release sencer:** onboarding, llistat, crear persona i detall ja funcionen amb R8; falta provar nota ràpida, persones protegides, Ajustos i exportar, i afegir regles explícites de Koin, `NavKey` o Room si en calen.
-- [ ] **`isShrinkResources`:** comprovar si AGP 9 ja ho fa amb `optimization { enable = true }`.
-- [ ] **Símbols natius:** Play avisa que l'AAB té codi natiu sense símbols (`libandroidx.graphics.path.so`, `libdatastore_shared_counter.so`). Afegir `ndk { debugSymbolLevel = "SYMBOL_TABLE" }` al `buildTypes.release`. No bloqueja.
+- [x] **Mida de la font:** `roboto_flex.ttf` passa d'1,7 MB a 151 KB: subconjunt llatí (en/ca/es) i eixos limitats als que fa servir `Type.kt` (opsz 14–72, wght 400–800, wdth 100–118; la resta fixos). Es regenera amb `designsystem/fonts/subset.sh <original>`. Els caràcters fora del llatí (noms en altres alfabets) cauen a la font del sistema.
+- [x] **Provar el release sencer:** l'APK de release (R8) provat a l'emulador: llistat, crear persona, detall, nova entrada, nota ràpida amb persona, persona protegida (PIN amb `BiometricPrompt`), Ajustos (tema, color dinàmic, idioma) i exportar. Sense crashs ni regles de Koin, `NavKey` o Room: les regles de les llibreries n'hi ha prou.
+- [x] **`isShrinkResources`:** no cal; amb `optimization { enable = true }` AGP 9 ja redueix els recursos (`resources.txt` al mapping).
+- [x] **Símbols natius:** `ndk { debugSymbolLevel = "SYMBOL_TABLE" }` al `buildTypes.release`.
 - [ ] **Fitxa de Play per a producció:** revisar la fitxa en ca/es/en, les captures en clar i fosc i el formulari de seguretat de les dades.
 
 ### Proves manuals
