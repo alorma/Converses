@@ -57,7 +57,7 @@ enum class AvatarShape {
   }
 }
 
-private val AvatarInitialsColor = Color(0xFF1E1D24)
+internal val AvatarInitialsColor = Color(0xFF1E1D24)
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
