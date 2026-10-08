@@ -119,10 +119,10 @@ Una sola activitat (`MainActivity`, una `FragmentActivity` pel `BiometricPrompt`
 | Onboarding | `OnboardingRoute` | Només el primer cop (`OnboardingFlag`); en acabar substitueix la pila per `PeopleRoute` |
 | Llistat | `PeopleRoute` | Xips de filtre per canal (multiselecció, OR entre grups; cap marcat = tothom), nova persona a la capçalera i fila final, barra flotant (Persones · Arxivades · Ajustos) |
 | Arxivades | `ArchivedRoute` | Sense filtres de canal ni fila d'afegir; desarxivar només des del detall |
-| Detall | `PersonRoute(id)` | Només «Cronologia» és títol de secció; les dades són un bloc plegable sense títol (`CollapsibleFacts`: plegat mostra la primera dada i la pastilla «+N»; l'estat és efímer). Split button «Nota ▾», llapis d'editar, ⋮ a cada entrada, `FLAG_SECURE` si és protegida. Persona amb poques dades: subtítol «Des de {mes any}», pastilla «+ On hi parles», fila «Afegeix una dada» i entrada fantasma amb Jo / {nom} / Apunt (obre Nova entrada amb aquest «Qui» i el teclat); desapareixen quan hi ha el primer canal, dada o entrada |
+| Detall | `PersonRoute(id)` | Només «Cronologia» és títol de secció; les dades són un bloc plegable sense títol (`CollapsibleFacts`: plegat mostra la primera dada i la pastilla «+N»; l'estat és efímer). Pastilles de canal a la capçalera, derivades de les entrades (grups usats, ordre fix; sense entrades no n'hi ha cap; no són editables). Split button «Nota ▾», llapis d'editar, ⋮ a cada entrada, `FLAG_SECURE` si és protegida. Persona amb poques dades: subtítol «Des de {mes any}», fila «Afegeix una dada» i entrada fantasma amb Jo / {nom} / Apunt (obre Nova entrada amb aquest «Qui» i el teclat); desapareixen quan hi ha la primera dada o entrada |
 | Desbloqueig | `PersonLockedRoute(id)` | `BiometricPrompt` automàtic; si va bé, substitueix la ruta pel detall |
 | Nota ràpida | `QuickNoteRoute(personId?)` | Sense persona per defecte; una protegida demana l'empremta en triar-la |
-| Editar/crear | `EditPersonRoute(personId, focus)` | `0` = persona nova; en crear, va al detall; `focus` (`EditFocus.CHANNELS` / `NEW_FACT`) fa scroll fins a «On hi parles» o afegeix una dada i en posa el focus |
+| Editar/crear | `EditPersonRoute(personId, focus)` | `0` = persona nova; en crear, va al detall; `focus` (`EditFocus.NEW_FACT`) afegeix una dada i en posa el focus; l'editor ja no té selecció de canals |
 | Ajustos | `SettingsRoute` | Inclou la política de privadesa |
 | Fulls i diàlegs | Dins del detall i de l'editor | Nova entrada, accions d'entrada, menú del split button, triar persona, «Quan», «Avatar», esborrar |
 
@@ -131,7 +131,7 @@ Una sola activitat (`MainActivity`, una `FragmentActivity` pel `BiometricPrompt`
 | Taula | Camps |
 | --- | --- |
 | `person` | `id`, `name`, `alias?`, `avatarShape?`, `avatarColor?` (`null` = estàndard), `isProtected`, `archived`, `notes?`, `createdAt`, `updatedAt` |
-| `channel` | `id`, `personId`, `type` (conjunt de canals de la persona, sense usuari) |
+| `channel` | `id`, `personId`, `type`. **Ja no s'usa**: l'app no la llegeix ni l'escriu (els canals d'una persona es deriven de les seves entrades); es manté a la BD perquè els sub-canals Pro (backlog 8) la puguin reaprofitar |
 | `entry` | `id`, `personId`, `kind` (`SAID`, `HEARD`, `HAPPENED`), `channelType`, `text`, `occurredAt` |
 | `pinned_fact` | `id`, `personId`, `label`, `value`, `position` |
 
@@ -155,7 +155,7 @@ Darrere de `PersonColorFeature`. Encès, cada persona porta el color de l'avatar
 ### Formulari d'entrada, «Quan» i «Qui»
 
 - `EntryForm` és l'únic formulari (nota ràpida, nova entrada i edició), amb els slots `header` («Amb qui», només a la nota ràpida) i `saveButton`. Ordre: Qui, text, On, Quan.
-- «On»: `FilterChip` de selecció única amb els canals de la persona (o tots si no en té); per defecte, el canal de la seva última entrada.
+- «On»: `FilterChip` de selecció única amb els 5 grups, sempre; per defecte, el canal de la seva última entrada.
 - «Quan»: fila `WhenRow` que obre `WhenSheet` («Quan va ser?»): Ara, Fa una hora, Ahir a aquesta hora i Tria dia i hora…. `WhenChoice` (`Now`, `HourAgo`, `Yesterday`, `Custom`, `Stored`); «Ara» es resol en desar i un `Custom` en el futur es retalla a l'hora actual.
 - «Qui»: `EntryKind` no canvia; es mostra com **Jo**, **{primer nom}** i **Apunt**. `whoLabel(...)` és l'única funció d'etiquetes (cronologia, full d'accions i exportació). Selector `WhoSelector` (`ConversesToggleGroup` prominent). Cronologia amb marcadors de 32 dp i filtres de multiselecció.
 - Exportació: text pla `[data · canal] Jo: text`, compartit amb el full del sistema.
@@ -173,7 +173,7 @@ Darrere de `PersonColorFeature`. Encès, cada persona porta el color de l'avatar
 
 ### Components propis (`designsystem`)
 
-`Avatar`, `GroupedList` / `groupedItems`, `TimelineRow` i `TimelineMarker`, `ConversesFilterChip`, `ConversesChannelChip`, `ConversesToggleGroup`, `ConversesFloatingToolbar` i `ToolbarDestination`, `ConversesSplitButton` i `ConversesMenuItem`, `SettingRow` / `SettingSwitchRow`, `DashedActionRow`, `EmptyState` i `WelcomeEmptyState` (llistat sense cap persona), `ColorSwatches`, `ConversesLoadingIndicator`, `ConversesTheme`, `PersonTheme` i `AppColors`. A l'app: `PersonPickerSheet`, `ChannelsCard`, `AvatarSheet`.
+`Avatar`, `GroupedList` / `groupedItems`, `TimelineRow` i `TimelineMarker`, `ConversesFilterChip`, `ConversesChannelChip`, `ConversesToggleGroup`, `ConversesFloatingToolbar` i `ToolbarDestination`, `ConversesSplitButton` i `ConversesMenuItem`, `SettingRow` / `SettingSwitchRow`, `DashedActionRow`, `EmptyState` i `WelcomeEmptyState` (llistat sense cap persona), `ColorSwatches`, `ConversesLoadingIndicator`, `ConversesTheme`, `PersonTheme` i `AppColors`. A l'app: `PersonPickerSheet`, `AvatarSheet`.
 
 ### Tests
 

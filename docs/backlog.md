@@ -46,7 +46,7 @@ Depèn del 13 (els 5 grups). Dins de qualsevol grup, inclòs «Altres», l'usuar
 - Taula nova a Room (persona, grup, nom, valor opcional) amb **migració i test**.
 - Sense icones pròpies de moment: cada sub-canal usa la del seu grup.
 - Si s'esborra un sub-canal, les entrades que hi apuntaven passen al grup (no es perd res).
-- Afecta: detall de persona, `EntryForm` («On»), `ChannelsCard` de l'editor, filtres (sub-xips en seleccionar un grup) i `PersonExporter.kt`.
+- Afecta: detall de persona, `EntryForm` («On»), editor de persona (ara sense selecció de canals), filtres (sub-xips en seleccionar un grup) i `PersonExporter.kt`. La taula `channel` es manté a la BD sense ús per reaprofitar-la.
 - Pregunta oberta: valor només informatiu o accionable (obrir WhatsApp, trucar, copiar). Si és accionable, mirar privadesa i permisos.
 - Les persones protegides no han de mostrar sub-canals ni valors abans de desbloquejar.
 
