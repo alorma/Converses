@@ -54,11 +54,12 @@ fun ConversesSaveButton(
 ) {
   val haptics = rememberConversesHaptics()
   Box(
-    modifier = modifier.pointerInput(enabled) {
+    modifier = Modifier.pointerInput(enabled) {
       if (!enabled) detectTapGestures { haptics.reject() }
     },
   ) {
     Button(
+      modifier = modifier,
       onClick = {
         haptics.confirm()
         onClick()
