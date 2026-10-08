@@ -38,8 +38,8 @@ Converses és una app Android per recordar què has dit, què t'han dit i què h
 - [x] **Mida de la font:** `roboto_flex.ttf` passa d'1,7 MB a 151 KB: subconjunt llatí (en/ca/es) i eixos limitats als que fa servir `Type.kt` (opsz 14–72, wght 400–800, wdth 100–118; la resta fixos). Es regenera amb `designsystem/fonts/subset.sh <original>`. Els caràcters fora del llatí (noms en altres alfabets) cauen a la font del sistema.
 - [x] **Provar el release sencer:** l'APK de release (R8) provat a l'emulador: llistat, crear persona, detall, nova entrada, nota ràpida amb persona, persona protegida (PIN amb `BiometricPrompt`), Ajustos (tema, color dinàmic, idioma) i exportar. Sense crashs ni regles de Koin, `NavKey` o Room: les regles de les llibreries n'hi ha prou.
 - [x] **`isShrinkResources`:** no cal; amb `optimization { enable = true }` AGP 9 ja redueix els recursos (`resources.txt` al mapping).
-- [x] **Símbols natius:** `ndk { debugSymbolLevel = "SYMBOL_TABLE" }` al `buildTypes.release`.
-- [ ] **Fitxa de Play per a producció:** revisar la fitxa en ca/es/en, les captures en clar i fosc i el formulari de seguretat de les dades.
+- [ ] **Símbols natius:** `ndk { debugSymbolLevel = "SYMBOL_TABLE" }` és al `buildTypes.release`, però en local l'AAB no porta `debugsymbols` (`libandroidx.graphics.path.so` ja ve sense símbols i AGP no n'ha extret de l'altra, potser per falta de NDK). Comprovar si el CI ho genera i si Play deixa d'avisar; no bloqueja.
+- [ ] **Fitxa de Play per a producció:** la fitxa (textos, icona, gràfic de funcions i 5 captures en en/ca/es) és a `app/src/main/play` i es puja amb `publish-listing.yml`. Falta executar-lo, revisar-la a la Play Console i omplir el formulari de seguretat de les dades (només a mà).
 
 ### Proves manuals
 
@@ -173,7 +173,8 @@ Darrere de `PersonColorFeature`. Encès, cada persona porta el color de l'avatar
 ### CI i release
 
 - `pr-build.yml` i `build-apk.yml`: tests unitaris, APK de debug i release.
+- `publish-listing.yml` (manual): puja la fitxa de Play (`publishReleaseListing`) des de `app/src/main/play`. Comparteix el grup de concurrència `play-publish` amb `release.yml`, perquè Play només admet una edició oberta a la vegada.
 - `screenshot-tests.yml`: valida les captures a cada PR i deixa un comentari amb les diferències; l'etiqueta `update-screenshots` regenera les referències; a `main`, si alguna falla, obre una PR des de `screenshots/main-update`.
-- `release.yml` (manual, sobre `main`, entrada `track`, beta per defecte): construeix l'APK i l'AAB signats, puja l'AAB a Google Play (`SERVICE_ACCOUNT_JSON`, paquet `com.alorma.contactnotes`), crea el tag i la GitHub Release i puja la versió menor a `main`.
+- `release.yml` (manual, sobre `main`, entrada `track`, beta per defecte): construeix l'APK i l'AAB signats, puja l'AAB i les notes de la versió de `app/src/main/play/release-notes` amb Gradle Play Publisher (`publishReleaseBundle`, `SERVICE_ACCOUNT_JSON` com a `ANDROID_PUBLISHER_CREDENTIALS`, paquet `com.alorma.contactnotes`; el mapping de R8 va dins l'AAB), crea el tag i la GitHub Release i puja la versió menor a `main`.
 - **Signatura:** la `signingConfig` `release` només existeix si hi ha `certs/release.keystore` (fora del repo) i `KEYSTORE_PASSWORD`, `KEY_ALIAS`, `KEY_PASSWORD`; a la CI la keystore ve del secret `RELEASE_KEYSTORE_BASE64`. Debug: `app/debug.keystore` al repo i `applicationIdSuffix = ".debug"`.
 - **Versió:** plugin `io.github.alorma.version` a partir de `version.properties`; no s'escriu a mà a `build.gradle.kts`.
