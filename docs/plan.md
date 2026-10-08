@@ -70,7 +70,7 @@ Sense data: es va sincronitzant amb l'app a mesura que convé i no bloqueja res.
 El detall és a `docs/backlog.md`. Els punts 6 i 8 necessiten migració (la v3; vegeu «Regla de la base de dades»); el 11 no. Els punts 12, 14 i 15 vénen del feedback de la beta (issues #40, #43 i #44; el #45 s'ha descartat) i són tasques independents. Els canals en 5 grups (punt 13, issue #42, migració v1 → v2) ja estan fets i van a la 1.5.0.
 
 - **Follow-ups / entrades pendents o planificades (6, issue #5):** flag `pending` a `EntryEntity` i interruptor a `EntryForm`, sota de «Quan». Migració v2 → v3. És Pro.
-- **Sub-canals (8):** dins dels 5 grups, amb nom lliure (únic per persona) i valor opcional. Absorbeix «Empresa» (7). És Pro. Reaprofita la taula `channel`, que ja no s'usa.
+- **Sub-canals (8):** dins dels 5 grups, amb nom lliure (únic per persona) i valor opcional. Absorbeix «Empresa» (7). És Pro. Necessitarà una taula nova (persona, grup, nom, valor).
 - **Importar text a la nota ràpida, «share invers» (11, issue #30):** compartir text des d'altres apps (`ACTION_SEND`), seleccionar text (`ACTION_PROCESS_TEXT`) i un botó «Enganxa» al porta-retalls; la nota ràpida s'obre amb el text posat i només cal triar la persona. Sense canvis a Room, no cal migració. És gratis.
 - **Feedback de la beta, tasques independents:**
   - **12 · Nota ràpida (bug, #40):** el xip «Persona» de «Qui» sense persona obre el selector en comptes de ser desactivat.
@@ -132,11 +132,10 @@ Una sola activitat (`MainActivity`, una `FragmentActivity` pel `BiometricPrompt`
 | Taula | Camps |
 | --- | --- |
 | `person` | `id`, `name`, `alias?`, `avatarShape?`, `avatarColor?` (`null` = estàndard), `isProtected`, `archived`, `notes?`, `createdAt`, `updatedAt` |
-| `channel` | `id`, `personId`, `type`. **Ja no s'usa**: l'app no la llegeix ni l'escriu (els canals d'una persona es deriven de les seves entrades); es manté a la BD perquè els sub-canals Pro (backlog 8) la puguin reaprofitar |
 | `entry` | `id`, `personId`, `kind` (`SAID`, `HEARD`, `HAPPENED`), `channelType`, `text`, `occurredAt` |
 | `pinned_fact` | `id`, `personId`, `label`, `value`, `position` |
 
-Totes les claus `personId` tenen `onDelete = CASCADE`, i hi ha un índex a `entry(personId, occurredAt)`. Canals (`ChannelType`, en aquest ordre): En persona · Telèfon · Xat · Social · Altres. Els filtres del llistat són aquests mateixos 5 valors. Migració v1 → v2 (`Migrations.kt`): WhatsApp, Telegram, Signal, Discord i Correu → Xat; X, Instagram, LinkedIn i Reddit → Social; es dedupliquen per persona.
+Totes les claus `personId` tenen `onDelete = CASCADE`, i hi ha un índex a `entry(personId, occurredAt)`. Canals (`ChannelType`, en aquest ordre): En persona · Telèfon · Xat · Social · Altres; només etiqueten cada entrada (`entry.channelType`), la persona no en té de propis (es deriven de les entrades) i la taula `channel` de la v1 es va esborrar a la migració v1 → v2. Els filtres del llistat són aquests mateixos 5 valors. Migració v1 → v2 (`Migrations.kt`): WhatsApp, Telegram, Signal, Discord i Correu → Xat; X, Instagram, LinkedIn i Reddit → Social; es dedupliquen per persona.
 
 ### Tema
 

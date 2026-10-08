@@ -44,7 +44,7 @@ Mai es cobra per **accedir, protegir o treure** les dades pròpies. Al Pro hi va
 ## Decidit
 
 - **Canal «Empresa»** (backlog 7): ja no és un canal del sistema; és un sub-canal d'«Altres» (Pro).
-- Els canals que els usuaris de la beta tenien (WhatsApp, Telegram…) es migren al seu grup en una sola entrada; no es mantenen gratis.
+- Els canals de les entrades de la beta (WhatsApp, Telegram…) passen al seu grup i les persones deixen de tenir canals propis; no es mantenen gratis.
 
 ## Proves
 
