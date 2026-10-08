@@ -1,6 +1,6 @@
 # Converses — Pla i estat
 
-Actualitzat el 8 d'oct. de 2026 · @Bernat · **la v1 és publicada a Google Play (pista alpha).** Aquest document només recull l'estat actual, el que queda per fer i la referència tècnica; el detall de la feina ja feta és a l'historial de git.
+Actualitzat el 8 d'oct. de 2026 · @Bernat · **la v1 és publicada a Google Play (pista beta).** Aquest document només recull l'estat actual, el que queda per fer i la referència tècnica; el detall de la feina ja feta és a l'historial de git.
 
 ## Resum
 
@@ -27,7 +27,7 @@ Converses és una app Android per recordar què has dit, què t'han dit i què h
 | M4 · Qualitat | Fet (amb excepcions acceptades) |
 | Versió gratuïta (flags, avatar estàndard, redisseny de l'editor) | Fet (falta la prova final de «res de Pro visible») |
 | Menú de debug | Fet (falta provar-lo a l'emulador) |
-| M5 · Publicació | Publicada a alpha; només queda la fitxa de Play per a producció |
+| M5 · Publicació | Publicada a beta; només queda la fitxa de Play per a producció |
 | Iteració 2 | Després de la publicació |
 | Pro | Planificat (`docs/pro.md`) |
 
@@ -174,6 +174,6 @@ Darrere de `PersonColorFeature`. Encès, cada persona porta el color de l'avatar
 
 - `pr-build.yml` i `build-apk.yml`: tests unitaris, APK de debug i release.
 - `screenshot-tests.yml`: valida les captures a cada PR i deixa un comentari amb les diferències; l'etiqueta `update-screenshots` regenera les referències; a `main`, si alguna falla, obre una PR des de `screenshots/main-update`.
-- `release.yml` (manual, sobre `main`, entrada `track`, alpha per defecte): construeix l'APK i l'AAB signats, puja l'AAB a Google Play (`SERVICE_ACCOUNT_JSON`, paquet `com.alorma.contactnotes`), crea el tag i la GitHub Release i puja la versió menor a `main`.
+- `release.yml` (manual, sobre `main`, entrada `track`, beta per defecte): construeix l'APK i l'AAB signats, puja l'AAB a Google Play (`SERVICE_ACCOUNT_JSON`, paquet `com.alorma.contactnotes`), crea el tag i la GitHub Release i puja la versió menor a `main`.
 - **Signatura:** la `signingConfig` `release` només existeix si hi ha `certs/release.keystore` (fora del repo) i `KEYSTORE_PASSWORD`, `KEY_ALIAS`, `KEY_PASSWORD`; a la CI la keystore ve del secret `RELEASE_KEYSTORE_BASE64`. Debug: `app/debug.keystore` al repo i `applicationIdSuffix = ".debug"`.
 - **Versió:** plugin `io.github.alorma.version` a partir de `version.properties`; no s'escriu a mà a `build.gradle.kts`.
