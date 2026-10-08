@@ -42,7 +42,7 @@ El haptic confirma accions amb efecte i marca errors, igual que el vermell nomé
 | Desa entrada (nova o editar) | `Confirm` / `Reject` | `NewEntrySheet` |
 | Persona protegida | `ToggleOn` / `ToggleOff` | `EditPersonScreen`, després que l'empremta vagi bé |
 | Bloqueig de l'app | `ToggleOn` / `ToggleOff` | `SettingsScreen`, després de l'empremta |
-| Xips de canal | `SegmentTick` | `EntryForm` (només si canvia), `ChannelsCard` de l'editor i `FilterRow` del llistat |
+| Xips de canal | `SegmentTick` | `EntryForm` (només si canvia) i `FilterRow` del llistat |
 | Reordenar dades | `LongPress` en agafar, `SegmentTick` a cada posició | `FactsEditor` |
 | Esborra persona i esborra dia | `Confirm` | `DeletePersonDialog`, `ConfirmDeleteDialog` |
 | Esborrar una entrada | `Confirm` | `PersonDetailScreen`, ⋮ → Esborra |
