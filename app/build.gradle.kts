@@ -60,6 +60,10 @@ android {
       optimization {
         enable = true
       }
+      // Símbols de les .so de les llibreries (graphics-path, datastore): Play deixa de avisar que l'AAB no en porta
+      ndk {
+        debugSymbolLevel = "SYMBOL_TABLE"
+      }
       signingConfigs.findByName("release")?.let { signingConfig = it }
     }
   }
