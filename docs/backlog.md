@@ -126,17 +126,25 @@ Ara hi ha un split FAB amb **Nota** i un menú amb **Exportar notes** i **Arxiva
 - `ConversesSplitButton` es queda a `:designsystem`, encara que l'app no el faci servir.
 - Persones protegides: l'exportació no canvia. Sense Room. Actualitzar les captures del detall.
 
-## 15 · Millora: «Quant a» als Ajustos
+## 15 · Millora: ampliar «Quant a» als Ajustos
 
 Issue: [#43](https://github.com/alorma/Converses/issues/43)
 
-Entrada «Quant a» als Ajustos, amb subpantalla (`ConversesTopBar`, mateixes regles de `Scaffold`):
-- Autor i una manera de contactar o seguir el projecte.
-- Nom de l'app i versió.
-- Enllaç al repositori (si és públic) i llicències de codi obert.
-- Política de privadesa / fitxa de Play, i enviar feedback.
+Ajustos **ja té** una secció «Quant a» (`settings_about`) amb la política de privadesa i, al peu, «Converses · versió X». Cal ampliar-la perquè es vegi qui hi ha darrere de l'app.
 
-Pendent de decidir: dades i enllaços concrets. Textos a `strings.xml` (en, ca, es). Sense Room.
+**Decidit**
+- **Opció A:** més files a la secció actual (`SettingsScreen.kt`), sense subpantalla.
+- **Sense llicències de codi obert de moment** (quedaria per més endavant, amb una pantalla pròpia o AboutLibraries, mirant abans la versió estable).
+
+**Files a afegir**, a sota de la privadesa
+- **Qui ho fa:** el nom de l'autor amb un enllaç.
+- **Codi font:** enllaç al repositori, si és públic.
+- **Enviar feedback:** correu o formulari.
+- Opcional: **Valorar a Google Play**.
+
+**Dades a decidir:** nom i enllaç de l'autor, si el repositori és públic, i el canal del feedback (`mailto:` o issues de GitHub; el correu quedaria exposat).
+
+Textos a `strings.xml` (en, ca, es) i captures d'Ajustos. Sense Room.
 
 ## 16 · Millora: idiomes disponibles
 

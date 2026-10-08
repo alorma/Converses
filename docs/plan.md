@@ -75,7 +75,7 @@ El detall és a `docs/backlog.md`. Els punts 6, 8 i 13 necessiten migració (veg
 - **Feedback de la beta, tasques independents (després del 13):**
   - **12 · Nota ràpida (bug, #40):** el xip «Persona» de «Qui» sense persona obre el selector en comptes de ser desactivat.
   - **14 · Accions del detall (#44):** FAB estès només per a «Nota»; a la `topBar`, icones Editar i Compartir i un «⋮» amb Arxivar.
-  - **15 · «Quant a» als Ajustos (#43):** autor, versió, repositori i llicències, privadesa i feedback.
+  - **15 · Ampliar «Quant a» als Ajustos (#43):** la secció ja existeix (privadesa i versió); s'hi afegeixen autor, repositori i feedback, sense llicències de moment. Dades per decidir.
   - **16 · Idiomes (#45):** mostrar els disponibles i l'actiu a Ajustos; valorar gallec i italià.
   - **17 · Cerca (#41):** nom i text de les entrades; les protegides només pel nom. `LIKE` o FTS (FTS exigeix migració).
 
