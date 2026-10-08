@@ -8,7 +8,7 @@ paths:
 
 # Room: the database is published
 
-Converses v1 is live on Google Play (alpha track). Real users have a `converses.db` at schema version 1. **Every database change MUST ship with a migration and a migration test.** No exceptions, no "it's only alpha".
+Converses v1 is live on Google Play (beta track). Real users have a `converses.db` at schema version 1. **Every database change MUST ship with a migration and a migration test.** No exceptions, no "it's only beta".
 
 ## What counts as a schema change
 
