@@ -66,7 +66,7 @@ Sense data: es va sincronitzant amb l'app a mesura que convé i no bloqueja res.
 
 ## Iteració 2 (després de la publicació)
 
-El detall és a `docs/backlog.md`. Els punts 6, 8 i 13 necessiten migració (vegeu «Regla de la base de dades»); el 11 no. Els punts 12 i 14–17 vénen del feedback de la beta (issues #40–#45) i són tasques independents; el 13 (canals) va primer i porta la migració v1 → v2.
+El detall és a `docs/backlog.md`. Els punts 6, 8 i 13 necessiten migració (vegeu «Regla de la base de dades»); el 11 no. Els punts 12, 14, 15 i 17 vénen del feedback de la beta (issues #40, #41, #43 i #44; el #45 s'ha descartat) i són tasques independents; el 13 (canals) va primer i porta la migració v1 → v2.
 
 - **Refactor dels canals (13, issue #42), la primera tasca:** `ChannelType` passa a En persona, Telèfon, Xat, Social i Altres; els canals actuals es migren al seu grup (migració v1 → v2, equivalències a decidir a la tasca), avís genèric als usuaris i badge «beta» al títol de la llista. Gratis.
 - **Follow-ups / entrades pendents o planificades (6, issue #5):** flag `pending` a `EntryEntity` i interruptor a `EntryForm`, sota de «Quan». Primera migració (v1 → v2). És Pro.
@@ -76,7 +76,6 @@ El detall és a `docs/backlog.md`. Els punts 6, 8 i 13 necessiten migració (veg
   - **12 · Nota ràpida (bug, #40):** el xip «Persona» de «Qui» sense persona obre el selector en comptes de ser desactivat.
   - **14 · Accions del detall (#44):** FAB estès només per a «Nota»; a la `topBar`, icones Editar i Compartir i un «⋮» amb Arxivar.
   - **15 · Ampliar «Quant a» als Ajustos (#43):** la secció ja existeix (privadesa i versió); s'hi afegeixen autor, repositori i feedback, sense llicències de moment. Dades per decidir.
-  - **16 · Idiomes (#45):** mostrar els disponibles i l'actiu a Ajustos; valorar gallec i italià.
   - **17 · Cerca (#41):** nom i text de les entrades; les protegides només pel nom. `LIKE` o FTS (FTS exigeix migració).
 
 ## Després de la v1
