@@ -94,14 +94,6 @@ class FakePersonDao(private val db: FakeDb) : PersonDao() {
     db.facts.update { list -> list.filterNot { it.personId == person.id } }
   }
 
-  override suspend fun insertChannels(channels: List<ChannelEntity>) {
-    db.channels.update { list -> list + channels.map { it.copy(id = db.nextId()) } }
-  }
-
-  override suspend fun deleteChannels(personId: Long) {
-    db.channels.update { list -> list.filterNot { it.personId == personId } }
-  }
-
   override suspend fun insertFacts(facts: List<PinnedFactEntity>) {
     db.facts.update { list -> list + facts.map { it.copy(id = db.nextId()) } }
   }

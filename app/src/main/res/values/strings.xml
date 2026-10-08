@@ -66,7 +66,6 @@
     <string name="app_lock_prompt_title">Unlock Converses</string>
     <string name="today">Today</string>
     <string name="person_since">Since %1$s</string>
-    <string name="empty_channels_cta">Where you talk</string>
     <string name="empty_facts_title">Add info</string>
     <string name="empty_facts_hint">Work, family, birthday, where they\'re from…</string>
     <string name="empty_timeline_title">Nothing here yet</string>
@@ -145,12 +144,6 @@
     <string name="move_up">Move up</string>
     <string name="move_down">Move down</string>
     <string name="reorder">Reorder</string>
-    <string name="channels_title">Where you talk</string>
-    <string name="channels_count_none">None</string>
-    <plurals name="channels_count">
-        <item quantity="one">%d selected</item>
-        <item quantity="other">%d selected</item>
-    </plurals>
     <string name="protected_person">Protected person</string>
     <string name="protected_person_summary">Needs your fingerprint to be viewed. The last comment isn\'t shown in the list.</string>
     <string name="protected_unavailable">Needs a fingerprint or a screen lock on the device</string>
