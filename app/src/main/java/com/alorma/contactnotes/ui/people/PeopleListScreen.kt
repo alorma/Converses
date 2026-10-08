@@ -2,6 +2,7 @@ package com.alorma.contactnotes.ui.people
 
 import com.alorma.contactnotes.data.db.shape
 import com.alorma.contactnotes.data.db.color
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -101,18 +102,23 @@ fun PeopleListScreen(
         contentPadding = PaddingValues(start = ScreenMargin, end = ScreenMargin, bottom = 136.dp),
         verticalArrangement = Arrangement.spacedBy(GroupedListDefaults.ItemSpacing),
       ) {
-        item(key = "header") {
-          Header(
-            archived = archived,
-            total = state.total,
-            isLoading = state.isLoading,
-            onNewPerson = onNewPerson,
-            modifier = Modifier.windowInsetsPadding(WindowInsets.statusBars),
-          )
-        }
-        if (!archived) {
-          item(key = "filters") {
-            FilterRow(selected = state.filter, onSelected = onFilterSelected)
+        // Capçalera i filtres fixos a dalt: el fons opac tapa la llista que passa per sota, també l'àrea de la barra d'estat
+        stickyHeader(key = "header") {
+          Column(
+            modifier = Modifier
+              .background(MaterialTheme.colorScheme.surface)
+              .windowInsetsPadding(WindowInsets.statusBars),
+            verticalArrangement = Arrangement.spacedBy(GroupedListDefaults.ItemSpacing),
+          ) {
+            Header(
+              archived = archived,
+              total = state.total,
+              isLoading = state.isLoading,
+              onNewPerson = onNewPerson,
+            )
+            if (!archived) {
+              FilterRow(selected = state.filter, onSelected = onFilterSelected)
+            }
           }
         }
         if (!state.isLoading && state.people.isEmpty()) {
