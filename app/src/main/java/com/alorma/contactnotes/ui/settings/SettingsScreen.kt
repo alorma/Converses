@@ -45,6 +45,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -141,24 +142,38 @@ fun SettingsContent(
   onOpenPrivacyPolicy: () -> Unit,
   showPersonColor: Boolean = true,
 ) {
-  Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.surface) {
+  Scaffold(
+    containerColor = MaterialTheme.colorScheme.surface,
+    contentWindowInsets = WindowInsets.navigationBars,
+    topBar = {
+      // Fixa a dalt: la fletxa i el títol no fan scroll amb els grups
+      Column(
+        modifier = Modifier
+          .fillMaxWidth()
+          .background(MaterialTheme.colorScheme.surface)
+          .windowInsetsPadding(WindowInsets.statusBars)
+          .padding(horizontal = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+      ) {
+        IconButton(onClick = onBack) {
+          Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = stringResource(R.string.back))
+        }
+        Text(
+          text = stringResource(R.string.settings_title),
+          style = ScreenTitleStyle,
+          modifier = Modifier.padding(start = 4.dp, bottom = 8.dp),
+        )
+      }
+    },
+  ) { padding ->
     Column(
       modifier = Modifier
         .fillMaxSize()
         .verticalScroll(rememberScrollState())
-        .windowInsetsPadding(WindowInsets.statusBars)
-        .windowInsetsPadding(WindowInsets.navigationBars)
-        .padding(horizontal = 16.dp),
+        .padding(padding)
+        .padding(start = 16.dp, end = 16.dp, top = 12.dp),
       verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-      IconButton(onClick = onBack) {
-        Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = stringResource(R.string.back))
-      }
-      Text(
-        text = stringResource(R.string.settings_title),
-        style = ScreenTitleStyle,
-        modifier = Modifier.padding(start = 4.dp, bottom = 8.dp),
-      )
 
       SettingsGroup(
         title = { SectionTitle(stringResource(R.string.settings_appearance)) },
