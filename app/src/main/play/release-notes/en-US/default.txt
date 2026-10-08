@@ -1,4 +1,5 @@
-Version 1.2.0:
-• The header finally stopped running away when you scroll. Title and filters now stay put, as they should have since day one.
-• The app is on a diet: 1.6 MB of font gone, and nobody will miss it.
+Version 1.4.0:
+• Your phone now buzzes when you save or confirm. If you hate it, there is a setting to make it stop.
+• Screens slide like a proper Android app, and the back gesture shows where you're going.
+• Channel filters are now chips you can combine, and empty states have a shape you can poke.
 • A few small fixes you won't notice, which is exactly the point.
