@@ -1,4 +1,5 @@
-Versión 1.2.0:
-• La cabecera por fin ha dejado de huir al hacer scroll. El título y los filtros se quedan quietos, como debió ser desde el primer día.
-• La app se ha puesto a dieta: 1,6 MB de letra menos, y nadie los echará de menos.
+Versión 1.4.0:
+• El móvil ahora vibra al guardar o confirmar. Si te molesta, hay un ajuste para hacerlo callar.
+• Las pantallas se deslizan como en una app de Android de verdad, y el gesto de volver enseña adónde vas.
+• Los filtros de canal ahora son chips combinables, y los estados vacíos tienen una forma que puedes tocar.
 • Unas cuantas correcciones pequeñas que no notarás, que es justo la idea.
