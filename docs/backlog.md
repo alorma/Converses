@@ -108,6 +108,7 @@ Els 11 valors de `ChannelType` passen a **5 grups fixos**: **En persona, Telèfo
 - **Badge «beta»** al títol de la primera pantalla (la llista de persones).
 - Textos a `strings.xml` (en, ca, es), captures i actualitzar `docs/plan.md` i `docs/pro.md`.
 - Pot compartir la migració v1 → v2 amb el 6 (follow-ups) si van junts.
+- **Per treure més endavant:** l'avís dels canals (banner, `showChannelsNotice`, flag `channelsNoticePending` i el callback de `Migration1To2`) quan la v1 sigui residual a la Play Console. La migració i el seu test **no es treuen mai**.
 
 ## 14 · Millora: accions del detall de persona
 
