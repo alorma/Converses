@@ -1,4 +1,5 @@
-Versió 1.2.0:
-• La capçalera per fi ha deixat de fugir quan fas scroll. El títol i els filtres es queden quiets, com havia de ser des del primer dia.
-• L'app ha anat a dieta: 1,6 MB de lletra menys, i ningú no ho trobarà a faltar.
+Versió 1.3.0:
+• El mòbil ara vibra quan deses o confirmes. Si t'emprenya, hi ha un ajust per fer-lo callar.
+• Les pantalles llisquen com en una app d'Android de debò, i el gest de tornar ensenya on vas.
+• Els filtres de canal ara són xips combinables, i els estats buits tenen una forma que pots tocar.
 • Unes quantes correccions petites que no notaràs, que és exactament la idea.
