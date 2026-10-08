@@ -58,8 +58,7 @@ class PersonDetailViewModelTest {
   }
 
   @Test
-  fun channelsStayEmptyWithoutEntriesEvenIfOldChannelRowsExist() = runTest {
-    db.addChannel(person.id, ChannelType.PHONE)
+  fun channelsStayEmptyWithoutEntries() = runTest {
     val vm = viewModel()
 
     assertTrue(vm.uiState.value.channels.isEmpty())

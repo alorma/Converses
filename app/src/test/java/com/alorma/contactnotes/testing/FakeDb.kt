@@ -1,7 +1,6 @@
 package com.alorma.contactnotes.testing
 
 import com.alorma.contactnotes.data.ConversesRepository
-import com.alorma.contactnotes.data.db.ChannelEntity
 import com.alorma.contactnotes.data.db.ChannelType
 import com.alorma.contactnotes.data.db.EntryDao
 import com.alorma.contactnotes.data.db.EntryEntity
@@ -23,7 +22,6 @@ import kotlinx.coroutines.flow.update
 /** Base de dades en memòria que fan servir els DAOs falsos; evita Room i Robolectric als tests de ViewModel. */
 class FakeDb {
   val people = MutableStateFlow<List<PersonEntity>>(emptyList())
-  val channels = MutableStateFlow<List<ChannelEntity>>(emptyList())
   val entries = MutableStateFlow<List<EntryEntity>>(emptyList())
   val facts = MutableStateFlow<List<PinnedFactEntity>>(emptyList())
   private var next = 1L
@@ -54,12 +52,6 @@ class FakeDb {
     return person
   }
 
-  fun addChannel(personId: Long, type: ChannelType): ChannelEntity {
-    val channel = ChannelEntity(id = nextId(), personId = personId, type = type)
-    channels.update { it + channel }
-    return channel
-  }
-
   fun addEntry(
     personId: Long,
     kind: EntryKind = EntryKind.SAID,
@@ -88,7 +80,6 @@ class FakePersonDao(private val db: FakeDb) : PersonDao() {
 
   override suspend fun delete(person: PersonEntity) {
     db.people.update { list -> list.filterNot { it.id == person.id } }
-    db.channels.update { list -> list.filterNot { it.personId == person.id } }
     db.entries.update { list -> list.filterNot { it.personId == person.id } }
     db.facts.update { list -> list.filterNot { it.personId == person.id } }
   }

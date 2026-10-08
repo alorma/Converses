@@ -46,31 +46,17 @@ class MigrationTest {
   }
 
   @Test
-  fun migrate1To2DeduplicatesChannelsThatEndUpInTheSameGroup() {
+  fun migrate1To2DropsTheChannelTableButKeepsPeopleAndEntries() {
     helper.createDatabase(TEST_DB, 1).use { db ->
       db.insertPerson(1)
-      db.insertPerson(2)
-      listOf("WHATSAPP", "TELEGRAM", "EMAIL", "X", "REDDIT", "IN_PERSON").forEach { db.insertChannel(1, it) }
-      db.insertChannel(2, "SIGNAL")
-    }
-
-    val db = helper.runMigrationsAndValidate(TEST_DB, 2, true, Migration1To2())
-
-    assertEquals(listOf("CHAT", "SOCIAL", "IN_PERSON"), db.strings("SELECT type FROM channel WHERE personId = 1 ORDER BY id"))
-    assertEquals(listOf("CHAT"), db.strings("SELECT type FROM channel WHERE personId = 2"))
-  }
-
-  @Test
-  fun migrate1To2KeepsValuesThatAreAlreadyGroupsAndTheData() {
-    helper.createDatabase(TEST_DB, 1).use { db ->
-      db.insertPerson(1)
-      db.insertChannel(1, "PHONE")
+      listOf("WHATSAPP", "TELEGRAM", "X", "IN_PERSON").forEach { db.insertChannel(1, it) }
       db.insertEntry(1, "PHONE")
     }
 
     val db = helper.runMigrationsAndValidate(TEST_DB, 2, true, Migration1To2())
 
-    assertEquals(listOf("PHONE"), db.strings("SELECT type FROM channel"))
+    assertTrue(db.strings("SELECT name FROM sqlite_master WHERE type = 'table' AND name = 'channel'").isEmpty())
+    assertEquals(listOf("P1"), db.strings("SELECT name FROM person"))
     assertEquals(listOf("PHONE"), db.strings("SELECT channelType FROM entry"))
     assertEquals(listOf("t"), db.strings("SELECT text FROM entry"))
   }
