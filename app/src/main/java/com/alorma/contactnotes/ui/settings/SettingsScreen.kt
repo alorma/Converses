@@ -36,6 +36,7 @@ import androidx.compose.material.icons.rounded.Face
 import androidx.compose.material.icons.rounded.Fingerprint
 import androidx.compose.material.icons.rounded.Language
 import androidx.compose.material.icons.rounded.Palette
+import androidx.compose.material.icons.rounded.Vibration
 import androidx.compose.material.icons.rounded.PrivacyTip
 import androidx.compose.material.icons.rounded.Timer
 import androidx.compose.material.icons.rounded.UnfoldMore
@@ -117,6 +118,7 @@ fun SettingsScreen(
     onThemeMode = viewModel::onThemeMode,
     onDynamicColor = viewModel::onDynamicColor,
     onPersonColorTheme = viewModel::onPersonColorTheme,
+    onHapticFeedback = viewModel::onHapticFeedback,
     onAppLockChange = { enabled ->
       activity.promptUnlock(authTitle, authSubtitle) {
         viewModel.onAppLock(enabled)
@@ -141,6 +143,7 @@ fun SettingsContent(
   onThemeMode: (ThemeMode) -> Unit,
   onDynamicColor: (Boolean) -> Unit,
   onPersonColorTheme: (Boolean) -> Unit,
+  onHapticFeedback: (Boolean) -> Unit,
   onAppLockChange: (Boolean) -> Unit,
   onRelockAfter: (Int) -> Unit,
   onOpenLanguage: () -> Unit,
@@ -179,7 +182,7 @@ fun SettingsContent(
         title = { SectionTitle(stringResource(R.string.settings_appearance)) },
         verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap),
       ) {
-        val themeCount = if (showPersonColor) 3 else 2
+        val themeCount = if (showPersonColor) 4 else 3
         ThemeModeRow(
           selected = settings.themeMode,
           onSelected = onThemeMode,
@@ -199,6 +202,14 @@ fun SettingsContent(
           icon = Icons.Rounded.Face,
           checked = settings.personColorTheme,
           onCheckedChange = onPersonColorTheme,
+          shape = groupedItemShape(2, themeCount),
+        )
+        SettingSwitchRow(
+          title = stringResource(R.string.settings_haptic),
+          subtitle = stringResource(R.string.settings_haptic_summary),
+          icon = Icons.Rounded.Vibration,
+          checked = settings.hapticFeedback,
+          onCheckedChange = onHapticFeedback,
           shape = groupedItemShape(themeCount - 1, themeCount),
         )
       }

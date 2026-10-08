@@ -100,6 +100,7 @@ Una sola activitat (`MainActivity`, una `FragmentActivity` pel `BiometricPrompt`
 | Dades | Room 2.8.5 + KSP 2.3.12 | Versió 1 publicada; tot canvi necessita migració |
 | DI | Koin 4.2.2 | |
 | Preferències | DataStore Preferences 1.2.1 | `SettingsRepository` i `FeatureFlagStore` |
+| Haptic | `ConversesHaptics` (`:designsystem`) | Única font del feedback haptic: `Confirm` en desar i esborrar, `Reject` en tocar Desa desactivat, `ToggleOn/Off` als interruptors, `SegmentTick` als selectors i xips. Mai al scroll ni a la navegació. Respecta el sistema i l'ajust «Feedback tàctil» d'Ajustos (`hapticFeedback`, per defecte actiu) |
 | Ajustos UI | Compose-Settings `ui-tiles-expressive` 3.3.0 | Només `SettingsGroup`; les files són pròpies (`SettingRow`) |
 | Biometria | `androidx.biometric` 1.1.0 | `BIOMETRIC_STRONG or DEVICE_CREDENTIAL` |
 | Onboarding | FireAndForget 1.3.0 (`com.github.alorma.fire-and-forget`, `core`) | `OnboardingFlag` amb un runner propi sobre DataStore |

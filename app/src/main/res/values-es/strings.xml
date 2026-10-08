@@ -35,6 +35,8 @@
     <string name="settings_theme_system">Sistema</string>
     <string name="settings_person_color">Color de la persona</string>
     <string name="settings_person_color_summary">Las pantallas de cada persona toman el color de su avatar</string>
+    <string name="settings_haptic">Respuesta háptica</string>
+    <string name="settings_haptic_summary">Vibra al guardar, cambiar un ajuste o confirmar</string>
     <string name="settings_dynamic_color">Color dinámico</string>
     <string name="settings_dynamic_color_summary">Toma el tono del fondo de pantalla</string>
     <string name="settings_language">Idioma</string>

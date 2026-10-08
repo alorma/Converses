@@ -27,6 +27,8 @@ private class FakeSettingsRepository : SettingsRepository {
 
   override suspend fun setPersonColorTheme(enabled: Boolean) = state.update { it.copy(personColorTheme = enabled) }
 
+  override suspend fun setHapticFeedback(enabled: Boolean) = state.update { it.copy(hapticFeedback = enabled) }
+
   override suspend fun setAppLock(enabled: Boolean) = state.update { it.copy(appLock = enabled) }
 
   override suspend fun setRelockAfterSeconds(seconds: Int) = state.update { it.copy(relockAfterSeconds = seconds) }
@@ -49,6 +51,7 @@ class SettingsViewModelTest {
     vm.onThemeMode(ThemeMode.Dark)
     vm.onDynamicColor(false)
     vm.onPersonColorTheme(false)
+    vm.onHapticFeedback(false)
     vm.onAppLock(true)
     vm.onRelockAfter(300)
 
@@ -56,6 +59,7 @@ class SettingsViewModelTest {
     assertEquals(ThemeMode.Dark, settings.themeMode)
     assertFalse(settings.dynamicColor)
     assertFalse(settings.personColorTheme)
+    assertFalse(settings.hapticFeedback)
     assertTrue(settings.appLock)
     assertEquals(300, settings.relockAfterSeconds)
   }
