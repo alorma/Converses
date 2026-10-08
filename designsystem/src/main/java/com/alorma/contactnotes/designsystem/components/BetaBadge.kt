@@ -11,16 +11,20 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 
 /** Píndola tonal de 22 dp amb el text de la versió (p. ex. «BETA»), al costat del títol de la llista. */
 @Composable
 fun BetaBadge(text: String, contentDescription: String, modifier: Modifier = Modifier) {
   val scheme = MaterialTheme.colorScheme
+  // Etiqueta decorativa de 22 dp: el text no escala amb la mida de lletra del sistema (la descripció sí que es llegeix)
+  val fontSize = with(LocalDensity.current) { 11.dp.toSp() }
+  val letterSpacing = with(LocalDensity.current) { 0.8.dp.toSp() }
+  val lineHeight = with(LocalDensity.current) { 14.dp.toSp() }
   Box(
     modifier = modifier
       .height(22.dp)
@@ -33,10 +37,12 @@ fun BetaBadge(text: String, contentDescription: String, modifier: Modifier = Mod
     Text(
       text = text,
       color = scheme.onPrimaryContainer,
-      fontSize = 11.sp,
+      fontSize = fontSize,
       fontWeight = FontWeight.ExtraBold,
-      letterSpacing = 0.8.sp,
+      letterSpacing = letterSpacing,
+      lineHeight = lineHeight,
       maxLines = 1,
+      softWrap = false,
     )
   }
 }
