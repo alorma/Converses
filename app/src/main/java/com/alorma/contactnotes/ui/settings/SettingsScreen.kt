@@ -27,6 +27,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
+import androidx.compose.material.icons.automirrored.rounded.OpenInNew
 import androidx.compose.material.icons.rounded.BrightnessAuto
 import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material.icons.rounded.DarkMode
@@ -34,7 +35,6 @@ import androidx.compose.material.icons.rounded.LightMode
 import androidx.compose.material.icons.rounded.Face
 import androidx.compose.material.icons.rounded.Fingerprint
 import androidx.compose.material.icons.rounded.Language
-import androidx.compose.material.icons.rounded.OpenInNew
 import androidx.compose.material.icons.rounded.Palette
 import androidx.compose.material.icons.rounded.PrivacyTip
 import androidx.compose.material.icons.rounded.Timer
@@ -196,7 +196,7 @@ fun SettingsContent(
           title = stringResource(R.string.settings_app_language),
           subtitle = languageName,
           icon = Icons.Rounded.Language,
-          trailing = { Icon(Icons.Rounded.OpenInNew, contentDescription = null) },
+          trailing = { Icon(Icons.AutoMirrored.Rounded.OpenInNew, contentDescription = null) },
           shape = groupedItemShape(0, 1),
           onClick = onOpenLanguage,
         )
@@ -211,7 +211,7 @@ fun SettingsContent(
             title = stringResource(R.string.settings_security_setup),
             subtitle = stringResource(R.string.settings_security_setup_summary),
             icon = Icons.Rounded.Fingerprint,
-            trailing = { Icon(Icons.Rounded.OpenInNew, contentDescription = null) },
+            trailing = { Icon(Icons.AutoMirrored.Rounded.OpenInNew, contentDescription = null) },
             shape = groupedItemShape(0, 1),
             onClick = { onOpenSecuritySetup() },
           )
@@ -248,7 +248,7 @@ fun SettingsContent(
         SettingRow(
           title = stringResource(R.string.settings_privacy_policy),
           icon = Icons.Rounded.PrivacyTip,
-          trailing = { Icon(Icons.Rounded.OpenInNew, contentDescription = null) },
+          trailing = { Icon(Icons.AutoMirrored.Rounded.OpenInNew, contentDescription = null) },
           shape = groupedItemShape(0, 1),
           onClick = onOpenPrivacyPolicy,
         )
