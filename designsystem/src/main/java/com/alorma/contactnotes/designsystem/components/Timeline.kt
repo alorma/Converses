@@ -19,6 +19,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 
@@ -53,6 +54,17 @@ fun TimelineMarker(icon: ImageVector, style: TimelineMarkerStyle, modifier: Modi
   }
 }
 
+/** Marcador fantasma: cercle amb vora discontínua i un «+», per a la primera entrada que encara no existeix. */
+@Composable
+fun GhostTimelineMarker(icon: ImageVector, modifier: Modifier = Modifier) {
+  Box(
+    modifier = modifier.size(MarkerSize).dashedBorder(MaterialTheme.colorScheme.outline, radius = MarkerSize / 2, width = LineWidth),
+    contentAlignment = Alignment.Center,
+  ) {
+    Icon(icon, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(18.dp))
+  }
+}
+
 /** Marcador amb contingut propi (per exemple, l'avatar de la persona), sense fons. */
 @Composable
 fun TimelineMarker(modifier: Modifier = Modifier, content: @Composable () -> Unit) {
@@ -77,6 +89,7 @@ fun TimelineRow(
   modifier: Modifier = Modifier,
   marker: (@Composable () -> Unit)? = null,
   lineProgress: () -> Float = { 1f },
+  dashedLine: Boolean = false,
   content: @Composable () -> Unit,
 ) {
   val lineColor = MaterialTheme.colorScheme.outlineVariant
@@ -92,7 +105,13 @@ fun TimelineRow(
           val end = if (isLast) markerCenter.coerceAtMost(size.height) else size.height
           if (end > start) {
             val drawnEnd = start + (end - start) * lineProgress()
-            drawLine(lineColor, Offset(x, start), Offset(x, drawnEnd), strokeWidth = LineWidth.toPx())
+            drawLine(
+              lineColor,
+              Offset(x, start),
+              Offset(x, drawnEnd),
+              strokeWidth = LineWidth.toPx(),
+              pathEffect = if (dashedLine) PathEffect.dashPathEffect(floatArrayOf(6.dp.toPx(), 5.dp.toPx())) else null,
+            )
           }
         },
       contentAlignment = Alignment.TopCenter,

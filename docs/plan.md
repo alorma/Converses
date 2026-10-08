@@ -113,10 +113,10 @@ Una sola activitat (`MainActivity`, una `FragmentActivity` pel `BiometricPrompt`
 | Onboarding | `OnboardingRoute` | Només el primer cop (`OnboardingFlag`); en acabar substitueix la pila per `PeopleRoute` |
 | Llistat | `PeopleRoute` | Xips de filtre per canal (multiselecció, OR entre grups; cap marcat = tothom), nova persona a la capçalera i fila final, barra flotant (Persones · Arxivades · Ajustos) |
 | Arxivades | `ArchivedRoute` | Sense filtres de canal ni fila d'afegir; desarxivar només des del detall |
-| Detall | `PersonRoute(id)` | Split button «Nota ▾», llapis d'editar, ⋮ a cada entrada, `FLAG_SECURE` si és protegida |
+| Detall | `PersonRoute(id)` | Split button «Nota ▾», llapis d'editar, ⋮ a cada entrada, `FLAG_SECURE` si és protegida. Persona amb poques dades: subtítol «Des de {mes any}», pastilla «+ On hi parles», fila «Afegeix una dada» i entrada fantasma amb Jo / {nom} / Apunt (obre Nova entrada amb aquest «Qui» i el teclat); desapareixen quan hi ha el primer canal, dada o entrada |
 | Desbloqueig | `PersonLockedRoute(id)` | `BiometricPrompt` automàtic; si va bé, substitueix la ruta pel detall |
 | Nota ràpida | `QuickNoteRoute(personId?)` | Sense persona per defecte; una protegida demana l'empremta en triar-la |
-| Editar/crear | `EditPersonRoute(personId)` | `0` = persona nova; en crear, va al detall |
+| Editar/crear | `EditPersonRoute(personId, focus)` | `0` = persona nova; en crear, va al detall; `focus` (`EditFocus.CHANNELS` / `NEW_FACT`) fa scroll fins a «On hi parles» o afegeix una dada i en posa el focus |
 | Ajustos | `SettingsRoute` | Inclou la política de privadesa |
 | Fulls i diàlegs | Dins del detall i de l'editor | Nova entrada, accions d'entrada, menú del split button, triar persona, «Quan», «Avatar», esborrar |
 

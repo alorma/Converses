@@ -47,9 +47,11 @@ fun NewEntrySheet(
   channels: List<ChannelType>,
   onDismiss: () -> Unit,
   initial: EntryEntity? = null,
+  initialKind: EntryKind = EntryKind.SAID,
+  focusText: Boolean = false,
   onSave: (kind: EntryKind, channel: ChannelType, text: String, occurredAt: Long?) -> Unit,
 ) {
-  val form = rememberEntryFormState(initial)
+  val form = rememberEntryFormState(initial, initialKind)
   val available = availableChannels(channels + listOfNotNull(initial?.channelType))
   val channel = form.channel?.takeIf { it in available } ?: available.first()
 
@@ -64,6 +66,7 @@ fun NewEntrySheet(
       available = available,
       channel = channel,
       isNew = initial == null,
+      focusText = focusText,
       onDismiss = onDismiss,
       onSave = { onSave(form.kind, channel, form.text.trim(), form.occurredAt) },
     )
@@ -80,6 +83,7 @@ fun NewEntrySheetContent(
   isNew: Boolean,
   onDismiss: () -> Unit,
   onSave: () -> Unit,
+  focusText: Boolean = false,
 ) {
   Column(
     modifier = Modifier
@@ -114,6 +118,7 @@ fun NewEntrySheetContent(
         channels = available,
         channel = channel,
         onChannelChange = { form.channel = it },
+        focusText = focusText,
       )
     }
     // El botó queda fix a baix, fora del que es desplaça, perquè el teclat no el tapi

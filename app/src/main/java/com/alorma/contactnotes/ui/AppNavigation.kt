@@ -24,6 +24,7 @@ import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
+import com.alorma.contactnotes.ui.edit.EditFocus
 import com.alorma.contactnotes.ui.edit.EditPersonScreen
 import com.alorma.contactnotes.ui.entry.PersonSelectionBridge
 import com.alorma.contactnotes.ui.entry.QuickNoteScreen
@@ -48,7 +49,11 @@ data object ArchivedRoute : NavKey
 data object SettingsRoute : NavKey
 
 @Serializable
-data class EditPersonRoute(val personId: Long = 0L, val returnSelection: Boolean = false) : NavKey
+data class EditPersonRoute(
+  val personId: Long = 0L,
+  val returnSelection: Boolean = false,
+  val focus: EditFocus? = null,
+) : NavKey
 
 @Serializable
 data class QuickNoteRoute(val personId: Long = 0L) : NavKey
@@ -131,12 +136,13 @@ fun AppNavigation(startOnboarding: Boolean = false) {
         PersonDetailRoute(
           personId = route.id,
           onBack = { backStack.removeLastOrNull() },
-          onEdit = { backStack.add(EditPersonRoute(route.id)) },
+          onEdit = { focus -> backStack.add(EditPersonRoute(route.id, focus = focus)) },
         )
       }
       entry<EditPersonRoute>(metadata = modalTransitions) { route ->
         EditPersonScreen(
           personId = route.personId,
+          focus = route.focus,
           onClose = { backStack.removeLastOrNull() },
           onSaved = { id ->
             backStack.removeLastOrNull()

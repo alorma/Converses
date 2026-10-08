@@ -58,7 +58,13 @@
     <string name="app_lock_title">Converses is locked</string>
     <string name="app_lock_prompt_title">Unlock Converses</string>
     <string name="today">Today</string>
-    <string name="profile_created">Profile created: %1$s</string>
+    <string name="person_since">Since %1$s</string>
+    <string name="empty_channels_cta">Where you talk</string>
+    <string name="empty_facts_title">Add info</string>
+    <string name="empty_facts_hint">Work, family, birthday, where they\'re from…</string>
+    <string name="empty_timeline_title">Nothing here yet</string>
+    <string name="empty_timeline_body">What did %1$s tell you? What did you tell them? Start here.</string>
+    <string name="empty_timeline_new_entry">New entry: %1$s</string>
     <string name="facts_title">Info</string>
     <string name="timeline">Timeline</string>
     <string name="archived_empty_description">Archived people will show up here.</string>
