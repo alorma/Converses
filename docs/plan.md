@@ -66,18 +66,19 @@ Sense data: es va sincronitzant amb l'app a mesura que convé i no bloqueja res.
 
 ## Iteració 2 (després de la publicació)
 
-El detall és a `docs/backlog.md`. Els punts 6, 8 i 13 necessiten migració (vegeu «Regla de la base de dades»); el 11 no. El 13 reuneix el feedback de la beta (issues #40–#45), és la primera tasca i porta la migració v1 → v2.
+El detall és a `docs/backlog.md`. Els punts 6, 8 i 13 necessiten migració (vegeu «Regla de la base de dades»); el 11 no. Els punts 12 i 14–17 vénen del feedback de la beta (issues #40–#45) i són tasques independents; el 13 (canals) va primer i porta la migració v1 → v2.
 
-- **Tasca gran: canals a 5 grups i feedback de la beta (13, issues #40–#45):** una sola tasca, amb passes en aquest ordre, la primera a fer:
-  1. **Migració de canals (#42):** `ChannelType` passa a En persona, Telèfon, Xat, Social i Altres; els canals actuals es migren al seu grup (migració v1 → v2, equivalències a decidir), avís genèric i badge «beta» al títol de la llista.
-  2. **Nota ràpida (#40, bug):** el xip «Persona» de «Qui» sense persona obre el selector.
-  3. **Accions del detall (#44, a avaluar):** FAB només per a «Nota» i Exportar/Arxivar a la `topBar`, o barra flotant amb les tres.
-  4. **«Quant a» als Ajustos (#43).**
-  5. **Idiomes (#45):** mostrar els disponibles i l'actiu a Ajustos; valorar gallec i italià.
-  6. **Cerca (#41):** nom i text de les entrades; les protegides només pel nom. `LIKE` (recomanat) o FTS, que s'hauria de fer a la mateixa migració v2.
+- **Refactor dels canals (13, issue #42), la primera tasca:** `ChannelType` passa a En persona, Telèfon, Xat, Social i Altres; els canals actuals es migren al seu grup (migració v1 → v2, equivalències a decidir a la tasca), avís genèric als usuaris i badge «beta» al títol de la llista. Gratis.
 - **Follow-ups / entrades pendents o planificades (6, issue #5):** flag `pending` a `EntryEntity` i interruptor a `EntryForm`, sota de «Quan». Primera migració (v1 → v2). És Pro.
 - **Sub-canals (8):** dins dels 5 grups, amb nom lliure (únic per persona) i valor opcional. Absorbeix «Empresa» (7). És Pro. Depèn del 13.
 - **Importar text a la nota ràpida, «share invers» (11, issue #30):** compartir text des d'altres apps (`ACTION_SEND`), seleccionar text (`ACTION_PROCESS_TEXT`) i un botó «Enganxa» al porta-retalls; la nota ràpida s'obre amb el text posat i només cal triar la persona. Sense canvis a Room, no cal migració. És gratis.
+- **Feedback de la beta, tasques independents (després del 13):**
+  - **12 · Nota ràpida (bug, #40):** el xip «Persona» de «Qui» sense persona obre el selector en comptes de ser desactivat.
+  - **14 · Accions del detall (#44, a avaluar):** FAB només per a «Nota» i Exportar/Arxivar a la `topBar`, o barra flotant amb les tres.
+  - **15 · «Quant a» als Ajustos (#43):** autor, versió, repositori i llicències, privadesa i feedback.
+  - **16 · Idiomes (#45):** mostrar els disponibles i l'actiu a Ajustos; valorar gallec i italià.
+  - **17 · Cerca (#41):** nom i text de les entrades; les protegides només pel nom. `LIKE` o FTS (FTS exigeix migració).
+
 ## Després de la v1
 
 - **Pro** (pagament únic): vegeu `docs/pro.md`.
