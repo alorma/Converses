@@ -8,14 +8,9 @@ Actualitzat el 8 d'oct. de 2026. Només hi ha el que encara no està fet.
 | 7 | Feature (Iteració 2) | Nou canal "Empresa" (queda dins el 8, com a sub-canal d'Altres) | — |
 | 8 | Feature (Iteració 2, Pro) | Sub-canals amb nom i valor (dins dels 5 grups del 13) | — |
 | 11 | Feature (Iteració 2) | Importar text a la nota ràpida (compartir, seleccionar text i enganxar) | [#30](https://github.com/alorma/Converses/issues/30) |
-| 12 | Bug | Nota ràpida: el xip «Persona» desactivat confon | [#40](https://github.com/alorma/Converses/issues/40) |
-| 13 | Migració | Canals simplificats a 5 grups (En persona, Telèfon, Xat, Social, Altres); absorbeix el #42 | [#42](https://github.com/alorma/Converses/issues/42) |
-| 14 | Millora (a avaluar) | Detall de persona: les 3 accions visibles, sense el split FAB | [#44](https://github.com/alorma/Converses/issues/44) |
-| 15 | Millora | Ajustos: secció «Quant a» | [#43](https://github.com/alorma/Converses/issues/43) |
-| 16 | Millora | Idiomes: mostrar els disponibles a Ajustos i valorar gallec i italià | [#45](https://github.com/alorma/Converses/issues/45) |
-| 17 | Feature | Cerca d'entrades per paraula clau | [#41](https://github.com/alorma/Converses/issues/41) |
+| 13 | Tasca gran (gratis, la primera) | Canals a 5 grups + feedback de la beta, per passes (inclou les antigues 12, 14, 15, 16 i 17) | [#42](https://github.com/alorma/Converses/issues/42), [#40](https://github.com/alorma/Converses/issues/40), [#44](https://github.com/alorma/Converses/issues/44), [#43](https://github.com/alorma/Converses/issues/43), [#45](https://github.com/alorma/Converses/issues/45), [#41](https://github.com/alorma/Converses/issues/41) |
 
-Els punts 6, 7, 8 i 11 són de l'**Iteració 2**; el 6 i el 8 són Pro, i l'11 i el 13 són gratis (vegeu `docs/pro.md`). Els punts 12–17 vénen del feedback de la beta (issues #40–#45) i es treballen en aquest ordre: primer el 12 i el 14 (petits), després el 13 (migració), el 15 i el 16, i la cerca (17) al final. **Qualsevol canvi de la base de dades ha d'incloure una migració i el seu test** (la v1 ja és a Google Play); l'11 no toca Room. Dels nous, el 13 requereix migració (v1 → v2) i el 17 pot tocar Room (si s'opta per FTS). La numeració és la del backlog original, perquè els issues i les referències no canviïn; els punts resolts (1–5, 9, 10) són a l'historial de git.
+Els punts 6, 7, 8 i 11 són de l'**Iteració 2**; el 6 i el 8 són Pro, i l'11 i el 13 són gratis (vegeu `docs/pro.md`). El punt 13 és una sola tasca gran, amb passes, que reuneix el feedback de la beta (issues #40–#45); és la primera a fer. **Qualsevol canvi de la base de dades ha d'incloure una migració i el seu test** (la v1 ja és a Google Play); l'11 no toca Room. El 13 requereix la migració v1 → v2 (i la cerca, si s'opta per FTS, s'hi ha de fer a la mateixa). La numeració és la del backlog original, perquè els issues i les referències no canviïn; els punts resolts (1–5, 9, 10) són a l'historial de git.
 
 ---
 
@@ -74,31 +69,20 @@ Portar text d'altres apps a la nota ràpida amb el mínim de passos: el text ja 
 
 ---
 
-## 12 · Bug: xip «Persona» desactivat a la nota ràpida
+## 13 · Tasca gran: canals a 5 grups i feedback de la beta
 
-Issue: [#40](https://github.com/alorma/Converses/issues/40)
+Issues: [#42](https://github.com/alorma/Converses/issues/42), [#40](https://github.com/alorma/Converses/issues/40), [#44](https://github.com/alorma/Converses/issues/44), [#43](https://github.com/alorma/Converses/issues/43), [#45](https://github.com/alorma/Converses/issues/45), [#41](https://github.com/alorma/Converses/issues/41)
 
-A la nota ràpida, sense persona triada, el xip «Persona» de «Qui» surt gris i desactivat (i truncat, «Pers…»). Sembla el lloc on afegir la persona; els usuaris el toquen i no passa res, perquè la persona es tria a la targeta «Amb qui» de dalt.
+Una sola tasca, amb passes que es fan en ordre i es validen una a una. **La migració de canals va primer**; la resta del feedback de la beta en forma part. Tot és gratis. Els sub-canals (8) i «Empresa» (7) són Pro i queden fora; depenen d'aquesta tasca.
 
-**Decisió recomanada:** tocar el xip sense persona obre el selector de persones (el mateix full que la targeta «Amb qui»); en triar-ne una, el xip queda seleccionat.
+### Pas 1 · Migració de canals a 5 grups (#42)
 
-**Què cal fer**
-- `WhoSelector` d'`EntryForm` (`ui/entry/EntryForm.kt`): el xip deixa d'estar desactivat quan no hi ha persona i demana obrir el selector. L'etiqueta continua sortint de `whoLabel(...)` (`ui/person/WhoLabels.kt`).
-- La nota ràpida és qui obre el full; el nou entry sheet de la persona no canvia.
-- Etiqueta llegible: treure la icona del xip buit perquè «Persona» càpiga sense tallar-se.
-- Protegides: el selector no ha de mostrar res de les entrades abans de desbloquejar.
-- Sense Room, sense migració. Captura de la nota ràpida sense persona.
-
-## 13 · Migració: canals simplificats a 5 grups
-
-Issue: [#42](https://github.com/alorma/Converses/issues/42) (els filtres surten amb els més usats tallats a la dreta)
-
-Els 11 valors de `ChannelType` passen a **5 grups fixos**: **En persona, Telèfon, Xat, Social, Altres**. Els filtres tornen a ser un a un amb el grup i caben sense scroll, en aquest ordre. Els sub-canals (WhatsApp, Telegram…) són el 8 i són Pro.
+Els 11 valors de `ChannelType` passen a **5 grups fixos**: **En persona, Telèfon, Xat, Social, Altres**. Els filtres tornen a ser un a un amb el grup i caben sense scroll (els més usats, tallats a la dreta, eren el problema del #42).
 
 **Decisions**
 - Els canals que els usuaris de la beta ja tenen (WhatsApp, Telegram…) **es migren al seu grup com un de sol** i els antics s'eliminen. Mantenir-los gratis seria massa complex i aniria contra el Pro. Són uns 20 usuaris.
 - Cada grup usa la seva icona; sense icones d'apps concretes.
-- Les **equivalències** (quins canals van a Xat, Social o Altres, i Email en particular) es decideixen en fer la tasca.
+- Les **equivalències** (quins canals van a Xat, Social o Altres, i Email en particular) es decideixen en fer el pas.
 
 **Què cal fer**
 - **Migració de Room v1 → v2** amb el seu test (`MigrationTestHelper`), sense columnes noves: canvia el valor desat de `channel.type` i d'`entry.channelType`. Cal deduplicar els canals d'una persona que acabin al mateix grup. Test amb una persona amb diversos canals del mateix grup i entrades de cada tipus.
@@ -106,24 +90,31 @@ Els 11 valors de `ChannelType` passen a **5 grups fixos**: **En persona, Telèfo
 - Afecta: detall de persona, `EntryForm` («On»), `ChannelsCard` de l'editor, `PeopleFormatting.kt`, `SampleData` i `PersonExporter.kt`.
 - **Avís genèric** a la primera obertura després de l'actualització («Hem simplificat els canals…»). Sense detall per persona.
 - **Badge «beta»** al títol de la primera pantalla (la llista de persones).
-- Textos a `strings.xml` (en, ca, es); actualitzar les captures i `docs/plan.md` i `docs/pro.md`.
-- Pot compartir la migració v1 → v2 amb el 6 (follow-ups) si van junts.
+- Textos a `strings.xml` (en, ca, es) i captures.
 
-## 14 · Millora (a avaluar): accions del detall de persona
+**Cal decidir abans de començar:** la cerca (pas 6) va a la mateixa tasca i, per tant, si s'opta per FTS la taula nova ha d'anar a **aquesta mateixa migració v2**. Recomanació: `LIKE`, sense canvi d'esquema.
 
-Issue: [#44](https://github.com/alorma/Converses/issues/44)
+### Pas 2 · Nota ràpida: el xip «Persona» (#40, bug)
+
+A la nota ràpida, sense persona triada, el xip «Persona» de «Qui» surt gris i desactivat (i truncat, «Pers…»). Sembla el lloc on afegir la persona; els usuaris el toquen i no passa res, perquè la persona es tria a la targeta «Amb qui» de dalt.
+
+**Decisió recomanada:** tocar el xip sense persona obre el selector de persones (el mateix full que la targeta «Amb qui»); en triar-ne una, el xip queda seleccionat.
+- `WhoSelector` d'`EntryForm` (`ui/entry/EntryForm.kt`): el xip deixa d'estar desactivat sense persona i demana obrir el selector. L'etiqueta continua sortint de `whoLabel(...)` (`ui/person/WhoLabels.kt`).
+- La nota ràpida és qui obre el full; el full de nova entrada de la persona no canvia.
+- Etiqueta llegible: treure la icona del xip buit perquè «Persona» càpiga sense tallar-se.
+- Protegides: el selector no ha de mostrar res de les entrades abans de desbloquejar.
+- Captura de la nota ràpida sense persona.
+
+### Pas 3 · Accions del detall de persona (#44, a avaluar)
 
 Ara hi ha un split FAB amb **Nota** i un menú amb **Exportar notes** i **Arxivar**. Només són tres accions.
 
-**Opcions**
 - A. FAB només per a **Nota**; Exportar i Arxivar a la `topBar` (accions o menú «⋮»). Recomanada: escala millor quan `docs/pro.md` hi afegeixi accions.
 - B. Barra flotant amb les tres accions visibles, al slot `floatingActionButton`.
 
-Pendent de decidir. Seguir les regles del `Scaffold` del `CLAUDE.md`. Sense Room.
+Pendent de decidir. Seguir les regles del `Scaffold` del `CLAUDE.md`.
 
-## 15 · Millora: «Quant a» als Ajustos
-
-Issue: [#43](https://github.com/alorma/Converses/issues/43)
+### Pas 4 · «Quant a» als Ajustos (#43)
 
 Entrada «Quant a» als Ajustos, amb subpantalla (`ConversesTopBar`, mateixes regles de `Scaffold`):
 - Autor i una manera de contactar o seguir el projecte.
@@ -131,26 +122,21 @@ Entrada «Quant a» als Ajustos, amb subpantalla (`ConversesTopBar`, mateixes re
 - Enllaç al repositori (si és públic) i llicències de codi obert.
 - Política de privadesa / fitxa de Play, i enviar feedback.
 
-Pendent de decidir: dades i enllaços concrets. Textos a `strings.xml` (en, ca, es). Sense Room.
+Pendent de decidir: dades i enllaços concrets. Textos a `strings.xml` (en, ca, es).
 
-## 16 · Millora: idiomes disponibles
-
-Issue: [#45](https://github.com/alorma/Converses/issues/45)
+### Pas 5 · Idiomes disponibles (#45)
 
 L'app només està en ca/es/en (`res/xml/locales_config.xml`); un idioma no suportat cau en silenci al següent de la llista.
 
-**Dues parts independents**
 - A. A Ajustos, «Idioma de l'app»: llistar els suportats i marcar l'actiu (i si segueix el del sistema). Esmentar-los a la fitxa de Play.
 - B. Valorar afegir **gallec** i **italià** (suggerits per l'usuari). Cada idioma nou és un `values-xx/` complet i una entrada a `locales_config.xml`; es poden acceptar traduccions de la comunitat.
 
-Pendent de decidir: només la A ara i la B segons qui tradueixi. Sense Room.
+Pendent de decidir: només la A ara i la B segons qui tradueixi.
 
-## 17 · Feature: cerca
-
-Issue: [#41](https://github.com/alorma/Converses/issues/41)
+### Pas 6 · Cerca (#41)
 
 Cerca pel nom de la persona i dins el text de les entrades, amb els resultats etiquetats per persona; tocar-ne un obre el detall a aquella entrada.
 
 - **Protegides:** només es troben pel nom; el text de les seves entrades no es cerca ni es mostra abans de desbloquejar.
-- **Tècnica:** consultes `LIKE` (sense canvi d'esquema, la recomanada per començar) o Room FTS (més ràpid amb molts registres, però exigeix taula nova, versió, migració i test). Si es tria FTS, coordinar-ho amb la migració del punt 6.
-- Surt de «Després de la v1» del pla: ara és a la iteració 2.
+- **Tècnica:** consultes `LIKE` (sense canvi d'esquema, la recomanada) o Room FTS (més ràpid amb molts registres, però exigeix taula nova, versió, migració i test; vegeu el pas 1).
+- Surt de «Després de la v1» del pla.
