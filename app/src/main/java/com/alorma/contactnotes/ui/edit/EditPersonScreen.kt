@@ -4,11 +4,8 @@ import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.selection.selectable
-import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
-import com.alorma.contactnotes.ui.people.colorNameRes
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Arrangement
@@ -25,13 +22,8 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -54,19 +46,18 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -83,11 +74,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
-import androidx.compose.material.icons.rounded.Check
-import androidx.compose.material3.FilterChipDefaults
-import androidx.compose.material3.FilterChip
-import androidx.compose.foundation.layout.FlowRow
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.relocation.BringIntoViewRequester
 import androidx.compose.foundation.relocation.bringIntoViewRequester
@@ -103,13 +89,9 @@ import androidx.compose.ui.semantics.semantics
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.alorma.contactnotes.R
-import com.alorma.contactnotes.data.db.ChannelType
-import com.alorma.contactnotes.designsystem.components.Avatar
 import com.alorma.contactnotes.designsystem.components.AvatarColor
 import com.alorma.contactnotes.designsystem.components.AvatarShape
-import com.alorma.contactnotes.designsystem.components.ColorSwatches
 import com.alorma.contactnotes.designsystem.components.ConversesSaveButton
-import com.alorma.contactnotes.designsystem.components.ConversesFilterChip
 import com.alorma.contactnotes.designsystem.components.GroupedListDefaults
 import com.alorma.contactnotes.designsystem.components.asShape
 import com.alorma.contactnotes.designsystem.components.groupedItemShape
@@ -117,8 +99,6 @@ import com.alorma.contactnotes.designsystem.theme.DialogTitleStyle
 import com.alorma.contactnotes.data.flags.CustomAvatarFeature
 import com.alorma.contactnotes.data.flags.rememberFeatureEnabled
 import com.alorma.contactnotes.designsystem.theme.PersonTheme
-import com.alorma.contactnotes.designsystem.theme.ScreenTitleStyle
-import com.alorma.contactnotes.ui.people.initialsOf
 import com.alorma.contactnotes.ui.people.label
 import com.alorma.contactnotes.ui.person.canUnlockWithDevice
 import com.alorma.contactnotes.ui.person.icon
@@ -214,15 +194,11 @@ fun EditPersonContent(
       // Els espais buits del detall obren l'editor amb el focus a una secció; ho fem un sol cop (també en girar la pantalla)
       var focusHandled by rememberSaveable { mutableStateOf(false) }
       val focusFactIndex = rememberSaveable { state.facts.size }
-      val channelsBring = remember { BringIntoViewRequester() }
       LaunchedEffect(Unit) {
         if (focusHandled || focus == null) return@LaunchedEffect
         focusHandled = true
         when (focus) {
           EditFocus.NEW_FACT -> actions.onAddFact()
-          EditFocus.CHANNELS -> {
-            channelsBring.bringIntoView()
-          }
         }
       }
       Column(
@@ -282,12 +258,6 @@ fun EditPersonContent(
 
         SectionHeader(title = stringResource(R.string.facts_title))
         FactsEditor(state.facts, actions, focusIndex = focusFactIndex.takeIf { focus == EditFocus.NEW_FACT })
-
-        ChannelsCard(
-          selected = state.channels,
-          onToggle = actions::onToggleChannel,
-          modifier = Modifier.bringIntoViewRequester(channelsBring),
-        )
 
         FieldCard(index = 0, count = 1) {
           Row(
@@ -582,77 +552,6 @@ private fun InlineField(
       }
     },
   )
-}
-
-@OptIn(ExperimentalLayoutApi::class)
-@Composable
-private fun ChannelsCard(
-  selected: Set<ChannelType>,
-  onToggle: (ChannelType) -> Unit,
-  modifier: Modifier = Modifier,
-) {
-  val haptics = rememberConversesHaptics()
-  Column(modifier = modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-    Row(
-      modifier = Modifier.fillMaxWidth().padding(start = 4.dp, top = 8.dp, end = 4.dp),
-      verticalAlignment = Alignment.CenterVertically,
-    ) {
-      Text(
-        text = stringResource(R.string.channels_title),
-        style = MaterialTheme.typography.titleMedium,
-        fontWeight = FontWeight.Bold,
-        color = MaterialTheme.colorScheme.onSurfaceVariant,
-        modifier = Modifier.weight(1f),
-      )
-      Text(
-        text = if (selected.isEmpty()) {
-          stringResource(R.string.channels_count_none)
-        } else {
-          pluralStringResource(R.plurals.channels_count, selected.size, selected.size)
-        },
-        style = MaterialTheme.typography.labelMedium,
-        color = MaterialTheme.colorScheme.onSurfaceVariant,
-      )
-    }
-    Surface(
-      shape = MaterialTheme.shapes.extraLarge,
-      color = GroupedListDefaults.containerColor,
-      modifier = Modifier.fillMaxWidth(),
-    ) {
-      Column(modifier = Modifier.padding(14.dp)) {
-      FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        ChannelType.entries.forEach { type ->
-          val isSelected = type in selected
-          FilterChip(
-            selected = isSelected,
-            onClick = {
-              haptics.segmentTick()
-              onToggle(type)
-            },
-            modifier = Modifier.height(36.dp),
-            label = {
-              Text(stringResource(type.label()), fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium)
-            },
-            leadingIcon = {
-              Icon(
-                imageVector = if (isSelected) Icons.Rounded.Check else type.icon(),
-                contentDescription = null,
-                modifier = Modifier.size(FilterChipDefaults.IconSize),
-              )
-            },
-            shape = RoundedCornerShape(10.dp),
-            colors = FilterChipDefaults.filterChipColors(
-              selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
-              selectedLabelColor = MaterialTheme.colorScheme.onPrimaryContainer,
-              selectedLeadingIconColor = MaterialTheme.colorScheme.onPrimaryContainer,
-            ),
-            border = if (isSelected) null else BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
-          )
-        }
-      }
-      }
-    }
-  }
 }
 
 @Composable

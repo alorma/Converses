@@ -15,7 +15,7 @@ import com.alorma.contactnotes.designsystem.preview.ConversesPreviewTheme
 import com.alorma.contactnotes.designsystem.theme.PersonTheme
 import com.alorma.contactnotes.ui.preview.PreviewData
 
-private val Channels = PreviewData.martaChannels.map { it.type }
+private val Channels = PreviewData.martaChannels
 
 @Composable
 private fun QuickNotePreview(state: QuickNoteUiState, form: EntryFormState) {
@@ -47,7 +47,6 @@ internal fun QuickNoteFilledPreview() {
     state = QuickNoteUiState(
       people = listOf(PreviewData.marta),
       selected = PreviewData.marta,
-      channels = Channels,
       lastChannel = Channels.first(),
     ),
     form = EntryFormState(
@@ -72,7 +71,6 @@ internal fun EditEntrySheetPreview() {
             text = "Told her I can't make it to dinner on Saturday.",
             whenChoice = WhenChoice.Stored(PreviewData.formTime),
           ),
-          available = availableChannels(Channels),
           channel = Channels.first(),
           isNew = false,
           onDismiss = {},
@@ -96,7 +94,6 @@ internal fun NewEntrySheetPreview() {
             text = "We went to the photography exhibition.",
             whenChoice = WhenChoice.Stored(PreviewData.formTime),
           ),
-          available = availableChannels(Channels),
           channel = Channels.first(),
           isNew = true,
           onDismiss = {},

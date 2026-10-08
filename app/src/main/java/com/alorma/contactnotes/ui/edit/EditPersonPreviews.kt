@@ -2,7 +2,6 @@ package com.alorma.contactnotes.ui.edit
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
-import com.alorma.contactnotes.data.db.ChannelType
 import com.alorma.contactnotes.designsystem.components.AvatarColor
 import com.alorma.contactnotes.designsystem.components.AvatarShape
 import com.alorma.contactnotes.designsystem.preview.ConversesPreviewTheme
@@ -18,7 +17,6 @@ private object NoOpEditPersonActions : EditPersonActions {
   override fun onFactChange(key: Long, label: String, value: String) = Unit
   override fun onRemoveFact(key: Long) = Unit
   override fun onMoveFact(from: Int, to: Int) = Unit
-  override fun onToggleChannel(type: ChannelType) = Unit
   override fun delete(exportFirst: Boolean, onDeleted: () -> Unit) = Unit
   override fun save(onSaved: (Long) -> Unit) = Unit
 }
@@ -44,7 +42,6 @@ private val Facts = listOf(
   FactDraft(key = 2, label = "Work", value = "Designer in Barcelona"),
 )
 
-private val Channels = setOf(ChannelType.WHATSAPP, ChannelType.IN_PERSON)
 
 @Preview
 @Composable
@@ -61,7 +58,6 @@ internal fun EditPersonExistingPreview() {
     shape = AvatarShape.Cookie9Sided,
     color = AvatarColor.Lavender,
     facts = Facts,
-    channels = Channels,
   )
   EditPersonPreview(
     EditPersonUiState(
@@ -72,7 +68,6 @@ internal fun EditPersonExistingPreview() {
       shape = snapshot.shape,
       color = snapshot.color,
       facts = Facts,
-      channels = Channels,
       entryCount = 3,
       baseline = snapshot,
     ),
@@ -94,7 +89,6 @@ internal fun EditPersonProtectedPreview() {
       isProtected = true,
       aliasTaken = true,
       facts = Facts.take(1),
-      channels = Channels.take(1).toSet(),
       entryCount = 1,
     ),
   )
@@ -127,7 +121,6 @@ internal fun EditPersonCustomAvatarPreview() {
       shape = AvatarShape.Clover4Leaf,
       color = AvatarColor.Sky,
       facts = Facts.take(1),
-      channels = Channels.take(1).toSet(),
       entryCount = 3,
     ),
     customAvatar = true,

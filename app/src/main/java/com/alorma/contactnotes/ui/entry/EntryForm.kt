@@ -96,10 +96,6 @@ fun rememberEntryFormState(initial: EntryEntity? = null, initialKind: EntryKind 
     )
   }
 
-/** Canals que es poden triar: els de la persona, en l'ordre fix, o tots si no en té o no es poden mostrar. */
-fun availableChannels(personChannels: List<ChannelType>, showAll: Boolean = false): List<ChannelType> =
-  if (showAll || personChannels.isEmpty()) ChannelType.entries else personChannels.distinct().sorted()
-
 /**
  * Formulari d'entrada comú: Qui, text, On i Quan.
  * `header` va a dalt de tot (la targeta «Amb qui» de la nota ràpida) i `saveButton` a baix.
@@ -108,7 +104,6 @@ fun availableChannels(personChannels: List<ChannelType>, showAll: Boolean = fals
 fun EntryForm(
   state: EntryFormState,
   person: PersonEntity?,
-  channels: List<ChannelType>,
   channel: ChannelType,
   onChannelChange: (ChannelType) -> Unit,
   modifier: Modifier = Modifier,
@@ -125,7 +120,7 @@ fun EntryForm(
       requestFocus = focusText,
     )
     FormSection(title = stringResource(R.string.entry_where_title)) {
-      ChannelChips(channels = channels, selected = channel, onSelected = onChannelChange)
+      ChannelChips(selected = channel, onSelected = onChannelChange)
     }
     FormSection(title = stringResource(R.string.entry_when_title)) {
       WhenRow(choice = state.whenChoice, onChoice = { state.whenChoice = it })
@@ -214,9 +209,9 @@ fun EntryTextField(
   )
 }
 
+/** Els 5 grups, sempre en l'ordre fix: l'entrada es pot etiquetar amb qualsevol, tingui o no la persona entrades al grup. */
 @Composable
 fun ChannelChips(
-  channels: List<ChannelType>,
   selected: ChannelType,
   onSelected: (ChannelType) -> Unit,
   modifier: Modifier = Modifier,
@@ -227,7 +222,7 @@ fun ChannelChips(
     modifier = modifier.horizontalScroll(rememberScrollState()),
     horizontalArrangement = Arrangement.spacedBy(8.dp),
   ) {
-    channels.forEach { channel ->
+    ChannelType.entries.forEach { channel ->
       val isSelected = channel == selected
       FilterChip(
         selected = isSelected,

@@ -5,6 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import com.android.tools.screenshot.PreviewTest
 import com.alorma.contactnotes.designsystem.components.AvatarPreview
+import com.alorma.contactnotes.designsystem.components.NoticeBannerPreview
 import com.alorma.contactnotes.designsystem.components.CollapsibleFactsPreview
 import com.alorma.contactnotes.designsystem.components.ColorSwatchesPreview
 import com.alorma.contactnotes.designsystem.components.FilterChipPreview
@@ -31,6 +32,13 @@ class ComponentsScreenshotTests {
   @Composable
   fun collapsibleFacts() {
     CollapsibleFactsPreview()
+  }
+
+  @ComponentPreviews
+  @PreviewTest
+  @Composable
+  fun noticeBanner() {
+    NoticeBannerPreview()
   }
 
   @ComponentPreviews

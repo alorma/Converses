@@ -13,12 +13,14 @@ import kotlinx.coroutines.flow.map
 
 data class AppSettings(
   val themeMode: ThemeMode = ThemeMode.System,
-  val dynamicColor: Boolean = true,
+  val dynamicColor: Boolean = false,
   val personColorTheme: Boolean = true,
   val hapticFeedback: Boolean = true,
   val appLock: Boolean = false,
   val relockAfterSeconds: Int = 60,
   val onboardingDone: Boolean = false,
+  /** Cert només després de la migració 1 → 2 dels canals (backlog 13); els usuaris nous no hi passen mai. */
+  val channelsNoticePending: Boolean = false,
 )
 
 interface SettingsRepository {
@@ -37,6 +39,8 @@ interface SettingsRepository {
   suspend fun setRelockAfterSeconds(seconds: Int)
 
   suspend fun setOnboardingDone(done: Boolean)
+
+  suspend fun setChannelsNoticePending(pending: Boolean)
 }
 
 private val Context.settingsDataStore by preferencesDataStore(name = "settings")
@@ -60,6 +64,8 @@ class DataStoreSettingsRepository(context: Context) : SettingsRepository {
 
   override suspend fun setOnboardingDone(done: Boolean) = write { it[OnboardingDoneKey] = done }
 
+  override suspend fun setChannelsNoticePending(pending: Boolean) = write { it[ChannelsNoticePendingKey] = pending }
+
   private suspend fun write(block: (androidx.datastore.preferences.core.MutablePreferences) -> Unit) {
     dataStore.edit { block(it) }
   }
@@ -74,6 +80,7 @@ class DataStoreSettingsRepository(context: Context) : SettingsRepository {
       appLock = this[AppLockKey] ?: defaults.appLock,
       relockAfterSeconds = this[RelockAfterKey] ?: defaults.relockAfterSeconds,
       onboardingDone = this[OnboardingDoneKey] ?: defaults.onboardingDone,
+      channelsNoticePending = this[ChannelsNoticePendingKey] ?: defaults.channelsNoticePending,
     )
   }
 
@@ -85,6 +92,7 @@ class DataStoreSettingsRepository(context: Context) : SettingsRepository {
     val AppLockKey = booleanPreferencesKey("app_lock")
     val RelockAfterKey = intPreferencesKey("relock_after")
     val OnboardingDoneKey = booleanPreferencesKey("onboarding_done")
+    val ChannelsNoticePendingKey = booleanPreferencesKey("channels_notice_pending")
   }
 }
 

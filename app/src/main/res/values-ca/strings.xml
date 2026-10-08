@@ -2,6 +2,10 @@
     <string name="app_name">Converses</string>
 
     <string name="people_title">Converses</string>
+    <string name="channels_notice_title">Hem simplificat els canals</string>
+    <string name="channels_notice_body">Ara hi ha cinc grups: En persona, Telèfon, Xat, Social i Altres. Les teves entrades ja els fan servir, i els canals de cada persona surten de les converses.</string>
+    <string name="channels_notice_action">Entesos</string>
+    <string name="beta_description">Versió beta</string>
     <plurals name="people_count">
         <item quantity="one">%d persona</item>
         <item quantity="other">%d persones</item>
@@ -61,7 +65,6 @@
     <string name="app_lock_prompt_title">Desbloqueja Converses</string>
     <string name="today">Avui</string>
     <string name="person_since">Des de %1$s</string>
-    <string name="empty_channels_cta">On hi parles</string>
     <string name="empty_facts_title">Afegeix una dada</string>
     <string name="empty_facts_hint">Feina, família, aniversari, d\'on és…</string>
     <string name="empty_timeline_title">Encara no hi ha res</string>
@@ -84,20 +87,10 @@
     <string name="quick_note">Nota ràpida</string>
     <string name="yesterday">Ahir</string>
 
-    <string name="filter_chat">Xat</string>
-    <string name="filter_social">Xarxes</string>
-    <string name="filter_in_person">En persona</string>
-    <string name="filter_phone">Telèfon</string>
 
-    <string name="channel_discord">Discord</string>
-    <string name="channel_telegram">Telegram</string>
-    <string name="channel_whatsapp">WhatsApp</string>
-    <string name="channel_reddit">Reddit</string>
-    <string name="channel_email">Correu</string>
-    <string name="channel_signal">Signal</string>
-    <string name="channel_linkedin">LinkedIn</string>
-    <string name="channel_x">X</string>
-    <string name="channel_instagram">Instagram</string>
+    <string name="channel_chat">Xat</string>
+    <string name="channel_social">Xarxes</string>
+    <string name="channel_other">Altres</string>
     <string name="channel_phone">Telèfon</string>
     <string name="channel_in_person">En persona</string>
     <string name="more_options">Més opcions</string>
@@ -150,12 +143,6 @@
     <string name="move_up">Mou amunt</string>
     <string name="move_down">Mou avall</string>
     <string name="reorder">Reordena</string>
-    <string name="channels_title">On hi parles</string>
-    <string name="channels_count_none">Cap</string>
-    <plurals name="channels_count">
-        <item quantity="one">%d triat</item>
-        <item quantity="other">%d triats</item>
-    </plurals>
     <string name="protected_person">Persona protegida</string>
     <string name="protected_person_summary">Cal l\'empremta per veure-la. Al llistat no es mostra l\'últim comentari.</string>
     <string name="protected_unavailable">Cal una empremta o un bloqueig de pantalla al dispositiu</string>

@@ -44,24 +44,6 @@ fun Modifier.dashedBorder(color: Color, radius: Dp, width: Dp = 1.5.dp, dash: Dp
     )
   }
 
-/** Pastilla discontínua «+ text» per afegir el primer element d'una fila (p. ex. el primer canal). */
-@Composable
-fun DashedPill(label: String, onClick: () -> Unit, modifier: Modifier = Modifier) {
-  Row(
-    modifier = modifier
-      .heightIn(min = 40.dp)
-      .clip(RoundedCornerShape(20.dp))
-      .clickable(role = Role.Button, onClick = onClick)
-      .dashedBorder(MaterialTheme.colorScheme.outline, radius = 20.dp)
-      .padding(horizontal = 16.dp),
-    horizontalArrangement = Arrangement.spacedBy(8.dp),
-    verticalAlignment = Alignment.CenterVertically,
-  ) {
-    Icon(Icons.Rounded.Add, contentDescription = null, modifier = Modifier.size(18.dp))
-    Text(label, fontSize = 14.sp, fontWeight = FontWeight.Bold)
-  }
-}
-
 /** Fila discontínua amb títol i pista per afegir el primer element d'una secció. */
 @Composable
 fun DashedHintRow(title: String, hint: String, onClick: () -> Unit, modifier: Modifier = Modifier) {

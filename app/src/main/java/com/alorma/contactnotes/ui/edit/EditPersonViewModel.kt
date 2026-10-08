@@ -3,8 +3,6 @@ package com.alorma.contactnotes.ui.edit
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.alorma.contactnotes.data.ConversesRepository
-import com.alorma.contactnotes.data.db.ChannelEntity
-import com.alorma.contactnotes.data.db.ChannelType
 import com.alorma.contactnotes.data.db.PersonEntity
 import com.alorma.contactnotes.data.db.PinnedFactEntity
 import com.alorma.contactnotes.designsystem.components.AvatarColor
@@ -25,7 +23,6 @@ data class EditSnapshot(
   val color: AvatarColor? = null,
   val isProtected: Boolean = false,
   val facts: List<FactDraft> = emptyList(),
-  val channels: Set<ChannelType> = emptySet(),
 )
 
 data class EditPersonUiState(
@@ -37,13 +34,12 @@ data class EditPersonUiState(
   val color: AvatarColor? = null,
   val isProtected: Boolean = false,
   val facts: List<FactDraft> = emptyList(),
-  val channels: Set<ChannelType> = emptySet(),
   val aliasTaken: Boolean = false,
   val entryCount: Int = 0,
   val baseline: EditSnapshot = EditSnapshot(),
 ) {
   private val snapshot: EditSnapshot
-    get() = EditSnapshot(name, alias, shape, color, isProtected, facts, channels)
+    get() = EditSnapshot(name, alias, shape, color, isProtected, facts)
 
   val canSave: Boolean get() = loaded && name.isNotBlank() && !aliasTaken && (isNew || snapshot != baseline)
 }
@@ -59,7 +55,6 @@ interface EditPersonActions {
   fun onFactChange(key: Long, label: String, value: String)
   fun onRemoveFact(key: Long)
   fun onMoveFact(from: Int, to: Int)
-  fun onToggleChannel(type: ChannelType)
   fun delete(exportFirst: Boolean, onDeleted: () -> Unit)
   fun save(onSaved: (Long) -> Unit)
 }
@@ -82,11 +77,9 @@ class EditPersonViewModel(
   private fun load() {
     viewModelScope.launch {
       val person = repository.observePerson(personId).first() ?: return@launch
-      val channels = repository.observeChannels(personId).first()
       val facts = repository.observePinnedFacts(personId).first()
       original = person
       val loadedFacts = facts.map { FactDraft(nextKey++, it.label, it.value) }
-      val loadedChannels = channels.map { it.type }.toSet()
       _state.value = EditPersonUiState(
         isNew = false,
         loaded = true,
@@ -96,7 +89,6 @@ class EditPersonViewModel(
         color = person.avatarColor,
         isProtected = person.isProtected,
         facts = loadedFacts,
-        channels = loadedChannels,
         entryCount = repository.getEntries(personId).size,
         baseline = EditSnapshot(
           name = person.name,
@@ -105,7 +97,6 @@ class EditPersonViewModel(
           color = person.avatarColor,
           isProtected = person.isProtected,
           facts = loadedFacts,
-          channels = loadedChannels,
         ),
       )
     }
@@ -155,10 +146,6 @@ class EditPersonViewModel(
     }
   }
 
-  override fun onToggleChannel(type: ChannelType) = _state.update { state ->
-    state.copy(channels = if (type in state.channels) state.channels - type else state.channels + type)
-  }
-
   override fun delete(exportFirst: Boolean, onDeleted: () -> Unit) {
     val person = original ?: return
     viewModelScope.launch {
@@ -191,11 +178,10 @@ class EditPersonViewModel(
         createdAt = base?.createdAt ?: now,
         updatedAt = now,
       )
-      val channels = current.channels.sorted().map { ChannelEntity(personId = 0, type = it) }
       val facts = current.facts
         .filter { it.label.isNotBlank() || it.value.isNotBlank() }
         .map { PinnedFactEntity(personId = 0, label = it.label.trim(), value = it.value.trim(), position = 0) }
-      onSaved(repository.savePerson(person, channels, facts))
+      onSaved(repository.savePerson(person, facts))
     }
   }
 }

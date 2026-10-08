@@ -10,7 +10,8 @@ import com.alorma.contactnotes.designsystem.components.AvatarColor
 import com.alorma.contactnotes.designsystem.components.AvatarShape
 
 /** L'ordre de declaració és l'ordre fix amb què es mostren els canals, del més habitual al menys. */
-enum class ChannelType { IN_PERSON, WHATSAPP, TELEGRAM, X, INSTAGRAM, PHONE, EMAIL, DISCORD, SIGNAL, LINKEDIN, REDDIT }
+/** Els 5 grups fixos de canals. Els valors es desen pel nom: la migració 1 → 2 va fusionar els antics (WhatsApp, X…) al seu grup. */
+enum class ChannelType { IN_PERSON, PHONE, CHAT, SOCIAL, OTHER }
 
 enum class EntryKind { SAID, HEARD, HAPPENED }
 
@@ -32,24 +33,6 @@ data class PersonEntity(
 val PersonEntity.shape: AvatarShape get() = avatarShape ?: AvatarShape.Standard
 
 val PersonEntity.color: AvatarColor get() = avatarColor ?: AvatarColor.forName(name)
-
-@Entity(
-  tableName = "channel",
-  foreignKeys = [
-    ForeignKey(
-      entity = PersonEntity::class,
-      parentColumns = ["id"],
-      childColumns = ["personId"],
-      onDelete = ForeignKey.CASCADE,
-    ),
-  ],
-  indices = [Index("personId")],
-)
-data class ChannelEntity(
-  @PrimaryKey(autoGenerate = true) val id: Long = 0,
-  val personId: Long,
-  val type: ChannelType,
-)
 
 @Entity(
   tableName = "entry",
@@ -97,5 +80,7 @@ data class KindCount(val kind: EntryKind, val count: Int)
 data class PersonListItem(
   @Embedded val person: PersonEntity,
   @Embedded(prefix = "last_") val lastEntry: EntryEntity?,
-  @Relation(parentColumn = "id", entityColumn = "personId") val channels: List<ChannelEntity>,
+  /** Grups de canal de les seves entrades (amb repeticions); la taula `channel` ja no s'usa. */
+  @Relation(parentColumn = "id", entityColumn = "personId", entity = EntryEntity::class, projection = ["channelType"])
+  val channels: List<ChannelType>,
 )

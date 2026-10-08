@@ -1,5 +1,4 @@
-Versión 1.4.0:
-• El móvil ahora vibra al guardar o confirmar. Si te molesta, hay un ajuste para hacerlo callar.
-• Las pantallas se deslizan como en una app de Android de verdad, y el gesto de volver enseña adónde vas.
-• Los filtros de canal ahora son chips combinables, y los estados vacíos tienen una forma que puedes tocar.
-• Unas cuantas correcciones pequeñas que no notarás, que es justo la idea.
+Versión 1.5.0:
+• Los canales son más simples: En persona, Teléfono, Chat, Social y Otros. Las entradas que tenías han pasado al grupo que toca, y la app te lo cuenta una vez.
+• Los canales de una persona ahora salen de tus conversaciones, así que al añadir a alguien ya no te pregunta dónde habláis.
+• Una pequeña etiqueta «beta» junto al título y unas cuantas correcciones que no notarás, que es la idea.
