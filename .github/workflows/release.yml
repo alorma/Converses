@@ -1,7 +1,7 @@
 name: Release
 
 # Builds the signed release APK and AAB from main, uploads the AAB and its release notes to Google Play, publishes a GitHub release
-# tagged with the version in version.properties and bumps the minor version (as a snapshot) for the next cycle.
+# tagged with the version in version.properties and bumps the patch version (as a snapshot) for the next cycle.
 # Manual trigger only
 on:
   workflow_dispatch:
@@ -103,12 +103,13 @@ jobs:
             --target "${{ github.sha }}" \
             "converses-$VERSION.apk"
 
-      - name: Bump minor version for the next release
+      - name: Bump patch version for the next release
         run: |
           MAJOR=$(grep "^major=" version.properties | cut -d= -f2)
           MINOR=$(grep "^minor=" version.properties | cut -d= -f2)
-          NEXT="$MAJOR.$((MINOR + 1)).0"
-          printf "major=%s\nminor=%s\npatch=0\nsnapshot=true\n" "$MAJOR" "$((MINOR + 1))" > version.properties
+          PATCH=$(grep "^patch=" version.properties | cut -d= -f2)
+          NEXT="$MAJOR.$MINOR.$((PATCH + 1))"
+          printf "major=%s\nminor=%s\npatch=%s\nsnapshot=true\n" "$MAJOR" "$MINOR" "$((PATCH + 1))" > version.properties
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add version.properties
