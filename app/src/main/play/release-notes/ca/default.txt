@@ -1,4 +1,4 @@
-Versió 1.5.0:
-• Els canals s'han simplificat: En persona, Telèfon, Xat, Social i Altres. Les entrades que tenies han passat al grup que toca, i l'app t'ho diu una vegada.
-• Els canals d'una persona ara surten de les teves converses, així que en afegir algú ja no et pregunta on parleu.
-• Una petita etiqueta «beta» al costat del títol i unes quantes correccions que no notaràs, que és la idea.
+Versió 1.6.0:
+• Ajustos per fi diu quina versió tens, i hi ha un enllaç per escriure'ns. Fins ara l'app era molt misteriosa.
+• Els interruptors encesos porten una marca a dins, per si dubtaves que estaven encesos.
+• Una secció «Quant a» amb la política de privacitat i qui ha fet l'app.

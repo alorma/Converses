@@ -1,4 +1,4 @@
-Versión 1.5.0:
-• Los canales son más simples: En persona, Teléfono, Chat, Social y Otros. Las entradas que tenías han pasado al grupo que toca, y la app te lo cuenta una vez.
-• Los canales de una persona ahora salen de tus conversaciones, así que al añadir a alguien ya no te pregunta dónde habláis.
-• Una pequeña etiqueta «beta» junto al título y unas cuantas correcciones que no notarás, que es la idea.
+Versión 1.6.0:
+• Ajustes por fin dice qué versión tienes, y hay un enlace para escribirnos. Hasta ahora la app era muy misteriosa.
+• Los interruptores encendidos llevan una marca dentro, por si dudabas de que estaban encendidos.
+• Una sección «Acerca de» con la política de privacidad y quién ha hecho la app.
