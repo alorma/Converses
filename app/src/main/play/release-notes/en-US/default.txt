@@ -1,4 +1,4 @@
-Version 1.5.0:
-• Channels got simpler: In person, Phone, Chat, Social and Other. Your old entries moved into the right group, and the app tells you once.
-• A person's channels now come from your conversations, so adding someone no longer asks where you talk.
-• A small "beta" tag next to the title, and a few fixes you won't notice, which is the point.
+Version 1.6.0:
+• Settings now tells you which version you have, and there is a link to write to us. Until now the app was quite mysterious about itself.
+• Switches that are on now carry a check mark, in case you doubted they were on.
+• An «About» section with the privacy policy and who made the app.
