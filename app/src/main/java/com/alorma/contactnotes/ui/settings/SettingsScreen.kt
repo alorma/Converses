@@ -408,9 +408,9 @@ private fun Context.openUrl(url: String) {
 }
 
 private fun Context.openFeedback(subject: String, body: String) {
-  val intent = Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:${AboutLinks.FeedbackEmail}"))
-    .putExtra(Intent.EXTRA_SUBJECT, subject)
-    .putExtra(Intent.EXTRA_TEXT, body)
+  // Assumpte i cos van dins l'URI: Gmail ignora `EXTRA_SUBJECT` i `EXTRA_TEXT` amb `ACTION_SENDTO`.
+  val uri = Uri.parse("mailto:${AboutLinks.FeedbackEmail}?subject=${Uri.encode(subject)}&body=${Uri.encode(body)}")
+  val intent = Intent(Intent.ACTION_SENDTO, uri)
   try {
     startActivity(intent)
   } catch (_: ActivityNotFoundException) {
