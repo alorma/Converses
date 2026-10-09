@@ -8,11 +8,10 @@ Actualitzat el 8 d'oct. de 2026. Només hi ha el que encara no està fet.
 | 7 | Feature (Iteració 2) | Nou canal "Empresa" (queda dins el 8, com a sub-canal d'Altres) | — |
 | 8 | Feature (Iteració 2, Pro) | Sub-canals amb nom i valor (dins dels 5 grups de canals) | — |
 | 11 | Feature (Iteració 2) | Importar text a la nota ràpida (compartir, seleccionar text i enganxar) | [#30](https://github.com/alorma/Converses/issues/30) |
-| 14 | Millora | Detall de persona: les 3 accions visibles, sense el split FAB | [#44](https://github.com/alorma/Converses/issues/44) |
 | 15 | Millora | Ajustos: secció «Quant a» | [#43](https://github.com/alorma/Converses/issues/43) |
 | 16 | Neteja | Treure l'avís dels canals quan la v1 sigui residual | — |
 
-Els punts 6, 7, 8 i 11 són de l'**Iteració 2**; el 6 i el 8 són Pro, i l'11 és gratis (vegeu `docs/pro.md`). Els punts 14 i 15 vénen del feedback de la beta (issues #40, #43 i #44; el #45 s'ha descartat i la cerca, #41, queda per més endavant (vegeu `docs/plan.md`)) i són tasques independents. **Qualsevol canvi de la base de dades ha d'incloure una migració i el seu test** (la v1 ja és a Google Play); l'11, el 14, el 15 i el 16 no toquen Room. La v2 (canals en 5 grups) ja està feta; el 6 i el 8 necessitaran la v3. La numeració és la del backlog original, perquè els issues i les referències no canviïn; els punts resolts (1–5, 9, 10, 12, 13) són a l'historial de git.
+Els punts 6, 7, 8 i 11 són de l'**Iteració 2**; el 6 i el 8 són Pro, i l'11 és gratis (vegeu `docs/pro.md`). El punt 15 ve del feedback de la beta (issue #43; el #45 s'ha descartat i la cerca, #41, queda per més endavant (vegeu `docs/plan.md`)) i és una tasca independent. **Qualsevol canvi de la base de dades ha d'incloure una migració i el seu test** (la v1 ja és a Google Play); l'11, el 15 i el 16 no toquen Room. La v2 (canals en 5 grups) ja està feta; el 6 i el 8 necessitaran la v3. La numeració és la del backlog original, perquè els issues i les referències no canviïn; els punts resolts (1–5, 9, 10, 12, 13) i el 14 (descartat: es queda el split button del detall) són a l'historial de git.
 
 ---
 
@@ -78,23 +77,6 @@ Quan la v1 sigui residual a la Play Console, treure l'avís de la migració dels
 **La migració i el seu test no es treuen mai:** qualsevol usuari amb la BBDD a la v1 que obri una versió nova ha de passar per ella.
 
 ---
-
-## 14 · Millora: accions del detall de persona
-
-Issue: [#44](https://github.com/alorma/Converses/issues/44)
-
-Ara hi ha un split FAB amb **Nota** i un menú amb **Exportar notes** i **Arxivar**; l'usuari proposa tenir-les visibles.
-
-**Decidit**
-- **FAB estès només per a «Nota»** (adéu al split button).
-- **`topBar`:** Enrere a l'esquerra; a la dreta, icones **Editar** i **Compartir** (exportar notes), i un «⋮» amb **Arxivar / Desarxivar**. Arxivar és l'acció menys freqüent i el menú deixa lloc a accions Pro futures.
-
-**Què cal fer**
-- `PersonDetailScreen.kt`: treure `ConversesSplitButton` del slot `floatingActionButton` i posar-hi un FAB estès; afegir les accions i el menú a la `topBar`.
-- `contentDescription` i tooltip a les icones (la de compartir diu «Exportar notes»).
-- Quan la persona és arxivada, l'entrada del menú passa a «Desarxivar».
-- `ConversesSplitButton` es queda a `:designsystem`, encara que l'app no el faci servir.
-- Persones protegides: l'exportació no canvia. Sense Room. Actualitzar les captures del detall.
 
 ## 15 · Millora: ampliar «Quant a» als Ajustos
 
