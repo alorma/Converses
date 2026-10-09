@@ -44,7 +44,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Switch
+import com.alorma.contactnotes.designsystem.components.ConversesSwitch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -274,7 +274,7 @@ fun EditPersonContent(
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
               )
             }
-            Switch(
+            ConversesSwitch(
               checked = state.isProtected,
               enabled = canAuthenticate,
               onCheckedChange = onProtectedChange,

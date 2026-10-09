@@ -61,7 +61,16 @@
     <string name="settings_protected_note">Protected people ask for your fingerprint anyway, even if the app is already unlocked.</string>
     <string name="settings_about">About</string>
     <string name="settings_privacy_policy">Privacy policy</string>
-    <string name="settings_footer">Converses · version %1$s</string>
+    <string name="settings_interaction">Interaction</string>
+    <string name="settings_version">Version</string>
+    <string name="settings_privacy_policy_summary">What data is stored and where</string>
+    <string name="settings_privacy_policy_url">https://converses.app/privacy/</string>
+    <string name="settings_feedback">Send feedback</string>
+    <string name="settings_feedback_summary">Ideas, bugs or questions</string>
+    <string name="settings_feedback_subject">Converses feedback</string>
+    <string name="settings_feedback_body">App version: %s</string>
+    <string name="settings_made_by">Made by %s</string>
+    <string name="settings_opens_outside">Opens outside the app</string>
     <string name="app_lock_title">Converses is locked</string>
     <string name="app_lock_prompt_title">Unlock Converses</string>
     <string name="today">Today</string>

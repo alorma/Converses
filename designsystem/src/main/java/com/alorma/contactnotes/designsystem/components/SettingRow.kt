@@ -6,7 +6,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -77,6 +76,6 @@ fun SettingSwitchRow(
         onCheckedChange(it)
       },
     ),
-    trailing = { Switch(checked = checked, onCheckedChange = null) },
+    trailing = { ConversesSwitch(checked = checked, onCheckedChange = null) },
   )
 }

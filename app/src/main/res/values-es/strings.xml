@@ -60,7 +60,16 @@
     <string name="settings_protected_note">Las personas protegidas piden la huella igualmente, aunque la app ya esté desbloqueada.</string>
     <string name="settings_about">Acerca de</string>
     <string name="settings_privacy_policy">Política de privacidad</string>
-    <string name="settings_footer">Converses · versión %1$s</string>
+    <string name="settings_interaction">Interacción</string>
+    <string name="settings_version">Versión</string>
+    <string name="settings_privacy_policy_summary">Qué datos se guardan y dónde</string>
+    <string name="settings_privacy_policy_url">https://converses.app/es/privacidad/</string>
+    <string name="settings_feedback">Enviar comentarios</string>
+    <string name="settings_feedback_summary">Ideas, errores o dudas</string>
+    <string name="settings_feedback_subject">Comentarios sobre Converses</string>
+    <string name="settings_feedback_body">Versión de la app: %s</string>
+    <string name="settings_made_by">Hecho por %s</string>
+    <string name="settings_opens_outside">Se abre fuera de la app</string>
     <string name="app_lock_title">Converses está bloqueada</string>
     <string name="app_lock_prompt_title">Desbloquea Converses</string>
     <string name="today">Hoy</string>
