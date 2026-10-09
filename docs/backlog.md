@@ -8,12 +8,11 @@ Actualitzat el 8 d'oct. de 2026. Només hi ha el que encara no està fet.
 | 7 | Feature (Iteració 2) | Nou canal "Empresa" (queda dins el 8, com a sub-canal d'Altres) | — |
 | 8 | Feature (Iteració 2, Pro) | Sub-canals amb nom i valor (dins dels 5 grups de canals) | — |
 | 11 | Feature (Iteració 2) | Importar text a la nota ràpida (compartir, seleccionar text i enganxar) | [#30](https://github.com/alorma/Converses/issues/30) |
-| 12 | Bug | Nota ràpida: el xip «Persona» desactivat confon | [#40](https://github.com/alorma/Converses/issues/40) |
 | 14 | Millora | Detall de persona: les 3 accions visibles, sense el split FAB | [#44](https://github.com/alorma/Converses/issues/44) |
 | 15 | Millora | Ajustos: secció «Quant a» | [#43](https://github.com/alorma/Converses/issues/43) |
 | 16 | Neteja | Treure l'avís dels canals quan la v1 sigui residual | — |
 
-Els punts 6, 7, 8 i 11 són de l'**Iteració 2**; el 6 i el 8 són Pro, i l'11 és gratis (vegeu `docs/pro.md`). Els punts 12, 14 i 15 vénen del feedback de la beta (issues #40, #43 i #44; el #45 s'ha descartat i la cerca, #41, queda per més endavant (vegeu `docs/plan.md`)) i són tasques independents. **Qualsevol canvi de la base de dades ha d'incloure una migració i el seu test** (la v1 ja és a Google Play); l'11, el 12, el 14, el 15 i el 16 no toquen Room. La v2 (canals en 5 grups) ja està feta; el 6 i el 8 necessitaran la v3. La numeració és la del backlog original, perquè els issues i les referències no canviïn; els punts resolts (1–5, 9, 10, 13) són a l'historial de git.
+Els punts 6, 7, 8 i 11 són de l'**Iteració 2**; el 6 i el 8 són Pro, i l'11 és gratis (vegeu `docs/pro.md`). Els punts 14 i 15 vénen del feedback de la beta (issues #40, #43 i #44; el #45 s'ha descartat i la cerca, #41, queda per més endavant (vegeu `docs/plan.md`)) i són tasques independents. **Qualsevol canvi de la base de dades ha d'incloure una migració i el seu test** (la v1 ja és a Google Play); l'11, el 14, el 15 i el 16 no toquen Room. La v2 (canals en 5 grups) ja està feta; el 6 i el 8 necessitaran la v3. La numeració és la del backlog original, perquè els issues i les referències no canviïn; els punts resolts (1–5, 9, 10, 12, 13) són a l'historial de git.
 
 ---
 
@@ -71,21 +70,6 @@ Portar text d'altres apps a la nota ràpida amb el mínim de passos: el text ja 
 - Sense canvis a Room, **no cal migració**. Textos nous a `values/`, `values-ca/` i `values-es/`; en acabar, afegir-ho a «Gratis per sempre» de `docs/pro.md` i actualitzar `docs/plan.md`.
 
 ---
-
-## 12 · Bug: xip «Persona» desactivat a la nota ràpida
-
-Issue: [#40](https://github.com/alorma/Converses/issues/40)
-
-A la nota ràpida, sense persona triada, el xip «Persona» de «Qui» surt gris i desactivat (i truncat, «Pers…»). Sembla el lloc on afegir la persona; els usuaris el toquen i no passa res, perquè la persona es tria a la targeta «Amb qui» de dalt.
-
-**Decisió recomanada:** tocar el xip sense persona obre el selector de persones (el mateix full que la targeta «Amb qui»); en triar-ne una, el xip queda seleccionat.
-
-**Què cal fer**
-- `WhoSelector` d'`EntryForm` (`ui/entry/EntryForm.kt`): el xip deixa d'estar desactivat sense persona i demana obrir el selector. L'etiqueta continua sortint de `whoLabel(...)` (`ui/person/WhoLabels.kt`).
-- La nota ràpida és qui obre el full; el full de nova entrada de la persona no canvia.
-- Etiqueta llegible: treure la icona del xip buit perquè «Persona» càpiga sense tallar-se.
-- Protegides: el selector no ha de mostrar res de les entrades abans de desbloquejar.
-- Sense Room, sense migració. Captura de la nota ràpida sense persona.
 
 ## 16 · Neteja: treure l'avís dels canals
 
