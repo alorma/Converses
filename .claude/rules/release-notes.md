@@ -1,9 +1,16 @@
----
-paths:
-  - "app/src/main/play/release-notes/**"
----
+# Google Play release notes
 
-# Google Play release notes: tone and format
+No `paths` on purpose: the check below applies to every task, not only when editing the notes.
+
+## When to add a bullet
+
+At the end of every task or feature, say whether it deserves a bullet in the release notes and why.
+
+- **Yes** only if the user can see or measure it. **No** for refactors, docs, CI, dependency bumps, internal fixes, and anything behind a flag (Pro, `PersonColorFeature`, `CustomAvatarFeature`, …).
+- Propose it and ask. Do not edit the notes unless the user agrees.
+- The notes are rewritten for every release, so a bullet agreed now can wait until the next release is prepared.
+
+## Tone and format
 
 The «What's new» text lives in `app/src/main/play/release-notes/<locale>/default.txt` and is uploaded with the AAB by `release.yml` (Gradle Play Publisher). It is user-facing, so the tone matters.
 
