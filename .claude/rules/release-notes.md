@@ -10,7 +10,7 @@ At the end of every task or feature, say whether it deserves a bullet in the rel
 - Propose it and ask. Do not edit the notes unless the user agrees.
 - The notes are rewritten for every release, so a bullet agreed now can wait until the next release is prepared.
 
-## Tone and format
+## Where they live
 
 The «What's new» text lives in `app/src/main/play/release-notes/<locale>/default.txt` and is uploaded with the AAB by `release.yml` (Gradle Play Publisher). It is user-facing, so the tone matters.
 
