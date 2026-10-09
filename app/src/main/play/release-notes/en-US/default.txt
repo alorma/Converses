@@ -1,4 +1,4 @@
 Version 1.6.0:
-• Settings now tells you which version you have, and there is a link to write to us. Until now the app was quite mysterious about itself.
-• Switches that are on now carry a check mark, in case you doubted they were on.
-• An «About» section with the privacy policy and who made the app.
+• Settings now tells you which version you have and has an «About» section with a way to write to us. The app is barely two weeks old and was already keeping secrets. Impressive, in a way.
+• Switches that are on now show a check mark. They were always on, we just never had the courage to prove it.
+• In the quick note, the «Person» chip now lets you pick the person. Until now it was just there looking pretty. We have all been there.

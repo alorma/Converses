@@ -1,4 +1,4 @@
 Versión 1.6.0:
-• Ajustes por fin dice qué versión tienes, y hay un enlace para escribirnos. Hasta ahora la app era muy misteriosa.
-• Los interruptores encendidos llevan una marca dentro, por si dudabas de que estaban encendidos.
-• Una sección «Acerca de» con la política de privacidad y quién ha hecho la app.
+• Ajustes ahora dice qué versión tienes y tiene una sección «Acerca de» con una vía para escribirnos. La app apenas tiene dos semanas y ya guardaba secretos. Tiene mérito, en el fondo.
+• Los interruptores encendidos ahora llevan una marca dentro. Siempre lo estuvieron, simplemente nunca nos atrevimos a demostrarlo.
+• En la nota rápida, el chip «Persona» ahora te deja elegir a la persona. Hasta ahora solo estaba para hacer bonito. Todos hemos estado ahí.

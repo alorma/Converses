@@ -1,4 +1,4 @@
 Versió 1.6.0:
-• Ajustos per fi diu quina versió tens, i hi ha un enllaç per escriure'ns. Fins ara l'app era molt misteriosa.
-• Els interruptors encesos porten una marca a dins, per si dubtaves que estaven encesos.
-• Una secció «Quant a» amb la política de privacitat i qui ha fet l'app.
+• Ajustos ara diu quina versió tens i té una secció «Quant a» amb una via per escriure'ns. L'app amb prou feines té dues setmanes i ja guardava secrets. Té mèrit, en el fons.
+• Els interruptors encesos ara porten una marca a dins. Sempre ho han estat, simplement mai ens havíem atrevit a demostrar-ho.
+• A la nota ràpida, el xip «Persona» ara et deixa triar la persona. Fins ara només hi era per fer bonic. Tots hi hem estat.
