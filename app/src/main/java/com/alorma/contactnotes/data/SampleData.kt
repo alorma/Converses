@@ -40,7 +40,7 @@ internal suspend fun ConversesDatabase.insertSampleData(now: Long = System.curre
       ),
     ),
     SamplePerson(
-      name = "Laia Ferrer", alias = null, shape = AvatarShape.Flower, color = AvatarColor.Peach,
+      name = "Laia Ferrer", alias = null, shape = AvatarShape.Clover8Leaf, color = AvatarColor.Peach,
       facts = emptyList(),
       entries = listOf(
         Triple(EntryKind.HAPPENED, ChannelType.PHONE, "Long call about the trip to Lisbon.") to ago(20),

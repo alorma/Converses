@@ -216,4 +216,6 @@
     <string name="shape_clover">Clover</string>
     <string name="shape_flower">Flower</string>
     <string name="shape_sunny">Sun</string>
+    <string name="shape_ghost">Ghost</string>
+    <string name="shape_pillow">Pillow</string>
 </resources>

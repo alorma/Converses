@@ -143,4 +143,4 @@ internal fun AvatarSheetAutoPreview() = AvatarSheetPreview(shape = null, color =
 
 @Preview
 @Composable
-internal fun AvatarSheetCustomPreview() = AvatarSheetPreview(shape = AvatarShape.Flower, color = AvatarColor.Rose)
+internal fun AvatarSheetCustomPreview() = AvatarSheetPreview(shape = AvatarShape.Clover8Leaf, color = AvatarColor.Rose)

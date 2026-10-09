@@ -2,6 +2,7 @@ package com.alorma.contactnotes.data.db
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
+import androidx.room.TypeConverters
 
 @Database(
   entities = [
@@ -11,6 +12,7 @@ import androidx.room.RoomDatabase
   ],
   version = 2,
 )
+@TypeConverters(AvatarShapeConverter::class)
 abstract class ConversesDatabase : RoomDatabase() {
   abstract fun personDao(): PersonDao
   abstract fun entryDao(): EntryDao
