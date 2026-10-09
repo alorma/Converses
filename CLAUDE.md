@@ -43,7 +43,6 @@ No linter (ktlint/detekt) is configured.
 ## Rules
 
 - Work in small steps and validate each one before continuing; state and pending work live in `docs/plan.md`.
-- At the end of every task or feature, say whether it deserves a bullet in the Google Play release notes (`app/src/main/play/release-notes/`) and why: yes only if the user can see or measure it (not refactors, docs, CI, dependency bumps, or anything behind a flag such as Pro). Propose it and ask; do not edit the notes unless the user agrees. Tone and format are in `.claude/rules/release-notes.md`.
 - Before adding a library, check its current stable version in the official documentation.
 - Every screen is a Material 3 `Scaffold`: fixed headers (back, title, actions) go in `topBar` and never scroll with the content (titled screens use `ConversesTopBar` from `:designsystem`: Medium by default, `large = true` for Settings; person detail and the people list keep their own headers), FABs and the floating toolbar in `floatingActionButton`, snackbars in `snackbarHost`; no manual `windowInsetsPadding` for the system bars, use the `padding` the `Scaffold` gives (with `consumeWindowInsets` before `imePadding`). The floating navigation toolbar goes in the FAB slot (`FabPosition.Center`), not in `bottomBar`, because it must not reserve space.
 - Keep all `@OptIn(ExperimentalMaterial3ExpressiveApi::class)` in the `designsystem` module; screens do not repeat them.
