@@ -8,10 +8,9 @@ Actualitzat el 8 d'oct. de 2026. Només hi ha el que encara no està fet.
 | 7 | Feature (Iteració 2) | Nou canal "Empresa" (queda dins el 8, com a sub-canal d'Altres) | — |
 | 8 | Feature (Iteració 2, Pro) | Sub-canals amb nom i valor (dins dels 5 grups de canals) | — |
 | 11 | Feature (Iteració 2) | Importar text a la nota ràpida (compartir, seleccionar text i enganxar) | [#30](https://github.com/alorma/Converses/issues/30) |
-| 15 | Millora | Ajustos: secció «Quant a» | [#43](https://github.com/alorma/Converses/issues/43) |
 | 16 | Neteja | Treure l'avís dels canals quan la v1 sigui residual | — |
 
-Els punts 6, 7, 8 i 11 són de l'**Iteració 2**; el 6 i el 8 són Pro, i l'11 és gratis (vegeu `docs/pro.md`). El punt 15 ve del feedback de la beta (issue #43; el #45 s'ha descartat i la cerca, #41, queda per més endavant (vegeu `docs/plan.md`)) i és una tasca independent. **Qualsevol canvi de la base de dades ha d'incloure una migració i el seu test** (la v1 ja és a Google Play); l'11, el 15 i el 16 no toquen Room. La v2 (canals en 5 grups) ja està feta; el 6 i el 8 necessitaran la v3. La numeració és la del backlog original, perquè els issues i les referències no canviïn; els punts resolts (1–5, 9, 10, 12, 13) i el 14 (descartat: es queda el split button del detall) són a l'historial de git.
+Els punts 6, 7, 8 i 11 són de l'**Iteració 2**; el 6 i el 8 són Pro, i l'11 és gratis (vegeu `docs/pro.md`). El #45 s'ha descartat i la cerca (#41) queda per més endavant (vegeu `docs/plan.md`). **Qualsevol canvi de la base de dades ha d'incloure una migració i el seu test** (la v1 ja és a Google Play); l'11 i el 16 no toquen Room. La v2 (canals en 5 grups) ja està feta; el 6 i el 8 necessitaran la v3. La numeració és la del backlog original, perquè els issues i les referències no canviïn; els punts resolts (1–5, 9, 10, 12, 13, 15) i el 14 (descartat: es queda el split button del detall) són a l'historial de git.
 
 ---
 
@@ -75,25 +74,3 @@ Portar text d'altres apps a la nota ràpida amb el mínim de passos: el text ja 
 Quan la v1 sigui residual a la Play Console, treure l'avís de la migració dels canals: el banner (`NoticeBanner` i el seu ús a `PeopleListScreen`), `showChannelsNotice` i `onChannelsNoticeDismissed` al `PeopleListViewModel`, el flag `channelsNoticePending` d'`AppSettings`/`SettingsRepository`, el callback de `Migration1To2` i les strings `channels_notice_*`.
 
 **La migració i el seu test no es treuen mai:** qualsevol usuari amb la BBDD a la v1 que obri una versió nova ha de passar per ella.
-
----
-
-## 15 · Millora: ampliar «Quant a» als Ajustos
-
-Issue: [#43](https://github.com/alorma/Converses/issues/43)
-
-Ajustos **ja té** una secció «Quant a» (`settings_about`) amb la política de privadesa i, al peu, «Converses · versió X». Cal ampliar-la perquè es vegi qui hi ha darrere de l'app.
-
-**Decidit**
-- **Opció A:** més files a la secció actual (`SettingsScreen.kt`), sense subpantalla.
-- **Sense llicències de codi obert de moment** (quedaria per més endavant, amb una pantalla pròpia o AboutLibraries, mirant abans la versió estable).
-
-**Files a afegir**, a sota de la privadesa
-- **Qui ho fa:** el nom de l'autor amb un enllaç.
-- **Codi font:** enllaç al repositori, si és públic.
-- **Enviar feedback:** correu o formulari.
-- Opcional: **Valorar a Google Play**.
-
-**Dades a decidir:** nom i enllaç de l'autor, si el repositori és públic, i el canal del feedback (`mailto:` o issues de GitHub; el correu quedaria exposat).
-
-Textos a `strings.xml` (en, ca, es) i captures d'Ajustos. Sense Room.

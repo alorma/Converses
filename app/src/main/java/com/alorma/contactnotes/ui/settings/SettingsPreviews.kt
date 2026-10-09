@@ -12,7 +12,7 @@ private fun SettingsPreview(settings: AppSettings, canUnlock: Boolean) {
       settings = settings,
       canUnlock = canUnlock,
       languageName = "English",
-      versionName = "1.0",
+      versionName = "1.0 (1)",
       onBack = {},
       onThemeMode = {},
       onDynamicColor = {},
@@ -23,6 +23,7 @@ private fun SettingsPreview(settings: AppSettings, canUnlock: Boolean) {
       onOpenLanguage = {},
       onOpenSecuritySetup = {},
       onOpenPrivacyPolicy = {},
+      onOpenFeedback = {},
     )
   }
 }

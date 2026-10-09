@@ -73,7 +73,7 @@ El detall és a `docs/backlog.md`. Els punts 6 i 8 necessiten migració (la v3; 
 - **Sub-canals (8):** dins dels 5 grups, amb nom lliure (únic per persona) i valor opcional. Absorbeix «Empresa» (7). És Pro. Necessitarà una taula nova (persona, grup, nom, valor).
 - **Importar text a la nota ràpida, «share invers» (11, issue #30):** compartir text des d'altres apps (`ACTION_SEND`), seleccionar text (`ACTION_PROCESS_TEXT`) i un botó «Enganxa» al porta-retalls; la nota ràpida s'obre amb el text posat i només cal triar la persona. Sense canvis a Room, no cal migració. És gratis.
 - **Feedback de la beta, tasques independents:**
-  - **15 · Ampliar «Quant a» als Ajustos (#43):** la secció ja existeix (privadesa i versió); s'hi afegeixen autor, repositori i feedback, sense llicències de moment. Dades per decidir.
+  - **15 · «Quant a» als Ajustos (#43):** fet. Ordre: Aparença · Interacció (feedback tàctil, ara secció pròpia) · Idioma · Seguretat · Quant a (versió, privacitat, comentaris per `mailto:`) i «Fet per Alorma» (sense «Codi font»: el repo no és públic). Les dades són a `ui/settings/AboutLinks.kt`.
   - **16 · Neteja:** treure l'avís dels canals (banner, flag i callback de la migració) quan la v1 sigui residual a la Play Console; la migració i el seu test no es treuen mai.
 
 ## Després de la v1
@@ -122,7 +122,7 @@ Una sola activitat (`MainActivity`, una `FragmentActivity` pel `BiometricPrompt`
 | Desbloqueig | `PersonLockedRoute(id)` | `BiometricPrompt` automàtic; si va bé, substitueix la ruta pel detall |
 | Nota ràpida | `QuickNoteRoute(personId?)` | Sense persona per defecte; una protegida demana l'empremta en triar-la |
 | Editar/crear | `EditPersonRoute(personId, focus)` | `0` = persona nova; en crear, va al detall; `focus` (`EditFocus.NEW_FACT`) afegeix una dada i en posa el focus; l'editor ja no té selecció de canals |
-| Ajustos | `SettingsRoute` | Inclou la política de privadesa |
+| Ajustos | `SettingsRoute` | Aparença, Interacció, Idioma, Seguretat i Quant a (versió, política de privacitat, comentaris) |
 | Fulls i diàlegs | Dins del detall i de l'editor | Nova entrada, accions d'entrada, menú del split button, triar persona, «Quan», «Avatar», esborrar |
 
 ### Model de dades (Room, versió 2)

@@ -1,5 +1,6 @@
 package com.alorma.contactnotes.ui.settings
 
+import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -37,7 +38,9 @@ import androidx.compose.material.icons.rounded.Fingerprint
 import androidx.compose.material.icons.rounded.Language
 import androidx.compose.material.icons.rounded.Palette
 import androidx.compose.material.icons.rounded.Vibration
-import androidx.compose.material.icons.rounded.PrivacyTip
+import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material.icons.outlined.Mail
+import androidx.compose.material.icons.outlined.Policy
 import androidx.compose.material.icons.rounded.Timer
 import androidx.compose.material.icons.rounded.UnfoldMore
 import androidx.compose.material3.DropdownMenu
@@ -63,8 +66,16 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.LinkAnnotation
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextLinkStyles
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.withLink
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.core.content.pm.PackageInfoCompat
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
@@ -107,13 +118,15 @@ fun SettingsScreen(
   val authTitle = stringResource(R.string.app_lock_prompt_title)
   val authSubtitle = stringResource(R.string.unlock_subtitle)
 
+  val feedbackSubject = stringResource(R.string.settings_feedback_subject)
+  val feedbackBody = stringResource(R.string.settings_feedback_body, remember { versionLabel(context) })
   val haptics = rememberConversesHaptics()
   SettingsContent(
     settings = settings,
     showPersonColor = rememberFeatureEnabled<PersonColorFeature>(),
     canUnlock = canUnlock,
     languageName = remember { currentLanguageName(context) },
-    versionName = remember { versionName(context) },
+    versionName = remember { versionLabel(context) },
     onBack = onBack,
     onThemeMode = viewModel::onThemeMode,
     onDynamicColor = viewModel::onDynamicColor,
@@ -130,6 +143,7 @@ fun SettingsScreen(
     onOpenLanguage = { context.openLanguageSettings() },
     onOpenSecuritySetup = { context.openSecuritySetup() },
     onOpenPrivacyPolicy = { context.openPrivacyPolicy() },
+    onOpenFeedback = { context.openFeedback(feedbackSubject, feedbackBody) },
   )
 }
 
@@ -149,6 +163,7 @@ fun SettingsContent(
   onOpenLanguage: () -> Unit,
   onOpenSecuritySetup: () -> Unit,
   onOpenPrivacyPolicy: () -> Unit,
+  onOpenFeedback: () -> Unit,
   showPersonColor: Boolean = true,
 ) {
   val scrollBehavior = rememberTopBarScrollBehavior()
@@ -182,7 +197,7 @@ fun SettingsContent(
         title = { SectionTitle(stringResource(R.string.settings_appearance)) },
         verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap),
       ) {
-        val themeCount = if (showPersonColor) 4 else 3
+        val themeCount = if (showPersonColor) 3 else 2
         ThemeModeRow(
           selected = settings.themeMode,
           onSelected = onThemeMode,
@@ -204,13 +219,19 @@ fun SettingsContent(
           onCheckedChange = onPersonColorTheme,
           shape = groupedItemShape(2, themeCount),
         )
+      }
+
+      SettingsGroup(
+        title = { SectionTitle(stringResource(R.string.settings_interaction)) },
+        verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap),
+      ) {
         SettingSwitchRow(
           title = stringResource(R.string.settings_haptic),
           subtitle = stringResource(R.string.settings_haptic_summary),
           icon = Icons.Rounded.Vibration,
           checked = settings.hapticFeedback,
           onCheckedChange = onHapticFeedback,
-          shape = groupedItemShape(themeCount - 1, themeCount),
+          shape = groupedItemShape(0, 1),
         )
       }
 
@@ -268,24 +289,33 @@ fun SettingsContent(
         modifier = Modifier.padding(horizontal = 4.dp),
       )
 
+      val aboutCount = 3
       SettingsGroup(
         title = { SectionTitle(stringResource(R.string.settings_about)) },
         verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap),
       ) {
         SettingRow(
+          title = stringResource(R.string.settings_version),
+          subtitle = versionName,
+          icon = Icons.Outlined.Info,
+          shape = groupedItemShape(0, aboutCount),
+        )
+        ExternalLinkRow(
           title = stringResource(R.string.settings_privacy_policy),
-          icon = Icons.Rounded.PrivacyTip,
-          trailing = { Icon(Icons.AutoMirrored.Rounded.OpenInNew, contentDescription = null) },
-          shape = groupedItemShape(0, 1),
+          subtitle = stringResource(R.string.settings_privacy_policy_summary),
+          icon = Icons.Outlined.Policy,
+          shape = groupedItemShape(1, aboutCount),
           onClick = onOpenPrivacyPolicy,
         )
+        ExternalLinkRow(
+          title = stringResource(R.string.settings_feedback),
+          subtitle = stringResource(R.string.settings_feedback_summary),
+          icon = Icons.Outlined.Mail,
+          shape = groupedItemShape(2, aboutCount),
+          onClick = onOpenFeedback,
+        )
       }
-      Text(
-        text = stringResource(R.string.settings_footer, versionName),
-        style = MaterialTheme.typography.bodyMedium,
-        color = MaterialTheme.colorScheme.onSurfaceVariant,
-        modifier = Modifier.padding(start = 4.dp, top = 12.dp, bottom = 32.dp),
-      )
+      MadeBy(modifier = Modifier.padding(start = 4.dp, top = 4.dp, bottom = 32.dp))
     }
   }
 }
@@ -367,11 +397,25 @@ private fun Context.openLanguageSettings() {
   startActivity(intent)
 }
 
-private const val PrivacyPolicyUrl = "https://alorma.github.io/converses/privacy/"
+private fun Context.openPrivacyPolicy() = openUrl(getString(R.string.settings_privacy_policy_url))
 
-private fun Context.openPrivacyPolicy() {
-  val language = resources.configuration.locales[0].language.takeIf { it in SupportedLanguages } ?: "en"
-  startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("$PrivacyPolicyUrl#$language")))
+private fun Context.openUrl(url: String) {
+  try {
+    startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
+  } catch (_: ActivityNotFoundException) {
+    // Sense navegador: no hi ha res a obrir.
+  }
+}
+
+private fun Context.openFeedback(subject: String, body: String) {
+  val intent = Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:${AboutLinks.FeedbackEmail}"))
+    .putExtra(Intent.EXTRA_SUBJECT, subject)
+    .putExtra(Intent.EXTRA_TEXT, body)
+  try {
+    startActivity(intent)
+  } catch (_: ActivityNotFoundException) {
+    // Sense app de correu: no hi ha res a obrir.
+  }
 }
 
 private fun currentLanguageName(context: Context): String {
@@ -380,8 +424,53 @@ private fun currentLanguageName(context: Context): String {
   return locale.getDisplayLanguage(locale).replaceFirstChar { it.titlecase(locale) }
 }
 
-private fun versionName(context: Context): String =
-  context.packageManager.getPackageInfo(context.packageName, 0).versionName.orEmpty()
+/** «versionName (versionCode)». */
+private fun versionLabel(context: Context): String {
+  val info = context.packageManager.getPackageInfo(context.packageName, 0)
+  return "${info.versionName.orEmpty()} (${PackageInfoCompat.getLongVersionCode(info)})"
+}
+
+@Composable
+private fun ExternalLinkRow(
+  title: String,
+  subtitle: String,
+  icon: androidx.compose.ui.graphics.vector.ImageVector,
+  shape: androidx.compose.ui.graphics.Shape,
+  onClick: () -> Unit,
+) {
+  SettingRow(
+    title = title,
+    subtitle = subtitle,
+    icon = icon,
+    trailing = {
+      Icon(Icons.AutoMirrored.Rounded.OpenInNew, contentDescription = stringResource(R.string.settings_opens_outside))
+    },
+    shape = shape,
+    onClick = onClick,
+  )
+}
+
+@Composable
+private fun MadeBy(modifier: Modifier = Modifier) {
+  val text = stringResource(R.string.settings_made_by, AboutLinks.AuthorName)
+  val start = text.indexOf(AboutLinks.AuthorName)
+  val color = MaterialTheme.colorScheme.onSurface
+  val linkStyles = TextLinkStyles(SpanStyle(color = color, fontWeight = FontWeight.Bold, textDecoration = TextDecoration.Underline))
+  Text(
+    text = buildAnnotatedString {
+      if (start < 0) {
+        append(text)
+      } else {
+        append(text.substring(0, start))
+        withLink(LinkAnnotation.Url(AboutLinks.AuthorUrl, linkStyles)) { append(AboutLinks.AuthorName) }
+        append(text.substring(start + AboutLinks.AuthorName.length))
+      }
+    },
+    style = MaterialTheme.typography.bodySmall.copy(fontSize = 13.sp),
+    color = MaterialTheme.colorScheme.onSurfaceVariant,
+    modifier = modifier,
+  )
+}
 
 @Composable
 private fun SectionTitle(text: String) {
