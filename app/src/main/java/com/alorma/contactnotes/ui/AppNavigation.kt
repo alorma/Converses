@@ -147,7 +147,7 @@ fun AppNavigation(startOnboarding: Boolean = false) {
           onSaved = { id ->
             backStack.removeLastOrNull()
             if (route.returnSelection) {
-              selectionBridge.post(id)
+              selectionBridge.post(id, authenticated = true)
             } else if (route.personId == 0L) {
               backStack.add(PersonRoute(id))
             }

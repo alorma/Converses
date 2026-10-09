@@ -14,7 +14,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Check
-import androidx.compose.material.icons.rounded.PersonOutline
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
@@ -108,12 +107,13 @@ fun EntryForm(
   onChannelChange: (ChannelType) -> Unit,
   modifier: Modifier = Modifier,
   focusText: Boolean = false,
+  onPickPerson: (() -> Unit)? = null,
   header: @Composable () -> Unit = {},
   saveButton: @Composable () -> Unit = {},
 ) {
   Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(14.dp)) {
     header()
-    FormSection(title = stringResource(R.string.entry_who_title)) { WhoSelector(state, person) }
+    FormSection(title = stringResource(R.string.entry_who_title)) { WhoSelector(state, person, onPickPerson = onPickPerson) }
     EntryTextField(
       state,
       placeholder = entryHint(state.kind, person?.name?.let(::firstName).orEmpty()),
@@ -153,7 +153,12 @@ fun entryHint(kind: EntryKind, firstName: String): String = when (kind) {
 
 /** Selector «Qui»: Jo, la persona (amb el seu avatar) o un apunt. */
 @Composable
-fun WhoSelector(state: EntryFormState, person: PersonEntity?, modifier: Modifier = Modifier) {
+fun WhoSelector(
+  state: EntryFormState,
+  person: PersonEntity?,
+  modifier: Modifier = Modifier,
+  onPickPerson: (() -> Unit)? = null,
+) {
   val name = person?.let { firstName(it.name) }
   ConversesToggleGroup(
     options = EntryKind.entries.map { kind ->
@@ -161,9 +166,8 @@ fun WhoSelector(state: EntryFormState, person: PersonEntity?, modifier: Modifier
         EntryKind.HEARD -> ToggleOption(
           value = kind,
           label = name ?: stringResource(R.string.entry_who_person),
-          icon = if (person == null) Icons.Rounded.PersonOutline else null,
           leading = if (person != null) ({ PersonInitialAvatar(person, size = 26.dp) }) else null,
-          enabled = person != null,
+          enabled = person != null || onPickPerson != null,
           contentDescription = person?.name,
         )
         else -> ToggleOption(
@@ -175,7 +179,9 @@ fun WhoSelector(state: EntryFormState, person: PersonEntity?, modifier: Modifier
       }
     },
     selected = state.kind,
-    onSelect = { state.kind = it },
+    onSelect = { kind ->
+      if (kind == EntryKind.HEARD && person == null) onPickPerson?.invoke() else state.kind = kind
+    },
     modifier = modifier,
     prominent = true,
   )

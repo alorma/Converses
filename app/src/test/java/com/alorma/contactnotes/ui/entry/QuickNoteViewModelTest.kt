@@ -145,6 +145,18 @@ class QuickNoteViewModelTest {
   }
 
   @Test
+  fun aProtectedPersonCreatedJustNowIsSelectedWithoutAskingAgain() = runTest {
+    val luna = db.addPerson("Luna", isProtected = true)
+    val vm = viewModel()
+
+    bridge.post(luna.id, authenticated = true)
+
+    assertEquals(luna.id, vm.uiState.value.selected?.id)
+    assertNull(vm.uiState.value.pending)
+    assertNull(bridge.picked.value)
+  }
+
+  @Test
   fun startsWithTheGivenPerson() = runTest {
     val marta = db.addPerson("Marta")
 

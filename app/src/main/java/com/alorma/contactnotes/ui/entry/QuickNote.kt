@@ -103,9 +103,11 @@ class QuickNoteViewModel(
   init {
     if (initialPersonId > 0) request(initialPersonId)
     viewModelScope.launch {
-      selectionBridge.picked.collect { id ->
-        if (id != null) {
-          request(id)
+      selectionBridge.picked.collect { pick ->
+        if (pick != null) {
+          // Una protegida creada ara ja s'ha autenticat a l'editor: no es demana una segona vegada
+          if (pick.authenticated) unlocked.update { it + pick.personId }
+          request(pick.personId)
           selectionBridge.clear()
         }
       }
@@ -249,6 +251,20 @@ fun QuickNoteContent(
 ) {
   val selected = state.selected
   val channel = form.channel ?: state.lastChannel ?: ChannelType.entries.first()
+  var showSheet by rememberSaveable { mutableStateOf(false) }
+  // El xip «Persona» obre el mateix selector; en triar-ne una, el xip queda seleccionat
+  var pickedFromChip by rememberSaveable { mutableStateOf(false) }
+
+  // Sense persones el selector estaria buit: es passa directe a crear-ne una
+  val openPicker = { if (state.people.isEmpty()) onNewPerson() else showSheet = true }
+
+  // Quan la persona arriba (triada, creada o desbloquejada) després d'haver tocat el xip, el xip es marca
+  LaunchedEffect(selected?.id) {
+    if (pickedFromChip && selected != null) {
+      form.kind = EntryKind.HEARD
+      pickedFromChip = false
+    }
+  }
 
   PersonTheme(selected?.color) {
     val scrollBehavior = rememberTopBarScrollBehavior()
@@ -290,25 +306,47 @@ fun QuickNoteContent(
           person = selected,
           channel = channel,
           onChannelChange = { form.channel = it },
+          onPickPerson = {
+            pickedFromChip = true
+            openPicker()
+          },
           header = {
-            PersonPicker(selected = selected, people = state.people, onSelect = onSelectPerson, onNewPerson = onNewPerson)
+            PersonPicker(
+              selected = selected,
+              onClick = {
+                pickedFromChip = false
+                openPicker()
+              },
+            )
           },
         )
       }
+    }
+    if (showSheet) {
+      PersonPickerSheet(
+        people = state.people,
+        selectedId = selected?.id,
+        onSelect = {
+          onSelectPerson(it)
+          showSheet = false
+        },
+        onNewPerson = {
+          showSheet = false
+          onNewPerson()
+        },
+        onDismiss = {
+          pickedFromChip = false
+          showSheet = false
+        },
+      )
     }
   }
 }
 
 @Composable
-private fun PersonPicker(
-  selected: PersonEntity?,
-  people: List<PersonEntity>,
-  onSelect: (PersonEntity) -> Unit,
-  onNewPerson: () -> Unit,
-) {
-  var showSheet by rememberSaveable { mutableStateOf(false) }
+private fun PersonPicker(selected: PersonEntity?, onClick: () -> Unit) {
   Surface(
-    onClick = { showSheet = true },
+    onClick = onClick,
     shape = MaterialTheme.shapes.extraLarge,
     color = GroupedListDefaults.containerColor,
     modifier = Modifier.fillMaxWidth(),
@@ -343,20 +381,5 @@ private fun PersonPicker(
       }
       Icon(Icons.Rounded.UnfoldMore, contentDescription = null)
     }
-  }
-  if (showSheet) {
-    PersonPickerSheet(
-      people = people,
-      selectedId = selected?.id,
-      onSelect = {
-        onSelect(it)
-        showSheet = false
-      },
-      onNewPerson = {
-        showSheet = false
-        onNewPerson()
-      },
-      onDismiss = { showSheet = false },
-    )
   }
 }
