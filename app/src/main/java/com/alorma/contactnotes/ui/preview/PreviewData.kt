@@ -57,7 +57,7 @@ internal object PreviewData {
   private val laia = PersonEntity(
     id = 4,
     name = "Laia Ferrer",
-    avatarShape = AvatarShape.Flower,
+    avatarShape = AvatarShape.Clover8Leaf,
     avatarColor = AvatarColor.Peach,
     createdAt = at(2, 1, 9),
     updatedAt = at(2, 1, 9),

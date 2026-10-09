@@ -48,8 +48,10 @@ enum class AvatarColor(val color: Color, val seed: Color) {
 enum class AvatarShape {
   Cookie9Sided,
   Clover4Leaf,
-  Flower,
-  Sunny;
+  Clover8Leaf,
+  Sunny,
+  Ghostish,
+  PuffyDiamond;
 
   companion object {
     /** Forma de l'avatar estàndard, la mateixa per a tothom. */
@@ -64,8 +66,10 @@ internal val AvatarInitialsColor = Color(0xFF1E1D24)
 fun AvatarShape.asShape(): Shape = when (this) {
   AvatarShape.Cookie9Sided -> MaterialShapes.Cookie9Sided
   AvatarShape.Clover4Leaf -> MaterialShapes.Clover4Leaf
-  AvatarShape.Flower -> MaterialShapes.Flower
+  AvatarShape.Clover8Leaf -> MaterialShapes.Clover8Leaf
   AvatarShape.Sunny -> MaterialShapes.Sunny
+  AvatarShape.Ghostish -> MaterialShapes.Ghostish
+  AvatarShape.PuffyDiamond -> MaterialShapes.PuffyDiamond
 }.toShape()
 
 /** Avatar amb forma expressiva i color pastel. Les inicials sempre en fosc, també en mode fosc. */

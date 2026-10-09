@@ -54,13 +54,17 @@ import com.alorma.contactnotes.designsystem.theme.SheetTitleStyle
 import com.alorma.contactnotes.ui.people.colorNameRes
 import com.alorma.contactnotes.ui.people.initialsOf
 
+private const val ShapesPerRow = 3
+
 private val InitialsColor = Color(0xFF1E1D24)
 
 private fun shapeNameRes(shape: AvatarShape): Int = when (shape) {
   AvatarShape.Cookie9Sided -> R.string.shape_cookie
   AvatarShape.Clover4Leaf -> R.string.shape_clover
-  AvatarShape.Flower -> R.string.shape_flower
+  AvatarShape.Clover8Leaf -> R.string.shape_flower
   AvatarShape.Sunny -> R.string.shape_sunny
+  AvatarShape.Ghostish -> R.string.shape_ghost
+  AvatarShape.PuffyDiamond -> R.string.shape_pillow
 }
 
 /**
@@ -189,16 +193,21 @@ fun AvatarSheetContent(
     }
 
     SheetSection(stringResource(R.string.avatar_shape)) {
-      Row(modifier = Modifier.fillMaxWidth().selectableGroup(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        AvatarShape.entries.forEachIndexed { index, option ->
-          ShapeButton(
-            shape = option,
-            selected = option == resolvedShape,
-            first = index == 0,
-            last = index == AvatarShape.entries.lastIndex,
-            onClick = { onShape(option) },
-            modifier = Modifier.weight(1f),
-          )
+      // Dues files de 3: amb 6 formes en una fila les etiquetes no hi caben
+      Column(modifier = Modifier.fillMaxWidth().selectableGroup(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        AvatarShape.entries.chunked(ShapesPerRow).forEach { row ->
+          Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            row.forEachIndexed { index, option ->
+              ShapeButton(
+                shape = option,
+                selected = option == resolvedShape,
+                first = index == 0,
+                last = index == row.lastIndex,
+                onClick = { onShape(option) },
+                modifier = Modifier.weight(1f),
+              )
+            }
+          }
         }
       }
     }
@@ -254,7 +263,7 @@ private fun ShapeButton(
   }
   Column(
     modifier = modifier
-      .height(72.dp)
+      .height(84.dp)
       .clip(buttonShape)
       .background(if (selected) scheme.primaryContainer else scheme.surfaceContainerLowest)
       .selectable(selected = selected, role = Role.RadioButton, onClick = onClick),
@@ -263,11 +272,11 @@ private fun ShapeButton(
   ) {
     Box(
       modifier = Modifier
-        .size(34.dp)
+        .size(32.dp)
         .clip(shape.asShape())
         .background(if (selected) scheme.onPrimaryContainer else scheme.outline),
     )
-    Spacer(Modifier.height(4.dp))
+    Spacer(Modifier.height(6.dp))
     Text(
       text = stringResource(shapeNameRes(shape)),
       fontSize = 12.sp,

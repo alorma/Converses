@@ -34,7 +34,7 @@ internal fun AvatarPreview() {
     Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
       Avatar(initials = "MS", shape = AvatarShape.Cookie9Sided, color = AvatarColor.Lavender)
       Avatar(initials = "JP", shape = AvatarShape.Clover4Leaf, color = AvatarColor.Mint)
-      Avatar(initials = "LF", shape = AvatarShape.Flower, color = AvatarColor.Peach)
+      Avatar(initials = "LF", shape = AvatarShape.Clover8Leaf, color = AvatarColor.Peach)
       Avatar(initials = "PV", shape = AvatarShape.Sunny, color = AvatarColor.Sky)
       Avatar(initials = "LR", shape = AvatarShape.Cookie9Sided, color = AvatarColor.Rose, locked = true)
     }
