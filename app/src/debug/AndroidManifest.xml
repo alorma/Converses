@@ -4,6 +4,6 @@
 
     <!-- Nom diferent perquè la versió de debug i la de release es distingeixin al launcher -->
     <application
-        android:label="Converses Debug"
+        android:label="@string/app_name"
         tools:replace="android:label" />
 </manifest>
