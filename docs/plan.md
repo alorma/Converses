@@ -144,7 +144,7 @@ Totes les claus `personId` tenen `onDelete = CASCADE`, i hi ha un índex a `entr
 - **Avatars:** 7 pastels i 6 formes (`Cookie9Sided`, `Clover4Leaf`, `Clover8Leaf`, `Sunny`, `Ghostish`, `PuffyDiamond`; al selector, «Galeta», «Trèvol», «Flor», «Sol», «Fantasma» i «Coixí»). `AvatarShapeConverter` (`@TypeConverter` a `data/db`) desa la forma com a text i llegeix el nom antic `Flower` com a `Clover8Leaf` perquè el domini no arrossegui noms obsolets; un valor desconegut és l'avatar estàndard. No canvia l'esquema (columna `TEXT`), així que no cal migració. A la v1 tots són estàndard: Galeta i color automàtic pel nom (`AvatarColor.forName`, hash FNV-1a del nom normalitzat). Inicials en `#1E1D24` (primera lletra del primer i de l'últim mot), cadenat si la persona és protegida.
 - **Tipografia:** Roboto Flex. Els títols (44/40/30/28/24/22 sp) van en pes 800, amplada 118 i mida òptica 72.
 - **Formes:** llistes agrupades de 24 dp als extrems i 6 dp entre files, separades per 2 dp. Els grups de botons van amb juntes de 8 dp.
-- **Icona i splash:** adaptive icon (bombolla amb boletes) amb variant fosca del fons; l'splash de plataforma fa servir `window_background` (neutres dinàmics). En debug la icona és vermella.
+- **Icona i splash:** adaptive icon (bombolla amb boletes) amb variant fosca del fons; l'splash de plataforma fa servir `window_background` (neutres dinàmics). En debug la icona és la mateixa amb una franja «DEV» a baix (`app/src/debug/res`, amb monocroma pròpia) i el nom és «Converses Dev».
 
 ### Color de la persona (Pro, apagat a la v1)
 

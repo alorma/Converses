@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+  <string name="app_name">(D) Converses</string>
   <string name="debug_menu_open">Debug menu</string>
   <string name="debug_menu_title">Debug menu</string>
   <string name="debug_data_title">Data</string>
