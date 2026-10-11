@@ -62,7 +62,7 @@ android {
     debug {
       signingConfig = signingConfigs.getByName("debug")
       // Permet tenir instal·lades a la vegada la versió de debug i la de release
-      applicationIdSuffix = ".debug"
+      applicationIdSuffix = ".dev"
     }
     release {
       optimization {
