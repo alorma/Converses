@@ -58,14 +58,15 @@ private const val ShapesPerRow = 3
 
 private val InitialsColor = Color(0xFF1E1D24)
 
-private fun shapeNameRes(shape: AvatarShape): Int = when (shape) {
-  AvatarShape.Cookie9Sided -> R.string.shape_cookie
-  AvatarShape.Clover4Leaf -> R.string.shape_clover
-  AvatarShape.Clover8Leaf -> R.string.shape_flower
-  AvatarShape.Sunny -> R.string.shape_sunny
-  AvatarShape.Ghostish -> R.string.shape_ghost
-  AvatarShape.PuffyDiamond -> R.string.shape_pillow
-}
+private fun shapeNameRes(shape: AvatarShape): Int =
+  when (shape) {
+    AvatarShape.Cookie9Sided -> R.string.shape_cookie
+    AvatarShape.Clover4Leaf -> R.string.shape_clover
+    AvatarShape.Clover8Leaf -> R.string.shape_flower
+    AvatarShape.Sunny -> R.string.shape_sunny
+    AvatarShape.Ghostish -> R.string.shape_ghost
+    AvatarShape.PuffyDiamond -> R.string.shape_pillow
+  }
 
 /**
  * Avatar del formulari i del full. Les inicials i el color canvien mentre s'escriu el nom; amb el nom buit surt un «?»
@@ -113,30 +114,40 @@ internal fun NameAvatar(
   val description = stringResource(R.string.avatar_edit_cd)
   Box(modifier = Modifier.size(56.dp)) {
     Box(
-      modifier = Modifier
-        .fillMaxSize()
-        .then(
-          if (editable) {
-            Modifier.clip(CircleShape).selectable(selected = false, role = Role.Button, onClick = onClick).semantics { contentDescription = description }
-          } else {
-            Modifier
-          },
-        ),
+      modifier =
+        Modifier
+          .fillMaxSize()
+          .then(
+            if (editable) {
+              Modifier.clip(CircleShape).selectable(selected = false, role = Role.Button, onClick = onClick).semantics {
+                contentDescription =
+                  description
+              }
+            } else {
+              Modifier
+            },
+          ),
     ) {
       EditorAvatar(name = name, shape = shape, color = color, size = 56.dp, initialsSize = 20)
     }
     if (editable) {
       Box(
-        modifier = Modifier
-          .align(Alignment.BottomEnd)
-          .offset(x = 4.dp, y = 4.dp)
-          .size(24.dp)
-          .clip(CircleShape)
-          .background(MaterialTheme.colorScheme.primary)
-          .border(2.dp, badgeBorder, CircleShape),
+        modifier =
+          Modifier
+            .align(Alignment.BottomEnd)
+            .offset(x = 4.dp, y = 4.dp)
+            .size(24.dp)
+            .clip(CircleShape)
+            .background(MaterialTheme.colorScheme.primary)
+            .border(2.dp, badgeBorder, CircleShape),
         contentAlignment = Alignment.Center,
       ) {
-        Icon(Icons.Rounded.Edit, contentDescription = null, tint = MaterialTheme.colorScheme.onPrimary, modifier = Modifier.size(13.dp))
+        Icon(
+          Icons.Rounded.Edit,
+          contentDescription = null,
+          tint = MaterialTheme.colorScheme.onPrimary,
+          modifier = Modifier.size(13.dp),
+        )
       }
     }
   }
@@ -152,7 +163,10 @@ fun AvatarSheet(
   onColor: (AvatarColor?) -> Unit,
   onDismiss: () -> Unit,
 ) {
-  ModalBottomSheet(onDismissRequest = onDismiss, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)) {
+  ModalBottomSheet(
+    onDismissRequest = onDismiss,
+    sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
+  ) {
     AvatarSheetContent(name, shape, color, onShape, onColor, onDone = onDismiss)
   }
 }
@@ -171,7 +185,14 @@ fun AvatarSheetContent(
   val resolvedColor = color ?: AvatarColor.forName(name)
   val shapeName = stringResource(shapeNameRes(resolvedShape))
   val colorName = stringResource(colorNameRes(resolvedColor.name))
-  val summary = if (color == null) stringResource(R.string.avatar_summary_auto, shapeName, colorName) else "$shapeName · $colorName"
+  val summary =
+    if (color ==
+      null
+    ) {
+      stringResource(R.string.avatar_summary_auto, shapeName, colorName)
+    } else {
+      "$shapeName · $colorName"
+    }
 
   Column(
     modifier = Modifier.padding(start = 20.dp, end = 20.dp, top = 10.dp, bottom = 28.dp),
@@ -187,8 +208,17 @@ fun AvatarSheetContent(
         blankPlaceholder = false,
       )
       Column {
-        Text(stringResource(R.string.avatar_sheet_title), style = SheetTitleStyle, color = MaterialTheme.colorScheme.onSurface)
-        Text(summary, style = MaterialTheme.typography.bodySmall, fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Text(
+          stringResource(R.string.avatar_sheet_title),
+          style = SheetTitleStyle,
+          color = MaterialTheme.colorScheme.onSurface,
+        )
+        Text(
+          summary,
+          style = MaterialTheme.typography.bodySmall,
+          fontSize = 13.sp,
+          color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
       }
     }
 
@@ -232,7 +262,10 @@ fun AvatarSheetContent(
 }
 
 @Composable
-private fun SheetSection(title: String, content: @Composable () -> Unit) {
+private fun SheetSection(
+  title: String,
+  content: @Composable () -> Unit,
+) {
   Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
     Text(title, fontSize = 14.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
     content()
@@ -251,30 +284,33 @@ private fun ShapeButton(
   val scheme = MaterialTheme.colorScheme
   val outer = 20.dp
   val inner = 6.dp
-  val buttonShape = if (selected) {
-    RoundedCornerShape(outer)
-  } else {
-    RoundedCornerShape(
-      topStart = if (first) outer else inner,
-      bottomStart = if (first) outer else inner,
-      topEnd = if (last) outer else inner,
-      bottomEnd = if (last) outer else inner,
-    )
-  }
+  val buttonShape =
+    if (selected) {
+      RoundedCornerShape(outer)
+    } else {
+      RoundedCornerShape(
+        topStart = if (first) outer else inner,
+        bottomStart = if (first) outer else inner,
+        topEnd = if (last) outer else inner,
+        bottomEnd = if (last) outer else inner,
+      )
+    }
   Column(
-    modifier = modifier
-      .height(84.dp)
-      .clip(buttonShape)
-      .background(if (selected) scheme.primaryContainer else scheme.surfaceContainerLowest)
-      .selectable(selected = selected, role = Role.RadioButton, onClick = onClick),
+    modifier =
+      modifier
+        .height(84.dp)
+        .clip(buttonShape)
+        .background(if (selected) scheme.primaryContainer else scheme.surfaceContainerLowest)
+        .selectable(selected = selected, role = Role.RadioButton, onClick = onClick),
     horizontalAlignment = Alignment.CenterHorizontally,
     verticalArrangement = Arrangement.Center,
   ) {
     Box(
-      modifier = Modifier
-        .size(32.dp)
-        .clip(shape.asShape())
-        .background(if (selected) scheme.onPrimaryContainer else scheme.outline),
+      modifier =
+        Modifier
+          .size(32.dp)
+          .clip(shape.asShape())
+          .background(if (selected) scheme.onPrimaryContainer else scheme.outline),
     )
     Spacer(Modifier.height(6.dp))
     Text(
@@ -288,28 +324,46 @@ private fun ShapeButton(
 
 /** Mostra de 30 dp dins d'un anell de 40 dp; `null` és «Automàtic». */
 @Composable
-private fun Swatch(color: AvatarColor?, selected: Boolean, onClick: () -> Unit) {
+private fun Swatch(
+  color: AvatarColor?,
+  selected: Boolean,
+  onClick: () -> Unit,
+) {
   val scheme = MaterialTheme.colorScheme
   val description = stringResource(if (color == null) R.string.avatar_color_auto else colorNameRes(color.name))
   Box(
-    modifier = Modifier
-      .size(40.dp)
-      .clip(CircleShape)
-      .then(if (selected) Modifier.border(BorderStroke(2.dp, scheme.primary), CircleShape) else Modifier)
-      .selectable(selected = selected, role = Role.RadioButton, onClick = onClick)
-      .semantics { contentDescription = description },
+    modifier =
+      Modifier
+        .size(40.dp)
+        .clip(CircleShape)
+        .then(if (selected) Modifier.border(BorderStroke(2.dp, scheme.primary), CircleShape) else Modifier)
+        .selectable(selected = selected, role = Role.RadioButton, onClick = onClick)
+        .semantics { contentDescription = description },
     contentAlignment = Alignment.Center,
   ) {
     Box(
-      modifier = Modifier
-        .size(30.dp)
-        .clip(CircleShape)
-        .background(color?.color ?: scheme.surfaceContainerHigh),
+      modifier =
+        Modifier
+          .size(30.dp)
+          .clip(CircleShape)
+          .background(color?.color ?: scheme.surfaceContainerHigh),
       contentAlignment = Alignment.Center,
     ) {
       when {
-        color == null -> Icon(Icons.Rounded.Autorenew, contentDescription = null, tint = scheme.onSurfaceVariant, modifier = Modifier.size(18.dp))
-        selected -> Icon(Icons.Rounded.Check, contentDescription = null, tint = InitialsColor, modifier = Modifier.size(18.dp))
+        color == null ->
+          Icon(
+            Icons.Rounded.Autorenew,
+            contentDescription = null,
+            tint = scheme.onSurfaceVariant,
+            modifier = Modifier.size(18.dp),
+          )
+        selected ->
+          Icon(
+            Icons.Rounded.Check,
+            contentDescription = null,
+            tint = InitialsColor,
+            modifier = Modifier.size(18.dp),
+          )
       }
     }
   }

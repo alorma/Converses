@@ -15,6 +15,10 @@ abstract class FeatureFlag(
   open fun isEnabled(): Boolean = runner.isEnabled(this)
 }
 
-class CustomAvatarFeature(runner: FeatureFlagRunner) : FeatureFlag(runner, key = "custom_avatar_enabled", pro = true)
+class CustomAvatarFeature(
+  runner: FeatureFlagRunner,
+) : FeatureFlag(runner, key = "custom_avatar_enabled", pro = true)
 
-class PersonColorFeature(runner: FeatureFlagRunner) : FeatureFlag(runner, key = "person_color_enabled", pro = true)
+class PersonColorFeature(
+  runner: FeatureFlagRunner,
+) : FeatureFlag(runner, key = "person_color_enabled", pro = true)

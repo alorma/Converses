@@ -1,6 +1,5 @@
 package com.alorma.contactnotes.ui.person
 
-import com.alorma.contactnotes.data.db.color
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -8,9 +7,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import com.alorma.contactnotes.data.db.EntryKind
+import com.alorma.contactnotes.data.db.color
 import com.alorma.contactnotes.designsystem.components.AvatarColor
-import com.alorma.contactnotes.designsystem.theme.PersonTheme
 import com.alorma.contactnotes.designsystem.preview.ConversesPreviewTheme
+import com.alorma.contactnotes.designsystem.theme.PersonTheme
 import com.alorma.contactnotes.ui.preview.PreviewData
 
 @Composable
@@ -84,7 +84,9 @@ internal class AvatarColorProvider : PreviewParameterProvider<AvatarColor> {
 /** El detall amb el tema de cada un dels 7 colors de persona. */
 @Preview
 @Composable
-internal fun PersonDetailScreenThemedPreview(@PreviewParameter(AvatarColorProvider::class) color: AvatarColor) {
+internal fun PersonDetailScreenThemedPreview(
+  @PreviewParameter(AvatarColorProvider::class) color: AvatarColor,
+) {
   PersonDetailScreenPreview(
     PersonDetailUiState(
       person = PreviewData.marta.copy(avatarColor = color),

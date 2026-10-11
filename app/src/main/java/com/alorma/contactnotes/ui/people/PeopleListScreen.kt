@@ -1,7 +1,5 @@
 package com.alorma.contactnotes.ui.people
 
-import com.alorma.contactnotes.data.db.shape
-import com.alorma.contactnotes.data.db.color
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
@@ -10,10 +8,7 @@ import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
@@ -26,10 +21,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Archive
 import androidx.compose.material.icons.rounded.Check
@@ -48,12 +46,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.setValue
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -65,19 +62,21 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.alorma.contactnotes.R
+import com.alorma.contactnotes.data.db.ChannelType
 import com.alorma.contactnotes.data.db.PersonEntity
 import com.alorma.contactnotes.data.db.PersonListItem
-import com.alorma.contactnotes.data.db.ChannelType
+import com.alorma.contactnotes.data.db.color
+import com.alorma.contactnotes.data.db.shape
 import com.alorma.contactnotes.designsystem.components.Avatar
-import com.alorma.contactnotes.designsystem.components.rememberConversesHaptics
-import com.alorma.contactnotes.designsystem.components.DashedActionRow
 import com.alorma.contactnotes.designsystem.components.BetaBadge
-import com.alorma.contactnotes.designsystem.components.NoticeBanner
 import com.alorma.contactnotes.designsystem.components.ConversesFloatingToolbar
+import com.alorma.contactnotes.designsystem.components.DashedActionRow
 import com.alorma.contactnotes.designsystem.components.GroupedListDefaults
+import com.alorma.contactnotes.designsystem.components.NoticeBanner
 import com.alorma.contactnotes.designsystem.components.ToolbarDestination
 import com.alorma.contactnotes.designsystem.components.WelcomeEmptyState
 import com.alorma.contactnotes.designsystem.components.groupedItems
+import com.alorma.contactnotes.designsystem.components.rememberConversesHaptics
 import com.alorma.contactnotes.designsystem.theme.ListTitleStyle
 import com.alorma.contactnotes.ui.person.channelName
 import org.koin.compose.viewmodel.koinViewModel
@@ -136,10 +135,11 @@ fun PeopleListScreen(
     topBar = {
       // Capçalera i filtres fixos a dalt, amb fons opac perquè la llista passi per sota, també l'àrea de la barra d'estat
       Column(
-        modifier = Modifier
-          .background(MaterialTheme.colorScheme.surface)
-          .windowInsetsPadding(WindowInsets.statusBars)
-          .padding(horizontal = ScreenMargin),
+        modifier =
+          Modifier
+            .background(MaterialTheme.colorScheme.surface)
+            .windowInsetsPadding(WindowInsets.statusBars)
+            .padding(horizontal = ScreenMargin),
         verticalArrangement = Arrangement.spacedBy(GroupedListDefaults.ItemSpacing),
       ) {
         Header(
@@ -198,12 +198,13 @@ fun PeopleListScreen(
     LazyColumn(
       state = listState,
       modifier = Modifier.fillMaxSize(),
-      contentPadding = PaddingValues(
-        start = ScreenMargin,
-        end = ScreenMargin,
-        top = padding.calculateTopPadding(),
-        bottom = 96.dp + padding.calculateBottomPadding(),
-      ),
+      contentPadding =
+        PaddingValues(
+          start = ScreenMargin,
+          end = ScreenMargin,
+          top = padding.calculateTopPadding(),
+          bottom = 96.dp + padding.calculateBottomPadding(),
+        ),
       verticalArrangement = Arrangement.spacedBy(GroupedListDefaults.ItemSpacing),
     ) {
       if (!state.isLoading && state.people.isEmpty()) {
@@ -223,9 +224,10 @@ fun PeopleListScreen(
             WelcomeEmptyState(
               icon = if (archived) Icons.Rounded.Archive else Icons.Rounded.Groups,
               title = stringResource(if (archived) R.string.archived_empty else R.string.people_empty_filter),
-              description = stringResource(
-                if (archived) R.string.archived_empty_description else R.string.people_empty_filter_description,
-              ),
+              description =
+                stringResource(
+                  if (archived) R.string.archived_empty_description else R.string.people_empty_filter_description,
+                ),
               modifier = Modifier.fillParentMaxSize(),
             )
           }
@@ -250,56 +252,73 @@ fun PeopleListScreen(
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-private fun Header(archived: Boolean, total: Int, isLoading: Boolean, onNewPerson: () -> Unit, modifier: Modifier = Modifier) {
+private fun Header(
+  archived: Boolean,
+  total: Int,
+  isLoading: Boolean,
+  onNewPerson: () -> Unit,
+  modifier: Modifier = Modifier,
+) {
   Row(
     modifier = modifier.fillMaxWidth().padding(start = 4.dp, top = 16.dp, bottom = if (archived) 14.dp else 0.dp),
     verticalAlignment = Alignment.Top,
   ) {
-  Column(modifier = Modifier.weight(1f)) {
-    // Amb lletra gran el badge baixa a la línia següent en comptes de partir el títol
-    FlowRow(
-      horizontalArrangement = Arrangement.spacedBy(8.dp),
-      verticalArrangement = Arrangement.spacedBy(2.dp),
-    ) {
-      Text(
-        text = stringResource(if (archived) R.string.filter_archived else R.string.people_title),
-        style = ListTitleStyle,
-        maxLines = 1,
-        softWrap = false,
-      )
-      if (!archived) {
-        BetaBadge(
-          text = stringResource(R.string.beta_badge),
-          contentDescription = stringResource(R.string.beta_description),
-          modifier = Modifier.padding(top = 7.dp),
+    Column(modifier = Modifier.weight(1f)) {
+      // Amb lletra gran el badge baixa a la línia següent en comptes de partir el títol
+      FlowRow(
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalArrangement = Arrangement.spacedBy(2.dp),
+      ) {
+        Text(
+          text = stringResource(if (archived) R.string.filter_archived else R.string.people_title),
+          style = ListTitleStyle,
+          maxLines = 1,
+          softWrap = false,
+        )
+        if (!archived) {
+          BetaBadge(
+            text = stringResource(R.string.beta_badge),
+            contentDescription = stringResource(R.string.beta_description),
+            modifier = Modifier.padding(top = 7.dp),
+          )
+        }
+      }
+      if (!isLoading) {
+        Text(
+          text =
+            if (total == 0 &&
+              !archived
+            ) {
+              stringResource(R.string.people_count_none)
+            } else {
+              pluralStringResource(R.plurals.people_count, total, total)
+            },
+          style = MaterialTheme.typography.bodyLarge,
+          color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
       }
     }
-    if (!isLoading) {
-      Text(
-        text = if (total == 0 && !archived) stringResource(R.string.people_count_none) else pluralStringResource(R.plurals.people_count, total, total),
-        style = MaterialTheme.typography.bodyLarge,
-        color = MaterialTheme.colorScheme.onSurfaceVariant,
-      )
+    if (!archived) {
+      FilledTonalIconButton(onClick = onNewPerson) {
+        Icon(Icons.Rounded.PersonAdd, contentDescription = stringResource(R.string.add_person))
+      }
     }
-  }
-  if (!archived) {
-    FilledTonalIconButton(onClick = onNewPerson) {
-      Icon(Icons.Rounded.PersonAdd, contentDescription = stringResource(R.string.add_person))
-    }
-  }
   }
 }
 
 @Composable
-private fun FilterRow(selected: Set<ChannelType>, onToggle: (ChannelType) -> Unit) {
+private fun FilterRow(
+  selected: Set<ChannelType>,
+  onToggle: (ChannelType) -> Unit,
+) {
   val scheme = MaterialTheme.colorScheme
   val haptics = rememberConversesHaptics()
   Row(
-    modifier = Modifier
-      .fillMaxWidth()
-      .horizontalScroll(rememberScrollState())
-      .padding(top = 12.dp, bottom = 14.dp),
+    modifier =
+      Modifier
+        .fillMaxWidth()
+        .horizontalScroll(rememberScrollState())
+        .padding(top = 12.dp, bottom = 14.dp),
     horizontalArrangement = Arrangement.spacedBy(8.dp),
   ) {
     ChannelType.entries.forEach { group ->
@@ -318,40 +337,47 @@ private fun FilterRow(selected: Set<ChannelType>, onToggle: (ChannelType) -> Uni
             maxLines = 1,
           )
         },
-        leadingIcon = if (isSelected) {
-          { Icon(Icons.Rounded.Check, contentDescription = null, modifier = Modifier.size(18.dp)) }
-        } else {
-          null
-        },
+        leadingIcon =
+          if (isSelected) {
+            { Icon(Icons.Rounded.Check, contentDescription = null, modifier = Modifier.size(18.dp)) }
+          } else {
+            null
+          },
         shape = RoundedCornerShape(8.dp),
-        colors = FilterChipDefaults.filterChipColors(
-          containerColor = Color.Transparent,
-          labelColor = scheme.onSurfaceVariant,
-          selectedContainerColor = scheme.primaryContainer,
-          selectedLabelColor = scheme.onPrimaryContainer,
-          selectedLeadingIconColor = scheme.onPrimaryContainer,
-        ),
-        border = FilterChipDefaults.filterChipBorder(
-          enabled = true,
-          selected = isSelected,
-          borderColor = scheme.outlineVariant,
-          selectedBorderColor = Color.Transparent,
-          borderWidth = 1.dp,
-          selectedBorderWidth = 0.dp,
-        ),
+        colors =
+          FilterChipDefaults.filterChipColors(
+            containerColor = Color.Transparent,
+            labelColor = scheme.onSurfaceVariant,
+            selectedContainerColor = scheme.primaryContainer,
+            selectedLabelColor = scheme.onPrimaryContainer,
+            selectedLeadingIconColor = scheme.onPrimaryContainer,
+          ),
+        border =
+          FilterChipDefaults.filterChipBorder(
+            enabled = true,
+            selected = isSelected,
+            borderColor = scheme.outlineVariant,
+            selectedBorderColor = Color.Transparent,
+            borderWidth = 1.dp,
+            selectedBorderWidth = 0.dp,
+          ),
       )
     }
   }
 }
 
 @Composable
-private fun PersonRow(item: PersonListItem, onClick: () -> Unit) {
+private fun PersonRow(
+  item: PersonListItem,
+  onClick: () -> Unit,
+) {
   val person = item.person
   Row(
-    modifier = Modifier
-      .fillMaxWidth()
-      .clickable(onClick = onClick)
-      .padding(horizontal = 16.dp, vertical = 14.dp),
+    modifier =
+      Modifier
+        .fillMaxWidth()
+        .clickable(onClick = onClick)
+        .padding(horizontal = 16.dp, vertical = 14.dp),
     horizontalArrangement = Arrangement.spacedBy(16.dp),
     verticalAlignment = Alignment.CenterVertically,
   ) {

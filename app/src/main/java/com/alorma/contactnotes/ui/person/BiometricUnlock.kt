@@ -26,22 +26,31 @@ fun FragmentActivity.promptUnlock(
   onError: (code: Int) -> Unit = {},
   onSuccess: () -> Unit,
 ) {
-  val callback = object : BiometricPrompt.AuthenticationCallback() {
-    override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) = onSuccess()
+  val callback =
+    object : BiometricPrompt.AuthenticationCallback() {
+      override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) = onSuccess()
 
-    override fun onAuthenticationError(errorCode: Int, errString: CharSequence) = onError(errorCode)
-  }
-  val info = BiometricPrompt.PromptInfo.Builder()
-    .setTitle(title)
-    .setSubtitle(subtitle)
-    .setAllowedAuthenticators(Authenticators)
-    .build()
+      override fun onAuthenticationError(
+        errorCode: Int,
+        errString: CharSequence,
+      ) = onError(errorCode)
+    }
+  val info =
+    BiometricPrompt.PromptInfo
+      .Builder()
+      .setTitle(title)
+      .setSubtitle(subtitle)
+      .setAllowedAuthenticators(Authenticators)
+      .build()
   BiometricPrompt(this, ContextCompat.getMainExecutor(this), callback).authenticate(info)
 }
 
 /** Obre l'alta d'empremta o bloqueig de pantalla; si el sistema no la té, la configuració de seguretat. */
 fun Context.openSecuritySetup() {
-  val enroll = Intent(Settings.ACTION_BIOMETRIC_ENROLL).putExtra(Settings.EXTRA_BIOMETRIC_AUTHENTICATORS_ALLOWED, Authenticators)
+  val enroll =
+    Intent(
+      Settings.ACTION_BIOMETRIC_ENROLL,
+    ).putExtra(Settings.EXTRA_BIOMETRIC_AUTHENTICATORS_ALLOWED, Authenticators)
   try {
     startActivity(enroll)
   } catch (_: ActivityNotFoundException) {

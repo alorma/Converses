@@ -33,9 +33,10 @@ class PersonLockViewModel : ViewModel() {
     val next = lockStateForError(code)
     _state.value = next
     if (next is LockState.LockedOut) {
-      countdownJob = viewModelScope.launch {
-        countdown(next.seconds).collect { _state.value = LockState.LockedOut(it) }
-      }
+      countdownJob =
+        viewModelScope.launch {
+          countdown(next.seconds).collect { _state.value = LockState.LockedOut(it) }
+        }
     }
   }
 }

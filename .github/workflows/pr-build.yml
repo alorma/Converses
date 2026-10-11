@@ -27,6 +27,9 @@ jobs:
 
       - uses: gradle/actions/setup-gradle@v6
 
+      - name: Run ktlint
+        run: ./gradlew ktlintCheck
+
       - name: Run unit tests
         run: ./gradlew testDebugUnitTest
 

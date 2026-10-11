@@ -15,6 +15,8 @@ import androidx.room.TypeConverters
 @TypeConverters(AvatarShapeConverter::class)
 abstract class ConversesDatabase : RoomDatabase() {
   abstract fun personDao(): PersonDao
+
   abstract fun entryDao(): EntryDao
+
   abstract fun pinnedFactDao(): PinnedFactDao
 }

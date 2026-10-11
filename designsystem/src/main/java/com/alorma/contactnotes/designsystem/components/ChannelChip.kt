@@ -30,22 +30,27 @@ fun ConversesChannelChip(
   onLongClick: (() -> Unit)? = null,
 ) {
   val haptics = rememberConversesHaptics()
-  Surface(shape = MaterialTheme.shapes.large, color = MaterialTheme.colorScheme.surfaceContainerHigh, modifier = modifier) {
+  Surface(
+    shape = MaterialTheme.shapes.large,
+    color = MaterialTheme.colorScheme.surfaceContainerHigh,
+    modifier = modifier,
+  ) {
     Row(
-      modifier = Modifier
-        .height(32.dp)
-        .combinedClickable(
-          enabled = onClick != null || onLongClick != null,
-          role = Role.Button,
-          onClick = { onClick?.invoke() },
-          onLongClick = onLongClick?.let { longClick ->
-            {
-              haptics.longPress()
-              longClick()
-            }
-          },
-        )
-        .padding(horizontal = 12.dp),
+      modifier =
+        Modifier
+          .height(32.dp)
+          .combinedClickable(
+            enabled = onClick != null || onLongClick != null,
+            role = Role.Button,
+            onClick = { onClick?.invoke() },
+            onLongClick =
+              onLongClick?.let { longClick ->
+                {
+                  haptics.longPress()
+                  longClick()
+                }
+              },
+          ).padding(horizontal = 12.dp),
       verticalAlignment = Alignment.CenterVertically,
       horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {

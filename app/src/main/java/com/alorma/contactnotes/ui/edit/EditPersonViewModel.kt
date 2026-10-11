@@ -14,7 +14,11 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-data class FactDraft(val key: Long, val label: String, val value: String)
+data class FactDraft(
+  val key: Long,
+  val label: String,
+  val value: String,
+)
 
 data class EditSnapshot(
   val name: String = "",
@@ -47,15 +51,35 @@ data class EditPersonUiState(
 /** Accions de l'editor; les implementa el `ViewModel` i les previews les deixen buides. */
 interface EditPersonActions {
   fun onName(value: String)
+
   fun onAlias(value: String)
+
   fun onShape(shape: AvatarShape)
+
   fun onColor(color: AvatarColor?)
+
   fun onProtected(value: Boolean)
+
   fun onAddFact()
-  fun onFactChange(key: Long, label: String, value: String)
+
+  fun onFactChange(
+    key: Long,
+    label: String,
+    value: String,
+  )
+
   fun onRemoveFact(key: Long)
-  fun onMoveFact(from: Int, to: Int)
-  fun delete(exportFirst: Boolean, onDeleted: () -> Unit)
+
+  fun onMoveFact(
+    from: Int,
+    to: Int,
+  )
+
+  fun delete(
+    exportFirst: Boolean,
+    onDeleted: () -> Unit,
+  )
+
   fun save(onSaved: (Long) -> Unit)
 }
 
@@ -63,7 +87,8 @@ class EditPersonViewModel(
   private val personId: Long,
   private val repository: ConversesRepository,
   private val exporter: PersonExporter,
-) : ViewModel(), EditPersonActions {
+) : ViewModel(),
+  EditPersonActions {
   private var original: PersonEntity? = null
   private var nextKey = 1L
 
@@ -80,25 +105,27 @@ class EditPersonViewModel(
       val facts = repository.observePinnedFacts(personId).first()
       original = person
       val loadedFacts = facts.map { FactDraft(nextKey++, it.label, it.value) }
-      _state.value = EditPersonUiState(
-        isNew = false,
-        loaded = true,
-        name = person.name,
-        alias = person.alias.orEmpty(),
-        shape = person.avatarShape,
-        color = person.avatarColor,
-        isProtected = person.isProtected,
-        facts = loadedFacts,
-        entryCount = repository.getEntries(personId).size,
-        baseline = EditSnapshot(
+      _state.value =
+        EditPersonUiState(
+          isNew = false,
+          loaded = true,
           name = person.name,
           alias = person.alias.orEmpty(),
           shape = person.avatarShape,
           color = person.avatarColor,
           isProtected = person.isProtected,
           facts = loadedFacts,
-        ),
-      )
+          entryCount = repository.getEntries(personId).size,
+          baseline =
+            EditSnapshot(
+              name = person.name,
+              alias = person.alias.orEmpty(),
+              shape = person.avatarShape,
+              color = person.avatarColor,
+              isProtected = person.isProtected,
+              facts = loadedFacts,
+            ),
+        )
     }
   }
 
@@ -132,13 +159,29 @@ class EditPersonViewModel(
 
   override fun onAddFact() = _state.update { it.copy(facts = it.facts + FactDraft(nextKey++, "", "")) }
 
-  override fun onFactChange(key: Long, label: String, value: String) = _state.update { state ->
+  override fun onFactChange(
+    key: Long,
+    label: String,
+    value: String,
+  ) = _state.update { state ->
     state.copy(facts = state.facts.map { if (it.key == key) it.copy(label = label, value = value) else it })
   }
 
-  override fun onRemoveFact(key: Long) = _state.update { state -> state.copy(facts = state.facts.filterNot { it.key == key }) }
+  override fun onRemoveFact(key: Long) =
+    _state.update { state ->
+      state.copy(
+        facts =
+          state.facts.filterNot {
+            it.key ==
+              key
+          },
+      )
+    }
 
-  override fun onMoveFact(from: Int, to: Int) = _state.update { state ->
+  override fun onMoveFact(
+    from: Int,
+    to: Int,
+  ) = _state.update { state ->
     if (from !in state.facts.indices || to !in state.facts.indices) {
       state
     } else {
@@ -146,7 +189,10 @@ class EditPersonViewModel(
     }
   }
 
-  override fun delete(exportFirst: Boolean, onDeleted: () -> Unit) {
+  override fun delete(
+    exportFirst: Boolean,
+    onDeleted: () -> Unit,
+  ) {
     val person = original ?: return
     viewModelScope.launch {
       if (exportFirst) exporter.buildText(personId)?.let { exporter.share(person.name, it) }
@@ -166,21 +212,23 @@ class EditPersonViewModel(
       }
       val now = System.currentTimeMillis()
       val base = original
-      val person = PersonEntity(
-        id = personId,
-        name = current.name.trim(),
-        alias = alias,
-        avatarShape = current.shape,
-        avatarColor = current.color,
-        isProtected = current.isProtected,
-        archived = base?.archived ?: false,
-        notes = base?.notes,
-        createdAt = base?.createdAt ?: now,
-        updatedAt = now,
-      )
-      val facts = current.facts
-        .filter { it.label.isNotBlank() || it.value.isNotBlank() }
-        .map { PinnedFactEntity(personId = 0, label = it.label.trim(), value = it.value.trim(), position = 0) }
+      val person =
+        PersonEntity(
+          id = personId,
+          name = current.name.trim(),
+          alias = alias,
+          avatarShape = current.shape,
+          avatarColor = current.color,
+          isProtected = current.isProtected,
+          archived = base?.archived ?: false,
+          notes = base?.notes,
+          createdAt = base?.createdAt ?: now,
+          updatedAt = now,
+        )
+      val facts =
+        current.facts
+          .filter { it.label.isNotBlank() || it.value.isNotBlank() }
+          .map { PinnedFactEntity(personId = 0, label = it.label.trim(), value = it.value.trim(), position = 0) }
       onSaved(repository.savePerson(person, facts))
     }
   }

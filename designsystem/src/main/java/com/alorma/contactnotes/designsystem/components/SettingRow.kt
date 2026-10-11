@@ -41,7 +41,12 @@ fun SettingRow(
     )
   }
   if (onClick != null) {
-    Surface(onClick = onClick, shape = shape, color = GroupedListDefaults.containerColor, modifier = modifier.fillMaxWidth()) {
+    Surface(
+      onClick = onClick,
+      shape = shape,
+      color = GroupedListDefaults.containerColor,
+      modifier = modifier.fillMaxWidth(),
+    ) {
       content()
     }
   } else {
@@ -68,14 +73,15 @@ fun SettingSwitchRow(
     subtitle = subtitle,
     icon = icon,
     modifier = modifier,
-    contentModifier = Modifier.toggleable(
-      value = checked,
-      role = Role.Switch,
-      onValueChange = {
-        if (haptic) haptics.toggle(it)
-        onCheckedChange(it)
-      },
-    ),
+    contentModifier =
+      Modifier.toggleable(
+        value = checked,
+        role = Role.Switch,
+        onValueChange = {
+          if (haptic) haptics.toggle(it)
+          onCheckedChange(it)
+        },
+      ),
     trailing = { ConversesSwitch(checked = checked, onCheckedChange = null) },
   )
 }

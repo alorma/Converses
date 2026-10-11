@@ -8,4 +8,23 @@ plugins {
   alias(libs.plugins.room) apply false
   alias(libs.plugins.compose.screenshot) apply false
   alias(libs.plugins.play.publisher) apply false
+  alias(libs.plugins.ktlint) apply false
+}
+
+subprojects {
+  apply(plugin = "org.jlleitschuh.gradle.ktlint")
+
+  configure<org.jlleitschuh.gradle.ktlint.KtlintExtension> {
+    version.set("1.5.0")
+    android.set(true)
+    ignoreFailures.set(false)
+    reporters {
+      reporter(org.jlleitschuh.gradle.ktlint.reporter.ReporterType.PLAIN)
+      reporter(org.jlleitschuh.gradle.ktlint.reporter.ReporterType.CHECKSTYLE)
+    }
+    filter {
+      exclude("**/generated/**")
+      exclude("**/build/**")
+    }
+  }
 }

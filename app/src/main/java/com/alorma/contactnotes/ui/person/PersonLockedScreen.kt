@@ -1,7 +1,5 @@
 package com.alorma.contactnotes.ui.person
 
-import com.alorma.contactnotes.data.db.shape
-import com.alorma.contactnotes.data.db.color
 import androidx.activity.compose.LocalActivity
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.fadeIn
@@ -12,13 +10,13 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.only
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material.icons.Icons
@@ -53,6 +51,8 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.alorma.contactnotes.R
+import com.alorma.contactnotes.data.db.color
+import com.alorma.contactnotes.data.db.shape
 import com.alorma.contactnotes.data.settings.SecureWindow
 import com.alorma.contactnotes.designsystem.components.Avatar
 import com.alorma.contactnotes.designsystem.components.AvatarColor
@@ -139,7 +139,13 @@ fun PersonLockedContent(
     topBar = {
       IconButton(
         onClick = onBack,
-        modifier = Modifier.windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal)).padding(8.dp),
+        modifier =
+          Modifier
+            .windowInsetsPadding(
+              WindowInsets.safeDrawing.only(
+                WindowInsetsSides.Top + WindowInsetsSides.Horizontal,
+              ),
+            ).padding(8.dp),
       ) {
         Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = stringResource(R.string.back))
       }
@@ -155,7 +161,10 @@ fun PersonLockedContent(
         Spacer(Modifier.height(24.dp))
         Text(text = name, style = PersonNameStyle, textAlign = TextAlign.Center)
         Spacer(Modifier.height(24.dp))
-        Box(modifier = Modifier.fillMaxWidth().heightIn(min = StateAreaMinHeight), contentAlignment = Alignment.TopCenter) {
+        Box(
+          modifier = Modifier.fillMaxWidth().heightIn(min = StateAreaMinHeight),
+          contentAlignment = Alignment.TopCenter,
+        ) {
           AnimatedContent(
             targetState = state,
             contentKey = { it::class },
@@ -194,11 +203,12 @@ private fun LockStateContent(
         Message(
           icon = Icons.Rounded.Info,
           title = stringResource(R.string.lock_canceled_title),
-          body = if (state.permanentLockout) {
-            stringResource(R.string.lock_lockout_permanent)
-          } else {
-            stringResource(R.string.lock_canceled_body, name)
-          },
+          body =
+            if (state.permanentLockout) {
+              stringResource(R.string.lock_lockout_permanent)
+            } else {
+              stringResource(R.string.lock_canceled_body, name)
+            },
         )
         Actions(
           primaryIcon = Icons.Rounded.Fingerprint,
@@ -217,11 +227,12 @@ private fun LockStateContent(
         )
         Actions(
           primaryIcon = Icons.Rounded.Timer,
-          primaryLabel = if (state.seconds > 0) {
-            stringResource(R.string.lock_retry_in, state.seconds)
-          } else {
-            stringResource(R.string.lock_retry)
-          },
+          primaryLabel =
+            if (state.seconds > 0) {
+              stringResource(R.string.lock_retry_in, state.seconds)
+            } else {
+              stringResource(R.string.lock_retry)
+            },
           primaryEnabled = state.seconds == 0,
           onPrimary = onRetry,
           onBack = onBack,
@@ -246,7 +257,12 @@ private fun LockStateContent(
 }
 
 @Composable
-private fun Message(icon: ImageVector, title: String, body: String, error: Boolean = false) {
+private fun Message(
+  icon: ImageVector,
+  title: String,
+  body: String,
+  error: Boolean = false,
+) {
   val scheme = MaterialTheme.colorScheme
   Icon(icon, contentDescription = null, tint = if (error) scheme.error else scheme.onSurfaceVariant)
   Spacer(Modifier.height(8.dp))

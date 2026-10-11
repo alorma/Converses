@@ -12,7 +12,10 @@ abstract class FeatureFlagRunner {
 
   fun isEnabled(flag: FeatureFlag): Boolean = getBoolean(flag.key, flag.defaultValue)
 
-  protected abstract fun getBoolean(key: String, defaultValue: Boolean): Boolean
+  protected abstract fun getBoolean(
+    key: String,
+    defaultValue: Boolean,
+  ): Boolean
 }
 
 /**
@@ -27,9 +30,15 @@ class LocalFeatureFlagRunner(
 
   override val changes: StateFlow<Any> = overrides.asStateFlow()
 
-  override fun getBoolean(key: String, defaultValue: Boolean): Boolean = overrides.value[key] ?: defaultValue
+  override fun getBoolean(
+    key: String,
+    defaultValue: Boolean,
+  ): Boolean = overrides.value[key] ?: defaultValue
 
-  fun setOverride(key: String, value: Boolean) = change { it + (key to value) }
+  fun setOverride(
+    key: String,
+    value: Boolean,
+  ) = change { it + (key to value) }
 
   fun clearOverride(key: String) = change { it - key }
 

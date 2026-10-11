@@ -44,18 +44,28 @@ class PersonExporter(
     }.trimEnd()
   }
 
-  private fun EntryEntity.line(firstName: String, formatter: DateTimeFormatter, zone: ZoneId): String {
+  private fun EntryEntity.line(
+    firstName: String,
+    formatter: DateTimeFormatter,
+    zone: ZoneId,
+  ): String {
     val whenText = Instant.ofEpochMilli(occurredAt).atZone(zone).format(formatter)
     return "[$whenText · ${channelName(context, channelType)}] ${whoLabel(context, kind, firstName)}: $text"
   }
 
-  fun share(name: String, text: String) {
-    val send = Intent(Intent.ACTION_SEND)
-      .setType("text/plain")
-      .putExtra(Intent.EXTRA_SUBJECT, context.getString(R.string.export_title, name))
-      .putExtra(Intent.EXTRA_TEXT, text)
-    val chooser = Intent.createChooser(send, context.getString(R.string.export_title, name))
-      .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+  fun share(
+    name: String,
+    text: String,
+  ) {
+    val send =
+      Intent(Intent.ACTION_SEND)
+        .setType("text/plain")
+        .putExtra(Intent.EXTRA_SUBJECT, context.getString(R.string.export_title, name))
+        .putExtra(Intent.EXTRA_TEXT, text)
+    val chooser =
+      Intent
+        .createChooser(send, context.getString(R.string.export_title, name))
+        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
     context.startActivity(chooser)
   }
 }

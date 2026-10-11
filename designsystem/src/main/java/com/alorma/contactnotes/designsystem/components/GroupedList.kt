@@ -4,13 +4,13 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import androidx.compose.foundation.shape.RoundedCornerShape
 import com.alorma.contactnotes.designsystem.theme.isDarkTheme
 
 object GroupedListDefaults {
@@ -19,15 +19,19 @@ object GroupedListDefaults {
   val ItemSpacing = 2.dp
 
   val containerColor: Color
-    @Composable get() = if (isDarkTheme) {
-      MaterialTheme.colorScheme.surfaceContainer
-    } else {
-      MaterialTheme.colorScheme.surfaceContainerLowest
-    }
+    @Composable get() =
+      if (isDarkTheme) {
+        MaterialTheme.colorScheme.surfaceContainer
+      } else {
+        MaterialTheme.colorScheme.surfaceContainerLowest
+      }
 }
 
 /** Cantonades segons la posició: 24 dp als extrems del grup, 6 dp entre files. */
-fun groupedItemShape(index: Int, count: Int): RoundedCornerShape {
+fun groupedItemShape(
+  index: Int,
+  count: Int,
+): RoundedCornerShape {
   val top = if (index == 0) GroupedListDefaults.OuterCorner else GroupedListDefaults.InnerCorner
   val bottom = if (index == count - 1) GroupedListDefaults.OuterCorner else GroupedListDefaults.InnerCorner
   return RoundedCornerShape(topStart = top, topEnd = top, bottomStart = bottom, bottomEnd = bottom)

@@ -1,7 +1,5 @@
 package com.alorma.contactnotes.ui.person
 
-import com.alorma.contactnotes.data.db.shape
-import com.alorma.contactnotes.data.db.color
 import android.content.ClipData
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -33,30 +31,30 @@ import androidx.compose.material.icons.rounded.Unarchive
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ClipEntry
 import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -67,16 +65,18 @@ import com.alorma.contactnotes.data.db.EntryEntity
 import com.alorma.contactnotes.data.db.EntryKind
 import com.alorma.contactnotes.data.db.PersonEntity
 import com.alorma.contactnotes.data.db.PinnedFactEntity
+import com.alorma.contactnotes.data.db.color
+import com.alorma.contactnotes.data.db.shape
 import com.alorma.contactnotes.data.settings.SecureWindow
 import com.alorma.contactnotes.designsystem.components.Avatar
 import com.alorma.contactnotes.designsystem.components.CollapsibleFacts
 import com.alorma.contactnotes.designsystem.components.ConversesChannelChip
-import com.alorma.contactnotes.designsystem.components.FactItem
 import com.alorma.contactnotes.designsystem.components.ConversesFilterChip
 import com.alorma.contactnotes.designsystem.components.ConversesMenuItem
 import com.alorma.contactnotes.designsystem.components.ConversesSplitButton
 import com.alorma.contactnotes.designsystem.components.DashedHintRow
 import com.alorma.contactnotes.designsystem.components.EmptyState
+import com.alorma.contactnotes.designsystem.components.FactItem
 import com.alorma.contactnotes.designsystem.components.GroupedListDefaults
 import com.alorma.contactnotes.designsystem.components.TimelineRow
 import com.alorma.contactnotes.designsystem.components.rememberConversesHaptics
@@ -98,21 +98,27 @@ private val ScreenMargin = 16.dp
 private const val UndoWindowMillis = 5_000L
 
 private sealed interface TimelineItem {
-  data class Day(val date: LocalDate) : TimelineItem
-  data class Entry(val entry: EntryEntity) : TimelineItem
+  data class Day(
+    val date: LocalDate,
+  ) : TimelineItem
+
+  data class Entry(
+    val entry: EntryEntity,
+  ) : TimelineItem
 }
 
-private fun List<EntryEntity>.toTimelineItems(): List<TimelineItem> = buildList {
-  var currentDay: LocalDate? = null
-  for (entry in this@toTimelineItems) {
-    val day = entryDate(entry.occurredAt)
-    if (day != currentDay) {
-      currentDay = day
-      add(TimelineItem.Day(day))
+private fun List<EntryEntity>.toTimelineItems(): List<TimelineItem> =
+  buildList {
+    var currentDay: LocalDate? = null
+    for (entry in this@toTimelineItems) {
+      val day = entryDate(entry.occurredAt)
+      if (day != currentDay) {
+        currentDay = day
+        add(TimelineItem.Day(day))
+      }
+      add(TimelineItem.Entry(entry))
     }
-    add(TimelineItem.Entry(entry))
   }
-}
 
 /** Quina acció d'una entrada està oberta. */
 private enum class EntryAction { None, Menu, Edit, Move, ConfirmDeleteDay }
@@ -208,73 +214,80 @@ fun PersonDetailRoute(
 
     if (actionEntry != null) {
       when (action) {
-        EntryAction.Menu -> EntryActionsSheet(
-          entry = actionEntry,
-          firstName = firstName(person.name),
-          dayCount = dayCount,
-          onDismiss = ::closeAction,
-          onEdit = { action = EntryAction.Edit },
-          onCopy = {
-            haptics.confirm()
-            scope.launch { clipboard.setClipEntry(ClipEntry(ClipData.newPlainText(person.name, actionEntry.text))) }
-            closeAction()
-          },
-          onMove = { action = EntryAction.Move },
-          onDelete = {
-            val deleted = actionEntry
-            haptics.confirm()
-            viewModel.deleteEntry(deleted)
-            closeAction()
-            scope.launch {
-              snackbarHostState.currentSnackbarData?.dismiss()
-              val timeout = launch {
-                delay(UndoWindowMillis)
+        EntryAction.Menu ->
+          EntryActionsSheet(
+            entry = actionEntry,
+            firstName = firstName(person.name),
+            dayCount = dayCount,
+            onDismiss = ::closeAction,
+            onEdit = { action = EntryAction.Edit },
+            onCopy = {
+              haptics.confirm()
+              scope.launch { clipboard.setClipEntry(ClipEntry(ClipData.newPlainText(person.name, actionEntry.text))) }
+              closeAction()
+            },
+            onMove = { action = EntryAction.Move },
+            onDelete = {
+              val deleted = actionEntry
+              haptics.confirm()
+              viewModel.deleteEntry(deleted)
+              closeAction()
+              scope.launch {
                 snackbarHostState.currentSnackbarData?.dismiss()
+                val timeout =
+                  launch {
+                    delay(UndoWindowMillis)
+                    snackbarHostState.currentSnackbarData?.dismiss()
+                  }
+                val result =
+                  snackbarHostState.showSnackbar(
+                    message = deletedMessage,
+                    actionLabel = undoLabel,
+                    duration = SnackbarDuration.Indefinite,
+                  )
+                timeout.cancel()
+                if (result == SnackbarResult.ActionPerformed) viewModel.restoreEntry(deleted)
               }
-              val result = snackbarHostState.showSnackbar(
-                message = deletedMessage,
-                actionLabel = undoLabel,
-                duration = SnackbarDuration.Indefinite,
-              )
-              timeout.cancel()
-              if (result == SnackbarResult.ActionPerformed) viewModel.restoreEntry(deleted)
-            }
-          },
-          onDeleteDay = { action = EntryAction.ConfirmDeleteDay },
-        )
-        EntryAction.Edit -> NewEntrySheet(
-          person = person,
-          defaultChannel = null,
-          initial = actionEntry,
-          onDismiss = ::closeAction,
-          onSave = { kind, channel, text, at ->
-            viewModel.updateEntry(actionEntry, kind, channel, text, at)
-            closeAction()
-          },
-        )
-        EntryAction.Move -> MoveEntryDialog(
-          people = otherPeople,
-          onDismiss = ::closeAction,
-          onSelect = {
-            haptics.confirm()
-            viewModel.moveEntry(actionEntry, it.id)
-            closeAction()
-          },
-        )
-        EntryAction.ConfirmDeleteDay -> ConfirmDeleteDialog(
-          title = stringResource(R.string.delete_day_title),
-          text = pluralStringResource(
-            R.plurals.entry_delete_day_summary,
-            dayCount,
-            dayCount,
-            channelName(actionEntry.channelType),
-          ),
-          onDismiss = ::closeAction,
-          onConfirm = {
-            viewModel.deleteDay(actionEntry)
-            closeAction()
-          },
-        )
+            },
+            onDeleteDay = { action = EntryAction.ConfirmDeleteDay },
+          )
+        EntryAction.Edit ->
+          NewEntrySheet(
+            person = person,
+            defaultChannel = null,
+            initial = actionEntry,
+            onDismiss = ::closeAction,
+            onSave = { kind, channel, text, at ->
+              viewModel.updateEntry(actionEntry, kind, channel, text, at)
+              closeAction()
+            },
+          )
+        EntryAction.Move ->
+          MoveEntryDialog(
+            people = otherPeople,
+            onDismiss = ::closeAction,
+            onSelect = {
+              haptics.confirm()
+              viewModel.moveEntry(actionEntry, it.id)
+              closeAction()
+            },
+          )
+        EntryAction.ConfirmDeleteDay ->
+          ConfirmDeleteDialog(
+            title = stringResource(R.string.delete_day_title),
+            text =
+              pluralStringResource(
+                R.plurals.entry_delete_day_summary,
+                dayCount,
+                dayCount,
+                channelName(actionEntry.channelType),
+              ),
+            onDismiss = ::closeAction,
+            onConfirm = {
+              viewModel.deleteDay(actionEntry)
+              closeAction()
+            },
+          )
         EntryAction.None -> Unit
       }
     }
@@ -304,11 +317,12 @@ fun PersonDetailScreen(
     contentWindowInsets = WindowInsets.navigationBars,
     topBar = {
       Row(
-        modifier = Modifier
-          .fillMaxWidth()
-          .background(MaterialTheme.colorScheme.surface)
-          .windowInsetsPadding(WindowInsets.statusBars)
-          .padding(horizontal = ScreenMargin),
+        modifier =
+          Modifier
+            .fillMaxWidth()
+            .background(MaterialTheme.colorScheme.surface)
+            .windowInsetsPadding(WindowInsets.statusBars)
+            .padding(horizontal = ScreenMargin),
         verticalAlignment = Alignment.CenterVertically,
       ) {
         IconButton(onClick = onBack) {
@@ -355,12 +369,13 @@ fun PersonDetailScreen(
     Box(modifier = Modifier.fillMaxSize()) {
       LazyColumn(
         modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(
-          start = ScreenMargin,
-          end = ScreenMargin,
-          top = padding.calculateTopPadding(),
-          bottom = 96.dp + padding.calculateBottomPadding(),
-        ),
+        contentPadding =
+          PaddingValues(
+            start = ScreenMargin,
+            end = ScreenMargin,
+            top = padding.calculateTopPadding(),
+            bottom = 96.dp + padding.calculateBottomPadding(),
+          ),
       ) {
         item(key = "header") { Header(person) }
         if (state.channels.isNotEmpty()) {
@@ -380,27 +395,37 @@ fun PersonDetailScreen(
           SectionHeader(
             title = stringResource(R.string.timeline),
             topPadding = 24.dp,
-            trailing = if (noEntries) {
-              null
-            } else {
-              pluralStringResource(R.plurals.entry_count, state.entries.size, state.entries.size)
-            },
+            trailing =
+              if (noEntries) {
+                null
+              } else {
+                pluralStringResource(R.plurals.entry_count, state.entries.size, state.entries.size)
+              },
           )
         }
-        if (!noEntries) item(key = "kind-filters") {
-          LazyRow(
-            contentPadding = PaddingValues(vertical = 8.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-          ) {
-            items(EntryKind.entries, key = { it.name }) { kind ->
-              ConversesFilterChip(
-                label = whoFilterLabel(kind, firstName),
-                selected = kind in state.selectedKinds,
-                onClick = { onKindToggled(kind) },
-                icon = kind.whoIcon(),
-                tonal = true,
-                leadingContent = if (kind == EntryKind.HEARD) ({ PersonInitialAvatar(person, size = 22.dp) }) else null,
-              )
+        if (!noEntries) {
+          item(key = "kind-filters") {
+            LazyRow(
+              contentPadding = PaddingValues(vertical = 8.dp),
+              horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+              items(EntryKind.entries, key = { it.name }) { kind ->
+                ConversesFilterChip(
+                  label = whoFilterLabel(kind, firstName),
+                  selected = kind in state.selectedKinds,
+                  onClick = { onKindToggled(kind) },
+                  icon = kind.whoIcon(),
+                  tonal = true,
+                  leadingContent =
+                    if (kind ==
+                      EntryKind.HEARD
+                    ) {
+                      ({ PersonInitialAvatar(person, size = 22.dp) })
+                    } else {
+                      null
+                    },
+                )
+              }
             }
           }
         }
@@ -410,17 +435,19 @@ fun PersonDetailScreen(
           }
         } else if (items.isEmpty()) {
           item(key = "empty") {
-            val kindsLabel = EntryKind.entries
-              .filter { it in state.selectedKinds }
-              .map { whoFilterLabel(it, firstName) }
-              .joinToString(" · ")
+            val kindsLabel =
+              EntryKind.entries
+                .filter { it in state.selectedKinds }
+                .map { whoFilterLabel(it, firstName) }
+                .joinToString(" · ")
             EmptyState(
               icon = Icons.Rounded.ChatBubbleOutline,
-              title = if (kindsLabel.isEmpty()) {
-                stringResource(R.string.timeline_empty)
-              } else {
-                stringResource(R.string.timeline_filtered_empty, kindsLabel)
-              },
+              title =
+                if (kindsLabel.isEmpty()) {
+                  stringResource(R.string.timeline_empty)
+                } else {
+                  stringResource(R.string.timeline_filtered_empty, kindsLabel)
+                },
             )
           }
         }
@@ -433,22 +460,24 @@ fun PersonDetailScreen(
           val isFirst = index == 0
           val isLast = index == items.lastIndex
           when (val item = items[index]) {
-            is TimelineItem.Day -> TimelineRow(isFirst = isFirst, isLast = isLast) {
-              Text(
-                text = dayLabel(item.date),
-                style = MaterialTheme.typography.titleSmall,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.padding(top = 12.dp, bottom = 4.dp),
-              )
-            }
-            is TimelineItem.Entry -> TimelineRow(
-              isFirst = isFirst,
-              isLast = isLast,
-              marker = { EntryMarker(item.entry.kind, person) },
-            ) {
-              EntryCard(item.entry, firstName, onMenu = { onEntryMenu(item.entry) })
-            }
+            is TimelineItem.Day ->
+              TimelineRow(isFirst = isFirst, isLast = isLast) {
+                Text(
+                  text = dayLabel(item.date),
+                  style = MaterialTheme.typography.titleSmall,
+                  fontWeight = FontWeight.Bold,
+                  color = MaterialTheme.colorScheme.onSurfaceVariant,
+                  modifier = Modifier.padding(top = 12.dp, bottom = 4.dp),
+                )
+              }
+            is TimelineItem.Entry ->
+              TimelineRow(
+                isFirst = isFirst,
+                isLast = isLast,
+                marker = { EntryMarker(item.entry.kind, person) },
+              ) {
+                EntryCard(item.entry, firstName, onMenu = { onEntryMenu(item.entry) })
+              }
           }
         }
       }
@@ -525,7 +554,11 @@ private fun PinnedFacts(
 }
 
 @Composable
-private fun SectionHeader(title: String, topPadding: androidx.compose.ui.unit.Dp, trailing: String? = null) {
+private fun SectionHeader(
+  title: String,
+  topPadding: androidx.compose.ui.unit.Dp,
+  trailing: String? = null,
+) {
   Row(
     modifier = Modifier.fillMaxWidth().padding(start = 4.dp, top = topPadding, bottom = 8.dp),
     verticalAlignment = Alignment.CenterVertically,
@@ -542,33 +575,40 @@ private fun SectionHeader(title: String, topPadding: androidx.compose.ui.unit.Dp
 }
 
 @Composable
-private fun EntryCard(entry: EntryEntity, firstName: String, onMenu: () -> Unit) {
+private fun EntryCard(
+  entry: EntryEntity,
+  firstName: String,
+  onMenu: () -> Unit,
+) {
   Surface(
     shape = MaterialTheme.shapes.extraLarge,
     color = GroupedListDefaults.containerColor,
     modifier = Modifier.fillMaxWidth(),
   ) {
-    val description = stringResource(
-      R.string.entry_description,
-      whoLabel(entry.kind, firstName),
-      dayLabel(entryDate(entry.occurredAt)),
-      formatTime(entry.occurredAt),
-      channelName(entry.channelType),
-      entry.text,
-    )
+    val description =
+      stringResource(
+        R.string.entry_description,
+        whoLabel(entry.kind, firstName),
+        dayLabel(entryDate(entry.occurredAt)),
+        formatTime(entry.occurredAt),
+        channelName(entry.channelType),
+        entry.text,
+      )
     Row(verticalAlignment = Alignment.Top) {
       Column(
-        modifier = Modifier
-          .weight(1f)
-          .padding(start = 16.dp, top = 14.dp, bottom = 14.dp)
-          .clearAndSetSemantics { contentDescription = description },
+        modifier =
+          Modifier
+            .weight(1f)
+            .padding(start = 16.dp, top = 14.dp, bottom = 14.dp)
+            .clearAndSetSemantics { contentDescription = description },
       ) {
         Text(
-          text = listOf(
-            whoLabel(entry.kind, firstName),
-            formatTime(entry.occurredAt),
-            channelName(entry.channelType),
-          ).joinToString(" · ") { it.uppercase() },
+          text =
+            listOf(
+              whoLabel(entry.kind, firstName),
+              formatTime(entry.occurredAt),
+              channelName(entry.channelType),
+            ).joinToString(" · ") { it.uppercase() },
           style = MaterialTheme.typography.labelMedium,
           fontWeight = FontWeight.SemiBold,
           color = MaterialTheme.colorScheme.onSurfaceVariant,

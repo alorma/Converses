@@ -35,7 +35,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 /** Una dada fixada: etiqueta i valor. */
-data class FactItem(val label: String, val value: String)
+data class FactItem(
+  val label: String,
+  val value: String,
+)
 
 /**
  * Dades d'una persona en un únic bloc plegable, sense títol: plegat només mostra la primera dada
@@ -69,31 +72,44 @@ fun CollapsibleFacts(
     Surface(
       onClick = onToggle,
       enabled = expandable,
-      shape = RoundedCornerShape(
-        topStart = GroupedListDefaults.OuterCorner,
-        topEnd = GroupedListDefaults.OuterCorner,
-        bottomStart = bottomCorner,
-        bottomEnd = bottomCorner,
-      ),
-      color = GroupedListDefaults.containerColor,
-      modifier = Modifier
-        .fillMaxWidth()
-        .then(
-          if (expandable) {
-            Modifier.semantics {
-              role = Role.Button
-              contentDescription = toggleDescription
-              if (open) collapse { onToggle(); true } else expand { onToggle(); true }
-            }
-          } else {
-            Modifier
-          },
+      shape =
+        RoundedCornerShape(
+          topStart = GroupedListDefaults.OuterCorner,
+          topEnd = GroupedListDefaults.OuterCorner,
+          bottomStart = bottomCorner,
+          bottomEnd = bottomCorner,
         ),
+      color = GroupedListDefaults.containerColor,
+      modifier =
+        Modifier
+          .fillMaxWidth()
+          .then(
+            if (expandable) {
+              Modifier.semantics {
+                role = Role.Button
+                contentDescription = toggleDescription
+                if (open) {
+                  collapse {
+                    onToggle()
+                    true
+                  }
+                } else {
+                  expand {
+                    onToggle()
+                    true
+                  }
+                }
+              }
+            } else {
+              Modifier
+            },
+          ),
     ) {
       Row(
-        modifier = Modifier
-          .heightIn(min = 56.dp)
-          .padding(start = 16.dp, top = 8.dp, end = 8.dp, bottom = 8.dp),
+        modifier =
+          Modifier
+            .heightIn(min = 56.dp)
+            .padding(start = 16.dp, top = 8.dp, end = 8.dp, bottom = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(8.dp),
       ) {
@@ -135,12 +151,27 @@ fun CollapsibleFacts(
       Column(verticalArrangement = Arrangement.spacedBy(GroupedListDefaults.ItemSpacing)) {
         rest.forEachIndexed { index, fact ->
           Surface(
-            shape = RoundedCornerShape(
-              topStart = GroupedListDefaults.InnerCorner,
-              topEnd = GroupedListDefaults.InnerCorner,
-              bottomStart = if (index == rest.lastIndex) GroupedListDefaults.OuterCorner else GroupedListDefaults.InnerCorner,
-              bottomEnd = if (index == rest.lastIndex) GroupedListDefaults.OuterCorner else GroupedListDefaults.InnerCorner,
-            ),
+            shape =
+              RoundedCornerShape(
+                topStart = GroupedListDefaults.InnerCorner,
+                topEnd = GroupedListDefaults.InnerCorner,
+                bottomStart =
+                  if (index ==
+                    rest.lastIndex
+                  ) {
+                    GroupedListDefaults.OuterCorner
+                  } else {
+                    GroupedListDefaults.InnerCorner
+                  },
+                bottomEnd =
+                  if (index ==
+                    rest.lastIndex
+                  ) {
+                    GroupedListDefaults.OuterCorner
+                  } else {
+                    GroupedListDefaults.InnerCorner
+                  },
+              ),
             color = GroupedListDefaults.containerColor,
             modifier = Modifier.fillMaxWidth(),
           ) {

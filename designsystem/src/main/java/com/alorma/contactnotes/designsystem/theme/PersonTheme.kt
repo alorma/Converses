@@ -27,18 +27,22 @@ private const val SchemeAnimationMillis = 300
  */
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-fun PersonTheme(color: AvatarColor?, content: @Composable () -> Unit) {
+fun PersonTheme(
+  color: AvatarColor?,
+  content: @Composable () -> Unit,
+) {
   if (color == null || !LocalPersonColorTheme.current) {
     content()
     return
   }
   val isDark = isDarkTheme
   val appScheme = LocalAppColorScheme.current ?: MaterialTheme.colorScheme
-  val target = rememberDynamicColorScheme(
-    seedColor = color.seed,
-    isDark = isDark,
-    style = PaletteStyle.TonalSpot,
-  ).withFixedError(isDark)
+  val target =
+    rememberDynamicColorScheme(
+      seedColor = color.seed,
+      isDark = isDark,
+      style = PaletteStyle.TonalSpot,
+    ).withFixedError(isDark)
 
   CompositionLocalProvider(LocalAppColorScheme provides appScheme) {
     MaterialExpressiveTheme(

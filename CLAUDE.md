@@ -26,7 +26,7 @@ Two modules: `:app` and `:designsystem`. ViewModel and repository tests are plai
 - Validate screenshots: `./gradlew validateDebugScreenshotTest`
 - Regenerate screenshots: `./gradlew updateDebugScreenshotTest`; for a single test: `./gradlew :app:updateDebugScreenshotTest --tests '*ScreensScreenshotTests.peopleListLoaded'`
 
-No linter (ktlint/detekt) is configured.
+Code style is enforced with ktlint (`./gradlew ktlintCheck`, `./gradlew ktlintFormat` to fix it); rules live in `.editorconfig`.
 
 ## Architecture
 
@@ -38,7 +38,7 @@ No linter (ktlint/detekt) is configured.
 - **`EntryForm`** is the only entry form (quick note, new entry and edit). `whoLabel(...)` is the only function producing the labels Me / {first name} / Note; `EntryKind` (`SAID`, `HEARD`, `HAPPENED`) does not change.
 - **Room:** version 1 is published on Google Play (beta track), schema in `app/schemas`. **Every database change MUST ship with a migration:** bump `version` in `ConversesDatabase`, commit the new exported schema JSON, add a `Migration` (or `AutoMigration`) registered in `di/AppModules.kt` and a migration test with `MigrationTestHelper` (`room-testing` is already in `androidTestImplementation`). Never edit an already-exported schema or rely on `fallbackToDestructiveMigration`: it is enabled only in debug and would wipe users' data in release. Sample data is not seeded by default, only from the debug menu (`insertSampleData`).
 - **Tests:** `FakeDb` (in-memory DAOs) and `MainDispatcherRule` in `app/src/test/.../testing`. Screenshot test method names use camelCase with no `_`; references are versioned in `<module>/src/screenshotTestDebug/reference/`.
-- **CI** (`.github/workflows`): `pr-build.yml` (tests + debug APK), `build-apk.yml` and `screenshot-tests.yml`. The `update-screenshots` label on a PR regenerates the references; there is no need to generate them locally.
+- **CI** (`.github/workflows`): `pr-build.yml` (ktlint + tests + debug APK), `build-apk.yml`, `screenshot-tests.yml`, `release.yml` (manual, with a `track` input) and `publish-listing.yml`. The `update-screenshots` label on a PR regenerates the references; there is no need to generate them locally.
 
 ## Rules
 

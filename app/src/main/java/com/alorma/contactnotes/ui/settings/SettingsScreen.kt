@@ -6,43 +6,32 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.provider.Settings
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBars
-import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.selection.selectableGroup
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.automirrored.rounded.OpenInNew
-import androidx.compose.material.icons.rounded.BrightnessAuto
-import androidx.compose.material.icons.rounded.Check
-import androidx.compose.material.icons.rounded.DarkMode
-import androidx.compose.material.icons.rounded.LightMode
-import androidx.compose.material.icons.rounded.Face
-import androidx.compose.material.icons.rounded.Fingerprint
-import androidx.compose.material.icons.rounded.Language
-import androidx.compose.material.icons.rounded.Palette
-import androidx.compose.material.icons.rounded.Vibration
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Mail
 import androidx.compose.material.icons.outlined.Policy
+import androidx.compose.material.icons.rounded.BrightnessAuto
+import androidx.compose.material.icons.rounded.DarkMode
+import androidx.compose.material.icons.rounded.Face
+import androidx.compose.material.icons.rounded.Fingerprint
+import androidx.compose.material.icons.rounded.Language
+import androidx.compose.material.icons.rounded.LightMode
+import androidx.compose.material.icons.rounded.Palette
 import androidx.compose.material.icons.rounded.Timer
 import androidx.compose.material.icons.rounded.UnfoldMore
+import androidx.compose.material.icons.rounded.Vibration
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -57,15 +46,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import com.alorma.contactnotes.designsystem.components.ConversesTopBar
-import com.alorma.contactnotes.designsystem.components.rememberTopBarScrollBehavior
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.LinkAnnotation
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextLinkStyles
@@ -87,13 +71,14 @@ import com.alorma.contactnotes.data.flags.rememberFeatureEnabled
 import com.alorma.contactnotes.data.settings.AppLockManager
 import com.alorma.contactnotes.data.settings.AppSettings
 import com.alorma.contactnotes.designsystem.components.ConversesToggleGroup
+import com.alorma.contactnotes.designsystem.components.ConversesTopBar
 import com.alorma.contactnotes.designsystem.components.GroupedListDefaults
 import com.alorma.contactnotes.designsystem.components.SettingRow
 import com.alorma.contactnotes.designsystem.components.SettingSwitchRow
-import com.alorma.contactnotes.designsystem.components.rememberConversesHaptics
-import com.alorma.contactnotes.designsystem.components.groupedItemShape
 import com.alorma.contactnotes.designsystem.components.ToggleOption
-import com.alorma.contactnotes.designsystem.theme.ScreenTitleStyle
+import com.alorma.contactnotes.designsystem.components.groupedItemShape
+import com.alorma.contactnotes.designsystem.components.rememberConversesHaptics
+import com.alorma.contactnotes.designsystem.components.rememberTopBarScrollBehavior
 import com.alorma.contactnotes.designsystem.theme.ThemeMode
 import com.alorma.contactnotes.ui.person.canUnlockWithDevice
 import com.alorma.contactnotes.ui.person.openSecuritySetup
@@ -185,14 +170,14 @@ fun SettingsContent(
     },
   ) { padding ->
     Column(
-      modifier = Modifier
-        .fillMaxSize()
-        .verticalScroll(rememberScrollState())
-        .padding(padding)
-        .padding(horizontal = 16.dp),
+      modifier =
+        Modifier
+          .fillMaxSize()
+          .verticalScroll(rememberScrollState())
+          .padding(padding)
+          .padding(horizontal = 16.dp),
       verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-
       SettingsGroup(
         title = { SectionTitle(stringResource(R.string.settings_appearance)) },
         verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap),
@@ -211,14 +196,16 @@ fun SettingsContent(
           onCheckedChange = onDynamicColor,
           shape = groupedItemShape(1, themeCount),
         )
-        if (showPersonColor) SettingSwitchRow(
-          title = stringResource(R.string.settings_person_color),
-          subtitle = stringResource(R.string.settings_person_color_summary),
-          icon = Icons.Rounded.Face,
-          checked = settings.personColorTheme,
-          onCheckedChange = onPersonColorTheme,
-          shape = groupedItemShape(2, themeCount),
-        )
+        if (showPersonColor) {
+          SettingSwitchRow(
+            title = stringResource(R.string.settings_person_color),
+            subtitle = stringResource(R.string.settings_person_color_summary),
+            icon = Icons.Rounded.Face,
+            checked = settings.personColorTheme,
+            onCheckedChange = onPersonColorTheme,
+            shape = groupedItemShape(2, themeCount),
+          )
+        }
       }
 
       SettingsGroup(
@@ -350,17 +337,19 @@ private fun RelockRow(
   }
 }
 
-private fun relockLabel(seconds: Int): Int = when (seconds) {
-  0 -> R.string.relock_immediately
-  60 -> R.string.relock_1_min
-  else -> R.string.relock_5_min
-}
+private fun relockLabel(seconds: Int): Int =
+  when (seconds) {
+    0 -> R.string.relock_immediately
+    60 -> R.string.relock_1_min
+    else -> R.string.relock_5_min
+  }
 
-private fun relockSummary(seconds: Int): Int = when (seconds) {
-  0 -> R.string.relock_summary_immediately
-  60 -> R.string.relock_summary_1_min
-  else -> R.string.relock_summary_5_min
-}
+private fun relockSummary(seconds: Int): Int =
+  when (seconds) {
+    0 -> R.string.relock_summary_immediately
+    60 -> R.string.relock_summary_1_min
+    else -> R.string.relock_summary_5_min
+  }
 
 @Composable
 private fun ThemeModeRow(
@@ -372,11 +361,16 @@ private fun ThemeModeRow(
     Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
       TileTitle(stringResource(R.string.settings_theme))
       ConversesToggleGroup(
-        options = listOf(
-          ToggleOption(ThemeMode.Light, stringResource(R.string.settings_theme_light), Icons.Rounded.LightMode),
-          ToggleOption(ThemeMode.Dark, stringResource(R.string.settings_theme_dark), Icons.Rounded.DarkMode),
-          ToggleOption(ThemeMode.System, stringResource(R.string.settings_theme_system), Icons.Rounded.BrightnessAuto),
-        ),
+        options =
+          listOf(
+            ToggleOption(ThemeMode.Light, stringResource(R.string.settings_theme_light), Icons.Rounded.LightMode),
+            ToggleOption(ThemeMode.Dark, stringResource(R.string.settings_theme_dark), Icons.Rounded.DarkMode),
+            ToggleOption(
+              ThemeMode.System,
+              stringResource(R.string.settings_theme_system),
+              Icons.Rounded.BrightnessAuto,
+            ),
+          ),
         selected = selected,
         onSelect = onSelected,
       )
@@ -386,14 +380,16 @@ private fun ThemeModeRow(
 
 private val SupportedLanguages = setOf("ca", "es", "en")
 
-/** Idioma efectiu de l'app; si el sistema en té un de no suportat, l'app cau a l'anglès per defecte. */
+// Idioma efectiu de l'app; si el sistema en té un de no suportat, l'app cau a l'anglès per defecte.
+
 /** Idioma per app des d'Android 13; abans, l'idioma del sistema, que l'app ja segueix (en, ca i es). */
 private fun Context.openLanguageSettings() {
-  val intent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-    Intent(Settings.ACTION_APP_LOCALE_SETTINGS).setData(Uri.fromParts("package", packageName, null))
-  } else {
-    Intent(Settings.ACTION_LOCALE_SETTINGS)
-  }
+  val intent =
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+      Intent(Settings.ACTION_APP_LOCALE_SETTINGS).setData(Uri.fromParts("package", packageName, null))
+    } else {
+      Intent(Settings.ACTION_LOCALE_SETTINGS)
+    }
   startActivity(intent)
 }
 
@@ -407,7 +403,10 @@ private fun Context.openUrl(url: String) {
   }
 }
 
-private fun Context.openFeedback(subject: String, body: String) {
+private fun Context.openFeedback(
+  subject: String,
+  body: String,
+) {
   // Assumpte i cos van dins l'URI: Gmail ignora `EXTRA_SUBJECT` i `EXTRA_TEXT` amb `ACTION_SENDTO`.
   val uri = Uri.parse("mailto:${AboutLinks.FeedbackEmail}?subject=${Uri.encode(subject)}&body=${Uri.encode(body)}")
   val intent = Intent(Intent.ACTION_SENDTO, uri)
@@ -455,17 +454,19 @@ private fun MadeBy(modifier: Modifier = Modifier) {
   val text = stringResource(R.string.settings_made_by, AboutLinks.AuthorName)
   val start = text.indexOf(AboutLinks.AuthorName)
   val color = MaterialTheme.colorScheme.onSurface
-  val linkStyles = TextLinkStyles(SpanStyle(color = color, fontWeight = FontWeight.Bold, textDecoration = TextDecoration.Underline))
+  val linkStyles =
+    TextLinkStyles(SpanStyle(color = color, fontWeight = FontWeight.Bold, textDecoration = TextDecoration.Underline))
   Text(
-    text = buildAnnotatedString {
-      if (start < 0) {
-        append(text)
-      } else {
-        append(text.substring(0, start))
-        withLink(LinkAnnotation.Url(AboutLinks.AuthorUrl, linkStyles)) { append(AboutLinks.AuthorName) }
-        append(text.substring(start + AboutLinks.AuthorName.length))
-      }
-    },
+    text =
+      buildAnnotatedString {
+        if (start < 0) {
+          append(text)
+        } else {
+          append(text.substring(0, start))
+          withLink(LinkAnnotation.Url(AboutLinks.AuthorUrl, linkStyles)) { append(AboutLinks.AuthorName) }
+          append(text.substring(start + AboutLinks.AuthorName.length))
+        }
+      },
     style = MaterialTheme.typography.bodySmall.copy(fontSize = 13.sp),
     color = MaterialTheme.colorScheme.onSurfaceVariant,
     modifier = modifier,

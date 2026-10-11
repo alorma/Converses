@@ -12,9 +12,10 @@ class AvatarShapeConverter {
   fun toDb(shape: AvatarShape?): String? = shape?.name
 
   @TypeConverter
-  fun fromDb(value: String?): AvatarShape? = value?.let { name ->
-    LegacyNames[name] ?: AvatarShape.entries.firstOrNull { it.name == name }
-  }
+  fun fromDb(value: String?): AvatarShape? =
+    value?.let { name ->
+      LegacyNames[name] ?: AvatarShape.entries.firstOrNull { it.name == name }
+    }
 
   private companion object {
     /** Noms desats per versions anteriors: `Flower` va passar a `Clover8Leaf` (forma més suau). */

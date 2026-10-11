@@ -1,9 +1,5 @@
 package com.alorma.contactnotes.ui.person
 
-import androidx.compose.material.icons.automirrored.rounded.Logout
-import com.alorma.contactnotes.designsystem.components.rememberConversesHaptics
-import com.alorma.contactnotes.data.db.shape
-import com.alorma.contactnotes.data.db.color
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -14,6 +10,7 @@ import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.Logout
 import androidx.compose.material.icons.rounded.ContentCopy
 import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.DeleteSweep
@@ -41,11 +38,13 @@ import androidx.compose.ui.unit.dp
 import com.alorma.contactnotes.R
 import com.alorma.contactnotes.data.db.EntryEntity
 import com.alorma.contactnotes.data.db.PersonEntity
+import com.alorma.contactnotes.data.db.color
+import com.alorma.contactnotes.data.db.shape
 import com.alorma.contactnotes.designsystem.components.Avatar
 import com.alorma.contactnotes.designsystem.components.GroupedListDefaults
 import com.alorma.contactnotes.designsystem.components.groupedItemShape
+import com.alorma.contactnotes.designsystem.components.rememberConversesHaptics
 import com.alorma.contactnotes.ui.people.initialsOf
-import com.alorma.contactnotes.ui.people.label
 import java.time.LocalDate
 
 /** Full d'accions d'una entrada (PNG 5). */
@@ -93,19 +92,21 @@ fun EntryActionsContent(
   onDeleteDay: () -> Unit,
 ) {
   Column(
-    modifier = Modifier
-      .fillMaxWidth()
-      .windowInsetsPadding(WindowInsets.navigationBars)
-      .padding(horizontal = 16.dp)
-      .padding(bottom = 16.dp),
+    modifier =
+      Modifier
+        .fillMaxWidth()
+        .windowInsetsPadding(WindowInsets.navigationBars)
+        .padding(horizontal = 16.dp)
+        .padding(bottom = 16.dp),
     verticalArrangement = Arrangement.spacedBy(2.dp),
   ) {
     Text(
-      text = listOf(
-        whoLabel(entry.kind, firstName),
-        formatTime(entry.occurredAt),
-        channelName(entry.channelType),
-      ).joinToString(" · ") { it.uppercase() },
+      text =
+        listOf(
+          whoLabel(entry.kind, firstName),
+          formatTime(entry.occurredAt),
+          channelName(entry.channelType),
+        ).joinToString(" · ") { it.uppercase() },
       style = MaterialTheme.typography.labelMedium,
       fontWeight = FontWeight.SemiBold,
       color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -136,12 +137,13 @@ fun EntryActionsContent(
         ActionRow(
           icon = Icons.Rounded.DeleteSweep,
           title = stringResource(R.string.entry_delete_day),
-          subtitle = pluralStringResource(
-            if (isToday) R.plurals.entry_delete_today_summary else R.plurals.entry_delete_day_summary,
-            dayCount,
-            dayCount,
-            channelName(entry.channelType),
-          ),
+          subtitle =
+            pluralStringResource(
+              if (isToday) R.plurals.entry_delete_today_summary else R.plurals.entry_delete_day_summary,
+              dayCount,
+              dayCount,
+              channelName(entry.channelType),
+            ),
           index = 1,
           count = 2,
           onClick = onDeleteDay,
@@ -180,7 +182,11 @@ private fun ActionRow(
 
 /** Diàleg per triar la persona a qui es mou una entrada. */
 @Composable
-fun MoveEntryDialog(people: List<PersonEntity>, onDismiss: () -> Unit, onSelect: (PersonEntity) -> Unit) {
+fun MoveEntryDialog(
+  people: List<PersonEntity>,
+  onDismiss: () -> Unit,
+  onSelect: (PersonEntity) -> Unit,
+) {
   AlertDialog(
     onDismissRequest = onDismiss,
     title = { Text(stringResource(R.string.move_entry_title)) },
@@ -204,7 +210,12 @@ fun MoveEntryDialog(people: List<PersonEntity>, onDismiss: () -> Unit, onSelect:
 }
 
 @Composable
-fun ConfirmDeleteDialog(title: String, text: String, onDismiss: () -> Unit, onConfirm: () -> Unit) {
+fun ConfirmDeleteDialog(
+  title: String,
+  text: String,
+  onDismiss: () -> Unit,
+  onConfirm: () -> Unit,
+) {
   val haptics = rememberConversesHaptics()
   AlertDialog(
     onDismissRequest = onDismiss,
@@ -217,7 +228,11 @@ fun ConfirmDeleteDialog(title: String, text: String, onDismiss: () -> Unit, onCo
           onConfirm()
         },
       ) {
-        Text(stringResource(R.string.delete_button), color = MaterialTheme.colorScheme.error, fontWeight = FontWeight.Bold)
+        Text(
+          stringResource(R.string.delete_button),
+          color = MaterialTheme.colorScheme.error,
+          fontWeight = FontWeight.Bold,
+        )
       }
     },
     dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(android.R.string.cancel)) } },

@@ -1,6 +1,5 @@
 package com.alorma.contactnotes.ui.entry
 
-import com.alorma.contactnotes.data.db.color
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -11,6 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.alorma.contactnotes.data.db.EntryKind
+import com.alorma.contactnotes.data.db.color
 import com.alorma.contactnotes.designsystem.preview.ConversesPreviewTheme
 import com.alorma.contactnotes.designsystem.theme.PersonTheme
 import com.alorma.contactnotes.ui.preview.PreviewData
@@ -18,7 +18,10 @@ import com.alorma.contactnotes.ui.preview.PreviewData
 private val Channels = PreviewData.martaChannels
 
 @Composable
-private fun QuickNotePreview(state: QuickNoteUiState, form: EntryFormState) {
+private fun QuickNotePreview(
+  state: QuickNoteUiState,
+  form: EntryFormState,
+) {
   ConversesPreviewTheme {
     QuickNoteContent(
       state = state,
@@ -44,16 +47,18 @@ internal fun QuickNoteNoPersonPreview() {
 @Composable
 internal fun QuickNoteFilledPreview() {
   QuickNotePreview(
-    state = QuickNoteUiState(
-      people = listOf(PreviewData.marta),
-      selected = PreviewData.marta,
-      lastChannel = Channels.first(),
-    ),
-    form = EntryFormState(
-      kind = EntryKind.HEARD,
-      text = "She can't come on Saturday.",
-      whenChoice = WhenChoice.Custom(PreviewData.formTime),
-    ),
+    state =
+      QuickNoteUiState(
+        people = listOf(PreviewData.marta),
+        selected = PreviewData.marta,
+        lastChannel = Channels.first(),
+      ),
+    form =
+      EntryFormState(
+        kind = EntryKind.HEARD,
+        text = "She can't come on Saturday.",
+        whenChoice = WhenChoice.Custom(PreviewData.formTime),
+      ),
   )
 }
 
@@ -66,11 +71,12 @@ internal fun EditEntrySheetPreview() {
       Surface(color = MaterialTheme.colorScheme.surface) {
         NewEntrySheetContent(
           person = PreviewData.marta,
-          form = EntryFormState(
-            kind = EntryKind.SAID,
-            text = "Told her I can't make it to dinner on Saturday.",
-            whenChoice = WhenChoice.Stored(PreviewData.formTime),
-          ),
+          form =
+            EntryFormState(
+              kind = EntryKind.SAID,
+              text = "Told her I can't make it to dinner on Saturday.",
+              whenChoice = WhenChoice.Stored(PreviewData.formTime),
+            ),
           channel = Channels.first(),
           isNew = false,
           onDismiss = {},
@@ -89,11 +95,12 @@ internal fun NewEntrySheetPreview() {
       Surface(color = MaterialTheme.colorScheme.surface) {
         NewEntrySheetContent(
           person = PreviewData.marta,
-          form = EntryFormState(
-            kind = EntryKind.HAPPENED,
-            text = "We went to the photography exhibition.",
-            whenChoice = WhenChoice.Stored(PreviewData.formTime),
-          ),
+          form =
+            EntryFormState(
+              kind = EntryKind.HAPPENED,
+              text = "We went to the photography exhibition.",
+              whenChoice = WhenChoice.Stored(PreviewData.formTime),
+            ),
           channel = Channels.first(),
           isNew = true,
           onDismiss = {},
@@ -121,4 +128,9 @@ internal fun WhenSheetNowPreview() = WhenSheetPreview(WhenChoice.Now)
 
 @Preview
 @Composable
-internal fun WhenSheetCustomPreview() = WhenSheetPreview(WhenChoice.Custom(PreviewData.formTime - 3 * 24 * 60 * 60 * 1000L))
+internal fun WhenSheetCustomPreview() =
+  WhenSheetPreview(
+    WhenChoice.Custom(
+      PreviewData.formTime - 3 * 24 * 60 * 60 * 1000L,
+    ),
+  )

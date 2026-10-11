@@ -45,7 +45,9 @@ interface SettingsRepository {
 
 private val Context.settingsDataStore by preferencesDataStore(name = "settings")
 
-class DataStoreSettingsRepository(context: Context) : SettingsRepository {
+class DataStoreSettingsRepository(
+  context: Context,
+) : SettingsRepository {
   private val dataStore = context.applicationContext.settingsDataStore
 
   override val settings: Flow<AppSettings> = dataStore.data.map { it.toSettings() }
@@ -96,5 +98,7 @@ class DataStoreSettingsRepository(context: Context) : SettingsRepository {
   }
 }
 
-private inline fun <reified E : Enum<E>> enumOrDefault(stored: String?, default: E): E =
-  enumValues<E>().firstOrNull { it.name.equals(stored, ignoreCase = true) } ?: default
+private inline fun <reified E : Enum<E>> enumOrDefault(
+  stored: String?,
+  default: E,
+): E = enumValues<E>().firstOrNull { it.name.equals(stored, ignoreCase = true) } ?: default

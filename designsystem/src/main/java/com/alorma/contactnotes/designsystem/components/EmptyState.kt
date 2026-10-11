@@ -45,9 +45,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.alorma.contactnotes.designsystem.theme.DialogTitleStyle
+import kotlin.random.Random
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlin.random.Random
 
 /** Estat buit centrat: icona, títol i, opcionalment, un botó per sortir-ne. */
 @Composable
@@ -59,9 +59,10 @@ fun EmptyState(
   onAction: (() -> Unit)? = null,
 ) {
   Column(
-    modifier = modifier
-      .fillMaxWidth()
-      .padding(horizontal = 32.dp, vertical = 40.dp),
+    modifier =
+      modifier
+        .fillMaxWidth()
+        .padding(horizontal = 32.dp, vertical = 40.dp),
     horizontalAlignment = Alignment.CenterHorizontally,
     verticalArrangement = Arrangement.spacedBy(16.dp),
   ) {
@@ -95,9 +96,10 @@ fun WelcomeEmptyState(
   onAction: (() -> Unit)? = null,
 ) {
   Column(
-    modifier = modifier
-      .fillMaxWidth()
-      .padding(horizontal = 32.dp, vertical = 24.dp),
+    modifier =
+      modifier
+        .fillMaxWidth()
+        .padding(horizontal = 32.dp, vertical = 24.dp),
     horizontalAlignment = Alignment.CenterHorizontally,
     verticalArrangement = Arrangement.Center,
   ) {
@@ -138,7 +140,11 @@ private const val AnimatedShapes = 5
  */
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-internal fun EmptyStateAvatar(icon: ImageVector, size: Dp, modifier: Modifier = Modifier) {
+internal fun EmptyStateAvatar(
+  icon: ImageVector,
+  size: Dp,
+  modifier: Modifier = Modifier,
+) {
   // La forma gira molt lentament (una volta cada 60 s); la icona no gira
   val rotation by rememberInfiniteTransition(label = "cookie").animateFloat(
     initialValue = 0f,
@@ -155,56 +161,59 @@ internal fun EmptyStateAvatar(icon: ImageVector, size: Dp, modifier: Modifier = 
   val shapeColor by animateColorAsState(
     AvatarColor.entries[colorIndex].color,
     tween(350),
-    label = "cookieColor"
+    label = "cookieColor",
   )
   Box(
     contentAlignment = Alignment.Center,
-    modifier = modifier
-      .size(size)
-      .pointerInput(Unit) {
-        detectTapGestures {
-          if (playing) return@detectTapGestures
-          scope.launch {
-            playing = true
-            // El LoadingIndicator canvia de forma cada 650 ms: un pastel nou per a cada forma, i acaba tornant a la cookie
-            repeat(AnimatedShapes) {
-              delay(ShapeIntervalMillis)
-              colorIndex = (colorIndex + 1) % AvatarColor.entries.size
+    modifier =
+      modifier
+        .size(size)
+        .pointerInput(Unit) {
+          detectTapGestures {
+            if (playing) return@detectTapGestures
+            scope.launch {
+              playing = true
+              // El LoadingIndicator canvia de forma cada 650 ms: un pastel nou per a cada forma, i acaba tornant a la cookie
+              repeat(AnimatedShapes) {
+                delay(ShapeIntervalMillis)
+                colorIndex = (colorIndex + 1) % AvatarColor.entries.size
+              }
+              playing = false
             }
-            playing = false
           }
-        }
-      },
+        },
   ) {
     if (playing) {
       // L'indicador dibuixa la forma al ~80 % de la seva mida
       LoadingIndicator(
         modifier = Modifier.requiredSize(size * 1.25f),
         color = shapeColor,
-        polygons = remember {
-          listOf(
-            MaterialShapes.Cookie9Sided,
-            MaterialShapes.Clover4Leaf,
-            MaterialShapes.Ghostish,
-            MaterialShapes.PuffyDiamond,
-            MaterialShapes.Sunny,
-          )
-        },
+        polygons =
+          remember {
+            listOf(
+              MaterialShapes.Cookie9Sided,
+              MaterialShapes.Clover4Leaf,
+              MaterialShapes.Ghostish,
+              MaterialShapes.PuffyDiamond,
+              MaterialShapes.Sunny,
+            )
+          },
       )
     } else {
       Surface(
         shape = AvatarShape.Cookie9Sided.asShape(),
         color = shapeColor,
-        modifier = Modifier
-          .fillMaxSize()
-          .rotate(rotation),
+        modifier =
+          Modifier
+            .fillMaxSize()
+            .rotate(rotation),
       ) {}
     }
     Icon(
       icon,
       contentDescription = null,
       tint = AvatarInitialsColor,
-      modifier = Modifier.size(size * 0.37f)
+      modifier = Modifier.size(size * 0.37f),
     )
   }
 }

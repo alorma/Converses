@@ -32,7 +32,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 /** Vora discontínua dins del límit de la vista, amb la forma d'un rectangle arrodonit (o un cercle si `radius` és la meitat). */
-fun Modifier.dashedBorder(color: Color, radius: Dp, width: Dp = 1.5.dp, dash: Dp = 6.dp, gap: Dp = 5.dp): Modifier =
+fun Modifier.dashedBorder(
+  color: Color,
+  radius: Dp,
+  width: Dp = 1.5.dp,
+  dash: Dp = 6.dp,
+  gap: Dp = 5.dp,
+): Modifier =
   drawBehind {
     val stroke = width.toPx()
     drawRoundRect(
@@ -46,15 +52,21 @@ fun Modifier.dashedBorder(color: Color, radius: Dp, width: Dp = 1.5.dp, dash: Dp
 
 /** Fila discontínua amb títol i pista per afegir el primer element d'una secció. */
 @Composable
-fun DashedHintRow(title: String, hint: String, onClick: () -> Unit, modifier: Modifier = Modifier) {
+fun DashedHintRow(
+  title: String,
+  hint: String,
+  onClick: () -> Unit,
+  modifier: Modifier = Modifier,
+) {
   Row(
-    modifier = modifier
-      .fillMaxWidth()
-      .heightIn(min = 64.dp)
-      .clip(RoundedCornerShape(24.dp))
-      .clickable(role = Role.Button, onClick = onClick)
-      .dashedBorder(MaterialTheme.colorScheme.outline, radius = 24.dp)
-      .padding(horizontal = 16.dp, vertical = 12.dp),
+    modifier =
+      modifier
+        .fillMaxWidth()
+        .heightIn(min = 64.dp)
+        .clip(RoundedCornerShape(24.dp))
+        .clickable(role = Role.Button, onClick = onClick)
+        .dashedBorder(MaterialTheme.colorScheme.outline, radius = 24.dp)
+        .padding(horizontal = 16.dp, vertical = 12.dp),
     horizontalArrangement = Arrangement.spacedBy(16.dp),
     verticalAlignment = Alignment.CenterVertically,
   ) {

@@ -3,17 +3,17 @@ package com.alorma.contactnotes.designsystem
 import android.content.res.Configuration
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
-import com.android.tools.screenshot.PreviewTest
 import com.alorma.contactnotes.designsystem.components.AvatarPreview
-import com.alorma.contactnotes.designsystem.components.NoticeBannerPreview
 import com.alorma.contactnotes.designsystem.components.CollapsibleFactsPreview
 import com.alorma.contactnotes.designsystem.components.ColorSwatchesPreview
 import com.alorma.contactnotes.designsystem.components.FilterChipPreview
 import com.alorma.contactnotes.designsystem.components.FloatingToolbarPreview
 import com.alorma.contactnotes.designsystem.components.GroupedListPreview
+import com.alorma.contactnotes.designsystem.components.NoticeBannerPreview
 import com.alorma.contactnotes.designsystem.components.SplitButtonPreview
 import com.alorma.contactnotes.designsystem.components.TimelinePreview
 import com.alorma.contactnotes.designsystem.components.ToggleGroupPreview
+import com.android.tools.screenshot.PreviewTest
 
 /** Cada test es renderitza en clar i en fosc, amb l'idioma fixat perquè no depengui de la màquina. */
 @Preview(name = "Light", locale = "en")
@@ -25,7 +25,6 @@ annotation class ComponentPreviews
 annotation class LargeFontComponentPreviews
 
 class ComponentsScreenshotTests {
-
   @ComponentPreviews
   @LargeFontComponentPreviews
   @PreviewTest

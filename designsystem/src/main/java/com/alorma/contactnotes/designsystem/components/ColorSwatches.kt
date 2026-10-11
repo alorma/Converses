@@ -44,20 +44,32 @@ fun <T> ColorSwatches(
       val isSelected = entry == selected
       val label = labelOf(entry)
       Box(
-        modifier = Modifier
-          .size(44.dp)
-          .then(
-            if (isSelected) Modifier.border(BorderStroke(2.dp, MaterialTheme.colorScheme.primary), CircleShape) else Modifier,
-          )
-          .padding(5.dp)
-          .clip(CircleShape)
-          .background(colorOf(entry))
-          .selectable(selected = isSelected, role = Role.RadioButton) { onSelect(entry) }
-          .semantics { contentDescription = label },
+        modifier =
+          Modifier
+            .size(44.dp)
+            .then(
+              if (isSelected) {
+                Modifier.border(
+                  BorderStroke(2.dp, MaterialTheme.colorScheme.primary),
+                  CircleShape,
+                )
+              } else {
+                Modifier
+              },
+            ).padding(5.dp)
+            .clip(CircleShape)
+            .background(colorOf(entry))
+            .selectable(selected = isSelected, role = Role.RadioButton) { onSelect(entry) }
+            .semantics { contentDescription = label },
         contentAlignment = Alignment.Center,
       ) {
         if (isSelected) {
-          Icon(Icons.Rounded.Check, contentDescription = null, tint = Color(0xFF1E1D24), modifier = Modifier.size(20.dp))
+          Icon(
+            Icons.Rounded.Check,
+            contentDescription = null,
+            tint = Color(0xFF1E1D24),
+            modifier = Modifier.size(20.dp),
+          )
         }
       }
     }

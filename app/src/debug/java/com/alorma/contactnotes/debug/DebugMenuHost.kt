@@ -42,17 +42,18 @@ fun DebugMenuHost(content: @Composable () -> Unit) {
     content()
     SmallFloatingActionButton(
       onClick = { showSheet = true },
-      modifier = Modifier
-        .align(Alignment.BottomEnd)
-        .navigationBarsPadding()
-        .padding(end = 8.dp, bottom = 96.dp)
-        .offset { dragOffset }
-        .pointerInput(Unit) {
-          detectDragGestures { change, drag ->
-            change.consume()
-            dragOffset += IntOffset(drag.x.roundToInt(), drag.y.roundToInt())
-          }
-        },
+      modifier =
+        Modifier
+          .align(Alignment.BottomEnd)
+          .navigationBarsPadding()
+          .padding(end = 8.dp, bottom = 96.dp)
+          .offset { dragOffset }
+          .pointerInput(Unit) {
+            detectDragGestures { change, drag ->
+              change.consume()
+              dragOffset += IntOffset(drag.x.roundToInt(), drag.y.roundToInt())
+            }
+          },
     ) {
       Icon(Icons.Filled.BugReport, contentDescription = stringResource(R.string.debug_menu_open))
     }

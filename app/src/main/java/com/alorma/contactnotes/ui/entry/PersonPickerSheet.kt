@@ -1,7 +1,5 @@
 package com.alorma.contactnotes.ui.entry
 
-import com.alorma.contactnotes.data.db.shape
-import com.alorma.contactnotes.data.db.color
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -41,6 +39,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.alorma.contactnotes.R
 import com.alorma.contactnotes.data.db.PersonEntity
+import com.alorma.contactnotes.data.db.color
+import com.alorma.contactnotes.data.db.shape
 import com.alorma.contactnotes.designsystem.components.Avatar
 import com.alorma.contactnotes.designsystem.components.DashedActionRow
 import com.alorma.contactnotes.designsystem.components.GroupedListDefaults
@@ -81,15 +81,17 @@ fun PersonPickerContent(
   onNewPerson: () -> Unit,
 ) {
   var query by rememberSaveable { mutableStateOf("") }
-  val visible = remember(people, query) {
-    if (query.isBlank()) people else people.filter { it.name.contains(query.trim(), ignoreCase = true) }
-  }
+  val visible =
+    remember(people, query) {
+      if (query.isBlank()) people else people.filter { it.name.contains(query.trim(), ignoreCase = true) }
+    }
   Column(
-    modifier = Modifier
-      .fillMaxWidth()
-      .imePadding()
-      .windowInsetsPadding(WindowInsets.navigationBars)
-      .padding(horizontal = 16.dp),
+    modifier =
+      Modifier
+        .fillMaxWidth()
+        .imePadding()
+        .windowInsetsPadding(WindowInsets.navigationBars)
+        .padding(horizontal = 16.dp),
     verticalArrangement = Arrangement.spacedBy(12.dp),
   ) {
     Text(stringResource(R.string.pick_person), style = SheetTitleStyle, modifier = Modifier.padding(start = 4.dp))
@@ -102,12 +104,13 @@ fun PersonPickerContent(
         placeholder = { Text(stringResource(R.string.search_by_name)) },
         singleLine = true,
         shape = RoundedCornerShape(24.dp),
-        colors = TextFieldDefaults.colors(
-          focusedContainerColor = container,
-          unfocusedContainerColor = container,
-          focusedIndicatorColor = Color.Transparent,
-          unfocusedIndicatorColor = Color.Transparent,
-        ),
+        colors =
+          TextFieldDefaults.colors(
+            focusedContainerColor = container,
+            unfocusedContainerColor = container,
+            focusedIndicatorColor = Color.Transparent,
+            unfocusedIndicatorColor = Color.Transparent,
+          ),
       )
     }
     LazyColumn(

@@ -9,7 +9,9 @@ import androidx.sqlite.db.SupportSQLiteDatabase
  * `WHATSAPP`, Room no el sabria llegir); la taula `channel` ja no s'usa i s'esborra.
  * [onMigrated] s'executa en acabar i serveix per marcar l'avís als usuaris que venen de la v1.
  */
-class Migration1To2(private val onMigrated: () -> Unit = {}) : Migration(1, 2) {
+class Migration1To2(
+  private val onMigrated: () -> Unit = {},
+) : Migration(1, 2) {
   override fun migrate(db: SupportSQLiteDatabase) {
     db.execSQL(
       """

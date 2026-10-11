@@ -16,81 +16,92 @@ class ConversesRepositoryTest {
   private val repository = db.repository
 
   @Test
-  fun protectedPeopleDoNotExposeTheirLastEntryNorChannels() = runTest {
-    val open = db.addPerson("Marta")
-    val secret = db.addPerson("Luna", isProtected = true)
-    db.addEntry(open.id, channel = ChannelType.CHAT, text = "hola")
-    db.addEntry(secret.id, channel = ChannelType.SOCIAL, text = "secret")
+  fun protectedPeopleDoNotExposeTheirLastEntryNorChannels() =
+    runTest {
+      val open = db.addPerson("Marta")
+      val secret = db.addPerson("Luna", isProtected = true)
+      db.addEntry(open.id, channel = ChannelType.CHAT, text = "hola")
+      db.addEntry(secret.id, channel = ChannelType.SOCIAL, text = "secret")
 
-    val list = repository.observePeople().first().associateBy { it.person.id }
+      val list = repository.observePeople().first().associateBy { it.person.id }
 
-    assertEquals("hola", list.getValue(open.id).lastEntry?.text)
-    assertEquals(1, list.getValue(open.id).channels.size)
-    assertNull(list.getValue(secret.id).lastEntry)
-    assertTrue(list.getValue(secret.id).channels.isEmpty())
-  }
-
-  @Test
-  fun listIsOrderedByLastActivityAndFallsBackToCreationDate() = runTest {
-    val old = db.addPerson("Old", createdAt = 1_000)
-    val recent = db.addPerson("Recent", createdAt = 2_000)
-    db.addEntry(old.id, occurredAt = 5_000)
-
-    assertEquals(listOf(old.id, recent.id), repository.observePeople().first().map { it.person.id })
-  }
+      assertEquals("hola", list.getValue(open.id).lastEntry?.text)
+      assertEquals(1, list.getValue(open.id).channels.size)
+      assertNull(list.getValue(secret.id).lastEntry)
+      assertTrue(list.getValue(secret.id).channels.isEmpty())
+    }
 
   @Test
-  fun archivedAndActiveListsAreSeparate() = runTest {
-    val active = db.addPerson("Active")
-    val archived = db.addPerson("Archived", archived = true)
+  fun listIsOrderedByLastActivityAndFallsBackToCreationDate() =
+    runTest {
+      val old = db.addPerson("Old", createdAt = 1_000)
+      val recent = db.addPerson("Recent", createdAt = 2_000)
+      db.addEntry(old.id, occurredAt = 5_000)
 
-    assertEquals(listOf(active.id), repository.observePeople(archived = false).first().map { it.person.id })
-    assertEquals(listOf(archived.id), repository.observePeople(archived = true).first().map { it.person.id })
-  }
-
-  @Test
-  fun aliasConflictIgnoresCaseTheOwnPersonAndArchivedPeople() = runTest {
-    val marta = db.addPerson("Marta", alias = "Marta")
-    db.addPerson("Gone", alias = "gone", archived = true)
-
-    assertTrue(repository.isAliasTaken("marta"))
-    assertFalse(repository.isAliasTaken("marta", excludePersonId = marta.id))
-    assertFalse(repository.isAliasTaken("gone"))
-  }
+      assertEquals(listOf(old.id, recent.id), repository.observePeople().first().map { it.person.id })
+    }
 
   @Test
-  fun savePersonCreatesAndThenReplacesFacts() = runTest {
-    val draft = db.addPerson("Draft").copy(id = 0)
-    db.people.value = emptyList()
-    val id = repository.savePerson(
-      draft,
-      listOf(com.alorma.contactnotes.data.db.PinnedFactEntity(personId = 0, label = "a", value = "b", position = 0)),
-    )
-    assertEquals(1, repository.observePinnedFacts(id).first().size)
+  fun archivedAndActiveListsAreSeparate() =
+    runTest {
+      val active = db.addPerson("Active")
+      val archived = db.addPerson("Archived", archived = true)
 
-    repository.savePerson(db.person(id)!!, emptyList())
-    assertTrue(repository.observePinnedFacts(id).first().isEmpty())
-  }
+      assertEquals(listOf(active.id), repository.observePeople(archived = false).first().map { it.person.id })
+      assertEquals(listOf(archived.id), repository.observePeople(archived = true).first().map { it.person.id })
+    }
 
   @Test
-  fun setProtectedAndArchivedUpdateThePerson() = runTest {
-    val person = db.addPerson("Marta")
+  fun aliasConflictIgnoresCaseTheOwnPersonAndArchivedPeople() =
+    runTest {
+      val marta = db.addPerson("Marta", alias = "Marta")
+      db.addPerson("Gone", alias = "gone", archived = true)
 
-    repository.setProtected(person, true)
-    repository.setArchived(db.person(person.id)!!, true)
-
-    val stored = db.person(person.id)!!
-    assertTrue(stored.isProtected)
-    assertTrue(stored.archived)
-  }
+      assertTrue(repository.isAliasTaken("marta"))
+      assertFalse(repository.isAliasTaken("marta", excludePersonId = marta.id))
+      assertFalse(repository.isAliasTaken("gone"))
+    }
 
   @Test
-  fun deletingAPersonRemovesItsEntries() = runTest {
-    val person = db.addPerson("Marta")
-    db.addEntry(person.id, EntryKind.HEARD)
+  fun savePersonCreatesAndThenReplacesFacts() =
+    runTest {
+      val draft = db.addPerson("Draft").copy(id = 0)
+      db.people.value = emptyList()
+      val id =
+        repository.savePerson(
+          draft,
+          listOf(
+            com.alorma.contactnotes.data.db
+              .PinnedFactEntity(personId = 0, label = "a", value = "b", position = 0),
+          ),
+        )
+      assertEquals(1, repository.observePinnedFacts(id).first().size)
 
-    repository.deletePerson(person)
+      repository.savePerson(db.person(id)!!, emptyList())
+      assertTrue(repository.observePinnedFacts(id).first().isEmpty())
+    }
 
-    assertTrue(repository.getEntries(person.id).isEmpty())
-  }
+  @Test
+  fun setProtectedAndArchivedUpdateThePerson() =
+    runTest {
+      val person = db.addPerson("Marta")
+
+      repository.setProtected(person, true)
+      repository.setArchived(db.person(person.id)!!, true)
+
+      val stored = db.person(person.id)!!
+      assertTrue(stored.isProtected)
+      assertTrue(stored.archived)
+    }
+
+  @Test
+  fun deletingAPersonRemovesItsEntries() =
+    runTest {
+      val person = db.addPerson("Marta")
+      db.addEntry(person.id, EntryKind.HEARD)
+
+      repository.deletePerson(person)
+
+      assertTrue(repository.getEntries(person.id).isEmpty())
+    }
 }

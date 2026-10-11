@@ -1,9 +1,9 @@
 package com.alorma.contactnotes.data.db
 
 import com.alorma.contactnotes.designsystem.components.AvatarShape
-import org.junit.Test
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
+import org.junit.Test
 
 class AvatarShapeConverterTest {
   private val converter = AvatarShapeConverter()

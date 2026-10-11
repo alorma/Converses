@@ -6,7 +6,10 @@ import com.alorma.contactnotes.data.settings.AppSettings
 import com.alorma.contactnotes.designsystem.preview.ConversesPreviewTheme
 
 @Composable
-private fun SettingsPreview(settings: AppSettings, canUnlock: Boolean) {
+private fun SettingsPreview(
+  settings: AppSettings,
+  canUnlock: Boolean,
+) {
   ConversesPreviewTheme {
     SettingsContent(
       settings = settings,
