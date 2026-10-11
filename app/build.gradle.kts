@@ -17,14 +17,21 @@ room {
 
 android {
   namespace = "com.alorma.contactnotes"
-  compileSdk {
-    version = release(37)
-  }
+  compileSdk =
+    libs.versions.android.compileSdk
+      .get()
+      .toInt()
 
   defaultConfig {
     applicationId = "com.alorma.contactnotes"
-    minSdk = 31
-    targetSdk = 37
+    minSdk =
+      libs.versions.android.minSdk
+        .get()
+        .toInt()
+    targetSdk =
+      libs.versions.android.targetSdk
+        .get()
+        .toInt()
 
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
   }
@@ -33,7 +40,7 @@ android {
   // es construeixi on es construeixi, i es pot instal·lar a sobre sense esborrar l'app
   signingConfigs {
     getByName("debug") {
-      storeFile = file("debug.keystore")
+      storeFile = rootProject.file("certs/debug.keystore")
       storePassword = "android"
       keyAlias = "androiddebugkey"
       keyPassword = "android"
@@ -74,8 +81,8 @@ android {
   }
 
   compileOptions {
-    sourceCompatibility = JavaVersion.VERSION_11
-    targetCompatibility = JavaVersion.VERSION_11
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
   }
 
   experimentalProperties["android.experimental.enableScreenshotTest"] = true

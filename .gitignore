@@ -1,8 +1,18 @@
 *.iml
 .gradle
-/local.properties
 .idea/
+.kotlin/
+.DS_Store
 build/
+/captures
+.externalNativeBuild
+.cxx
+local.properties
+.claude/*.local.*
+.claude/worktrees/
 
-# Release signing: never commit the keystore (the CI rebuilds it from a secret)
-/certs/
+# Release signing: never commit the release keystore (the CI rebuilds it from a secret)
+/certs/release.keystore
+
+# Firebase configuration (contains API keys)
+app/google-services.json

@@ -8,17 +8,21 @@ plugins {
 
 android {
   namespace = "com.alorma.contactnotes.designsystem"
-  compileSdk {
-    version = release(37)
-  }
+  compileSdk =
+    libs.versions.android.compileSdk
+      .get()
+      .toInt()
 
   defaultConfig {
-    minSdk = 31
+    minSdk =
+      libs.versions.android.minSdk
+        .get()
+        .toInt()
   }
 
   compileOptions {
-    sourceCompatibility = JavaVersion.VERSION_11
-    targetCompatibility = JavaVersion.VERSION_11
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
   }
 
   experimentalProperties["android.experimental.enableScreenshotTest"] = true

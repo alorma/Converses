@@ -1,5 +1,8 @@
 [versions]
 agp = "9.4.1"
+android-compileSdk = "37"
+android-minSdk = "31"
+android-targetSdk = "37"
 playPublisher = "4.1.1"
 kotlin = "2.4.20"
 composeBom = "2026.09.00"
