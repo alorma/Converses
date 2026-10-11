@@ -37,7 +37,10 @@ import com.alorma.contactnotes.ui.person.promptUnlock
 
 /** Pantalla que tapa tota l'app mentre el bloqueig és actiu; demana l'empremta o el PIN en aparèixer. */
 @Composable
-fun AppLockScreen(onUnlocked: () -> Unit, onDeviceUnprotected: () -> Unit) {
+fun AppLockScreen(
+  onUnlocked: () -> Unit,
+  onDeviceUnprotected: () -> Unit,
+) {
   val activity = LocalActivity.current as FragmentActivity
   val canUnlock = remember { activity.canUnlockWithDevice() }
   val currentOnUnlocked by rememberUpdatedState(onUnlocked)
@@ -61,7 +64,10 @@ fun AppLockScreen(onUnlocked: () -> Unit, onDeviceUnprotected: () -> Unit) {
 }
 
 @Composable
-fun AppLockContent(canUnlock: Boolean, onUnlock: () -> Unit) {
+fun AppLockContent(
+  canUnlock: Boolean,
+  onUnlock: () -> Unit,
+) {
   Scaffold(containerColor = MaterialTheme.colorScheme.surface) { padding ->
     Column(
       modifier = Modifier.fillMaxSize().padding(padding).padding(32.dp),

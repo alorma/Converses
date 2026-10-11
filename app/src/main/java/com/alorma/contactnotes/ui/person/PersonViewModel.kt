@@ -12,6 +12,8 @@ class PersonViewModel(
   personId: Long,
   repository: ConversesRepository,
 ) : ViewModel() {
-  val person: StateFlow<PersonEntity?> = repository.observePerson(personId)
-    .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
+  val person: StateFlow<PersonEntity?> =
+    repository
+      .observePerson(personId)
+      .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 }

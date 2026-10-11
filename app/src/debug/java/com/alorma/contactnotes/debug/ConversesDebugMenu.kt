@@ -1,18 +1,18 @@
 package com.alorma.contactnotes.debug
 
 import android.app.Activity
+import android.widget.Toast
 import androidx.compose.material3.Switch
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import android.widget.Toast
 import com.alorma.contactnotes.R
 import com.alorma.contactnotes.data.db.ConversesDatabase
-import com.alorma.contactnotes.data.insertSampleData
 import com.alorma.contactnotes.data.flags.FeatureFlag
 import com.alorma.contactnotes.data.flags.LocalFeatureFlagRunner
+import com.alorma.contactnotes.data.insertSampleData
 import com.alorma.contactnotes.data.settings.OnboardingFlag
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -88,7 +88,10 @@ private fun FeatureFlagsModule() {
     flags.forEach { flag ->
       DebugCell(
         title = flag.key,
-        subtitle = stringResource(if (runner.hasOverride(flag.key)) R.string.debug_flags_overridden else R.string.debug_flags_default),
+        subtitle =
+          stringResource(
+            if (runner.hasOverride(flag.key)) R.string.debug_flags_overridden else R.string.debug_flags_default,
+          ),
         trailing = { Switch(checked = flag.isEnabled(), onCheckedChange = { runner.setOverride(flag.key, it) }) },
       )
     }

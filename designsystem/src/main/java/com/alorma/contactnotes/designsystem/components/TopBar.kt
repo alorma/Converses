@@ -38,16 +38,18 @@ fun ConversesTopBar(
     colorScheme = MaterialTheme.colorScheme,
     motionScheme = MotionScheme.expressive(),
     shapes = MaterialTheme.shapes,
-    typography = MaterialTheme.typography.copy(
-      headlineSmall = ScreenTitleStyle,
-      headlineMedium = ScreenTitleStyle,
-      titleLarge = SectionTitleStyle,
-    ),
+    typography =
+      MaterialTheme.typography.copy(
+        headlineSmall = ScreenTitleStyle,
+        headlineMedium = ScreenTitleStyle,
+        titleLarge = SectionTitleStyle,
+      ),
   ) {
-    val colors = TopAppBarDefaults.topAppBarColors(
-      containerColor = MaterialTheme.colorScheme.surface,
-      scrolledContainerColor = MaterialTheme.colorScheme.surface,
-    )
+    val colors =
+      TopAppBarDefaults.topAppBarColors(
+        containerColor = MaterialTheme.colorScheme.surface,
+        scrolledContainerColor = MaterialTheme.colorScheme.surface,
+      )
     val titleContent: @Composable () -> Unit = { Text(text = title, maxLines = 1, overflow = TextOverflow.Ellipsis) }
     if (large) {
       LargeTopAppBar(

@@ -1,7 +1,6 @@
 package com.alorma.contactnotes.ui.edit
 
 import android.content.ContextWrapper
-import com.alorma.contactnotes.data.db.ChannelType
 import com.alorma.contactnotes.testing.FakeDb
 import com.alorma.contactnotes.testing.MainDispatcherRule
 import com.alorma.contactnotes.ui.person.PersonExporter
@@ -80,42 +79,56 @@ class EditPersonViewModelTest {
   }
 
   @Test
-  fun savingANewPersonStoresTrimmedDataAndDropsBlankFacts() = runTest {
-    val vm = viewModel()
-    vm.onName("  Marta  ")
-    vm.onAlias("m")
-    vm.onAddFact()
-    vm.onAddFact()
-    val (first, second) = vm.state.value.facts
-    vm.onFactChange(first.key, " Birthday ", " 14 March ")
-    vm.onFactChange(second.key, "", "")
+  fun savingANewPersonStoresTrimmedDataAndDropsBlankFacts() =
+    runTest {
+      val vm = viewModel()
+      vm.onName("  Marta  ")
+      vm.onAlias("m")
+      vm.onAddFact()
+      vm.onAddFact()
+      val (first, second) = vm.state.value.facts
+      vm.onFactChange(first.key, " Birthday ", " 14 March ")
+      vm.onFactChange(second.key, "", "")
 
-    var savedId = -1L
-    vm.save { savedId = it }
+      var savedId = -1L
+      vm.save { savedId = it }
 
-    val person = db.person(savedId)!!
-    assertEquals("Marta", person.name)
-    assertEquals("m", person.alias)
-    assertNull(person.avatarShape)
-    assertNull(person.avatarColor)
-    val facts = db.repository.observePinnedFacts(savedId).first()
-    assertEquals(listOf("Birthday" to "14 March"), facts.map { it.label to it.value })
-  }
+      val person = db.person(savedId)!!
+      assertEquals("Marta", person.name)
+      assertEquals("m", person.alias)
+      assertNull(person.avatarShape)
+      assertNull(person.avatarColor)
+      val facts = db.repository.observePinnedFacts(savedId).first()
+      assertEquals(listOf("Birthday" to "14 March"), facts.map { it.label to it.value })
+    }
 
   @Test
   fun factsCanBeReorderedAndOutOfRangeMovesAreIgnored() {
     val vm = viewModel()
     repeat(3) { vm.onAddFact() }
-    vm.state.value.facts.forEachIndexed { i, fact -> vm.onFactChange(fact.key, "f$i", "v$i") }
+    vm.state.value.facts
+      .forEachIndexed { i, fact -> vm.onFactChange(fact.key, "f$i", "v$i") }
 
     vm.onMoveFact(0, 2)
-    assertEquals(listOf("f1", "f2", "f0"), vm.state.value.facts.map { it.label })
+    assertEquals(
+      listOf("f1", "f2", "f0"),
+      vm.state.value.facts
+        .map { it.label },
+    )
 
     vm.onMoveFact(0, 9)
     vm.onMoveFact(-1, 1)
-    assertEquals(listOf("f1", "f2", "f0"), vm.state.value.facts.map { it.label })
+    assertEquals(
+      listOf("f1", "f2", "f0"),
+      vm.state.value.facts
+        .map { it.label },
+    )
 
-    vm.onRemoveFact(vm.state.value.facts.first().key)
+    vm.onRemoveFact(
+      vm.state.value.facts
+        .first()
+        .key,
+    )
     assertEquals(2, vm.state.value.facts.size)
   }
 

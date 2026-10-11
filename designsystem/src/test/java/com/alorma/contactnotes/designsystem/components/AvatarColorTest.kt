@@ -19,10 +19,29 @@ class AvatarColorTest {
 
   @Test
   fun twentyNamesUseEveryColor() {
-    val names = listOf(
-      "Marta", "Jordi", "Laia", "Pau", "Luna", "Nyra", "Kael", "Anna", "Pere", "Núria",
-      "Joan", "Maria", "Carles", "Elena", "David", "Sara", "Marc", "Irene", "Oriol", "Clara",
-    )
+    val names =
+      listOf(
+        "Marta",
+        "Jordi",
+        "Laia",
+        "Pau",
+        "Luna",
+        "Nyra",
+        "Kael",
+        "Anna",
+        "Pere",
+        "Núria",
+        "Joan",
+        "Maria",
+        "Carles",
+        "Elena",
+        "David",
+        "Sara",
+        "Marc",
+        "Irene",
+        "Oriol",
+        "Clara",
+      )
     val used = names.map { AvatarColor.forName(it) }.toSet()
     assertTrue("only ${used.size} colors: $used", used.size == AvatarColor.entries.size)
   }

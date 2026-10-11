@@ -10,12 +10,11 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
-import com.alorma.contactnotes.designsystem.components.LocalHapticsEnabled
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.fragment.app.FragmentActivity
-import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import com.alorma.contactnotes.data.flags.PersonColorFeature
 import com.alorma.contactnotes.data.flags.rememberFeatureEnabled
 import com.alorma.contactnotes.data.settings.AppLockManager
@@ -23,6 +22,7 @@ import com.alorma.contactnotes.data.settings.OnboardingFlag
 import com.alorma.contactnotes.data.settings.SecureWindow
 import com.alorma.contactnotes.data.settings.SettingsRepository
 import com.alorma.contactnotes.debug.DebugMenuHost
+import com.alorma.contactnotes.designsystem.components.LocalHapticsEnabled
 import com.alorma.contactnotes.designsystem.theme.ConversesTheme
 import com.alorma.contactnotes.designsystem.theme.ThemeMode
 import com.alorma.contactnotes.ui.AppNavigation
@@ -45,9 +45,10 @@ class MainActivity : FragmentActivity() {
     // Lectura síncrona abans del primer frame per evitar un parpelleig de tema en obrir.
     val initialSettings = runBlocking { settingsRepository.settings.first() }
     val showOnboarding = onboardingFlag.isEnabled()
-    val secureFlow = combine(settingsRepository.settings.map { it.appLock }, secureWindow.isRequested) { lock, requested ->
-      lock || requested
-    }
+    val secureFlow =
+      combine(settingsRepository.settings.map { it.appLock }, secureWindow.isRequested) { lock, requested ->
+        lock || requested
+      }
 
     setContent {
       val settings by settingsRepository.settings.collectAsStateWithLifecycle(initialSettings)
@@ -56,17 +57,19 @@ class MainActivity : FragmentActivity() {
 
       val personColorFeature = rememberFeatureEnabled<PersonColorFeature>()
       val systemDark = isSystemInDarkTheme()
-      val isDark = when (settings.themeMode) {
-        ThemeMode.System -> systemDark
-        ThemeMode.Light -> false
-        ThemeMode.Dark -> true
-      }
-      DisposableEffect(isDark) {
-        val style = if (isDark) {
-          SystemBarStyle.dark(Color.TRANSPARENT)
-        } else {
-          SystemBarStyle.light(Color.TRANSPARENT, Color.TRANSPARENT)
+      val isDark =
+        when (settings.themeMode) {
+          ThemeMode.System -> systemDark
+          ThemeMode.Light -> false
+          ThemeMode.Dark -> true
         }
+      DisposableEffect(isDark) {
+        val style =
+          if (isDark) {
+            SystemBarStyle.dark(Color.TRANSPARENT)
+          } else {
+            SystemBarStyle.light(Color.TRANSPARENT, Color.TRANSPARENT)
+          }
         enableEdgeToEdge(statusBarStyle = style, navigationBarStyle = style)
         onDispose {}
       }
@@ -79,26 +82,26 @@ class MainActivity : FragmentActivity() {
       }
 
       CompositionLocalProvider(LocalHapticsEnabled provides settings.hapticFeedback) {
-      ConversesTheme(
-        themeMode = settings.themeMode,
-        dynamicColor = settings.dynamicColor,
-        personColorTheme = settings.personColorTheme && personColorFeature,
-      ) {
-        DebugMenuHost {
-          Box {
-            AppNavigation(startOnboarding = showOnboarding)
-            if (showLock) {
-              AppLockScreen(
-                onUnlocked = appLock::unlock,
-                onDeviceUnprotected = {
-                  lifecycleScope.launch { settingsRepository.setAppLock(false) }
-                  appLock.unlock()
-                },
-              )
+        ConversesTheme(
+          themeMode = settings.themeMode,
+          dynamicColor = settings.dynamicColor,
+          personColorTheme = settings.personColorTheme && personColorFeature,
+        ) {
+          DebugMenuHost {
+            Box {
+              AppNavigation(startOnboarding = showOnboarding)
+              if (showLock) {
+                AppLockScreen(
+                  onUnlocked = appLock::unlock,
+                  onDeviceUnprotected = {
+                    lifecycleScope.launch { settingsRepository.setAppLock(false) }
+                    appLock.unlock()
+                  },
+                )
+              }
             }
           }
         }
-      }
       }
     }
   }

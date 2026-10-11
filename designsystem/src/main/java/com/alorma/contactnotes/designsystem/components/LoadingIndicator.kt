@@ -11,6 +11,9 @@ import androidx.compose.ui.unit.dp
 /** Indicador de càrrega expressiu amb contenidor. */
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-fun ConversesLoadingIndicator(modifier: Modifier = Modifier, size: Dp = 56.dp) {
+fun ConversesLoadingIndicator(
+  modifier: Modifier = Modifier,
+  size: Dp = 56.dp,
+) {
   ContainedLoadingIndicator(modifier = modifier.size(size))
 }

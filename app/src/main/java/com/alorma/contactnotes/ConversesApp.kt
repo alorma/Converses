@@ -6,8 +6,8 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
 import com.alorma.contactnotes.data.settings.AppLockManager
 import com.alorma.contactnotes.di.appModules
-import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.android.inject
+import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
 
 class ConversesApp : Application() {
@@ -18,10 +18,12 @@ class ConversesApp : Application() {
       modules(appModules)
     }
     val appLock: AppLockManager by inject()
-    ProcessLifecycleOwner.get().lifecycle.addObserver(object : DefaultLifecycleObserver {
-      override fun onStart(owner: LifecycleOwner) = appLock.onAppStarted()
+    ProcessLifecycleOwner.get().lifecycle.addObserver(
+      object : DefaultLifecycleObserver {
+        override fun onStart(owner: LifecycleOwner) = appLock.onAppStarted()
 
-      override fun onStop(owner: LifecycleOwner) = appLock.onAppStopped()
-    })
+        override fun onStop(owner: LifecycleOwner) = appLock.onAppStopped()
+      },
+    )
   }
 }

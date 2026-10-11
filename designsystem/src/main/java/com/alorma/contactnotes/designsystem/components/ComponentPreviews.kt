@@ -59,11 +59,12 @@ internal fun FilterChipPreview() {
 internal fun ToggleGroupPreview() {
   ConversesPreviewSurface {
     ConversesToggleGroup(
-      options = listOf(
-        ToggleOption("light", "Light", Icons.Rounded.LightMode),
-        ToggleOption("dark", "Dark", Icons.Rounded.DarkMode),
-        ToggleOption("system", "System", Icons.Rounded.BrightnessAuto),
-      ),
+      options =
+        listOf(
+          ToggleOption("light", "Light", Icons.Rounded.LightMode),
+          ToggleOption("dark", "Dark", Icons.Rounded.DarkMode),
+          ToggleOption("system", "System", Icons.Rounded.BrightnessAuto),
+        ),
       selected = "dark",
       onSelect = {},
       modifier = Modifier.width(360.dp),
@@ -165,20 +166,34 @@ internal fun GroupedListPreview() {
   }
 }
 
-private val PreviewFacts = listOf(
-  FactItem("Character", "Bren, dwarf blacksmith, 140 years old"),
-  FactItem("Origin", "Northern lands"),
-  FactItem("Real job", "Only knows he \"works with computers\" and not much else, so don't ask"),
-)
+private val PreviewFacts =
+  listOf(
+    FactItem("Character", "Bren, dwarf blacksmith, 140 years old"),
+    FactItem("Origin", "Northern lands"),
+    FactItem("Real job", "Only knows he \"works with computers\" and not much else, so don't ask"),
+  )
 
 @Preview
 @Composable
 internal fun CollapsibleFactsPreview() {
   ConversesPreviewSurface {
     Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-      CollapsibleFacts(PreviewFacts, expanded = false, onToggle = {}, lessLabel = "Less", toggleDescription = "Show facts")
-      CollapsibleFacts(PreviewFacts, expanded = true, onToggle = {}, lessLabel = "Less", toggleDescription = "Hide facts")
-      CollapsibleFacts(PreviewFacts.take(1), expanded = false, onToggle = {}, lessLabel = "Less", toggleDescription = "Show facts")
+      CollapsibleFacts(
+        PreviewFacts,
+        expanded = false,
+        onToggle = {},
+        lessLabel = "Less",
+        toggleDescription = "Show facts",
+      )
+      CollapsibleFacts(
+        PreviewFacts,
+        expanded = true,
+        onToggle = {},
+        lessLabel = "Less",
+        toggleDescription = "Hide facts",
+      )
+      CollapsibleFacts(PreviewFacts.take(1), expanded = false, onToggle = {
+      }, lessLabel = "Less", toggleDescription = "Show facts")
     }
   }
 }
@@ -191,7 +206,9 @@ internal fun NoticeBannerPreview() {
       BetaBadge(text = "BETA", contentDescription = "Beta version")
       NoticeBanner(
         title = "We've simplified channels",
-        body = "There are now five groups: In person, Phone, Chat, Social and Other. Your entries now use them, and each person's channels come from their conversations.",
+        body =
+          "There are now five groups: In person, Phone, Chat, Social and Other. " +
+            "Your entries now use them, and each person's channels come from their conversations.",
         actionLabel = "Got it",
         onAction = {},
       )

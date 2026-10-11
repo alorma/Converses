@@ -11,13 +11,14 @@ import java.time.temporal.ChronoUnit
 import java.util.Locale
 
 @StringRes
-fun ChannelType.label(): Int = when (this) {
-  ChannelType.IN_PERSON -> R.string.channel_in_person
-  ChannelType.PHONE -> R.string.channel_phone
-  ChannelType.CHAT -> R.string.channel_chat
-  ChannelType.SOCIAL -> R.string.channel_social
-  ChannelType.OTHER -> R.string.channel_other
-}
+fun ChannelType.label(): Int =
+  when (this) {
+    ChannelType.IN_PERSON -> R.string.channel_in_person
+    ChannelType.PHONE -> R.string.channel_phone
+    ChannelType.CHAT -> R.string.channel_chat
+    ChannelType.SOCIAL -> R.string.channel_social
+    ChannelType.OTHER -> R.string.channel_other
+  }
 
 fun initialsOf(name: String): String {
   val words = name.split(' ', '_', '-', '.').filter { it.isNotBlank() }
@@ -45,12 +46,13 @@ fun formatLastActivity(
 
 /** Nom del color d'un `AvatarColor`. */
 @StringRes
-fun colorNameRes(name: String): Int = when (name) {
-  "Lavender" -> R.string.color_lavender
-  "Mint" -> R.string.color_mint
-  "Peach" -> R.string.color_peach
-  "Sky" -> R.string.color_sky
-  "Rose" -> R.string.color_rose
-  "Lemon" -> R.string.color_lemon
-  else -> R.string.color_sand
-}
+fun colorNameRes(name: String): Int =
+  when (name) {
+    "Lavender" -> R.string.color_lavender
+    "Mint" -> R.string.color_mint
+    "Peach" -> R.string.color_peach
+    "Sky" -> R.string.color_sky
+    "Rose" -> R.string.color_rose
+    "Lemon" -> R.string.color_lemon
+    else -> R.string.color_sand
+  }

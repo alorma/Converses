@@ -60,11 +60,12 @@ fun <T> ConversesToggleGroup(
     horizontalArrangement = Arrangement.spacedBy(ButtonGroupDefaults.ConnectedSpaceBetween),
   ) {
     options.forEachIndexed { index, option ->
-      val shapes = when (index) {
-        0 -> ButtonGroupDefaults.connectedLeadingButtonShapes()
-        options.lastIndex -> ButtonGroupDefaults.connectedTrailingButtonShapes()
-        else -> ButtonGroupDefaults.connectedMiddleButtonShapes()
-      }
+      val shapes =
+        when (index) {
+          0 -> ButtonGroupDefaults.connectedLeadingButtonShapes()
+          options.lastIndex -> ButtonGroupDefaults.connectedTrailingButtonShapes()
+          else -> ButtonGroupDefaults.connectedMiddleButtonShapes()
+        }
       val checked = option.value == selected
       ToggleButton(
         checked = checked,
@@ -73,20 +74,22 @@ fun <T> ConversesToggleGroup(
           onSelect(option.value)
         },
         enabled = option.enabled,
-        modifier = Modifier
-          .weight(1f)
-          .then(if (prominent) Modifier.height(52.dp) else Modifier)
-          .semantics {
-            role = Role.RadioButton
-            option.contentDescription?.let { contentDescription = it }
-          },
+        modifier =
+          Modifier
+            .weight(1f)
+            .then(if (prominent) Modifier.height(52.dp) else Modifier)
+            .semantics {
+              role = Role.RadioButton
+              option.contentDescription?.let { contentDescription = it }
+            },
         shapes = shapes,
-        colors = ToggleButtonDefaults.colors(
-          containerColor = scheme.surfaceContainerHigh,
-          contentColor = scheme.onSurface,
-          checkedContainerColor = scheme.primary,
-          checkedContentColor = scheme.onPrimary,
-        ),
+        colors =
+          ToggleButtonDefaults.colors(
+            containerColor = scheme.surfaceContainerHigh,
+            contentColor = scheme.onSurface,
+            checkedContainerColor = scheme.primary,
+            checkedContentColor = scheme.onPrimary,
+          ),
       ) {
         val vector = if (checked) option.selectedIcon else option.icon
         if ((prominent || checked) && (option.leading != null || vector != null)) {

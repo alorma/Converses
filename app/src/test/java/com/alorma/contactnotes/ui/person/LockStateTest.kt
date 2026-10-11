@@ -39,7 +39,10 @@ class LockStateTest {
 
   @Test
   fun permanentLockoutAsksForThePin() {
-    assertEquals(LockState.Canceled(permanentLockout = true), lockStateForError(BiometricPrompt.ERROR_LOCKOUT_PERMANENT))
+    assertEquals(
+      LockState.Canceled(permanentLockout = true),
+      lockStateForError(BiometricPrompt.ERROR_LOCKOUT_PERMANENT),
+    )
   }
 
   @Test
@@ -54,7 +57,8 @@ class LockStateTest {
   }
 
   @Test
-  fun countdownEmitsDownToZero() = runTest {
-    assertEquals(listOf(3, 2, 1, 0), countdown(3).toList())
-  }
+  fun countdownEmitsDownToZero() =
+    runTest {
+      assertEquals(listOf(3, 2, 1, 0), countdown(3).toList())
+    }
 }

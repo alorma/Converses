@@ -47,13 +47,14 @@ fun NoticeBanner(
   val scheme = MaterialTheme.colorScheme
   val shape = RoundedCornerShape(24.dp)
   Column(
-    modifier = modifier
-      .fillMaxWidth()
-      .shadow(elevation = 8.dp, shape = shape, ambientColor = ShadowColor, spotColor = ShadowColor)
-      .clip(shape)
-      .background(scheme.primary)
-      .padding(start = 16.dp, top = 16.dp, end = 12.dp, bottom = 12.dp)
-      .semantics { liveRegion = LiveRegionMode.Polite },
+    modifier =
+      modifier
+        .fillMaxWidth()
+        .shadow(elevation = 8.dp, shape = shape, ambientColor = ShadowColor, spotColor = ShadowColor)
+        .clip(shape)
+        .background(scheme.primary)
+        .padding(start = 16.dp, top = 16.dp, end = 12.dp, bottom = 12.dp)
+        .semantics { liveRegion = LiveRegionMode.Polite },
     verticalArrangement = Arrangement.spacedBy(12.dp),
   ) {
     Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -75,13 +76,14 @@ fun NoticeBanner(
       }
     }
     Box(
-      modifier = Modifier
-        .align(Alignment.End)
-        .height(40.dp)
-        .clip(CircleShape)
-        .background(scheme.onPrimary)
-        .clickable(role = Role.Button, onClick = onAction)
-        .padding(horizontal = 20.dp),
+      modifier =
+        Modifier
+          .align(Alignment.End)
+          .height(40.dp)
+          .clip(CircleShape)
+          .background(scheme.onPrimary)
+          .clickable(role = Role.Button, onClick = onAction)
+          .padding(horizontal = 20.dp),
       contentAlignment = Alignment.Center,
     ) {
       Text(text = actionLabel, color = scheme.primary, fontSize = 14.sp, fontWeight = FontWeight.Bold)

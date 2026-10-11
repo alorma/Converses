@@ -1,7 +1,5 @@
 package com.alorma.contactnotes.ui.entry
 
-import com.alorma.contactnotes.data.db.shape
-import com.alorma.contactnotes.data.db.color
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -35,6 +33,8 @@ import com.alorma.contactnotes.data.db.ChannelType
 import com.alorma.contactnotes.data.db.EntryEntity
 import com.alorma.contactnotes.data.db.EntryKind
 import com.alorma.contactnotes.data.db.PersonEntity
+import com.alorma.contactnotes.data.db.color
+import com.alorma.contactnotes.data.db.shape
 import com.alorma.contactnotes.designsystem.components.Avatar
 import com.alorma.contactnotes.designsystem.components.ConversesSaveButton
 import com.alorma.contactnotes.designsystem.theme.SheetTitleStyle
@@ -84,16 +84,18 @@ fun NewEntrySheetContent(
   focusText: Boolean = false,
 ) {
   Column(
-    modifier = Modifier
-      .fillMaxWidth()
-      .windowInsetsPadding(WindowInsets.navigationBars)
-      .imePadding(),
+    modifier =
+      Modifier
+        .fillMaxWidth()
+        .windowInsetsPadding(WindowInsets.navigationBars)
+        .imePadding(),
   ) {
     Column(
-      modifier = Modifier
-        .weight(1f, fill = false)
-        .verticalScroll(rememberScrollState())
-        .padding(horizontal = 16.dp),
+      modifier =
+        Modifier
+          .weight(1f, fill = false)
+          .verticalScroll(rememberScrollState())
+          .padding(horizontal = 16.dp),
       verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
       Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {

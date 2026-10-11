@@ -9,20 +9,44 @@ import com.alorma.contactnotes.designsystem.theme.PersonTheme
 
 private object NoOpEditPersonActions : EditPersonActions {
   override fun onName(value: String) = Unit
+
   override fun onAlias(value: String) = Unit
+
   override fun onShape(shape: AvatarShape) = Unit
+
   override fun onColor(color: AvatarColor?) = Unit
+
   override fun onProtected(value: Boolean) = Unit
+
   override fun onAddFact() = Unit
-  override fun onFactChange(key: Long, label: String, value: String) = Unit
+
+  override fun onFactChange(
+    key: Long,
+    label: String,
+    value: String,
+  ) = Unit
+
   override fun onRemoveFact(key: Long) = Unit
-  override fun onMoveFact(from: Int, to: Int) = Unit
-  override fun delete(exportFirst: Boolean, onDeleted: () -> Unit) = Unit
+
+  override fun onMoveFact(
+    from: Int,
+    to: Int,
+  ) = Unit
+
+  override fun delete(
+    exportFirst: Boolean,
+    onDeleted: () -> Unit,
+  ) = Unit
+
   override fun save(onSaved: (Long) -> Unit) = Unit
 }
 
 @Composable
-private fun EditPersonPreview(state: EditPersonUiState, canAuthenticate: Boolean = true, customAvatar: Boolean = false) {
+private fun EditPersonPreview(
+  state: EditPersonUiState,
+  canAuthenticate: Boolean = true,
+  customAvatar: Boolean = false,
+) {
   ConversesPreviewTheme {
     EditPersonContent(
       state = state,
@@ -37,11 +61,11 @@ private fun EditPersonPreview(state: EditPersonUiState, canAuthenticate: Boolean
   }
 }
 
-private val Facts = listOf(
-  FactDraft(key = 1, label = "Birthday", value = "14 March"),
-  FactDraft(key = 2, label = "Work", value = "Designer in Barcelona"),
-)
-
+private val Facts =
+  listOf(
+    FactDraft(key = 1, label = "Birthday", value = "14 March"),
+    FactDraft(key = 2, label = "Work", value = "Designer in Barcelona"),
+  )
 
 @Preview
 @Composable
@@ -52,13 +76,14 @@ internal fun EditPersonNewPreview() {
 @Preview
 @Composable
 internal fun EditPersonExistingPreview() {
-  val snapshot = EditSnapshot(
-    name = "Marta Soler",
-    alias = "Marta",
-    shape = AvatarShape.Cookie9Sided,
-    color = AvatarColor.Lavender,
-    facts = Facts,
-  )
+  val snapshot =
+    EditSnapshot(
+      name = "Marta Soler",
+      alias = "Marta",
+      shape = AvatarShape.Cookie9Sided,
+      color = AvatarColor.Lavender,
+      facts = Facts,
+    )
   EditPersonPreview(
     EditPersonUiState(
       isNew = false,
@@ -128,9 +153,14 @@ internal fun EditPersonCustomAvatarPreview() {
 }
 
 @Composable
-private fun AvatarSheetPreview(shape: AvatarShape?, color: AvatarColor?) {
+private fun AvatarSheetPreview(
+  shape: AvatarShape?,
+  color: AvatarColor?,
+) {
   ConversesPreviewTheme {
-    androidx.compose.material3.Surface(color = androidx.compose.material3.MaterialTheme.colorScheme.surfaceContainerLow) {
+    androidx.compose.material3.Surface(
+      color = androidx.compose.material3.MaterialTheme.colorScheme.surfaceContainerLow,
+    ) {
       AvatarSheetContent(name = "Marta Soler", shape = shape, color = color, onShape = {}, onColor = {}, onDone = {})
     }
   }

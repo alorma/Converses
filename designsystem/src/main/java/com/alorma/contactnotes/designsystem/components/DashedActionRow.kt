@@ -31,21 +31,29 @@ fun DashedActionRow(
   val outline = MaterialTheme.colorScheme.outlineVariant
   val radius = 24.dp
   Row(
-    modifier = modifier
-      .fillMaxWidth()
-      .clip(RoundedCornerShape(radius))
-      .clickable(onClick = onClick)
-      .drawBehind {
-        val stroke = 2.dp.toPx()
-        drawRoundRect(
-          color = outline,
-          topLeft = androidx.compose.ui.geometry.Offset(stroke / 2, stroke / 2),
-          size = androidx.compose.ui.geometry.Size(size.width - stroke, size.height - stroke),
-          cornerRadius = CornerRadius(radius.toPx()),
-          style = Stroke(width = stroke, pathEffect = PathEffect.dashPathEffect(floatArrayOf(10.dp.toPx(), 8.dp.toPx()))),
-        )
-      }
-      .padding(horizontal = 16.dp, vertical = 18.dp),
+    modifier =
+      modifier
+        .fillMaxWidth()
+        .clip(RoundedCornerShape(radius))
+        .clickable(onClick = onClick)
+        .drawBehind {
+          val stroke = 2.dp.toPx()
+          drawRoundRect(
+            color = outline,
+            topLeft =
+              androidx.compose.ui.geometry
+                .Offset(stroke / 2, stroke / 2),
+            size =
+              androidx.compose.ui.geometry
+                .Size(size.width - stroke, size.height - stroke),
+            cornerRadius = CornerRadius(radius.toPx()),
+            style =
+              Stroke(
+                width = stroke,
+                pathEffect = PathEffect.dashPathEffect(floatArrayOf(10.dp.toPx(), 8.dp.toPx())),
+              ),
+          )
+        }.padding(horizontal = 16.dp, vertical = 18.dp),
     horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterHorizontally),
     verticalAlignment = Alignment.CenterVertically,
   ) {

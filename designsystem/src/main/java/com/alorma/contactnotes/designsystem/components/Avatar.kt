@@ -3,9 +3,9 @@ package com.alorma.contactnotes.designsystem.components
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
-import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Lock
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialShapes
 import androidx.compose.material3.Text
@@ -20,18 +20,21 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import java.text.Normalizer
 
 /** Pastel fix de l'avatar i llavor de l'esquema de color de la persona. */
-enum class AvatarColor(val color: Color, val seed: Color) {
+enum class AvatarColor(
+  val color: Color,
+  val seed: Color,
+) {
   Lavender(Color(0xFFDCD3F5), Color(0xFF6B55B5)),
   Mint(Color(0xFFC9EBD6), Color(0xFF2F7A52)),
   Peach(Color(0xFFFFD6BF), Color(0xFFB5602E)),
   Sky(Color(0xFFCBE3F7), Color(0xFF2D6FA3)),
   Rose(Color(0xFFF7CFDD), Color(0xFFB04670)),
   Lemon(Color(0xFFF1E9A8), Color(0xFF8A7A12)),
-  Sand(Color(0xFFE8DDCB), Color(0xFF86704C));
+  Sand(Color(0xFFE8DDCB), Color(0xFF86704C)),
+  ;
 
   companion object {
     /** Color automàtic: el mateix nom (sense majúscules, accents ni espais als extrems) dona sempre el mateix color. */
@@ -51,7 +54,8 @@ enum class AvatarShape {
   Clover8Leaf,
   Sunny,
   Ghostish,
-  PuffyDiamond;
+  PuffyDiamond,
+  ;
 
   companion object {
     /** Forma de l'avatar estàndard, la mateixa per a tothom. */
@@ -63,14 +67,15 @@ internal val AvatarInitialsColor = Color(0xFF1E1D24)
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-fun AvatarShape.asShape(): Shape = when (this) {
-  AvatarShape.Cookie9Sided -> MaterialShapes.Cookie9Sided
-  AvatarShape.Clover4Leaf -> MaterialShapes.Clover4Leaf
-  AvatarShape.Clover8Leaf -> MaterialShapes.Clover8Leaf
-  AvatarShape.Sunny -> MaterialShapes.Sunny
-  AvatarShape.Ghostish -> MaterialShapes.Ghostish
-  AvatarShape.PuffyDiamond -> MaterialShapes.PuffyDiamond
-}.toShape()
+fun AvatarShape.asShape(): Shape =
+  when (this) {
+    AvatarShape.Cookie9Sided -> MaterialShapes.Cookie9Sided
+    AvatarShape.Clover4Leaf -> MaterialShapes.Clover4Leaf
+    AvatarShape.Clover8Leaf -> MaterialShapes.Clover8Leaf
+    AvatarShape.Sunny -> MaterialShapes.Sunny
+    AvatarShape.Ghostish -> MaterialShapes.Ghostish
+    AvatarShape.PuffyDiamond -> MaterialShapes.PuffyDiamond
+  }.toShape()
 
 /** Avatar amb forma expressiva i color pastel. Les inicials sempre en fosc, també en mode fosc. */
 @Composable
@@ -83,10 +88,11 @@ fun Avatar(
   locked: Boolean = false,
 ) {
   Box(
-    modifier = modifier
-      .size(size)
-      .clip(shape.asShape())
-      .background(color.color),
+    modifier =
+      modifier
+        .size(size)
+        .clip(shape.asShape())
+        .background(color.color),
     contentAlignment = Alignment.Center,
   ) {
     if (locked) {

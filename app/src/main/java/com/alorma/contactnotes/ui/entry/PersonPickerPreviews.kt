@@ -14,7 +14,10 @@ import com.alorma.contactnotes.designsystem.theme.AppColors
 import com.alorma.contactnotes.ui.preview.PreviewData
 
 @Composable
-private fun PersonPickerPreview(people: List<PersonEntity>, selectedId: Long?) {
+private fun PersonPickerPreview(
+  people: List<PersonEntity>,
+  selectedId: Long?,
+) {
   ConversesPreviewTheme {
     AppColors {
       Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.surface) {
@@ -36,7 +39,8 @@ internal fun PersonPickerFewPreview() {
 @Preview
 @Composable
 internal fun PersonPickerManyPreview() {
-  val many = PreviewData.people.map { it.person } +
-    (5L..10L).map { PreviewData.marta.copy(id = it, name = "Person $it") }
+  val many =
+    PreviewData.people.map { it.person } +
+      (5L..10L).map { PreviewData.marta.copy(id = it, name = "Person $it") }
   PersonPickerPreview(people = many, selectedId = null)
 }

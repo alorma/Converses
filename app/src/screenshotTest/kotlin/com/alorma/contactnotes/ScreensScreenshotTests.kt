@@ -3,11 +3,12 @@ package com.alorma.contactnotes
 import android.content.res.Configuration
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
-import com.android.tools.screenshot.PreviewTest
+import androidx.compose.ui.tooling.preview.PreviewParameter
+import com.alorma.contactnotes.designsystem.components.AvatarColor
 import com.alorma.contactnotes.ui.edit.AvatarSheetAutoPreview
 import com.alorma.contactnotes.ui.edit.AvatarSheetCustomPreview
-import com.alorma.contactnotes.ui.edit.EditPersonCustomAvatarPreview
 import com.alorma.contactnotes.ui.edit.DeletePersonDialogPreview
+import com.alorma.contactnotes.ui.edit.EditPersonCustomAvatarPreview
 import com.alorma.contactnotes.ui.edit.EditPersonExistingPreview
 import com.alorma.contactnotes.ui.edit.EditPersonNewPreview
 import com.alorma.contactnotes.ui.edit.EditPersonProtectedPreview
@@ -15,35 +16,34 @@ import com.alorma.contactnotes.ui.entry.EditEntrySheetPreview
 import com.alorma.contactnotes.ui.entry.NewEntrySheetPreview
 import com.alorma.contactnotes.ui.entry.PersonPickerFewPreview
 import com.alorma.contactnotes.ui.entry.PersonPickerManyPreview
-import com.alorma.contactnotes.ui.lock.AppLockPreview
-import com.alorma.contactnotes.ui.person.ConfirmDeleteDialogPreview
-import com.alorma.contactnotes.ui.person.EntryActionsDayPreview
-import com.alorma.contactnotes.ui.person.MoveEntryDialogPreview
-import com.alorma.contactnotes.ui.onboarding.OnboardingStep1Preview
-import com.alorma.contactnotes.ui.onboarding.OnboardingStep2Preview
-import com.alorma.contactnotes.ui.onboarding.OnboardingStep3Preview
-import com.alorma.contactnotes.ui.settings.SettingsAppLockPreview
-import com.alorma.contactnotes.ui.settings.SettingsNoLockPreview
-import com.alorma.contactnotes.ui.person.EntryActionsSinglePreview
 import com.alorma.contactnotes.ui.entry.QuickNoteFilledPreview
 import com.alorma.contactnotes.ui.entry.QuickNoteNoPersonPreview
 import com.alorma.contactnotes.ui.entry.WhenSheetCustomPreview
 import com.alorma.contactnotes.ui.entry.WhenSheetNowPreview
+import com.alorma.contactnotes.ui.lock.AppLockPreview
+import com.alorma.contactnotes.ui.onboarding.OnboardingStep1Preview
+import com.alorma.contactnotes.ui.onboarding.OnboardingStep2Preview
+import com.alorma.contactnotes.ui.onboarding.OnboardingStep3Preview
 import com.alorma.contactnotes.ui.people.PeopleListScreenArchivedPreview
 import com.alorma.contactnotes.ui.people.PeopleListScreenEmptyPreview
 import com.alorma.contactnotes.ui.people.PeopleListScreenLoadedPreview
-import androidx.compose.ui.tooling.preview.PreviewParameter
-import com.alorma.contactnotes.designsystem.components.AvatarColor
 import com.alorma.contactnotes.ui.person.AvatarColorProvider
+import com.alorma.contactnotes.ui.person.ConfirmDeleteDialogPreview
+import com.alorma.contactnotes.ui.person.EntryActionsDayPreview
+import com.alorma.contactnotes.ui.person.EntryActionsSinglePreview
+import com.alorma.contactnotes.ui.person.MoveEntryDialogPreview
 import com.alorma.contactnotes.ui.person.PersonDetailScreenEmptyPreview
-import com.alorma.contactnotes.ui.person.PersonDetailScreenSingleFactPreview
-import com.alorma.contactnotes.ui.person.PersonDetailScreenThemedPreview
 import com.alorma.contactnotes.ui.person.PersonDetailScreenFilteredEmptyPreview
 import com.alorma.contactnotes.ui.person.PersonDetailScreenLoadedPreview
+import com.alorma.contactnotes.ui.person.PersonDetailScreenSingleFactPreview
+import com.alorma.contactnotes.ui.person.PersonDetailScreenThemedPreview
 import com.alorma.contactnotes.ui.person.PersonLockedCanceledPreview
 import com.alorma.contactnotes.ui.person.PersonLockedLockedOutPreview
 import com.alorma.contactnotes.ui.person.PersonLockedNoCredentialsPreview
 import com.alorma.contactnotes.ui.person.PersonLockedWaitingPreview
+import com.alorma.contactnotes.ui.settings.SettingsAppLockPreview
+import com.alorma.contactnotes.ui.settings.SettingsNoLockPreview
+import com.android.tools.screenshot.PreviewTest
 
 /** Pantalla d'un mòbil de mida mitjana, en clar i en fosc, amb l'idioma fixat perquè no depengui de la màquina. */
 @Preview(name = "Light", locale = "en", widthDp = 411, heightDp = 891)
@@ -63,7 +63,6 @@ annotation class ScreenPreviews
 annotation class LocalizedScreenPreviews
 
 class ScreensScreenshotTests {
-
   @ScreenPreviews
   @PreviewTest
   @Composable
@@ -110,7 +109,9 @@ class ScreensScreenshotTests {
   @ScreenPreviews
   @PreviewTest
   @Composable
-  fun personDetailThemed(@PreviewParameter(AvatarColorProvider::class) color: AvatarColor) {
+  fun personDetailThemed(
+    @PreviewParameter(AvatarColorProvider::class) color: AvatarColor,
+  ) {
     PersonDetailScreenThemedPreview(color)
   }
 

@@ -19,19 +19,24 @@ import androidx.compose.ui.unit.dp
 
 /** Píndola tonal de 22 dp amb el text de la versió (p. ex. «BETA»), al costat del títol de la llista. */
 @Composable
-fun BetaBadge(text: String, contentDescription: String, modifier: Modifier = Modifier) {
+fun BetaBadge(
+  text: String,
+  contentDescription: String,
+  modifier: Modifier = Modifier,
+) {
   val scheme = MaterialTheme.colorScheme
   // Etiqueta decorativa de 22 dp: el text no escala amb la mida de lletra del sistema (la descripció sí que es llegeix)
   val fontSize = with(LocalDensity.current) { 11.dp.toSp() }
   val letterSpacing = with(LocalDensity.current) { 0.8.dp.toSp() }
   val lineHeight = with(LocalDensity.current) { 14.dp.toSp() }
   Box(
-    modifier = modifier
-      .height(22.dp)
-      .clip(RoundedCornerShape(8.dp))
-      .background(scheme.primaryContainer)
-      .padding(horizontal = 8.dp)
-      .semantics { this.contentDescription = contentDescription },
+    modifier =
+      modifier
+        .height(22.dp)
+        .clip(RoundedCornerShape(8.dp))
+        .background(scheme.primaryContainer)
+        .padding(horizontal = 8.dp)
+        .semantics { this.contentDescription = contentDescription },
     contentAlignment = Alignment.Center,
   ) {
     Text(

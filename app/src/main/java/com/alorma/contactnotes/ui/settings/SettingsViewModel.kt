@@ -13,8 +13,9 @@ import kotlinx.coroutines.launch
 class SettingsViewModel(
   private val repository: SettingsRepository,
 ) : ViewModel() {
-  val settings: StateFlow<AppSettings> = repository.settings
-    .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), AppSettings())
+  val settings: StateFlow<AppSettings> =
+    repository.settings
+      .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), AppSettings())
 
   fun onThemeMode(mode: ThemeMode) = viewModelScope.launch { repository.setThemeMode(mode) }
 

@@ -96,7 +96,10 @@ internal fun GhostEntry(
   }
 }
 
-private fun groupShape(index: Int, count: Int): Shape {
+private fun groupShape(
+  index: Int,
+  count: Int,
+): Shape {
   val start = if (index == 0) OuterCorner else InnerCorner
   val end = if (index == count - 1) OuterCorner else InnerCorner
   return RoundedCornerShape(topStart = start, bottomStart = start, topEnd = end, bottomEnd = end)
@@ -115,13 +118,17 @@ private fun WhoButton(
     onClick = onClick,
     shape = shape,
     color = MaterialTheme.colorScheme.surfaceContainerHigh,
-    modifier = modifier
-      .heightIn(min = 44.dp)
-      .clearAndSetSemantics {
-        contentDescription = description
-        role = Role.Button
-        onClick { onClick(); true }
-      },
+    modifier =
+      modifier
+        .heightIn(min = 44.dp)
+        .clearAndSetSemantics {
+          contentDescription = description
+          role = Role.Button
+          onClick {
+            onClick()
+            true
+          }
+        },
   ) {
     Row(
       modifier = Modifier.padding(horizontal = 8.dp, vertical = 8.dp),

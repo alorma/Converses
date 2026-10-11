@@ -20,93 +20,101 @@ class PeopleListViewModelTest {
   private val db = FakeDb()
   private val settings = FakeSettingsRepository()
 
-  private fun names(vm: PeopleListViewModel) = vm.uiState.value.people.map { it.person.name }
+  private fun names(vm: PeopleListViewModel) =
+    vm.uiState.value.people
+      .map { it.person.name }
 
   @Test
-  fun filtersByChannelButKeepsTheUnfilteredTotal() = runTest {
-    val chat = db.addPerson("Chat", createdAt = 3)
-    val social = db.addPerson("Social", createdAt = 2)
-    val inPerson = db.addPerson("InPerson", createdAt = 1)
-    db.addEntry(chat.id, channel = ChannelType.CHAT)
-    db.addEntry(social.id, channel = ChannelType.SOCIAL)
-    db.addEntry(inPerson.id, channel = ChannelType.IN_PERSON)
-    val vm = PeopleListViewModel(archived = false, repository = db.repository, settings = settings)
-    backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { vm.uiState.collect {} }
+  fun filtersByChannelButKeepsTheUnfilteredTotal() =
+    runTest {
+      val chat = db.addPerson("Chat", createdAt = 3)
+      val social = db.addPerson("Social", createdAt = 2)
+      val inPerson = db.addPerson("InPerson", createdAt = 1)
+      db.addEntry(chat.id, channel = ChannelType.CHAT)
+      db.addEntry(social.id, channel = ChannelType.SOCIAL)
+      db.addEntry(inPerson.id, channel = ChannelType.IN_PERSON)
+      val vm = PeopleListViewModel(archived = false, repository = db.repository, settings = settings)
+      backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { vm.uiState.collect {} }
 
-    assertEquals(listOf("Chat", "Social", "InPerson"), names(vm))
+      assertEquals(listOf("Chat", "Social", "InPerson"), names(vm))
 
-    vm.onFilterToggled(ChannelType.CHAT)
-    assertEquals(listOf("Chat"), names(vm))
-    vm.onFilterToggled(ChannelType.IN_PERSON)
-    assertEquals(listOf("Chat", "InPerson"), names(vm))
-    assertEquals(3, vm.uiState.value.total)
+      vm.onFilterToggled(ChannelType.CHAT)
+      assertEquals(listOf("Chat"), names(vm))
+      vm.onFilterToggled(ChannelType.IN_PERSON)
+      assertEquals(listOf("Chat", "InPerson"), names(vm))
+      assertEquals(3, vm.uiState.value.total)
 
-    vm.onFilterToggled(ChannelType.CHAT)
-    vm.onFilterToggled(ChannelType.IN_PERSON)
-    assertEquals(listOf("Chat", "Social", "InPerson"), names(vm))
-  }
-
-  @Test
-  fun filteringBySocialExcludesOtherChannels() = runTest {
-    val onX = db.addPerson("OnSocial", createdAt = 2)
-    val onInstagram = db.addPerson("OnOther", createdAt = 1)
-    db.addEntry(onX.id, channel = ChannelType.SOCIAL)
-    db.addEntry(onInstagram.id, channel = ChannelType.OTHER)
-    val vm = PeopleListViewModel(archived = false, repository = db.repository, settings = settings)
-    backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { vm.uiState.collect {} }
-
-    vm.onFilterToggled(ChannelType.SOCIAL)
-    assertEquals(listOf("OnSocial"), names(vm))
-  }
+      vm.onFilterToggled(ChannelType.CHAT)
+      vm.onFilterToggled(ChannelType.IN_PERSON)
+      assertEquals(listOf("Chat", "Social", "InPerson"), names(vm))
+    }
 
   @Test
-  fun protectedPeopleOnlyShowUpWithoutFilterBecauseTheirChannelsAreHidden() = runTest {
-    val secret = db.addPerson("Luna", isProtected = true)
-    db.addEntry(secret.id, channel = ChannelType.CHAT)
-    val vm = PeopleListViewModel(archived = false, repository = db.repository, settings = settings)
-    backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { vm.uiState.collect {} }
+  fun filteringBySocialExcludesOtherChannels() =
+    runTest {
+      val onX = db.addPerson("OnSocial", createdAt = 2)
+      val onInstagram = db.addPerson("OnOther", createdAt = 1)
+      db.addEntry(onX.id, channel = ChannelType.SOCIAL)
+      db.addEntry(onInstagram.id, channel = ChannelType.OTHER)
+      val vm = PeopleListViewModel(archived = false, repository = db.repository, settings = settings)
+      backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { vm.uiState.collect {} }
 
-    assertEquals(listOf("Luna"), names(vm))
-    vm.onFilterToggled(ChannelType.CHAT)
-    assertEquals(emptyList<String>(), names(vm))
-  }
-
-  @Test
-  fun archivedListIgnoresTheChannelFilter() = runTest {
-    db.addPerson("Active")
-    db.addPerson("Archived", archived = true)
-    val vm = PeopleListViewModel(archived = true, repository = db.repository, settings = settings)
-    backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { vm.uiState.collect {} }
-
-    vm.onFilterToggled(ChannelType.PHONE)
-
-    assertEquals(listOf("Archived"), names(vm))
-    assertFalse(vm.uiState.value.isLoading)
-  }
+      vm.onFilterToggled(ChannelType.SOCIAL)
+      assertEquals(listOf("OnSocial"), names(vm))
+    }
 
   @Test
-  fun channelsNoticeShowsOnlyWhilePendingAndDismissingClearsIt() = runTest {
-    settings.setChannelsNoticePending(true)
-    val vm = PeopleListViewModel(archived = false, repository = db.repository, settings = settings)
-    backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { vm.uiState.collect {} }
-    assertTrue(vm.uiState.value.showChannelsNotice)
+  fun protectedPeopleOnlyShowUpWithoutFilterBecauseTheirChannelsAreHidden() =
+    runTest {
+      val secret = db.addPerson("Luna", isProtected = true)
+      db.addEntry(secret.id, channel = ChannelType.CHAT)
+      val vm = PeopleListViewModel(archived = false, repository = db.repository, settings = settings)
+      backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { vm.uiState.collect {} }
 
-    vm.onChannelsNoticeDismissed()
-
-    assertFalse(vm.uiState.value.showChannelsNotice)
-    assertFalse(settings.state.value.channelsNoticePending)
-  }
+      assertEquals(listOf("Luna"), names(vm))
+      vm.onFilterToggled(ChannelType.CHAT)
+      assertEquals(emptyList<String>(), names(vm))
+    }
 
   @Test
-  fun channelsNoticeIsNotShownToNewUsersNorInTheArchivedList() = runTest {
-    val fresh = PeopleListViewModel(archived = false, repository = db.repository, settings = settings)
-    settings.setChannelsNoticePending(true)
-    val archived = PeopleListViewModel(archived = true, repository = db.repository, settings = settings)
-    backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { archived.uiState.collect {} }
-    assertFalse(archived.uiState.value.showChannelsNotice)
+  fun archivedListIgnoresTheChannelFilter() =
+    runTest {
+      db.addPerson("Active")
+      db.addPerson("Archived", archived = true)
+      val vm = PeopleListViewModel(archived = true, repository = db.repository, settings = settings)
+      backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { vm.uiState.collect {} }
 
-    settings.setChannelsNoticePending(false)
-    backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { fresh.uiState.collect {} }
-    assertFalse(fresh.uiState.value.showChannelsNotice)
-  }
+      vm.onFilterToggled(ChannelType.PHONE)
+
+      assertEquals(listOf("Archived"), names(vm))
+      assertFalse(vm.uiState.value.isLoading)
+    }
+
+  @Test
+  fun channelsNoticeShowsOnlyWhilePendingAndDismissingClearsIt() =
+    runTest {
+      settings.setChannelsNoticePending(true)
+      val vm = PeopleListViewModel(archived = false, repository = db.repository, settings = settings)
+      backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { vm.uiState.collect {} }
+      assertTrue(vm.uiState.value.showChannelsNotice)
+
+      vm.onChannelsNoticeDismissed()
+
+      assertFalse(vm.uiState.value.showChannelsNotice)
+      assertFalse(settings.state.value.channelsNoticePending)
+    }
+
+  @Test
+  fun channelsNoticeIsNotShownToNewUsersNorInTheArchivedList() =
+    runTest {
+      val fresh = PeopleListViewModel(archived = false, repository = db.repository, settings = settings)
+      settings.setChannelsNoticePending(true)
+      val archived = PeopleListViewModel(archived = true, repository = db.repository, settings = settings)
+      backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { archived.uiState.collect {} }
+      assertFalse(archived.uiState.value.showChannelsNotice)
+
+      settings.setChannelsNoticePending(false)
+      backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { fresh.uiState.collect {} }
+      assertFalse(fresh.uiState.value.showChannelsNotice)
+    }
 }

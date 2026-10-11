@@ -27,14 +27,18 @@ abstract class PersonDao {
 
   /** Crea o actualitza la persona amb les seves dades fixades en una sola transacció. La taula `channel` no es toca. */
   @Transaction
-  open suspend fun save(person: PersonEntity, facts: List<PinnedFactEntity>): Long {
-    val id = if (person.id == 0L) {
-      insert(person)
-    } else {
-      update(person)
-      deleteFacts(person.id)
-      person.id
-    }
+  open suspend fun save(
+    person: PersonEntity,
+    facts: List<PinnedFactEntity>,
+  ): Long {
+    val id =
+      if (person.id == 0L) {
+        insert(person)
+      } else {
+        update(person)
+        deleteFacts(person.id)
+        person.id
+      }
     insertFacts(facts.mapIndexed { index, fact -> fact.copy(id = 0, personId = id, position = index) })
     return id
   }
@@ -67,7 +71,10 @@ abstract class PersonDao {
     WHERE archived = 0 AND id != :excludeId AND alias = :alias COLLATE NOCASE
     """,
   )
-  abstract suspend fun countAliasConflicts(alias: String, excludeId: Long): Int
+  abstract suspend fun countAliasConflicts(
+    alias: String,
+    excludeId: Long,
+  ): Int
 }
 
 @Dao
@@ -91,12 +98,22 @@ interface EntryDao {
   @Query(
     "DELETE FROM entry WHERE personId = :personId AND channelType = :channelType AND occurredAt >= :from AND occurredAt < :to",
   )
-  suspend fun deleteInRange(personId: Long, channelType: ChannelType, from: Long, to: Long): Int
+  suspend fun deleteInRange(
+    personId: Long,
+    channelType: ChannelType,
+    from: Long,
+    to: Long,
+  ): Int
 
   @Query(
     "SELECT COUNT(*) FROM entry WHERE personId = :personId AND channelType = :channelType AND occurredAt >= :from AND occurredAt < :to",
   )
-  suspend fun countInRange(personId: Long, channelType: ChannelType, from: Long, to: Long): Int
+  suspend fun countInRange(
+    personId: Long,
+    channelType: ChannelType,
+    from: Long,
+    to: Long,
+  ): Int
 
   @Query(
     """
@@ -105,7 +122,10 @@ interface EntryDao {
     ORDER BY occurredAt DESC, id DESC
     """,
   )
-  fun observeTimeline(personId: Long, kinds: Set<EntryKind>): Flow<List<EntryEntity>>
+  fun observeTimeline(
+    personId: Long,
+    kinds: Set<EntryKind>,
+  ): Flow<List<EntryEntity>>
 
   @Query("SELECT kind AS kind, COUNT(*) AS count FROM entry WHERE personId = :personId GROUP BY kind")
   fun observeCounts(personId: Long): Flow<List<KindCount>>

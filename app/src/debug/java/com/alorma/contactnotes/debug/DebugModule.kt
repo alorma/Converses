@@ -19,16 +19,20 @@ import androidx.compose.ui.unit.dp
 
 /** Accordion section of the debug sheet; [content] usually holds [DebugCell]s. */
 @Composable
-fun DebugModule(title: String, content: @Composable () -> Unit) {
+fun DebugModule(
+  title: String,
+  content: @Composable () -> Unit,
+) {
   var expanded by rememberSaveable(title) { mutableStateOf(false) }
   Column(Modifier.fillMaxWidth()) {
     Text(
       text = title,
       style = MaterialTheme.typography.titleMedium,
-      modifier = Modifier
-        .fillMaxWidth()
-        .clickable { expanded = !expanded }
-        .padding(horizontal = 24.dp, vertical = 16.dp),
+      modifier =
+        Modifier
+          .fillMaxWidth()
+          .clickable { expanded = !expanded }
+          .padding(horizontal = 24.dp, vertical = 16.dp),
     )
     AnimatedVisibility(expanded) { Column { content() } }
   }
@@ -43,10 +47,11 @@ fun DebugCell(
   trailing: (@Composable () -> Unit)? = null,
 ) {
   Row(
-    modifier = modifier
-      .fillMaxWidth()
-      .then(if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier)
-      .padding(horizontal = 24.dp, vertical = 12.dp),
+    modifier =
+      modifier
+        .fillMaxWidth()
+        .then(if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier)
+        .padding(horizontal = 24.dp, vertical = 12.dp),
     verticalAlignment = Alignment.CenterVertically,
   ) {
     Column(Modifier.weight(1f)) {

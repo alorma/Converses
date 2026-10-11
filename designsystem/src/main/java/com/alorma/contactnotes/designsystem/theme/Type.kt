@@ -21,46 +21,52 @@ private fun robotoFlex(
 ) = Font(
   resId = R.font.roboto_flex,
   weight = FontWeight(weight),
-  variationSettings = FontVariation.Settings(
-    *listOfNotNull(
-      FontVariation.weight(weight),
-      FontVariation.width(width),
-      opticalSize?.let { FontVariation.opticalSizing(it) },
-    ).toTypedArray(),
-  ),
+  variationSettings =
+    FontVariation.Settings(
+      *listOfNotNull(
+        FontVariation.weight(weight),
+        FontVariation.width(width),
+        opticalSize?.let { FontVariation.opticalSizing(it) },
+      ).toTypedArray(),
+    ),
 )
 
-val RobotoFlex = FontFamily(
-  robotoFlex(400),
-  robotoFlex(500),
-  robotoFlex(600),
-  robotoFlex(700),
-  robotoFlex(800),
-)
+val RobotoFlex =
+  FontFamily(
+    robotoFlex(400),
+    robotoFlex(500),
+    robotoFlex(600),
+    robotoFlex(700),
+    robotoFlex(800),
+  )
 
 private val RobotoFlexTitle = FontFamily(robotoFlex(800, TitleWidth, TitleOpticalSize))
 
-internal val ConversesTypography: Typography = Typography().let { base ->
-  base.copy(
-    displayLarge = base.displayLarge.copy(fontFamily = RobotoFlex),
-    displayMedium = base.displayMedium.copy(fontFamily = RobotoFlex),
-    displaySmall = base.displaySmall.copy(fontFamily = RobotoFlex),
-    headlineLarge = base.headlineLarge.copy(fontFamily = RobotoFlex),
-    headlineMedium = base.headlineMedium.copy(fontFamily = RobotoFlex),
-    headlineSmall = base.headlineSmall.copy(fontFamily = RobotoFlex),
-    titleLarge = base.titleLarge.copy(fontFamily = RobotoFlex),
-    titleMedium = base.titleMedium.copy(fontFamily = RobotoFlex),
-    titleSmall = base.titleSmall.copy(fontFamily = RobotoFlex),
-    bodyLarge = base.bodyLarge.copy(fontFamily = RobotoFlex),
-    bodyMedium = base.bodyMedium.copy(fontFamily = RobotoFlex),
-    bodySmall = base.bodySmall.copy(fontFamily = RobotoFlex),
-    labelLarge = base.labelLarge.copy(fontFamily = RobotoFlex),
-    labelMedium = base.labelMedium.copy(fontFamily = RobotoFlex),
-    labelSmall = base.labelSmall.copy(fontFamily = RobotoFlex),
-  )
-}
+internal val ConversesTypography: Typography =
+  Typography().let { base ->
+    base.copy(
+      displayLarge = base.displayLarge.copy(fontFamily = RobotoFlex),
+      displayMedium = base.displayMedium.copy(fontFamily = RobotoFlex),
+      displaySmall = base.displaySmall.copy(fontFamily = RobotoFlex),
+      headlineLarge = base.headlineLarge.copy(fontFamily = RobotoFlex),
+      headlineMedium = base.headlineMedium.copy(fontFamily = RobotoFlex),
+      headlineSmall = base.headlineSmall.copy(fontFamily = RobotoFlex),
+      titleLarge = base.titleLarge.copy(fontFamily = RobotoFlex),
+      titleMedium = base.titleMedium.copy(fontFamily = RobotoFlex),
+      titleSmall = base.titleSmall.copy(fontFamily = RobotoFlex),
+      bodyLarge = base.bodyLarge.copy(fontFamily = RobotoFlex),
+      bodyMedium = base.bodyMedium.copy(fontFamily = RobotoFlex),
+      bodySmall = base.bodySmall.copy(fontFamily = RobotoFlex),
+      labelLarge = base.labelLarge.copy(fontFamily = RobotoFlex),
+      labelMedium = base.labelMedium.copy(fontFamily = RobotoFlex),
+      labelSmall = base.labelSmall.copy(fontFamily = RobotoFlex),
+    )
+  }
 
-private fun titleStyle(size: Int, lineHeight: Int) = TextStyle(
+private fun titleStyle(
+  size: Int,
+  lineHeight: Int,
+) = TextStyle(
   fontFamily = RobotoFlexTitle,
   fontWeight = FontWeight.ExtraBold,
   fontSize = size.sp,

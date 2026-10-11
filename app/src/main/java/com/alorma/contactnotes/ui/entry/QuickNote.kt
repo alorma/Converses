@@ -1,19 +1,16 @@
 package com.alorma.contactnotes.ui.entry
 
-import com.alorma.contactnotes.designsystem.components.ConversesSaveButton
-import com.alorma.contactnotes.data.db.shape
-import com.alorma.contactnotes.data.db.color
 import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.navigationBars
-import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
@@ -41,10 +38,8 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.nestedscroll.nestedScroll
-import com.alorma.contactnotes.designsystem.components.ConversesTopBar
-import com.alorma.contactnotes.designsystem.components.rememberTopBarScrollBehavior
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -58,9 +53,14 @@ import com.alorma.contactnotes.data.db.ChannelType
 import com.alorma.contactnotes.data.db.EntryEntity
 import com.alorma.contactnotes.data.db.EntryKind
 import com.alorma.contactnotes.data.db.PersonEntity
+import com.alorma.contactnotes.data.db.color
+import com.alorma.contactnotes.data.db.shape
 import com.alorma.contactnotes.data.settings.SecureWindow
 import com.alorma.contactnotes.designsystem.components.Avatar
+import com.alorma.contactnotes.designsystem.components.ConversesSaveButton
+import com.alorma.contactnotes.designsystem.components.ConversesTopBar
 import com.alorma.contactnotes.designsystem.components.GroupedListDefaults
+import com.alorma.contactnotes.designsystem.components.rememberTopBarScrollBehavior
 import com.alorma.contactnotes.designsystem.theme.PersonTheme
 import com.alorma.contactnotes.ui.people.initialsOf
 import com.alorma.contactnotes.ui.person.canUnlockWithDevice
@@ -116,18 +116,19 @@ class QuickNoteViewModel(
 
   private val people = repository.observePeople().map { items -> items.map { it.person } }
 
-  val uiState: StateFlow<QuickNoteUiState> = combine(people, selectedId, pendingId, unlocked) { people, id, pending, unlocked ->
-    val selected = people.firstOrNull { it.id == id }?.takeIf { !it.isProtected || it.id in unlocked }
-    Triple(people, selected, people.firstOrNull { it.id == pending })
-  }.flatMapLatest { (people, selected, pending) ->
-    if (selected == null) {
-      flowOf(QuickNoteUiState(people = people, pending = pending))
-    } else {
-      repository.observeTimeline(selected.id).map { it.firstOrNull()?.channelType }.map { last ->
-        QuickNoteUiState(people = people, selected = selected, pending = pending, lastChannel = last)
+  val uiState: StateFlow<QuickNoteUiState> =
+    combine(people, selectedId, pendingId, unlocked) { people, id, pending, unlocked ->
+      val selected = people.firstOrNull { it.id == id }?.takeIf { !it.isProtected || it.id in unlocked }
+      Triple(people, selected, people.firstOrNull { it.id == pending })
+    }.flatMapLatest { (people, selected, pending) ->
+      if (selected == null) {
+        flowOf(QuickNoteUiState(people = people, pending = pending))
+      } else {
+        repository.observeTimeline(selected.id).map { it.firstOrNull()?.channelType }.map { last ->
+          QuickNoteUiState(people = people, selected = selected, pending = pending, lastChannel = last)
+        }
       }
-    }
-  }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), QuickNoteUiState())
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), QuickNoteUiState())
 
   /** Una protegida queda pendent d'autenticar; la resta es tria a l'acte. */
   fun select(person: PersonEntity) {
@@ -155,7 +156,14 @@ class QuickNoteViewModel(
     pendingId.value = null
   }
 
-  fun save(personId: Long, kind: EntryKind, channel: ChannelType, text: String, occurredAt: Long?, onSaved: () -> Unit) {
+  fun save(
+    personId: Long,
+    kind: EntryKind,
+    channel: ChannelType,
+    text: String,
+    occurredAt: Long?,
+    onSaved: () -> Unit,
+  ) {
     viewModelScope.launch {
       repository.addEntry(
         EntryEntity(
@@ -292,13 +300,14 @@ fun QuickNoteContent(
       },
     ) { padding ->
       Column(
-        modifier = Modifier
-          .fillMaxSize()
-          .padding(padding)
-          .consumeWindowInsets(padding)
-          .imePadding()
-          .verticalScroll(rememberScrollState())
-          .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 8.dp),
+        modifier =
+          Modifier
+            .fillMaxSize()
+            .padding(padding)
+            .consumeWindowInsets(padding)
+            .imePadding()
+            .verticalScroll(rememberScrollState())
+            .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 8.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
       ) {
         EntryForm(
@@ -344,7 +353,10 @@ fun QuickNoteContent(
 }
 
 @Composable
-private fun PersonPicker(selected: PersonEntity?, onClick: () -> Unit) {
+private fun PersonPicker(
+  selected: PersonEntity?,
+  onClick: () -> Unit,
+) {
   Surface(
     onClick = onClick,
     shape = MaterialTheme.shapes.extraLarge,
@@ -359,9 +371,17 @@ private fun PersonPicker(selected: PersonEntity?, onClick: () -> Unit) {
       if (selected != null) {
         Avatar(initialsOf(selected.name), selected.shape, selected.color, size = 44.dp, locked = selected.isProtected)
       } else {
-        Surface(shape = CircleShape, color = MaterialTheme.colorScheme.surfaceContainerHigh, modifier = Modifier.size(44.dp)) {
+        Surface(
+          shape = CircleShape,
+          color = MaterialTheme.colorScheme.surfaceContainerHigh,
+          modifier = Modifier.size(44.dp),
+        ) {
           Box(contentAlignment = Alignment.Center) {
-            Icon(Icons.Rounded.PersonOutline, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant)
+            Icon(
+              Icons.Rounded.PersonOutline,
+              contentDescription = null,
+              tint = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
           }
         }
       }

@@ -24,7 +24,8 @@ internal val GraphiteStyle = PaletteStyle.Monochrome
 internal val LocalIsDarkTheme = compositionLocalOf { false }
 
 val isDarkTheme: Boolean
-  @Composable @ReadOnlyComposable get() = LocalIsDarkTheme.current
+  @Composable @ReadOnlyComposable
+  get() = LocalIsDarkTheme.current
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -34,19 +35,21 @@ fun ConversesTheme(
   personColorTheme: Boolean = true,
   content: @Composable () -> Unit,
 ) {
-  val isDark = when (themeMode) {
-    ThemeMode.System -> isSystemInDarkTheme()
-    ThemeMode.Light -> false
-    ThemeMode.Dark -> true
-  }
+  val isDark =
+    when (themeMode) {
+      ThemeMode.System -> isSystemInDarkTheme()
+      ThemeMode.Light -> false
+      ThemeMode.Dark -> true
+    }
   val context = LocalContext.current
   val dynamicSeed = remember(context) { dynamicLightColorScheme(context).primary }
   // Sense color dinàmic, el tema Grafit: grisos purs, amb `primary` negre en clar i blanc en fosc.
-  val colorScheme = rememberDynamicColorScheme(
-    seedColor = if (dynamicColor) dynamicSeed else GraphiteSeed,
-    isDark = isDark,
-    style = if (dynamicColor) PaletteStyle.Neutral else GraphiteStyle,
-  ).withFixedError(isDark)
+  val colorScheme =
+    rememberDynamicColorScheme(
+      seedColor = if (dynamicColor) dynamicSeed else GraphiteSeed,
+      isDark = isDark,
+      style = if (dynamicColor) PaletteStyle.Neutral else GraphiteStyle,
+    ).withFixedError(isDark)
 
   CompositionLocalProvider(LocalIsDarkTheme provides isDark, LocalPersonColorTheme provides personColorTheme) {
     MaterialExpressiveTheme(

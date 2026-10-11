@@ -1,17 +1,27 @@
 package com.alorma.contactnotes.ui.entry
 
+import java.time.LocalDateTime
+import java.time.ZoneId
+import java.util.Locale
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
-import java.time.LocalDateTime
-import java.time.ZoneId
-import java.util.Locale
 
 class WhenChoiceTest {
   private val zone = ZoneId.of("Europe/Madrid")
-  private fun millis(year: Int, month: Int, day: Int, hour: Int, minute: Int) =
-    LocalDateTime.of(year, month, day, hour, minute).atZone(zone).toInstant().toEpochMilli()
+
+  private fun millis(
+    year: Int,
+    month: Int,
+    day: Int,
+    hour: Int,
+    minute: Int,
+  ) = LocalDateTime
+    .of(year, month, day, hour, minute)
+    .atZone(zone)
+    .toInstant()
+    .toEpochMilli()
 
   @Test
   fun nowResolvesAtSaveTime() {

@@ -39,16 +39,18 @@ fun ConversesFilterChip(
     },
     modifier = modifier,
     label = { Text(label) },
-    leadingIcon = leadingContent ?: leading?.let { vector ->
-      { Icon(vector, contentDescription = null, modifier = Modifier.size(FilterChipDefaults.IconSize)) }
-    },
+    leadingIcon =
+      leadingContent ?: leading?.let { vector ->
+        { Icon(vector, contentDescription = null, modifier = Modifier.size(FilterChipDefaults.IconSize)) }
+      },
     shape = MaterialTheme.shapes.large,
-    colors = FilterChipDefaults.filterChipColors(
-      containerColor = scheme.surfaceContainerHigh,
-      selectedContainerColor = selectedContainer,
-      selectedLabelColor = selectedContent,
-      selectedLeadingIconColor = selectedContent,
-    ),
+    colors =
+      FilterChipDefaults.filterChipColors(
+        containerColor = scheme.surfaceContainerHigh,
+        selectedContainerColor = selectedContainer,
+        selectedLabelColor = selectedContent,
+        selectedLeadingIconColor = selectedContent,
+      ),
     border = null,
   )
 }

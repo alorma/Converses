@@ -8,6 +8,8 @@ import org.koin.compose.koinInject
 @Composable
 inline fun <reified T : FeatureFlag> rememberFeatureEnabled(): Boolean {
   val flag: T = koinInject()
-  flag.runner.changes.collectAsState().value
+  flag.runner.changes
+    .collectAsState()
+    .value
   return flag.isEnabled()
 }

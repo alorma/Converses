@@ -37,17 +37,18 @@ class FakeDb {
     archived: Boolean = false,
     createdAt: Long = 1_000,
   ): PersonEntity {
-    val person = PersonEntity(
-      id = nextId(),
-      name = name,
-      alias = alias,
-      avatarShape = AvatarShape.Cookie9Sided,
-      avatarColor = AvatarColor.Lavender,
-      isProtected = isProtected,
-      archived = archived,
-      createdAt = createdAt,
-      updatedAt = createdAt,
-    )
+    val person =
+      PersonEntity(
+        id = nextId(),
+        name = name,
+        alias = alias,
+        avatarShape = AvatarShape.Cookie9Sided,
+        avatarColor = AvatarColor.Lavender,
+        isProtected = isProtected,
+        archived = archived,
+        createdAt = createdAt,
+        updatedAt = createdAt,
+      )
     people.update { it + person }
     return person
   }
@@ -59,7 +60,15 @@ class FakeDb {
     text: String = "text",
     occurredAt: Long = 10_000,
   ): EntryEntity {
-    val entry = EntryEntity(id = nextId(), personId = personId, kind = kind, channelType = channel, text = text, occurredAt = occurredAt)
+    val entry =
+      EntryEntity(
+        id = nextId(),
+        personId = personId,
+        kind = kind,
+        channelType = channel,
+        text = text,
+        occurredAt = occurredAt,
+      )
     entries.update { it + entry }
     return entry
   }
@@ -67,7 +76,9 @@ class FakeDb {
   fun person(id: Long): PersonEntity? = people.value.firstOrNull { it.id == id }
 }
 
-class FakePersonDao(private val db: FakeDb) : PersonDao() {
+class FakePersonDao(
+  private val db: FakeDb,
+) : PersonDao() {
   override suspend fun insert(person: PersonEntity): Long {
     val id = if (person.id == 0L) db.nextId() else person.id
     db.people.update { it + person.copy(id = id) }
@@ -98,17 +109,23 @@ class FakePersonDao(private val db: FakeDb) : PersonDao() {
 
   override fun observeList(archived: Boolean): Flow<List<PersonListItem>> =
     combine(db.people, db.entries) { people, entries ->
-      people.filter { it.archived == archived }.map { person ->
-        val last = entries.filter { it.personId == person.id }.maxWithOrNull(compareBy({ it.occurredAt }, { it.id }))
-        PersonListItem(person, last, entries.filter { it.personId == person.id }.map { it.channelType })
-      }.sortedByDescending { it.lastEntry?.occurredAt ?: it.person.createdAt }
+      people
+        .filter { it.archived == archived }
+        .map { person ->
+          val last = entries.filter { it.personId == person.id }.maxWithOrNull(compareBy({ it.occurredAt }, { it.id }))
+          PersonListItem(person, last, entries.filter { it.personId == person.id }.map { it.channelType })
+        }.sortedByDescending { it.lastEntry?.occurredAt ?: it.person.createdAt }
     }
 
-  override suspend fun countAliasConflicts(alias: String, excludeId: Long): Int =
-    db.people.value.count { !it.archived && it.id != excludeId && it.alias.equals(alias, ignoreCase = true) }
+  override suspend fun countAliasConflicts(
+    alias: String,
+    excludeId: Long,
+  ): Int = db.people.value.count { !it.archived && it.id != excludeId && it.alias.equals(alias, ignoreCase = true) }
 }
 
-class FakeEntryDao(private val db: FakeDb) : EntryDao {
+class FakeEntryDao(
+  private val db: FakeDb,
+) : EntryDao {
   override suspend fun insert(entry: EntryEntity): Long {
     val id = if (entry.id == 0L) db.nextId() else entry.id
     db.entries.update { it + entry.copy(id = id) }
@@ -128,21 +145,39 @@ class FakeEntryDao(private val db: FakeDb) : EntryDao {
   override fun observeChannelTypes(personId: Long): Flow<List<ChannelType>> =
     db.entries.map { list -> list.filter { it.personId == personId }.map { it.channelType }.distinct() }
 
-  private fun inRange(e: EntryEntity, personId: Long, channelType: ChannelType, from: Long, to: Long) =
-    e.personId == personId && e.channelType == channelType && e.occurredAt >= from && e.occurredAt < to
+  private fun inRange(
+    e: EntryEntity,
+    personId: Long,
+    channelType: ChannelType,
+    from: Long,
+    to: Long,
+  ) = e.personId == personId && e.channelType == channelType && e.occurredAt >= from && e.occurredAt < to
 
-  override suspend fun deleteInRange(personId: Long, channelType: ChannelType, from: Long, to: Long): Int {
+  override suspend fun deleteInRange(
+    personId: Long,
+    channelType: ChannelType,
+    from: Long,
+    to: Long,
+  ): Int {
     val doomed = db.entries.value.filter { inRange(it, personId, channelType, from, to) }
     db.entries.update { list -> list - doomed.toSet() }
     return doomed.size
   }
 
-  override suspend fun countInRange(personId: Long, channelType: ChannelType, from: Long, to: Long): Int =
-    db.entries.value.count { inRange(it, personId, channelType, from, to) }
+  override suspend fun countInRange(
+    personId: Long,
+    channelType: ChannelType,
+    from: Long,
+    to: Long,
+  ): Int = db.entries.value.count { inRange(it, personId, channelType, from, to) }
 
-  override fun observeTimeline(personId: Long, kinds: Set<EntryKind>): Flow<List<EntryEntity>> =
+  override fun observeTimeline(
+    personId: Long,
+    kinds: Set<EntryKind>,
+  ): Flow<List<EntryEntity>> =
     db.entries.map { list ->
-      list.filter { it.personId == personId && it.kind in kinds }
+      list
+        .filter { it.personId == personId && it.kind in kinds }
         .sortedWith(compareByDescending<EntryEntity> { it.occurredAt }.thenByDescending { it.id })
     }
 
@@ -152,7 +187,9 @@ class FakeEntryDao(private val db: FakeDb) : EntryDao {
     }
 }
 
-class FakePinnedFactDao(private val db: FakeDb) : PinnedFactDao {
+class FakePinnedFactDao(
+  private val db: FakeDb,
+) : PinnedFactDao {
   override fun observeForPerson(personId: Long): Flow<List<PinnedFactEntity>> =
     db.facts.map { list -> list.filter { it.personId == personId }.sortedBy { it.position } }
 }

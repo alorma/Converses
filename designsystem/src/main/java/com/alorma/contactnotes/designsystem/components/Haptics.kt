@@ -2,6 +2,7 @@ package com.alorma.contactnotes.designsystem.components
 
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
@@ -14,7 +15,6 @@ import androidx.compose.ui.hapticfeedback.HapticFeedback
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalHapticFeedback
-import androidx.compose.foundation.layout.RowScope
 
 /**
  * Única font del feedback haptic de l'app. Confirma accions amb efecte (`confirm`), marca errors (`reject`)
@@ -22,7 +22,10 @@ import androidx.compose.foundation.layout.RowScope
  * El sistema ja el silencia si l'usuari té el haptic desactivat.
  */
 @Stable
-class ConversesHaptics(private val feedback: HapticFeedback, private val enabled: Boolean = true) {
+class ConversesHaptics(
+  private val feedback: HapticFeedback,
+  private val enabled: Boolean = true,
+) {
   fun confirm() = perform(HapticFeedbackType.Confirm)
 
   fun reject() = perform(HapticFeedbackType.Reject)
@@ -62,9 +65,10 @@ fun ConversesSaveButton(
 ) {
   val haptics = rememberConversesHaptics()
   Box(
-    modifier = Modifier.pointerInput(enabled) {
-      if (!enabled) detectTapGestures { haptics.reject() }
-    },
+    modifier =
+      Modifier.pointerInput(enabled) {
+        if (!enabled) detectTapGestures { haptics.reject() }
+      },
   ) {
     Button(
       modifier = modifier,

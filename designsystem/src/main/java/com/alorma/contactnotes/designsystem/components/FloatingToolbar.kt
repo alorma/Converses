@@ -57,10 +57,11 @@ fun ToolbarDestination(
     checked = selected,
     onCheckedChange = { onClick() },
     modifier = modifier,
-    colors = IconButtonDefaults.iconToggleButtonColors(
-      checkedContainerColor = MaterialTheme.colorScheme.primary,
-      checkedContentColor = MaterialTheme.colorScheme.onPrimary,
-    ),
+    colors =
+      IconButtonDefaults.iconToggleButtonColors(
+        checkedContainerColor = MaterialTheme.colorScheme.primary,
+        checkedContentColor = MaterialTheme.colorScheme.onPrimary,
+      ),
   ) {
     Icon(imageVector = icon, contentDescription = contentDescription)
   }

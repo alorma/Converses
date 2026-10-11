@@ -9,8 +9,10 @@ import androidx.room.Relation
 import com.alorma.contactnotes.designsystem.components.AvatarColor
 import com.alorma.contactnotes.designsystem.components.AvatarShape
 
-/** L'ordre de declaració és l'ordre fix amb què es mostren els canals, del més habitual al menys. */
-/** Els 5 grups fixos de canals. Els valors es desen pel nom: la migració 1 → 2 va fusionar els antics (WhatsApp, X…) al seu grup. */
+/**
+ * Els 5 grups fixos de canals. L'ordre de declaració és l'ordre fix amb què es mostren, del més habitual al menys.
+ * Els valors es desen pel nom: la migració 1 → 2 va fusionar els antics (WhatsApp, X…) al seu grup.
+ */
 enum class ChannelType { IN_PERSON, PHONE, CHAT, SOCIAL, OTHER }
 
 enum class EntryKind { SAID, HEARD, HAPPENED }
@@ -75,7 +77,10 @@ data class PinnedFactEntity(
   val position: Int,
 )
 
-data class KindCount(val kind: EntryKind, val count: Int)
+data class KindCount(
+  val kind: EntryKind,
+  val count: Int,
+)
 
 data class PersonListItem(
   @Embedded val person: PersonEntity,
