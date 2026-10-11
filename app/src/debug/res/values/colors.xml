@@ -1,7 +1,0 @@
-<resources>
-    <!-- Icona del launcher en vermell per distingir la build debug de la release. -->
-    <color name="ic_launcher_extrusion">#FF7A1F1F</color>
-    <color name="ic_launcher_front">#FFE05252</color>
-    <color name="ic_launcher_highlight">#FFEE8A8A</color>
-    <color name="ic_launcher_lines">#FF591F1F</color>
-</resources>
