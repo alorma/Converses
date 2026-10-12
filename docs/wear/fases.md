@@ -175,7 +175,7 @@ Validada per Bernat amb les proves de l'emulador i els tests; el rellotge físic
 - [ ] Large i Small Round, mida de lletra gran, ambient, ca/es/en.
 - [ ] TalkBack al rellotge.
 - [ ] Rellotge real: bateria, latència, desconnexions, bloqueig i desbloqueig reals.
-- [ ] Release amb R8: Koin, serialització i Data Layer.
+- [x] Release amb R8: Koin, serialització i Data Layer. **Trobat:** `:wear:assembleRelease` no compilava (`WearScaffolds.kt` usa `ui-tooling-preview` i només hi era a debug); arreglat. **Emulador** (parella release mòbil + rellotge signats amb la clau de debug, ids sense `.dev`): els dos arrenquen sense crashes, el mòbil sincronitza una persona i una entrada nova i el rellotge les mostra (Data Layer, serialització, DataStore i desxifrat amb Keystore sota R8). Al mapping hi són el worker, els serveis i els codecs de protocol. **No provat sota R8:** dictat i entrega d'una nota del rellotge al mòbil, aprovació d'una protegida (necessita biometria) → rellotge real/fase 10. Koin no s'usa al rellotge. — `e0ff1ac`
 - [ ] Permisos: només els imprescindibles (`RECORD_AUDIO`).
 - [ ] Comparar la implementació amb `docs/wear/screenshots/` i anotar les diferències.
 
