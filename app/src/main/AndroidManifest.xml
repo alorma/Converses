@@ -33,6 +33,19 @@
                     android:scheme="wear" />
             </intent-filter>
         </service>
+
+        <!-- Rep les notes dictades al rellotge i les desa com a entrades noves -->
+        <service
+            android:name=".data.wear.WearNoteService"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.google.android.gms.wearable.REQUEST_RECEIVED" />
+                <data
+                    android:host="*"
+                    android:pathPrefix="/converses/note"
+                    android:scheme="wear" />
+            </intent-filter>
+        </service>
     </application>
 
 </manifest>

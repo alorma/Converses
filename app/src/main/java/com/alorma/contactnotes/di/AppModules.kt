@@ -18,9 +18,12 @@ import com.alorma.contactnotes.data.settings.DataStoreSettingsRepository
 import com.alorma.contactnotes.data.settings.OnboardingFlag
 import com.alorma.contactnotes.data.settings.SecureWindow
 import com.alorma.contactnotes.data.settings.SettingsRepository
+import com.alorma.contactnotes.data.wear.DataStoreNoteIdRegistry
 import com.alorma.contactnotes.data.wear.GmsWearLink
+import com.alorma.contactnotes.data.wear.NoteIdRegistry
 import com.alorma.contactnotes.data.wear.WearEntriesResponder
 import com.alorma.contactnotes.data.wear.WearLink
+import com.alorma.contactnotes.data.wear.WearNoteReceiver
 import com.alorma.contactnotes.data.wear.WearSnapshotPublisher
 import com.alorma.contactnotes.ui.edit.EditPersonViewModel
 import com.alorma.contactnotes.ui.entry.PersonSelectionBridge
@@ -92,6 +95,8 @@ val wearModule =
   module {
     single<WearLink> { GmsWearLink(androidContext()) }
     single { WearEntriesResponder(repository = get()) }
+    single<NoteIdRegistry> { DataStoreNoteIdRegistry(androidContext()) }
+    single { WearNoteReceiver(repository = get(), registry = get()) }
     single {
       WearSnapshotPublisher(
         repository = get(),
