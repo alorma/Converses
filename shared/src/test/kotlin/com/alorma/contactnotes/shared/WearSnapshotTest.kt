@@ -86,6 +86,11 @@ class WearSnapshotTest {
   }
 
   @Test
+  fun theProtocolVersionIsAlwaysWritten() {
+    assertTrue(""""version":$WEAR_PROTOCOL_VERSION""" in WearSnapshotCodec.encode(snapshot()))
+  }
+
+  @Test
   fun unknownProtocolVersionIsRejected() {
     val raw = """{"version":99,"generatedAt":1,"appLockActive":true,"people":[]}"""
     assertNull(WearSnapshotCodec.decode(raw))

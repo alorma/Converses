@@ -85,9 +85,16 @@ fun WearSnapshot.sanitized(): WearSnapshot =
       },
   )
 
-/** Serialització de l'instantani. Ignora camps nous per ser tolerant amb versions més recents del mòbil. */
+/**
+ * Serialització de l'instantani. Ignora camps nous per ser tolerant amb versions més recents del mòbil, i escriu
+ * també els valors per defecte: la `version` ha de viatjar sempre, encara que coincideixi amb la d'aquesta app.
+ */
 object WearSnapshotCodec {
-  private val json = Json { ignoreUnknownKeys = true }
+  private val json =
+    Json {
+      ignoreUnknownKeys = true
+      encodeDefaults = true
+    }
 
   fun encode(snapshot: WearSnapshot): String = json.encodeToString(WearSnapshot.serializer(), snapshot.sanitized())
 
