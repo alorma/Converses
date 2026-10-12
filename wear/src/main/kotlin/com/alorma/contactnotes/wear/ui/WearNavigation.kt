@@ -27,6 +27,7 @@ import com.alorma.contactnotes.wear.data.AppLockGate
 import com.alorma.contactnotes.wear.data.ApprovalResults
 import com.alorma.contactnotes.wear.data.GmsApprovalClient
 import com.alorma.contactnotes.wear.data.GmsMoreEntriesSource
+import com.alorma.contactnotes.wear.data.GmsNoteSender
 import com.alorma.contactnotes.wear.data.GmsPhoneConnection
 import com.alorma.contactnotes.wear.data.ProtectedSessions
 import com.alorma.contactnotes.wear.data.WearNotes
@@ -84,6 +85,7 @@ fun WearNavigation() {
   val speech = remember { AndroidSpeechSource(context) }
   val outbox = remember { WearNotes.get(context) }
   val approvals = remember { GmsApprovalClient(context) }
+  val directSender = remember { GmsNoteSender(context) }
   val sessions = remember { ProtectedSessions.shared }
   // Una protegida aprovada es veu com una persona normal mentre la seva sessió és oberta, i només en memòria
   val openSnapshots = remember { store.stored.withProtectedSessions(sessions.all) }
@@ -191,7 +193,17 @@ fun WearNavigation() {
               key = "who-${route.personId}",
               factory =
                 viewModelFactory {
-                  initializer { WhoViewModel(route.personId, route.text, openSnapshots, outbox, phone) }
+                  initializer {
+                    WhoViewModel(
+                      route.personId,
+                      route.text,
+                      openSnapshots,
+                      outbox,
+                      phone,
+                      sessions = sessions,
+                      directSender = directSender,
+                    )
+                  }
                 },
             )
           // Després de «Desat» es torna a la cronologia: es treuen «Qui» i el dictat

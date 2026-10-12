@@ -126,6 +126,16 @@ fun WhoScreen(
         onSave = viewModel::save,
         modifier = modifier,
       )
+    // Nota a una protegida que no ha arribat: no s'ha desat enlloc. Es reutilitzen les pantalles 12 i 11 de l'aprovació
+    is WhoUiState.NotSent ->
+      ApprovalContent(
+        state = if (current.phoneMissing) ApprovalUiState.NoPhone else ApprovalUiState.Expired,
+        onCancel = onDone,
+        // «Reintenta» (aprovació caducada): es torna enrere, on es pot tornar a obrir la persona
+        onRetry = onDone,
+        onClose = onDone,
+        modifier = modifier,
+      )
     is WhoUiState.Saved -> {
       LaunchedEffect(Unit) {
         haptics.performHapticFeedback(HapticFeedbackType.Confirm)

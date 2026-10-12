@@ -6,9 +6,14 @@ import com.alorma.contactnotes.shared.EntryKind
 import com.alorma.contactnotes.shared.WearNote
 import com.alorma.contactnotes.shared.WearPerson
 import com.alorma.contactnotes.shared.WearSnapshot
+import com.alorma.contactnotes.wear.data.NoteDelivery
+import com.alorma.contactnotes.wear.data.NoteSender
 import com.alorma.contactnotes.wear.data.NoteSubmitter
 import com.alorma.contactnotes.wear.data.PhoneConnection
+import com.alorma.contactnotes.wear.data.ProtectedSession
+import com.alorma.contactnotes.wear.data.ProtectedSessions
 import com.alorma.contactnotes.wear.data.StoredSnapshot
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -20,6 +25,7 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -111,6 +117,79 @@ class WhoViewModelTest {
       backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { vm.state.collect {} }
       vm.save()
       assertEquals(WhoUiState.Saved(pendingPhone = true), vm.state.value)
+    }
+
+  private val directSent = mutableListOf<WearNote>()
+  private var directAnswer = NoteDelivery.Delivered
+  private val sessions = ProtectedSessions()
+
+  private fun protectedViewModel() =
+    WhoViewModel(
+      1,
+      "  Secret  ",
+      snapshot(person()),
+      outbox,
+      FakePhone(true),
+      clock = { 42L },
+      newId = { "uuid-1" },
+      sessions = sessions,
+      directSender =
+        NoteSender {
+          directSent += it
+          directAnswer
+        },
+    ).also { vm ->
+      sessions.open(ProtectedSession(1, emptyList(), hasMore = false, noteToken = "tok", noteTokenExpiresAt = 99))
+      CoroutineScope(UnconfinedTestDispatcher()).launch { vm.state.collect {} }
+    }
+
+  @Test
+  fun aNoteToAnOpenProtectedPersonGoesStraightToThePhoneWithTheTokenAndNeverToTheQueue() =
+    runTest {
+      val vm = protectedViewModel()
+
+      vm.save()
+
+      assertEquals("tok", directSent.single().approvalToken)
+      assertEquals("Secret", directSent.single().text)
+      assertTrue(submitted.isEmpty())
+      assertEquals(WhoUiState.Saved(pendingPhone = false), vm.state.value)
+    }
+
+  @Test
+  fun aProtectedNoteWithoutPhoneIsNotSavedAnywhere() =
+    runTest {
+      directAnswer = NoteDelivery.Unavailable
+      val vm = protectedViewModel()
+
+      vm.save()
+
+      assertEquals(WhoUiState.NotSent(phoneMissing = true), vm.state.value)
+      assertTrue(submitted.isEmpty())
+    }
+
+  @Test
+  fun aProtectedNoteRejectedByThePhoneIsNotSavedEither() =
+    runTest {
+      directAnswer = NoteDelivery.Rejected
+      val vm = protectedViewModel()
+
+      vm.save()
+
+      assertEquals(WhoUiState.NotSent(phoneMissing = false), vm.state.value)
+      assertTrue(submitted.isEmpty())
+    }
+
+  @Test
+  fun aNormalPersonStillUsesTheQueueAndSendsNoToken() =
+    runTest {
+      val vm = viewModel()
+      backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { vm.state.collect {} }
+
+      vm.save()
+
+      assertNull(submitted.single().approvalToken)
+      assertTrue(directSent.isEmpty())
     }
 
   @Test

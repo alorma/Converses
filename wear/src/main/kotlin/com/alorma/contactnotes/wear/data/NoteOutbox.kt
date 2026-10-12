@@ -24,7 +24,7 @@ enum class NoteDelivery {
 }
 
 /** Envia una nota al mòbil. És una interfície perquè la cua es pugui provar sense Play Services. */
-interface NoteSender {
+fun interface NoteSender {
   suspend fun send(note: WearNote): NoteDelivery
 }
 
