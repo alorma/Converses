@@ -132,7 +132,7 @@ El brief posa el desbloqueig al rellotge i diu que el mòbil serveix les entrade
 
 ### Versionat (`alorma/VersionPlugin`)
 
-El plugin calcula `versionCode` només de `version.properties` (`major·minor·patch` + `1` release / `0` snapshot), així que `:wear` tindria **el mateix `versionCode` que `:app`**, i Play exigeix que sigui únic entre form factors. **Pendent de decidir (fase 1/10):** opció al plugin (`versionCodeOffset` o similar), o compensar-ho al `:wear` (p. ex. el del plugin + 2). El `versionName` pot ser el mateix.
+El plugin calcula `versionCode` només de `version.properties` (`major·minor·patch` + `1` release / `0` snapshot), així que `:wear` tindria **el mateix `versionCode` que `:app`**, i Play exigeix que sigui únic entre form factors. **Decidit:** s'amplia el plugin (1.1.0) amb `appVersion { formFactor = FormFactor.WEAR }` (offset 2 sobre el `versionCode`); `:app` queda en PHONE per defecte, sense canvis. El `versionName` és el mateix. Detall a `docs/wear/fases.md`, fase 0.
 
 ### Publicació a Play (investigat, no tot verificat)
 
