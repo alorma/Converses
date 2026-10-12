@@ -1,4 +1,4 @@
-Versió 1.6.0:
-• Ajustos ara diu quina versió tens i té una secció «Quant a» amb una via per escriure'ns. L'app amb prou feines té dues setmanes i ja guardava secrets. Té mèrit, en el fons.
-• Els interruptors encesos ara porten una marca a dins. Sempre ho han estat, simplement mai ens havíem atrevit a demostrar-ho.
-• A la nota ràpida, el xip «Persona» ara et deixa triar la persona. Fins ara només hi era per fer bonic. Tots hi hem estat.
+Versió 1.7.0:
+• Converses ja té app per a Wear OS. Les teves persones i les últimes notes al canell, on d'aquí a un moment miraves el mòbil igualment.
+• Dicta una nota al rellotge i arriba al mòbil. Si el mòbil és lluny, fa cua i espera el seu torn.
+• Les persones protegides només s'obren al rellotge quan ho aproves amb l'empremta al mòbil.

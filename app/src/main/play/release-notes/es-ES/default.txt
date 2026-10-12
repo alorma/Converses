@@ -1,4 +1,4 @@
-Versión 1.6.0:
-• Ajustes ahora dice qué versión tienes y tiene una sección «Acerca de» con una vía para escribirnos. La app apenas tiene dos semanas y ya guardaba secretos. Tiene mérito, en el fondo.
-• Los interruptores encendidos ahora llevan una marca dentro. Siempre lo estuvieron, simplemente nunca nos atrevimos a demostrarlo.
-• En la nota rápida, el chip «Persona» ahora te deja elegir a la persona. Hasta ahora solo estaba para hacer bonito. Todos hemos estado ahí.
+Versión 1.7.0:
+• Converses ya tiene app para Wear OS. Tus personas y sus últimas notas en la muñeca, donde ibas a mirar el móvil igualmente.
+• Dicta una nota en el reloj y llega al móvil. Si el móvil está lejos, hace cola y espera su turno.
+• Las personas protegidas solo se abren en el reloj cuando lo apruebas con la huella en el móvil.
