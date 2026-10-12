@@ -1,4 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Converses</string>
+
+    <!-- Reutilitzats del mòbil (mateixes claus i textos) -->
+    <string name="yesterday">Ayer</string>
+    <string name="channel_chat">Chat</string>
+    <string name="channel_social">Redes</string>
+    <string name="channel_other">Otros</string>
+    <string name="channel_phone">Teléfono</string>
+    <string name="channel_in_person">En persona</string>
+    <string name="save">Guardar</string>
+    <string name="entry_who_me">Yo</string>
+    <string name="entry_who_note">Apunte</string>
+
+    <!-- Nous del rellotge -->
+    <string name="note_button">Nota</string>
+    <string name="dictate_finish">Terminar</string>
+    <string name="who_title">¿Quién lo ha dicho?</string>
+    <string name="note_for">Nota para %1$s</string>
+    <string name="saved_title">Guardado</string>
+    <string name="saved_sent">Enviada al móvil</string>
+    <string name="saved_pending">Se enviará al móvil cuando haya conexión</string>
+    <string name="phone_not_connected">Móvil no conectado</string>
+    <string name="data_from_minutes">Datos de hace %1$d min</string>
+    <string name="protected_person_title">Persona protegida</string>
+    <string name="protected_person_hint">Desbloquéala con el PIN del reloj.</string>
+    <string name="unlock">Desbloquear</string>
+    <string name="lock_required_title">Hace falta un bloqueo</string>
+    <string name="lock_required_hint">Activa un PIN en el reloj.</string>
+    <string name="lock_required_action">Configurar</string>
 </resources>

@@ -1,4 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Converses</string>
+
+    <!-- Reutilitzats del mòbil (mateixes claus i textos) -->
+    <string name="yesterday">Yesterday</string>
+    <string name="channel_chat">Chat</string>
+    <string name="channel_social">Social</string>
+    <string name="channel_other">Other</string>
+    <string name="channel_phone">Phone</string>
+    <string name="channel_in_person">In person</string>
+    <string name="save">Save</string>
+    <string name="entry_who_me">Me</string>
+    <string name="entry_who_note">Note</string>
+
+    <!-- Nous del rellotge -->
+    <string name="note_button">Note</string>
+    <string name="dictate_finish">Done</string>
+    <string name="who_title">Who said it?</string>
+    <string name="note_for">Note for %1$s</string>
+    <string name="saved_title">Saved</string>
+    <string name="saved_sent">Sent to your phone</string>
+    <string name="saved_pending">It will be sent to your phone when it\'s connected</string>
+    <string name="phone_not_connected">Phone not connected</string>
+    <string name="data_from_minutes">Data from %1$d min ago</string>
+    <string name="protected_person_title">Protected person</string>
+    <string name="protected_person_hint">Unlock it with your watch PIN.</string>
+    <string name="unlock">Unlock</string>
+    <string name="lock_required_title">Lock required</string>
+    <string name="lock_required_hint">Set a PIN on your watch.</string>
+    <string name="lock_required_action">Set up</string>
 </resources>
