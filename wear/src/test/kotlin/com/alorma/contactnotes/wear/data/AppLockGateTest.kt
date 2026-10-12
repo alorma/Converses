@@ -3,6 +3,9 @@ package com.alorma.contactnotes.wear.data
 import com.alorma.contactnotes.shared.WearSnapshot
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -68,6 +71,25 @@ class AppLockGateTest {
       gate.recheck()
 
       assertTrue(gate.lockRequired.first())
+      assertEquals(1, purges)
+    }
+
+  @Test
+  fun theAppLockSwitchedOnOrOffWhileTheWatchIsOpenIsPickedUpFromTheNextSnapshot() =
+    runTest {
+      var purges = 0
+      val snapshots = MutableStateFlow<StoredSnapshot?>(stored(false))
+      val gate = AppLockGate(snapshots, { false }) { purges++ }
+      val seen = mutableListOf<Boolean>()
+      backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { gate.lockRequired.toList(seen) }
+      assertEquals(listOf(false), seen)
+
+      snapshots.value = stored(true)
+      assertEquals(listOf(false, true), seen)
+      assertEquals(1, purges)
+
+      snapshots.value = stored(false)
+      assertEquals(listOf(false, true, false), seen)
       assertEquals(1, purges)
     }
 }
