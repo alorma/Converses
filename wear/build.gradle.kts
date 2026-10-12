@@ -3,6 +3,7 @@ import com.android.compose.screenshot.tasks.PreviewScreenshotValidationTask
 plugins {
   alias(libs.plugins.android.application)
   alias(libs.plugins.kotlin.compose)
+  alias(libs.plugins.kotlin.serialization)
   alias(libs.plugins.compose.screenshot)
   alias(libs.plugins.version)
 }
@@ -77,6 +78,13 @@ dependencies {
   implementation(libs.androidx.graphics.shapes)
   implementation(libs.wear.compose.foundation)
   implementation(libs.wear.compose.material3)
+  implementation(libs.wear.compose.navigation3)
+  implementation(libs.wear.navigation3.runtime)
+  implementation(libs.wear.navigation3.ui)
+  implementation(libs.androidx.lifecycle.viewmodel.navigation3)
+  implementation(libs.androidx.lifecycle.viewmodel.compose)
+  implementation(libs.androidx.lifecycle.runtime.compose)
+  implementation(libs.kotlinx.serialization.json)
   implementation(libs.wear.tooling.preview)
   implementation(libs.androidx.datastore.preferences)
   implementation(libs.kotlinx.coroutines.android)
