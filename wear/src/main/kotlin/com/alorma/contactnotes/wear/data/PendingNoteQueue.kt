@@ -22,6 +22,9 @@ interface PendingNoteQueue {
 
   suspend fun remove(id: String)
 
+  /** Esborra les notes de qualsevol persona que no sigui a [personIds]. Retorna quantes n'ha esborrat. */
+  suspend fun retainOnly(personIds: Set<Long>): Int
+
   /** Esborra tota la cua: passa quan cal bloqueig al rellotge i no en té. Les notes es perden. */
   suspend fun clear()
 }
@@ -47,6 +50,17 @@ class DataStorePendingNoteQueue(
       val notes = read(prefs[QueueKey])
       if (notes.any { it.id == id }) prefs[QueueKey] = write(notes.filterNot { it.id == id })
     }
+  }
+
+  override suspend fun retainOnly(personIds: Set<Long>): Int {
+    var dropped = 0
+    dataStore.edit { prefs ->
+      val notes = read(prefs[QueueKey])
+      val kept = notes.filter { it.personId in personIds }
+      dropped = notes.size - kept.size
+      if (dropped > 0) prefs[QueueKey] = write(kept)
+    }
+    return dropped
   }
 
   override suspend fun clear() {

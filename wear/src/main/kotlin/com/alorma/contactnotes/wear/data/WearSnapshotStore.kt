@@ -26,6 +26,9 @@ data class StoredSnapshot(
  * Si el Bloqueig de l'app és actiu i el rellotge no té bloqueig de pantalla, no es desa res i s'esborra el que hi
  * hagués ([AppLockGate]), i també la cua de notes pendents ([onLockRequired]): sense bloqueig no en queda cap text.
  *
+ * En cada sincronització, les notes encuades de persones que ja són protegides o que ja no hi són es descarten
+ * ([onPeopleSynced]): una protegida no pot tenir text al disc del rellotge (R3, R4).
+ *
  * L'instantani es desa **xifrat** ([cipher], Keystore): amb el rellotge bloquejat és il·legible. Si no es pot xifrar,
  * no es desa res i es conserva la còpia anterior; si no es pot desxifrar, la còpia es tracta com si no hi fos.
  */
@@ -34,6 +37,7 @@ class WearSnapshotStore(
   private val deviceLock: DeviceLock,
   private val cipher: SnapshotCipher,
   private val onLockRequired: suspend () -> Unit = {},
+  private val onPeopleSynced: suspend (Set<Long>) -> Unit = {},
   private val clock: () -> Long = System::currentTimeMillis,
 ) {
   val stored: Flow<StoredSnapshot?> =
@@ -63,6 +67,12 @@ class WearSnapshotStore(
       // Clau de l'època sense xifratge, que quedava en clar
       prefs.remove(LegacySnapshotKey)
     }
+    onPeopleSynced(
+      snapshot.people
+        .filterNot { it.isProtected }
+        .map { it.id }
+        .toSet(),
+    )
     return true
   }
 
@@ -106,6 +116,7 @@ class WearSnapshotStore(
           AndroidDeviceLock(context),
           KeystoreSnapshotCipher(),
           onLockRequired = { DataStorePendingNoteQueue.get(context).clear() },
+          onPeopleSynced = { DataStorePendingNoteQueue.get(context).retainOnly(it) },
         ).also { instance = it }
       }
   }

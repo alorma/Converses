@@ -29,6 +29,12 @@ private class MemoryQueue : PendingNoteQueue {
     notes.removeAll { it.id == id }
   }
 
+  override suspend fun retainOnly(personIds: Set<Long>): Int {
+    val before = notes.size
+    notes.removeAll { it.personId !in personIds }
+    return before - notes.size
+  }
+
   override suspend fun clear() {
     notes.clear()
   }
@@ -61,7 +67,8 @@ class NoteOutboxTest {
   private fun note(
     id: String,
     text: String = "text $id",
-  ) = WearNote(id = id, personId = 1, who = EntryKind.SAID, text = text, timestamp = 1_000)
+    personId: Long = 1,
+  ) = WearNote(id = id, personId = personId, who = EntryKind.SAID, text = text, timestamp = 1_000)
 
   @Test
   fun submitStoresTheNoteAndSchedulesTheDelivery() =
@@ -147,5 +154,36 @@ class NoteOutboxTest {
       queue.add(note("b"))
       queue.clear()
       assertEquals(emptyList<WearNote>(), queue.all())
+    }
+
+  @Test
+  fun dataStoreQueueRetainOnlyDropsTheNotesOfOtherPeople() =
+    runTest {
+      val queue =
+        DataStorePendingNoteQueue(
+          PreferenceDataStoreFactory.create(scope = scope) { folder.newFile("retain.preferences_pb") },
+        )
+      queue.add(note("a", personId = 1))
+      queue.add(note("b", personId = 2))
+      queue.add(note("c", personId = 1))
+
+      assertEquals(1, queue.retainOnly(setOf(1)))
+      assertEquals(listOf("a", "c"), queue.all().map { it.id })
+      assertEquals(0, queue.retainOnly(setOf(1)))
+    }
+
+  @Test
+  fun aRetriedNoteAfterARestartIsNotDuplicated() =
+    runTest {
+      outbox.submit(note("a"))
+      sender.answer = { NoteDelivery.Unavailable }
+      assertFalse(outbox.deliverAll())
+
+      val restarted = NoteOutbox(queue, sender) { scheduled++ }
+      restarted.submit(note("a"))
+      sender.answer = { NoteDelivery.Delivered }
+
+      assertTrue(restarted.deliverAll())
+      assertEquals(emptyList<WearNote>(), queue.notes)
     }
 }
