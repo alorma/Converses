@@ -10,6 +10,7 @@ import com.alorma.contactnotes.data.db.PinnedFactDao
 import com.alorma.contactnotes.data.db.PinnedFactEntity
 import com.alorma.contactnotes.shared.ChannelType
 import com.alorma.contactnotes.shared.EntryKind
+import com.alorma.contactnotes.shared.WEAR_MAX_ENTRIES_PER_PERSON
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
@@ -41,6 +42,10 @@ class ConversesRepository(
   ): Flow<List<EntryEntity>> = entryDao.observeTimeline(personId, kinds)
 
   fun observeCounts(personId: Long): Flow<List<KindCount>> = entryDao.observeCounts(personId)
+
+  /** Últimes entrades de les persones visibles i no protegides, per a l'instantani del rellotge. */
+  fun observeRecentEntriesForWear(limit: Int = WEAR_MAX_ENTRIES_PER_PERSON): Flow<List<EntryEntity>> =
+    entryDao.observeRecentForWear(limit)
 
   suspend fun savePerson(
     person: PersonEntity,
