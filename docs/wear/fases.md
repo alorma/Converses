@@ -170,7 +170,7 @@ Validada per Bernat amb les proves de l'emulador i els tests; el rellotge físic
 
 ## Fase 9 · Qualitat, privacitat i accessibilitat
 
-- [ ] Repàs de privacitat de punta a punta: res de protegides al disc del rellotge (còpia, logs, backup, notificacions). Test que ho comprova.
+- [x] Repàs de privacitat de punta a punta: res de protegides al disc del rellotge (còpia, logs, backup, notificacions). Test que ho comprova (`PrivacyAuditTest`: un instantani amb contingut d'una protegida no arriba al fitxer ni amb un xifrat que deixi el text en clar, i el codi del rellotge no usa logs, notificacions ni altre emmagatzematge). **Emulador:** `files/` només té la còpia xifrada i la cua buida, la base de WorkManager no duu text de notes i les notes a protegides ja no passen per la cua (WhoViewModel). — `0a39811`
 - [ ] Còpia i cua fora del backup d'Android.
 - [ ] Large i Small Round, mida de lletra gran, ambient, ca/es/en.
 - [ ] TalkBack al rellotge.
