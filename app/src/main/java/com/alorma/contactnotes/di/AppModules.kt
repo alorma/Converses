@@ -18,19 +18,20 @@ import com.alorma.contactnotes.data.settings.DataStoreSettingsRepository
 import com.alorma.contactnotes.data.settings.OnboardingFlag
 import com.alorma.contactnotes.data.settings.SecureWindow
 import com.alorma.contactnotes.data.settings.SettingsRepository
+import com.alorma.contactnotes.data.wear.AndroidApprovalNotifier
 import com.alorma.contactnotes.data.wear.ApprovalNotifier
 import com.alorma.contactnotes.data.wear.ApprovalResultSender
 import com.alorma.contactnotes.data.wear.ApprovalTokens
 import com.alorma.contactnotes.data.wear.DataStoreNoteIdRegistry
 import com.alorma.contactnotes.data.wear.GmsApprovalResultSender
 import com.alorma.contactnotes.data.wear.GmsWearLink
-import com.alorma.contactnotes.data.wear.NoApprovalNotifier
 import com.alorma.contactnotes.data.wear.NoteIdRegistry
 import com.alorma.contactnotes.data.wear.WearApprovalCoordinator
 import com.alorma.contactnotes.data.wear.WearEntriesResponder
 import com.alorma.contactnotes.data.wear.WearLink
 import com.alorma.contactnotes.data.wear.WearNoteReceiver
 import com.alorma.contactnotes.data.wear.WearSnapshotPublisher
+import com.alorma.contactnotes.ui.approval.ApprovalViewModel
 import com.alorma.contactnotes.ui.edit.EditPersonViewModel
 import com.alorma.contactnotes.ui.entry.PersonSelectionBridge
 import com.alorma.contactnotes.ui.entry.QuickNoteViewModel
@@ -92,6 +93,7 @@ val viewModelModule =
     viewModelOf(::SettingsViewModel)
     viewModel { (personId: Long) -> PersonViewModel(personId, get()) }
     viewModel { PersonLockViewModel() }
+    viewModel { (requestId: String) -> ApprovalViewModel(requestId, get()) }
     viewModel { (personId: Long) -> PersonDetailViewModel(personId, get(), get()) }
     viewModel { (personId: Long) -> QuickNoteViewModel(personId, get(), get()) }
     viewModel { (personId: Long) -> EditPersonViewModel(personId, get(), get()) }
@@ -102,7 +104,7 @@ val wearModule =
     single<WearLink> { GmsWearLink(androidContext()) }
     single { WearEntriesResponder(repository = get()) }
     single { ApprovalTokens() }
-    single<ApprovalNotifier> { NoApprovalNotifier }
+    single<ApprovalNotifier> { AndroidApprovalNotifier(androidContext()) }
     single<ApprovalResultSender> { GmsApprovalResultSender(androidContext()) }
     single {
       WearApprovalCoordinator(repository = get(), notifier = get(), sender = get(), tokens = get())

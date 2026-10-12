@@ -226,4 +226,17 @@
     <string name="shape_sunny">Sol</string>
     <string name="shape_ghost">Fantasma</string>
     <string name="shape_pillow">Coixí</string>
+
+    <!-- Aprovació d'una persona protegida demanada des del rellotge: genèrica, sense el nom de ningú -->
+    <string name="approval_channel_name">Aprovacions del rellotge</string>
+    <string name="approval_notification_title">El rellotge demana obrir una persona protegida</string>
+    <string name="approval_title">El rellotge vol obrir una persona protegida</string>
+    <string name="approval_hint">Confirma que ets tu amb l\'empremta.</string>
+    <string name="approval_confirm">Confirma</string>
+    <string name="approval_deny">Denega</string>
+    <string name="approval_prompt_title">Confirma l\'accés</string>
+    <string name="approval_prompt_subtitle">Obre una persona protegida al rellotge.</string>
+    <string name="approval_done_title">Fet</string>
+    <string name="approval_done_body">Ja pots veure la persona al rellotge.</string>
+    <string name="approval_failed">No s\'ha pogut completar la petició</string>
 </resources>

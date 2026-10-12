@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <!-- Per avisar que el rellotge demana obrir una persona protegida (Android 13+) -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
     <application
         android:name=".ConversesApp"
         android:allowBackup="true"
@@ -20,6 +23,13 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!-- S'obre en tocar la notificació d'aprovació; fora de l'historial i de la tasca principal -->
+        <activity
+            android:name=".ui.approval.ApprovalActivity"
+            android:excludeFromRecents="true"
+            android:exported="false"
+            android:taskAffinity="" />
 
         <!-- Respon les peticions de «més entrades» del rellotge (només persones no protegides) -->
         <service

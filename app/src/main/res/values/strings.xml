@@ -227,4 +227,17 @@
     <string name="shape_sunny">Sun</string>
     <string name="shape_ghost">Ghost</string>
     <string name="shape_pillow">Pillow</string>
+
+    <!-- Aprovació d'una persona protegida demanada des del rellotge: genèrica, sense el nom de ningú -->
+    <string name="approval_channel_name">Watch approvals</string>
+    <string name="approval_notification_title">The watch is asking to open a protected person</string>
+    <string name="approval_title">The watch wants to open a protected person</string>
+    <string name="approval_hint">Confirm it\'s you with your fingerprint.</string>
+    <string name="approval_confirm">Confirm</string>
+    <string name="approval_deny">Deny</string>
+    <string name="approval_prompt_title">Confirm access</string>
+    <string name="approval_prompt_subtitle">Opens a protected person on the watch.</string>
+    <string name="approval_done_title">Done</string>
+    <string name="approval_done_body">You can now see the person on the watch.</string>
+    <string name="approval_failed">Couldn\'t complete the request</string>
 </resources>

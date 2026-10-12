@@ -226,4 +226,17 @@
     <string name="shape_sunny">Sol</string>
     <string name="shape_ghost">Fantasma</string>
     <string name="shape_pillow">Cojín</string>
+
+    <!-- Aprobación de una persona protegida pedida desde el reloj: genérica, sin el nombre de nadie -->
+    <string name="approval_channel_name">Aprobaciones del reloj</string>
+    <string name="approval_notification_title">El reloj pide abrir una persona protegida</string>
+    <string name="approval_title">El reloj quiere abrir una persona protegida</string>
+    <string name="approval_hint">Confirma que eres tú con la huella.</string>
+    <string name="approval_confirm">Confirmar</string>
+    <string name="approval_deny">Denegar</string>
+    <string name="approval_prompt_title">Confirma el acceso</string>
+    <string name="approval_prompt_subtitle">Abre una persona protegida en el reloj.</string>
+    <string name="approval_done_title">Hecho</string>
+    <string name="approval_done_body">Ya puedes ver a la persona en el reloj.</string>
+    <string name="approval_failed">No se pudo completar la petición</string>
 </resources>
