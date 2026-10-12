@@ -27,9 +27,9 @@ Com es treballa cada fase (tasques, commits, validació, proposta d'inici): `.cl
 
 Sense codi de producte.
 
-- [x] **P0:** aprovació al mòbil amb empremta, vigència de 5 min i notificació com a camí (decidit).
-- [x] Decidir si la vigència és un ajust (Ajustos → Seguretat) o queda fixa a 5 min (P11): fixa a 5 min.
-- [ ] Demanar el disseny de les pantalles noves (P12) **quan s'arribi a la fase 5**, no abans.
+- [x] **P0:** aprovació al mòbil amb empremta i notificació com a camí (decidit); revisat amb el disseny: sense credencial al rellotge i una aprovació nova a cada obertura.
+- [x] Decidir si la vigència és un ajust (Ajustos → Seguretat) o queda fixa a 5 min (P11): es va fixar a 5 min, i després **es descarta**: aprovació nova a cada obertura.
+- [x] Demanar el disseny de les pantalles noves (P12): rebut el 12 d'oct. de 2026 (`docs/wear/handoff/`).
 - [x] Tancar P1, P6, P7, P9, P11, P14 i P15 (vegeu `README.md`).
 - [x] Consultar la documentació oficial: Wear Compose Material 3 i navegació, Data Layer (`play-services-wearable`), `EdgeButton`, `TransformingLazyColumn`, reconeixement de veu i requisits de Play per a apps de Wear. Versions anotades al `README.md` i afegides al version catalog.
 - [x] **Versionat:** s'amplia `alorma/VersionPlugin` (1.1.0, encara no publicada) amb `appVersion { formFactor = FormFactor.WEAR }`: enum PHONE=0 (per defecte), WEAR=2, TV=4, AUTOMOTIVE=6, i `versionCode` = base + offset (1.2.3 → 10020031; WEAR → 10020033). `:app` no canvia. Document inicial: `~/projects/personal/VersionPlugin/docs/version-code-offset.md` (parlava de `versionCodeOffset`; el disseny final és `formFactor`). **Resolt a la fase 1** (1.1.0 publicada i integrada).
@@ -110,14 +110,15 @@ Depèn de **P0** i **P10**.
 - [ ] La cua de pendents i «més entrades» segueixen les mateixes regles.
 
 **Persones protegides**
-- [ ] **Disseny (P12):** abans de començar, demanar les pantalles noves de protegides i la notificació/flux al mòbil.
-- [ ] Pantalla 7 amb «Desbloqueja» → credencial de dispositiu; vigència de 5 min (P11).
-- [ ] **Aprovació al mòbil (P0):** petició amb identificador d'un sol ús i caducitat (~60 s) → pantalla «Confirma-ho al mòbil» → notificació genèrica al mòbil → `BiometricPrompt` → resposta amb les entrades només d'aquella persona. Denegat i caducat gestionats.
+- [x] **Disseny (P12):** rebut (pantalles 7, 10–12 al rellotge i 13–16 al mòbil).
+- [ ] Toc a una protegida → pantalla 7 «Confirma-ho al mòbil» (compte enrere ~60 s, «Cancel·la»). Sense credencial al rellotge i sense finestra de vigència: una aprovació nova a cada obertura (P0, P11).
+- [ ] **Aprovació al mòbil (P0):** petició amb identificador d'un sol ús i caducitat (~60 s) → notificació genèrica (13) → «Confirma» / «Denega» (14) → `BiometricPrompt` (15) → «Fet» (16) → resposta amb les entrades només d'aquella persona. «Denegat» (10) i «Ha caducat» (11, amb «Reintenta») al rellotge.
+- [ ] Mòbil: petició caducada oberta des de la notificació, o cancel·lada al rellotge amb el prompt obert: tanca la pantalla amb un missatge breu («No s'ha pogut completar la petició»), sense nom.
 - [ ] Limitar la freqüència de peticions i no registrar contingut.
 - [ ] Testimoni de vigència curta per a notes a protegides; el mòbil rebutja les que no en tenen un de vàlid.
 - [ ] Mostrar les entrades **només en memòria**; esborrar-les en sortir o amb l'app en segon pla.
-- [ ] Sense mòbil després del desbloqueig: «No disponible sense el mòbil» (P12).
-- [ ] Gravar una nota a una protegida només després del desbloqueig.
+- [ ] Sense mòbil: pantalla 12 «No disponible sense el mòbil».
+- [ ] Gravar una nota a una protegida només dins una sessió aprovada.
 - [ ] Al mòbil: servir les entrades d'una protegida **només amb una aprovació biomètrica vàlida** (P0).
 - [ ] Tests de JVM: res d'una protegida al disc ni a la còpia, esborrat en sortir, estat del bloqueig, assumir actiu; una petició sense aprovació, caducada o repetida no serveix res; una nota a protegida sense testimoni vàlid es rebutja.
 
