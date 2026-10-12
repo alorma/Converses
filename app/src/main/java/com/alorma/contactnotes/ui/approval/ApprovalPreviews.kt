@@ -4,17 +4,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import com.alorma.contactnotes.designsystem.preview.ConversesPreviewTheme
 
+@Preview
 @Composable
-private fun ApprovalPreview(state: ApprovalUiState) {
+internal fun ApprovalConfirmPreview() {
   ConversesPreviewTheme {
-    ApprovalContent(state = state, onConfirm = {}, onDeny = {}, onClose = {})
+    ApprovalContent(onConfirm = {}, onDeny = {}, onClose = {})
   }
 }
-
-@Preview
-@Composable
-internal fun ApprovalConfirmPreview() = ApprovalPreview(ApprovalUiState.Confirm)
-
-@Preview
-@Composable
-internal fun ApprovalDonePreview() = ApprovalPreview(ApprovalUiState.Done)

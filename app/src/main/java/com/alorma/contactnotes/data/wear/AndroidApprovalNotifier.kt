@@ -7,13 +7,17 @@ import android.app.PendingIntent
 import android.content.Context
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.ProcessLifecycleOwner
 import com.alorma.contactnotes.R
 import com.alorma.contactnotes.shared.WEAR_APPROVAL_TTL_MS
 import com.alorma.contactnotes.ui.approval.ApprovalActivity
 
 /**
- * Notificació d'aprovació: **genèrica, sense nom** ni cap contingut, perquè no filtri res a la pantalla de bloqueig.
- * En tocar-la s'obre [ApprovalActivity] amb l'identificador de la petició; caduca sola amb la petició.
+ * Avís d'aprovació. Amb l'app en primer pla s'obre [ApprovalActivity] directament; en segon pla, una notificació
+ * **genèrica, sense nom** ni cap contingut, perquè no filtri res a la pantalla de bloqueig (Android no deixa obrir
+ * activitats des d'un servei en segon pla). En tocar-la s'obre [ApprovalActivity] amb l'identificador de la petició;
+ * caduca sola amb la petició.
  */
 class AndroidApprovalNotifier(
   context: Context,
@@ -22,6 +26,15 @@ class AndroidApprovalNotifier(
 
   @SuppressLint("MissingPermission")
   override fun show(requestId: String) {
+    // Amb l'app en primer pla l'usuari ja és aquí: s'obre l'aprovació directament, sense notificació
+    if (ProcessLifecycleOwner
+        .get()
+        .lifecycle.currentState
+        .isAtLeast(Lifecycle.State.STARTED)
+    ) {
+      appContext.startActivity(ApprovalActivity.intent(appContext, requestId))
+      return
+    }
     val manager = NotificationManagerCompat.from(appContext)
     // Sense permís de notificacions (Android 13+) o amb elles apagades, no es pot avisar: la petició caducarà
     if (!manager.areNotificationsEnabled()) return

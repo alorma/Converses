@@ -8,18 +8,18 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-/** Estat de la pantalla d'aprovació. No porta mai res de la persona: ni el nom ni cap contingut. */
+/** Estat de l'aprovació. No porta mai res de la persona: ni el nom ni cap contingut. */
 sealed interface ApprovalUiState {
-  /** Espera que l'usuari toqui «Confirma» (que obre el `BiometricPrompt`) o «Denega». */
-  data object Confirm : ApprovalUiState
+  /** El `BiometricPrompt` és obert (o s'està obrint): no es mostra cap pantalla pròpia. */
+  data object Prompting : ApprovalUiState
 
-  /** Aprovada: el rellotge ja té les entrades. */
-  data object Done : ApprovalUiState
+  /** L'usuari ha cancel·lat el prompt: ara sí que es veu la pantalla amb «Confirma» (reobre el prompt) i «Denega». */
+  data object Confirm : ApprovalUiState
 
   /** La petició ja no es pot completar (caducada, cancel·lada al rellotge o desconeguda): es tanca amb un missatge. */
   data object Failed : ApprovalUiState
 
-  /** Denegada o descartada: la pantalla es tanca sense missatge. */
+  /** Aprovada o denegada: la pantalla es tanca sense missatge (després d'aprovar no cal cap pantalla de «Fet»). */
   data object Closed : ApprovalUiState
 }
 
@@ -27,24 +27,41 @@ class ApprovalViewModel(
   private val requestId: String,
   private val coordinator: WearApprovalCoordinator,
 ) : ViewModel() {
+  // Una petició caducada, cancel·lada o repetida (p. ex. en obrir una notificació antiga) no té res a aprovar
   private val _state =
     MutableStateFlow<ApprovalUiState>(
-      // Una petició caducada, cancel·lada o repetida (p. ex. en obrir una notificació antiga) no té res a aprovar
-      if (coordinator.isPending(requestId)) ApprovalUiState.Confirm else ApprovalUiState.Failed,
+      if (coordinator.isPending(requestId)) ApprovalUiState.Prompting else ApprovalUiState.Failed,
     )
   val state: StateFlow<ApprovalUiState> = _state.asStateFlow()
 
+  private var promptRequested = _state.value == ApprovalUiState.Prompting
+
+  /** L'activitat el crida en veure [ApprovalUiState.Prompting]: només un cop per intent (girar la pantalla no reobre res). */
+  fun takePromptRequest(): Boolean = promptRequested.also { promptRequested = false }
+
   /** La biometria ha anat bé. */
   fun onAuthenticated() {
-    if (_state.value != ApprovalUiState.Confirm) return
+    if (_state.value == ApprovalUiState.Closed || _state.value == ApprovalUiState.Failed) return
     viewModelScope.launch {
-      _state.value = if (coordinator.approve(requestId)) ApprovalUiState.Done else ApprovalUiState.Failed
+      _state.value = if (coordinator.approve(requestId)) ApprovalUiState.Closed else ApprovalUiState.Failed
     }
   }
 
-  /** «Denega», cancel·lar el prompt o fallar la biometria: el rellotge rep «Denegat». */
-  fun onDeny() {
+  /** L'usuari ha cancel·lat el prompt (o ha fallat): se li ofereix confirmar de nou o denegar, no es denega sense més. */
+  fun onPromptCancelled() {
+    if (_state.value == ApprovalUiState.Prompting) _state.value = ApprovalUiState.Confirm
+  }
+
+  /** «Confirma» a la pantalla: es reobre el prompt. */
+  fun onRetry() {
     if (_state.value != ApprovalUiState.Confirm) return
+    promptRequested = true
+    _state.value = ApprovalUiState.Prompting
+  }
+
+  /** «Denega»: el rellotge rep «Denegat». També quan el dispositiu no té biometria ni bloqueig de pantalla. */
+  fun onDeny() {
+    if (_state.value == ApprovalUiState.Closed || _state.value == ApprovalUiState.Failed) return
     viewModelScope.launch {
       coordinator.deny(requestId)
       _state.value = ApprovalUiState.Closed

@@ -236,7 +236,5 @@
     <string name="approval_deny">Denega</string>
     <string name="approval_prompt_title">Confirma l\'accés</string>
     <string name="approval_prompt_subtitle">Obre una persona protegida al rellotge.</string>
-    <string name="approval_done_title">Fet</string>
-    <string name="approval_done_body">Ja pots veure la persona al rellotge.</string>
     <string name="approval_failed">No s\'ha pogut completar la petició</string>
 </resources>
