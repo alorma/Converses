@@ -17,6 +17,9 @@ const val WEAR_APPROVAL_RESULT_PATH = "/converses/approval/result"
 /** Vigència d'una petició: passat aquest temps el mòbil la tracta com a caducada. El temps el valida el mòbil. */
 const val WEAR_APPROVAL_TTL_MS = 60_000L
 
+/** Vigència del testimoni que dona una aprovació per a notes a aquella persona: una nota encuada més tard es rebutja. */
+const val WEAR_NOTE_TOKEN_TTL_MS = 5 * 60_000L
+
 /**
  * Petició d'aprovació d'una persona protegida. [requestId] és un UUID d'un sol ús: cada intent (també «Reintenta»)
  * en porta un de nou, i una aprovació no es reutilitza mai.

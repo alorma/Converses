@@ -18,9 +18,15 @@ import com.alorma.contactnotes.data.settings.DataStoreSettingsRepository
 import com.alorma.contactnotes.data.settings.OnboardingFlag
 import com.alorma.contactnotes.data.settings.SecureWindow
 import com.alorma.contactnotes.data.settings.SettingsRepository
+import com.alorma.contactnotes.data.wear.ApprovalNotifier
+import com.alorma.contactnotes.data.wear.ApprovalResultSender
+import com.alorma.contactnotes.data.wear.ApprovalTokens
 import com.alorma.contactnotes.data.wear.DataStoreNoteIdRegistry
+import com.alorma.contactnotes.data.wear.GmsApprovalResultSender
 import com.alorma.contactnotes.data.wear.GmsWearLink
+import com.alorma.contactnotes.data.wear.NoApprovalNotifier
 import com.alorma.contactnotes.data.wear.NoteIdRegistry
+import com.alorma.contactnotes.data.wear.WearApprovalCoordinator
 import com.alorma.contactnotes.data.wear.WearEntriesResponder
 import com.alorma.contactnotes.data.wear.WearLink
 import com.alorma.contactnotes.data.wear.WearNoteReceiver
@@ -95,6 +101,12 @@ val wearModule =
   module {
     single<WearLink> { GmsWearLink(androidContext()) }
     single { WearEntriesResponder(repository = get()) }
+    single { ApprovalTokens() }
+    single<ApprovalNotifier> { NoApprovalNotifier }
+    single<ApprovalResultSender> { GmsApprovalResultSender(androidContext()) }
+    single {
+      WearApprovalCoordinator(repository = get(), notifier = get(), sender = get(), tokens = get())
+    }
     single<NoteIdRegistry> { DataStoreNoteIdRegistry(androidContext()) }
     single { WearNoteReceiver(repository = get(), registry = get()) }
     single {
