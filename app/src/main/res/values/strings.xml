@@ -42,6 +42,8 @@
     <string name="settings_person_color_summary">Each person\'s screens take the color of their avatar</string>
     <string name="settings_haptic">Haptic feedback</string>
     <string name="settings_haptic_summary">Vibrates when you save, switch or confirm</string>
+    <string name="settings_watch_notifications">Watch notifications</string>
+    <string name="settings_watch_notifications_summary">Shows a notification when your watch asks to open a protected person while the app is closed</string>
     <string name="settings_dynamic_color">Dynamic color</string>
     <string name="settings_dynamic_color_summary">Takes the tone of your wallpaper</string>
     <string name="settings_language">Language</string>

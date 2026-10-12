@@ -47,3 +47,30 @@ internal fun SettingsAppLockPreview() {
 internal fun SettingsNoLockPreview() {
   SettingsPreview(settings = AppSettings(), canUnlock = false)
 }
+
+/** Hi ha un rellotge emparellat: surt l'interruptor de notificacions del rellotge. */
+@Preview
+@Composable
+internal fun SettingsWatchPreview() {
+  ConversesPreviewTheme {
+    SettingsContent(
+      settings = AppSettings(),
+      canUnlock = true,
+      languageName = "English",
+      versionName = "1.0 (1)",
+      onBack = {},
+      onThemeMode = {},
+      onDynamicColor = {},
+      onPersonColorTheme = {},
+      onHapticFeedback = {},
+      onAppLockChange = {},
+      onRelockAfter = {},
+      onOpenLanguage = {},
+      onOpenSecuritySetup = {},
+      onOpenPrivacyPolicy = {},
+      onOpenFeedback = {},
+      showWatchNotifications = true,
+      watchNotifications = false,
+    )
+  }
+}
