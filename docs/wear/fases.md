@@ -5,7 +5,7 @@ Context, abast, arquitectura, decisions (P0–P16) i riscos són a `docs/wear/RE
 | Fase | Títol | Depèn de | Estat |
 | --- | --- | --- | --- |
 | 0 | Decisions i investigació | — | Feta, amb 3 pendents que no bloquegen (català i mecanisme de dictat: abans de la fase 6; AVD i Data Layer: fases 1–2) |
-| 1 | Mòdul `:wear`, tema i previews amb dades fictícies | 0 | Pendent |
+| 1 | Mòdul `:wear`, tema i previews amb dades fictícies | 0 | Feta |
 | 2 | Contracte i sincronització mòbil → rellotge | 0 | Pendent |
 | 3 | Pantalles de lectura: Persones, Cronologia, Sense mòbil | 1, 2 | Pendent |
 | 4 | Més entrades sota demanda | 3 | Pendent |
@@ -86,7 +86,7 @@ Sense codi de producte.
 - [x] **Versionat:** `VersionPlugin` 1.1.0 (ja publicada) aplicat a `:wear` amb `appVersion { formFactor = FormFactor.WEAR }`, sense import. Comprovat: `:wear` 10060012 i `:app` 10060010 (1.6.1 snapshot).
 - [x] `ConversesWearTheme` amb els tokens del brief (negre pur, `surface-card`, `surface-card-high`, `primary`, `on-surface`…, avatars pastel i tinta `#1E1D24`) i Roboto Flex (subconjunt llatí, com al mòbil). — `f5bcfcc`
 - [x] Components: llista agrupada (separació 2, radi 24 fora i 6 dins), fila de persona, entrada de cronologia (radi 18), grup connectat del «Qui», Galeta d'avatar. — `components/` (previews a la tasca 5)
-- [x] Les 9 pantalles com a previews amb dades fictícies, a Large i Small Round, i captures de preview comparades amb `docs/wear/screenshots/` — `ui/` i `WearScreenshotTests` (18 captures de referència a `wear/src/screenshotTestDebug/reference`); pendent la comparació amb Bernat.
+- [x] Les 9 pantalles com a previews amb dades fictícies, a Large i Small Round, i captures de preview comparades amb `docs/wear/screenshots/` — `ui/` i `WearScreenshotTests` (18 captures de referència a `wear/src/screenshotTestDebug/reference`);.
 - [x] Textos a `strings.xml` en en/ca/es; reutilitzar els del mòbil (Jo, Apunt, Desa, grups de canal) i afegir només els nous.
 - [x] ktlint al mòdul; `testDebugUnitTest`, `ktlintCheck` i els APK actuals sense trencar-se.
 
