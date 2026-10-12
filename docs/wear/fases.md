@@ -81,10 +81,10 @@ Sense codi de producte.
 
 ## Fase 1 · Mòdul `:wear`, tema i previews
 
-- [ ] Afegir `:wear` (i `:shared` si es confirma) a `settings.gradle.kts` i al catàleg de versions.
-- [ ] Mateix `applicationId` que `:app`, amb sufix `.dev` i signatura de debug com al mòbil; manifest amb `type.watch` i `standalone = false`; `allowBackup=false` i regles de backup.
+- [x] Afegir `:wear` (i `:shared` si es confirma) a `settings.gradle.kts` i al catàleg de versions. — `5708737` (`:shared` queda per a la fase 2)
+- [x] Mateix `applicationId` que `:app`, amb sufix `.dev` i signatura de debug com al mòbil; manifest amb `type.watch` i `standalone = false`; `allowBackup=false` i regles de backup. — `5708737`
 - [x] **Versionat:** `VersionPlugin` 1.1.0 (ja publicada) aplicat a `:wear` amb `appVersion { formFactor = FormFactor.WEAR }`, sense import. Comprovat: `:wear` 10060012 i `:app` 10060010 (1.6.1 snapshot).
-- [ ] `ConversesWearTheme` amb els tokens del brief (negre pur, `surface-card`, `surface-card-high`, `primary`, `on-surface`…, avatars pastel i tinta `#1E1D24`) i Roboto Flex (subconjunt llatí, com al mòbil).
+- [x] `ConversesWearTheme` amb els tokens del brief (negre pur, `surface-card`, `surface-card-high`, `primary`, `on-surface`…, avatars pastel i tinta `#1E1D24`) i Roboto Flex (subconjunt llatí, com al mòbil).
 - [ ] Components: llista agrupada (separació 2, radi 24 fora i 6 dins), fila de persona, entrada de cronologia (radi 18), grup connectat del «Qui», Galeta d'avatar.
 - [ ] Les 9 pantalles com a previews amb dades fictícies, a Large i Small Round, i captures de preview comparades amb `docs/wear/screenshots/`.
 - [ ] Textos a `strings.xml` en en/ca/es; reutilitzar els del mòbil (Jo, Apunt, Desa, grups de canal) i afegir només els nous.
