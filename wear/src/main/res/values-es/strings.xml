@@ -28,6 +28,8 @@
     <string name="no_data_hint">Abre Converses en el móvil para sincronizar.</string>
     <string name="phone_not_connected">Móvil no conectado</string>
     <string name="data_from_minutes">Datos de hace %1$d min</string>
+    <string name="data_just_now">Datos de ahora mismo</string>
+    <string name="data_from_hours">Datos de hace %1$d h</string>
     <string name="protected_person_title">Persona protegida</string>
     <string name="protected_person_hint">Desbloquéala con el PIN del reloj.</string>
     <string name="unlock">Desbloquear</string>

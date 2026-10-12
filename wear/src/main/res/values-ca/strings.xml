@@ -28,6 +28,8 @@
     <string name="no_data_hint">Obre Converses al mòbil per sincronitzar.</string>
     <string name="phone_not_connected">Mòbil no connectat</string>
     <string name="data_from_minutes">Dades de fa %1$d min</string>
+    <string name="data_just_now">Dades d\'ara mateix</string>
+    <string name="data_from_hours">Dades de fa %1$d h</string>
     <string name="protected_person_title">Persona protegida</string>
     <string name="protected_person_hint">Desbloqueja-la amb el PIN del rellotge.</string>
     <string name="unlock">Desbloqueja</string>
