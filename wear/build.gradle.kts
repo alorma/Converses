@@ -89,6 +89,7 @@ dependencies {
   implementation(libs.androidx.datastore.preferences)
   implementation(libs.kotlinx.coroutines.android)
   implementation(libs.play.services.wearable)
+  implementation(libs.kotlinx.coroutines.play.services)
   debugImplementation(libs.wear.compose.ui.tooling)
   testImplementation(libs.junit)
   testImplementation(libs.kotlinx.coroutines.test)
