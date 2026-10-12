@@ -5,11 +5,13 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import com.alorma.contactnotes.wear.ui.DictatePreview
 import com.alorma.contactnotes.wear.ui.LockRequiredPreview
+import com.alorma.contactnotes.wear.ui.NoDataPreview
 import com.alorma.contactnotes.wear.ui.PeoplePhoneOfflinePreview
 import com.alorma.contactnotes.wear.ui.PeoplePreview
 import com.alorma.contactnotes.wear.ui.ProtectedPersonPreview
 import com.alorma.contactnotes.wear.ui.SavedPendingPreview
 import com.alorma.contactnotes.wear.ui.SavedPreview
+import com.alorma.contactnotes.wear.ui.TimelineEmptyPreview
 import com.alorma.contactnotes.wear.ui.TimelinePreview
 import com.alorma.contactnotes.wear.ui.WhoPreview
 import com.android.tools.screenshot.PreviewTest
@@ -29,6 +31,16 @@ class WearScreenshotTests {
   @PreviewTest
   @Composable
   fun timeline() = TimelinePreview()
+
+  @WatchPreviews
+  @PreviewTest
+  @Composable
+  fun timelineEmpty() = TimelineEmptyPreview()
+
+  @WatchPreviews
+  @PreviewTest
+  @Composable
+  fun noData() = NoDataPreview()
 
   @WatchPreviews
   @PreviewTest
