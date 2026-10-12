@@ -186,10 +186,3 @@ class WearApprovalCoordinator(
     const val MAX_USED_IDS = 100
   }
 }
-
-/** Notificador provisional: la notificació real (genèrica, amb `BiometricPrompt`) arriba amb la pantalla d'aprovació. */
-object NoApprovalNotifier : ApprovalNotifier {
-  override fun show(requestId: String) = Unit
-
-  override fun cancel(requestId: String) = Unit
-}
