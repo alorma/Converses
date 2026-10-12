@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.wear.compose.material3.Icon
 import androidx.wear.compose.material3.Text
 import com.alorma.contactnotes.shared.AvatarColor
+import com.alorma.contactnotes.shared.AvatarShape
 import com.alorma.contactnotes.wear.theme.RowSubtitleStyle
 import com.alorma.contactnotes.wear.theme.RowTitleStyle
 import com.alorma.contactnotes.wear.theme.WearColors
@@ -34,6 +35,7 @@ fun PersonRow(
   name: String,
   initials: String,
   color: AvatarColor,
+  avatarShape: AvatarShape,
   lastEntry: String?,
   isProtected: Boolean,
   shape: RoundedCornerShape,
@@ -52,7 +54,7 @@ fun PersonRow(
     horizontalArrangement = Arrangement.spacedBy(10.dp),
     verticalAlignment = Alignment.CenterVertically,
   ) {
-    PersonAvatar(initials = initials, color = color, size = 36.dp)
+    PersonAvatar(initials = initials, color = color, shape = avatarShape, size = 36.dp)
     Column(modifier = Modifier.weight(1f)) {
       Text(text = name, style = RowTitleStyle, color = WearColors.OnSurface, maxLines = 1)
       if (!isProtected && lastEntry != null) {

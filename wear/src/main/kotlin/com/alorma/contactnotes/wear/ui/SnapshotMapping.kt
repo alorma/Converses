@@ -82,6 +82,7 @@ fun WearPerson.toItem(
     name = name,
     initials = initialsOf(name),
     color = avatarColor,
+    avatarShape = avatarShape,
     lastEntry = if (isProtected) null else lastEntryAt?.let { labels.relative(relativeTime(it, now, zone)) },
     isProtected = isProtected,
   )
@@ -95,7 +96,9 @@ fun WearEntry.toItem(
   val (author, who) =
     when (kind) {
       EntryKind.SAID -> EntryAuthor.Me to labels.me
-      EntryKind.HEARD -> EntryAuthor.Person(initialsOf(person.name), person.avatarColor) to firstName
+      EntryKind.HEARD ->
+        EntryAuthor.Person(initialsOf(person.name), person.avatarColor, person.avatarShape) to
+          firstName
       EntryKind.HAPPENED -> EntryAuthor.Note to labels.note
     }
   return EntryItem(

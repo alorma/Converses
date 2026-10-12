@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Lock
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -20,23 +21,14 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
-import androidx.graphics.shapes.CornerRounding
 import androidx.graphics.shapes.RoundedPolygon
-import androidx.graphics.shapes.star
 import androidx.graphics.shapes.toPath
 import androidx.wear.compose.material3.Icon
 import androidx.wear.compose.material3.Text
 import com.alorma.contactnotes.shared.AvatarColor
+import com.alorma.contactnotes.shared.AvatarShape
 import com.alorma.contactnotes.wear.theme.AvatarInk
 import com.alorma.contactnotes.wear.theme.color
-
-/** Galeta de 9 pètals, la mateixa forma que l'avatar del mòbil (`MaterialShapes.Cookie9Sided`). */
-private val Cookie9Sided: RoundedPolygon =
-  RoundedPolygon.star(
-    numVerticesPerRadius = 9,
-    innerRadius = 0.8f,
-    rounding = CornerRounding(radius = 0.5f),
-  )
 
 private class PolygonShape(
   private val polygon: RoundedPolygon,
@@ -57,14 +49,18 @@ private class PolygonShape(
   }
 }
 
-val CookieShape: Shape = PolygonShape(Cookie9Sided)
+val CookieShape: Shape = PolygonShape(AvatarShape.Cookie9Sided.polygon())
 
-/** Avatar Galeta amb color pastel. El text i la icona van sempre en tinta fosca. */
+/** Forma de l'avatar d'una persona, la mateixa que al mòbil. */
+fun AvatarShape.asShape(): Shape = PolygonShape(polygon())
+
+/** Avatar amb la forma i el color pastel de la persona. El text i la icona van sempre en tinta fosca. */
 @Composable
 fun PersonAvatar(
   initials: String,
   color: AvatarColor,
   modifier: Modifier = Modifier,
+  shape: AvatarShape = AvatarShape.Standard,
   size: Dp = 36.dp,
   locked: Boolean = false,
 ) {
@@ -72,7 +68,7 @@ fun PersonAvatar(
     modifier =
       modifier
         .size(size)
-        .clip(CookieShape)
+        .clip(remember(shape) { shape.asShape() })
         .background(color.color),
     contentAlignment = Alignment.Center,
   ) {

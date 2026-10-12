@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.sp
 import androidx.wear.compose.material3.Icon
 import androidx.wear.compose.material3.Text
 import com.alorma.contactnotes.shared.AvatarColor
+import com.alorma.contactnotes.shared.AvatarShape
 import com.alorma.contactnotes.wear.theme.EntryTextStyle
 import com.alorma.contactnotes.wear.theme.OverlineStyle
 import com.alorma.contactnotes.wear.theme.WearColors
@@ -35,6 +36,7 @@ sealed interface EntryAuthor {
   data class Person(
     val initials: String,
     val color: AvatarColor,
+    val shape: AvatarShape = AvatarShape.Standard,
   ) : EntryAuthor
 
   data object Note : EntryAuthor
@@ -57,7 +59,13 @@ private fun EntryMarker(author: EntryAuthor) {
           modifier = Modifier.size(12.dp),
         )
       }
-    is EntryAuthor.Person -> PersonAvatar(initials = author.initials, color = author.color, size = MarkerSize)
+    is EntryAuthor.Person ->
+      PersonAvatar(
+        initials = author.initials,
+        color = author.color,
+        shape = author.shape,
+        size = MarkerSize,
+      )
     EntryAuthor.Note ->
       Box(
         modifier = Modifier.size(MarkerSize).border(1.dp, WearColors.Outline, CircleShape),

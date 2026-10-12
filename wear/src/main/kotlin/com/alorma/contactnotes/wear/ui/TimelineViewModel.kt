@@ -3,6 +3,7 @@ package com.alorma.contactnotes.wear.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.alorma.contactnotes.shared.AvatarColor
+import com.alorma.contactnotes.shared.AvatarShape
 import com.alorma.contactnotes.wear.data.StoredSnapshot
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
@@ -20,6 +21,7 @@ sealed interface TimelineUiState {
     val name: String,
     val initials: String,
     val color: AvatarColor,
+    val avatarShape: AvatarShape,
     val entries: List<EntryItem>,
   ) : TimelineUiState
 }
@@ -40,6 +42,7 @@ class TimelineViewModel(
             name = person.name,
             initials = initialsOf(person.name),
             color = person.avatarColor,
+            avatarShape = person.avatarShape,
             entries = person.entries.map { it.toItem(person, labels) },
           )
         }
