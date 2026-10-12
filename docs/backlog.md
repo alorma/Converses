@@ -10,7 +10,7 @@ Actualitzat el 8 d'oct. de 2026. Només hi ha el que encara no està fet.
 | 11 | Feature (Iteració 2) | Importar text a la nota ràpida (compartir, seleccionar text i enganxar) | [#30](https://github.com/alorma/Converses/issues/30) |
 | 16 | Neteja | Treure l'avís dels canals quan la v1 sigui residual | — |
 
-Els punts 6, 7, 8 i 11 són de l'**Iteració 2**; el 6 i el 8 són Pro, i l'11 és gratis (vegeu `docs/pro.md`). El #45 s'ha descartat i la cerca (#41) queda per més endavant (vegeu `docs/plan.md`). **Qualsevol canvi de la base de dades ha d'incloure una migració i el seu test** (la v1 ja és a Google Play); l'11 i el 16 no toquen Room. La v2 (canals en 5 grups) ja està feta; el 6 i el 8 necessitaran la v3. La numeració és la del backlog original, perquè els issues i les referències no canviïn; els punts resolts (1–5, 9, 10, 12, 13, 15) i el 14 (descartat: es queda el split button del detall) són a l'historial de git.
+Els punts 6, 7, 8 i 11 són de l'**Iteració 2**; el 6 i el 8 són Pro, i l'11 és gratis (vegeu `docs/pro/`). El #45 s'ha descartat i la cerca (#41) queda per més endavant. **Qualsevol canvi de la base de dades ha d'incloure una migració i el seu test** (la v1 ja és a Google Play); l'11 i el 16 no toquen Room. La v2 (canals en 5 grups) ja està feta; el 6 i el 8 necessitaran la v3. La numeració és la del backlog original, perquè els issues i les referències no canviïn; els punts resolts (1–5, 9, 10, 12, 13, 15) i el 14 (descartat: es queda el split button del detall) són a l'historial de git.
 
 ---
 
@@ -28,7 +28,7 @@ Poder marcar coses per fer-ne seguiment amb una persona ("li he de preguntar com
 - Indicador visual a la cronologia, i potser un comptador o filtre de pendents al detall i a la llista.
 - Marcar i desmarcar des del full d'accions de l'entrada.
 - Opcional: recordatori o notificació en una data.
-- Textos a `strings.xml` (en, ca, es) i actualitzar `docs/plan.md`.
+- Textos a `strings.xml` (en, ca, es).
 
 ## 7 · Feature: nou canal "Empresa" (entrevistes de feina)
 
@@ -65,7 +65,7 @@ Portar text d'altres apps a la nota ràpida amb el mínim de passos: el text ja 
 - «Qui» per defecte a la persona (`HEARD`); provisionalment, un enllaç sol va a `HAPPENED` (pregunta oberta de la issue).
 - **Privacitat:** el bloqueig de l'app surt abans de la nota ràpida; una persona protegida demana l'empremta i la pantalla té `FLAG_SECURE`.
 - Fora d'abast: imatges i fitxers (`SEND_MULTIPLE`), Direct Share i xats exportats.
-- Sense canvis a Room, **no cal migració**. Textos nous a `values/`, `values-ca/` i `values-es/`; en acabar, afegir-ho a «Gratis per sempre» de `docs/pro.md` i actualitzar `docs/plan.md`.
+- Sense canvis a Room, **no cal migració**. Textos nous a `values/`, `values-ca/` i `values-es/`; en acabar, afegir-ho a «Gratis per sempre» de `docs/pro/README.md`.
 
 ---
 

@@ -8,9 +8,8 @@ Android app to remember what I said, what people said to me and what happened wi
 
 ## References (source of truth)
 
-- `docs/plan.md`: state of the app and the plan (stack, theme, components, screens, data model, decisions and pending work). Keep it up to date at the end of every task. It is written in Catalan.
-- `docs/backlog.md`: pending bugs and features (Iteration 2).
-- `docs/pro.md`: what is free forever and what will be Pro (behind feature flags).
+- `docs/backlog.md`: pending bugs and features (Iteration 2). It is written in Catalan.
+- `docs/pro/`: what is free forever and what will be Pro (behind feature flags); future paid-tier notes go here.
 
 ## Stack
 
@@ -42,7 +41,7 @@ Code style is enforced with ktlint (`./gradlew ktlintCheck`, `./gradlew ktlintFo
 
 ## Rules
 
-- Work in small steps and validate each one before continuing; state and pending work live in `docs/plan.md`.
+- Work in small steps and validate each one before continuing; pending work lives in `docs/backlog.md`.
 - Before adding a library, check its current stable version in the official documentation.
 - Every screen is a Material 3 `Scaffold`: fixed headers (back, title, actions) go in `topBar` and never scroll with the content (titled screens use `ConversesTopBar` from `:designsystem`: Medium by default, `large = true` for Settings; person detail and the people list keep their own headers), FABs and the floating toolbar in `floatingActionButton`, snackbars in `snackbarHost`; no manual `windowInsetsPadding` for the system bars, use the `padding` the `Scaffold` gives (with `consumeWindowInsets` before `imePadding`). The floating navigation toolbar goes in the FAB slot (`FabPosition.Center`), not in `bottomBar`, because it must not reserve space.
 - Keep all `@OptIn(ExperimentalMaterial3ExpressiveApi::class)` in the `designsystem` module; screens do not repeat them.
