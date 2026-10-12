@@ -24,12 +24,13 @@
             </intent-filter>
         </activity>
 
-        <!-- S'obre en tocar la notificació d'aprovació; fora de l'historial i de la tasca principal -->
+        <!-- S'obre en tocar la notificació d'aprovació i llança el BiometricPrompt; transparent, fora de l'historial i de la tasca principal -->
         <activity
             android:name=".ui.approval.ApprovalActivity"
             android:excludeFromRecents="true"
             android:exported="false"
-            android:taskAffinity="" />
+            android:taskAffinity=""
+            android:theme="@style/Theme.ContactNotes.Transparent" />
 
         <!-- Respon les peticions de «més entrades» del rellotge (només persones no protegides) -->
         <service

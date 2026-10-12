@@ -3,4 +3,13 @@
         <item name="android:windowBackground">@color/window_background</item>
         <item name="android:windowSplashScreenBackground">@color/window_background</item>
     </style>
+
+    <!-- L'aprovació des del rellotge no té pantalla pròpia: només el BiometricPrompt, sobre una finestra transparent -->
+    <style name="Theme.ContactNotes.Transparent">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowSplashScreenBackground">@android:color/transparent</item>
+        <item name="android:backgroundDimEnabled">false</item>
+        <item name="android:windowAnimationStyle">@null</item>
+    </style>
 </resources>

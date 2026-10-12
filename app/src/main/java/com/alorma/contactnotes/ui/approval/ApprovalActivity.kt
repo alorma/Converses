@@ -7,26 +7,28 @@ import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.biometric.BiometricManager
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.res.stringResource
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import com.alorma.contactnotes.R
 import com.alorma.contactnotes.data.settings.SettingsRepository
 import com.alorma.contactnotes.designsystem.theme.ConversesTheme
 import com.alorma.contactnotes.ui.person.promptUnlock
 import com.alorma.contactnotes.ui.person.unlockAvailability
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.koin.android.ext.android.inject
-import org.koin.compose.viewmodel.koinViewModel
+import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.parameter.parametersOf
 
 /**
- * S'obre en tocar la notificació d'aprovació d'una persona protegida demanada des del rellotge. No mostra mai el nom
- * ni cap contingut de la persona: l'única dada que rep és l'identificador de la petició. És una `FragmentActivity`
- * perquè el `BiometricPrompt` ho necessita.
+ * S'obre en tocar la notificació d'aprovació d'una persona protegida demanada des del rellotge (o directament, amb
+ * l'app en primer pla) i **llança el `BiometricPrompt` sense cap pantalla pròpia**: la finestra és transparent. Amb
+ * èxit s'aprova i l'activitat es tanca. Si l'usuari cancel·la el prompt, aleshores sí que es veu [ApprovalContent],
+ * amb «Confirma» (reobre el prompt) i «Denega». No mostra mai el nom ni cap contingut de la persona: l'única dada que
+ * rep és l'identificador de la petició. És una `FragmentActivity` perquè el `BiometricPrompt` ho necessita.
  */
 class ApprovalActivity : FragmentActivity() {
   private val settingsRepository: SettingsRepository by inject()
@@ -39,42 +41,47 @@ class ApprovalActivity : FragmentActivity() {
       return
     }
     enableEdgeToEdge()
+    val viewModel: ApprovalViewModel by viewModel { parametersOf(requestId) }
     val initialSettings = runBlocking { settingsRepository.settings.first() }
-    val title = getString(R.string.approval_prompt_title)
-    val subtitle = getString(R.string.approval_prompt_subtitle)
+
+    lifecycleScope.launch {
+      viewModel.state.collect { state ->
+        when (state) {
+          ApprovalUiState.Prompting -> if (viewModel.takePromptRequest()) prompt(viewModel)
+          ApprovalUiState.Confirm -> Unit
+          ApprovalUiState.Closed -> finish()
+          ApprovalUiState.Failed -> {
+            // Petició caducada, cancel·lada al rellotge o desconeguda: no hi ha res a aprovar
+            Toast.makeText(applicationContext, R.string.approval_failed, Toast.LENGTH_SHORT).show()
+            finish()
+          }
+        }
+      }
+    }
 
     setContent {
       val settings by settingsRepository.settings.collectAsStateWithLifecycle(initialSettings)
-      ConversesTheme(themeMode = settings.themeMode, dynamicColor = settings.dynamicColor, personColorTheme = false) {
-        val viewModel: ApprovalViewModel = koinViewModel(parameters = { parametersOf(requestId) })
-        val state by viewModel.state.collectAsStateWithLifecycle()
-        val failedMessage = stringResource(R.string.approval_failed)
-        LaunchedEffect(state) {
-          when (state) {
-            ApprovalUiState.Failed -> {
-              Toast.makeText(applicationContext, failedMessage, Toast.LENGTH_SHORT).show()
-              finish()
-            }
-
-            ApprovalUiState.Closed -> finish()
-            else -> Unit
-          }
+      val state by viewModel.state.collectAsStateWithLifecycle()
+      // Només després de cancel·lar el prompt; abans la finestra és transparent
+      if (state == ApprovalUiState.Confirm) {
+        ConversesTheme(themeMode = settings.themeMode, dynamicColor = settings.dynamicColor, personColorTheme = false) {
+          ApprovalContent(onConfirm = viewModel::onRetry, onDeny = viewModel::onDeny, onClose = ::finish)
         }
-        ApprovalContent(
-          state = state,
-          onConfirm = {
-            // Sense biometria ni bloqueig de pantalla no es pot aprovar: es tracta com una denegació
-            if (unlockAvailability() == BiometricManager.BIOMETRIC_SUCCESS) {
-              promptUnlock(title, subtitle, onError = { viewModel.onDeny() }) { viewModel.onAuthenticated() }
-            } else {
-              viewModel.onDeny()
-            }
-          },
-          onDeny = viewModel::onDeny,
-          onClose = ::finish,
-        )
       }
     }
+  }
+
+  private fun prompt(viewModel: ApprovalViewModel) {
+    // Sense biometria ni bloqueig de pantalla no es pot aprovar: es tracta com una denegació
+    if (unlockAvailability() != BiometricManager.BIOMETRIC_SUCCESS) {
+      viewModel.onDeny()
+      return
+    }
+    promptUnlock(
+      title = getString(R.string.approval_prompt_title),
+      subtitle = getString(R.string.approval_prompt_subtitle),
+      onError = { viewModel.onPromptCancelled() },
+    ) { viewModel.onAuthenticated() }
   }
 
   companion object {

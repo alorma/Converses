@@ -12,6 +12,7 @@ import com.alorma.contactnotes.testing.FakeDb
 import com.alorma.contactnotes.testing.MainDispatcherRule
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -50,10 +51,13 @@ class ApprovalViewModelTest {
   private fun lastDecision() = WearApprovalCodec.decodeResult(sent.last())!!.decision
 
   @Test
-  fun aPendingRequestStartsWaitingForTheUser() =
+  fun aPendingRequestStartsByOpeningThePromptRightAway() =
     runTest {
       pendingRequest()
-      assertEquals(ApprovalUiState.Confirm, ApprovalViewModel("req", coordinator).state.value)
+      val vm = ApprovalViewModel("req", coordinator)
+      assertEquals(ApprovalUiState.Prompting, vm.state.value)
+      assertTrue(vm.takePromptRequest())
+      assertFalse(vm.takePromptRequest())
     }
 
   @Test
@@ -74,7 +78,7 @@ class ApprovalViewModelTest {
 
       vm.onAuthenticated()
 
-      assertEquals(ApprovalUiState.Done, vm.state.value)
+      assertEquals(ApprovalUiState.Closed, vm.state.value)
       assertEquals(WearApprovalDecision.APPROVED, lastDecision())
       assertTrue(
         WearApprovalCodec
@@ -112,6 +116,51 @@ class ApprovalViewModelTest {
     }
 
   @Test
+  fun cancellingThePromptShowsTheScreenInsteadOfDenying() =
+    runTest {
+      pendingRequest()
+      val vm = ApprovalViewModel("req", coordinator)
+      vm.takePromptRequest()
+
+      vm.onPromptCancelled()
+
+      assertEquals(ApprovalUiState.Confirm, vm.state.value)
+      assertTrue(sent.isEmpty())
+      assertTrue(coordinator.isPending("req"))
+    }
+
+  @Test
+  fun confirmOnTheScreenReopensThePromptAndCanStillApprove() =
+    runTest {
+      pendingRequest()
+      val vm = ApprovalViewModel("req", coordinator)
+      vm.takePromptRequest()
+      vm.onPromptCancelled()
+
+      vm.onRetry()
+
+      assertEquals(ApprovalUiState.Prompting, vm.state.value)
+      assertTrue(vm.takePromptRequest())
+      vm.onAuthenticated()
+      assertEquals(ApprovalUiState.Closed, vm.state.value)
+      assertEquals(WearApprovalDecision.APPROVED, lastDecision())
+    }
+
+  @Test
+  fun denyOnTheScreenTellsTheWatch() =
+    runTest {
+      pendingRequest()
+      val vm = ApprovalViewModel("req", coordinator)
+      vm.takePromptRequest()
+      vm.onPromptCancelled()
+
+      vm.onDeny()
+
+      assertEquals(ApprovalUiState.Closed, vm.state.value)
+      assertEquals(WearApprovalDecision.DENIED, lastDecision())
+    }
+
+  @Test
   fun aSecondAnswerIsIgnored() =
     runTest {
       pendingRequest()
@@ -120,7 +169,7 @@ class ApprovalViewModelTest {
       vm.onAuthenticated()
       vm.onDeny()
 
-      assertEquals(ApprovalUiState.Done, vm.state.value)
+      assertEquals(ApprovalUiState.Closed, vm.state.value)
       assertEquals(1, sent.size)
     }
 }

@@ -237,7 +237,5 @@
     <string name="approval_deny">Deny</string>
     <string name="approval_prompt_title">Confirm access</string>
     <string name="approval_prompt_subtitle">Opens a protected person on the watch.</string>
-    <string name="approval_done_title">Done</string>
-    <string name="approval_done_body">You can now see the person on the watch.</string>
     <string name="approval_failed">Couldn\'t complete the request</string>
 </resources>
