@@ -14,8 +14,11 @@ class DeliverNotesWorker(
   context: Context,
   params: WorkerParameters,
 ) : CoroutineWorker(context, params) {
-  override suspend fun doWork(): Result =
-    if (WearNotes.get(applicationContext).deliverAll()) Result.success() else Result.retry()
+  override suspend fun doWork(): Result {
+    // Sense el bloqueig que exigeix el Bloqueig de l'app, la cua s'esborra en lloc d'entregar-se
+    if (WearSnapshotStore.get(applicationContext).enforceLock()) return Result.success()
+    return if (WearNotes.get(applicationContext).deliverAll()) Result.success() else Result.retry()
+  }
 }
 
 /** [DeliveryScheduler] sobre WorkManager: una sola feina única; si n'hi ha una en marxa, es substitueix (l'enviament és idempotent). */

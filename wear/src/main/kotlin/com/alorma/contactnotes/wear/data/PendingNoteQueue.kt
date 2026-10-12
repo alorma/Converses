@@ -21,11 +21,14 @@ interface PendingNoteQueue {
   suspend fun add(note: WearNote)
 
   suspend fun remove(id: String)
+
+  /** Esborra tota la cua: passa quan cal bloqueig al rellotge i no en té. Les notes es perden. */
+  suspend fun clear()
 }
 
 /**
  * Cua a `files/datastore`, fora de qualsevol còpia de seguretat. Cada nota es desa com a JSON, una per línia.
- * El xifratge amb Keystore és de la fase 5, igual que la còpia de l'instantani.
+ * Si el Bloqueig de l'app és actiu i el rellotge no té bloqueig, s'esborra sencera ([WearSnapshotStore.enforceLock]).
  */
 class DataStorePendingNoteQueue(
   private val dataStore: DataStore<Preferences>,
@@ -44,6 +47,10 @@ class DataStorePendingNoteQueue(
       val notes = read(prefs[QueueKey])
       if (notes.any { it.id == id }) prefs[QueueKey] = write(notes.filterNot { it.id == id })
     }
+  }
+
+  override suspend fun clear() {
+    dataStore.edit { it.remove(QueueKey) }
   }
 
   // Les notes mal formades es descarten: no es pot fer res amb elles i bloquejarien la cua

@@ -28,6 +28,10 @@ private class MemoryQueue : PendingNoteQueue {
   override suspend fun remove(id: String) {
     notes.removeAll { it.id == id }
   }
+
+  override suspend fun clear() {
+    notes.clear()
+  }
 }
 
 private class FakeSender(
@@ -130,5 +134,18 @@ class NoteOutboxTest {
       first.remove("b")
       assertEquals(listOf("a"), first.all().map { it.id })
       assertEquals("línia 1\nlínia 2", first.all().single().text)
+    }
+
+  @Test
+  fun dataStoreQueueClearRemovesEveryNote() =
+    runTest {
+      val queue =
+        DataStorePendingNoteQueue(
+          PreferenceDataStoreFactory.create(scope = scope) { folder.newFile("clear.preferences_pb") },
+        )
+      queue.add(note("a"))
+      queue.add(note("b"))
+      queue.clear()
+      assertEquals(emptyList<WearNote>(), queue.all())
     }
 }

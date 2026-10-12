@@ -10,6 +10,7 @@ import androidx.datastore.preferences.preferencesDataStore
 import com.alorma.contactnotes.shared.WearSnapshot
 import com.alorma.contactnotes.shared.WearSnapshotCodec
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 
 /** L'últim instantani rebut i quan es va rebre. */
@@ -23,11 +24,12 @@ data class StoredSnapshot(
  * no hi duen mai contingut. Viu a `files/`, que queda fora de qualsevol còpia de seguretat.
  *
  * Si el Bloqueig de l'app és actiu i el rellotge no té bloqueig de pantalla, no es desa res i s'esborra el que hi
- * hagués ([AppLockGate]). El xifratge amb Keystore és de la tasca següent de la fase 5.
+ * hagués ([AppLockGate]), i també la cua de notes pendents ([onLockRequired]): sense bloqueig no en queda cap text.
  */
 class WearSnapshotStore(
   private val dataStore: DataStore<Preferences>,
   private val deviceLock: DeviceLock,
+  private val onLockRequired: suspend () -> Unit = {},
   private val clock: () -> Long = System::currentTimeMillis,
 ) {
   val stored: Flow<StoredSnapshot?> =
@@ -44,7 +46,7 @@ class WearSnapshotStore(
   suspend fun save(payload: String): Boolean {
     val snapshot = WearSnapshotCodec.decode(payload) ?: return false
     if (isLockRequired(snapshot.appLockActive, deviceLock.isSecure())) {
-      clear()
+      eraseEverything()
       return false
     }
     dataStore.edit { prefs ->
@@ -59,6 +61,22 @@ class WearSnapshotStore(
     dataStore.edit { it.clear() }
   }
 
+  /**
+   * Si cal bloqueig i el rellotge no en té, esborra la còpia i la cua de notes pendents i retorna `true`. Sense
+   * instantani encara, l'estat no es pot verificar i s'assumeix actiu.
+   */
+  suspend fun enforceLock(): Boolean {
+    val appLockActive = stored.first()?.snapshot?.appLockActive
+    val required = isLockRequired(appLockActive, deviceLock.isSecure())
+    if (required) eraseEverything()
+    return required
+  }
+
+  private suspend fun eraseEverything() {
+    clear()
+    onLockRequired()
+  }
+
   companion object {
     private val SnapshotKey = stringPreferencesKey("snapshot")
     private val SyncedAtKey = longPreferencesKey("synced_at")
@@ -71,6 +89,7 @@ class WearSnapshotStore(
         instance ?: WearSnapshotStore(
           context.applicationContext.snapshotDataStore,
           AndroidDeviceLock(context),
+          onLockRequired = { DataStorePendingNoteQueue.get(context).clear() },
         ).also { instance = it }
       }
   }
