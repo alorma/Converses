@@ -11,7 +11,7 @@ Context, abast, arquitectura, decisions (P0–P16) i riscos són a `docs/wear/RE
 | 4 | Més entrades sota demanda | 3 | Feta |
 | 5 | Bloqueig de l'app i persones protegides | 0 (P0, P10), 3, 4 | Pendent |
 | 6 | Dictat | 1 | Feta |
-| 7 | Qui, Desat i nota rellotge → mòbil amb cua | 2, 3, 6 | Pendent |
+| 7 | Qui, Desat i nota rellotge → mòbil amb cua | 2, 3, 6 | Feta |
 | 8 | Estats d'error i casos límit | 5, 7 | Pendent |
 | 9 | Qualitat, privacitat i accessibilitat | 8 | Pendent |
 | 10 | CI i publicació | 9 | Pendent |
@@ -184,6 +184,8 @@ Validada per Bernat. Provada a l'emulador Wear (permís, escolta, error i reinte
 - [x] Tests de JVM: contracte (5), mòbil (5: desa, canal, duplicat, protegida/arxivada/inexistent, il·legible), cua i reintents (7) i «Qui» (6). Captures de referència intactes (`validateDebugScreenshotTest`).
 - [x] **Emulador** (telèfon + Wear XL Round): amb el mòbil a prop, la nota arriba al mòbil i el rellotge torna a la cronologia; amb el mòbil sense resposta la nota queda a la cua i s'entrega sola en ~30 s en tornar, sense duplicats (4 «Desa» = 4 entrades). El dictat real no es pot fer a l'emulador (no genera text): per provar «Qui» s'ha arrencat temporalment a `WhoRoute` amb text fix (canvi no commitejat). **Pendent amb rellotge real:** dictat de punta a punta i «Sense mòbil» real.
 - Les notes a persones **protegides** no es poden crear (la fase 5 és pendent) i el mòbil les rebutja; el descart de notes a persones esborrades o fetes protegides és de la fase 8 (R3, R4).
+
+Validada per Bernat amb les proves de l'emulador i els tests; el rellotge físic no s'ha pogut provar (no s'engega), així que el dictat real i «Sense mòbil» real queden per a quan es pugui (fase 9).
 
 **Sortida:** apuntar una nota des del rellotge i veure-la al mòbil, amb i sense connexió.
 
