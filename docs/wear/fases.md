@@ -6,7 +6,7 @@ Context, abast, arquitectura, decisions (P0–P16) i riscos són a `docs/wear/RE
 | --- | --- | --- | --- |
 | 0 | Decisions i investigació | — | Feta, amb 3 pendents que no bloquegen (català i mecanisme de dictat: abans de la fase 6; AVD i Data Layer: fases 1–2) |
 | 1 | Mòdul `:wear`, tema i previews amb dades fictícies | 0 | Feta |
-| 2 | Contracte i sincronització mòbil → rellotge | 0 | Pendent |
+| 2 | Contracte i sincronització mòbil → rellotge | 0 | Feta |
 | 3 | Pantalles de lectura: Persones, Cronologia, Sense mòbil | 1, 2 | Pendent |
 | 4 | Més entrades sota demanda | 3 | Pendent |
 | 5 | Bloqueig de l'app i persones protegides | 0 (P0, P10), 3, 4 | Pendent |
