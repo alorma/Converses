@@ -1,0 +1,7 @@
+<resources>
+    <!-- Icona del launcher (lila), la mateixa que el mòbil. La variant debug en sobreescriu els colors a src/debug. -->
+    <color name="ic_launcher_extrusion">#FF3D2E7A</color>
+    <color name="ic_launcher_front">#FF8C76E0</color>
+    <color name="ic_launcher_highlight">#FFA794EE</color>
+    <color name="ic_launcher_lines">#FF2E2459</color>
+</resources>
