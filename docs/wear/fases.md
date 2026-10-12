@@ -162,12 +162,11 @@ Validada per Bernat amb les proves de l'emulador i els tests; el rellotge físic
 
 ## Fase 8 · Estats d'error i casos límit
 
-- [ ] Mòbil absent durant tota la sessió; rellotge reiniciat amb notes a la cua.
-- [ ] Nota duplicada.
-- [ ] Persona que passa a protegida (amb còpia al rellotge i amb notes encuades): el rellotge esborra les entrades i la nota no s'aplica sense decisió (R3).
-- [ ] Persona esborrada al mòbil amb notes pendents (R4).
-- [ ] Reconeixedor sense resultat o sense català (P5).
-- [ ] Bloqueig de l'app activat o desactivat mentre el rellotge és obert.
+- [x] Mòbil absent durant tota la sessió; rellotge reiniciat amb notes a la cua: ja cobert (cua a disc, reprogramació en arrencar, tests de `NoteOutboxTest`); test nou de reintent després de reinici. — `209742c`
+- [x] Nota duplicada: la cua ignora UUID repetits i el mòbil també (registre de les últimes 500). — `209742c`
+- [x] Persona que passa a protegida (R3) i persona esborrada (R4), **decidit amb Bernat: es descarta**. A cada sincronització la cua esborra les notes de persones protegides o que ja no hi són (`retainOnly`), perquè no quedi text al disc; si el mòbil rebutja una nota, també es descarta. Avís mínim a Persones («N notes descartades», toc per tancar; comptador persistent sense contingut ni persona), amb captura a Large i Small Round. — `209742c`, `7baa9df`
+- [x] Reconeixedor sense resultat (P5): revisat, sense canvis (sense veu → «No s'ha sentit res», sense reconeixedor, micròfon i error genèric ja tenen pantalla). Un idioma no suportat cau a l'error genèric. **Pendent amb rellotge real (fase 9):** si el català hi és.
+- [x] Bloqueig de l'app activat o desactivat mentre el rellotge és obert: `AppLockGate` reacciona al següent instantani i a `ON_RESUME`; test nou. — `5767fe3`. **Pendent:** comprovar-ho a l'emulador (canviar el bloqueig al mòbil amb el rellotge obert).
 
 ## Fase 9 · Qualitat, privacitat i accessibilitat
 
