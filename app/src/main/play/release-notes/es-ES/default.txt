@@ -1,4 +1,4 @@
-Versión 1.7.0:
+Versión 1.7.1:
 • Converses ya tiene app para Wear OS. Tus personas y sus últimas notas en la muñeca, donde ibas a mirar el móvil igualmente.
 • Dicta una nota en el reloj y llega al móvil. Si el móvil está lejos, hace cola y espera su turno.
 • Las personas protegidas solo se abren en el reloj cuando lo apruebas con la huella en el móvil.

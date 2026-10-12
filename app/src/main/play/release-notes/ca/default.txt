@@ -1,4 +1,4 @@
-Versió 1.7.0:
+Versió 1.7.1:
 • Converses ja té app per a Wear OS. Les teves persones i les últimes notes al canell, on d'aquí a un moment miraves el mòbil igualment.
 • Dicta una nota al rellotge i arriba al mòbil. Si el mòbil és lluny, fa cua i espera el seu torn.
 • Les persones protegides només s'obren al rellotge quan ho aproves amb l'empremta al mòbil.
