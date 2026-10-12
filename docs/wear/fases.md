@@ -10,7 +10,7 @@ Context, abast, arquitectura, decisions (P0–P16) i riscos són a `docs/wear/RE
 | 3 | Pantalles de lectura: Persones, Cronologia, Sense mòbil | 1, 2 | Feta |
 | 4 | Més entrades sota demanda | 3 | Feta |
 | 5 | Bloqueig de l'app i persones protegides | 0 (P0, P10), 3, 4 | Pendent |
-| 6 | Dictat | 1 | Pendent |
+| 6 | Dictat | 1 | Feta |
 | 7 | Qui, Desat i nota rellotge → mòbil amb cua | 2, 3, 6 | Pendent |
 | 8 | Estats d'error i casos límit | 5, 7 | Pendent |
 | 9 | Qualitat, privacitat i accessibilitat | 8 | Pendent |
@@ -162,11 +162,14 @@ Depèn de **P0** i **P10**.
 
 ## Fase 6 · Dictat
 
-- [ ] Pantalla 3 amb el mecanisme triat a la fase 0, text parcial en directe i «Acaba».
-- [ ] Permís `RECORD_AUDIO` (flux de petició).
-- [ ] Ones: animació simple o lligada a l'amplitud del micròfon; respectar «reduir animacions».
-- [ ] Idioma el de l'app (ca/es/en).
-- [ ] Estats d'error i permís denegat (P4).
+- [x] `SpeechSource` (`SpeechRecognizer` amb parcials, `ACTION_RECOGNIZE_SPEECH` com a pla B no ha calt) i `DictationViewModel`; tests de JVM. — `9dea534`
+- [x] Pantalla 3 amb text parcial en directe i «Acaba»; el botó «Nota» de la cronologia hi porta. — `92ab57a`
+- [x] Permís `RECORD_AUDIO` (flux de petició; si el sistema ja no mostra el diàleg, «Permet» obre els ajustos de l'app). — `9dea534`, `92ab57a`
+- [x] Ones lligades a l'amplitud del micròfon; quietes si s'han desactivat les animacions del sistema. — `92ab57a`
+- [x] Idioma el de l'app (ca/es/en); el català depèn del reconeixedor del rellotge (P5, sense confirmar). — `92ab57a`
+- [x] Estats d'error i permís denegat (P4): sense veu, sense reconeixedor, micròfon, error genèric i permís, amb captures. — `92ab57a`
+
+Validada per Bernat. Provada a l'emulador Wear (permís, escolta, error i reintent); «Acaba» deixa la transcripció a la pantalla i la fase 7 la passarà a «Qui». El català no s'ha comprovat.
 
 **Sortida:** dictar una frase i veure'n la transcripció al rellotge.
 
