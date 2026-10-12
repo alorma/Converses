@@ -86,9 +86,9 @@ Sense codi de producte.
 - [x] **Versionat:** `VersionPlugin` 1.1.0 (ja publicada) aplicat a `:wear` amb `appVersion { formFactor = FormFactor.WEAR }`, sense import. Comprovat: `:wear` 10060012 i `:app` 10060010 (1.6.1 snapshot).
 - [x] `ConversesWearTheme` amb els tokens del brief (negre pur, `surface-card`, `surface-card-high`, `primary`, `on-surface`…, avatars pastel i tinta `#1E1D24`) i Roboto Flex (subconjunt llatí, com al mòbil). — `f5bcfcc`
 - [x] Components: llista agrupada (separació 2, radi 24 fora i 6 dins), fila de persona, entrada de cronologia (radi 18), grup connectat del «Qui», Galeta d'avatar. — `components/` (previews a la tasca 5)
-- [ ] Les 9 pantalles com a previews amb dades fictícies, a Large i Small Round, i captures de preview comparades amb `docs/wear/screenshots/`.
+- [x] Les 9 pantalles com a previews amb dades fictícies, a Large i Small Round, i captures de preview comparades amb `docs/wear/screenshots/` — `ui/` i `WearScreenshotTests` (18 captures de referència a `wear/src/screenshotTestDebug/reference`); pendent la comparació amb Bernat.
 - [x] Textos a `strings.xml` en en/ca/es; reutilitzar els del mòbil (Jo, Apunt, Desa, grups de canal) i afegir només els nous.
-- [ ] ktlint al mòdul; `testDebugUnitTest`, `ktlintCheck` i els APK actuals sense trencar-se.
+- [x] ktlint al mòdul; `testDebugUnitTest`, `ktlintCheck` i els APK actuals sense trencar-se.
 
 **Sortida:** les 9 pantalles es veuen a les previews i s'instal·la un APK de debug a l'emulador.
 
@@ -110,7 +110,7 @@ La part més delicada: privacitat.
 ## Fase 3 · Pantalles de lectura
 
 - [ ] Persones (1) i Persones sense mòbil (8), amb «Dades de fa N min». Les protegides només mostren nom i cadenat.
-- [ ] Cronologia (2) amb l'`EdgeButton` «Nota»: comprovar P2 i, si cal, forçar que sigui sempre visible.
+- [ ] Cronologia (2) amb l'`EdgeButton` «Nota»: comprovar P2 i, si cal, forçar que sigui sempre visible. **P2 ja comprovat a la fase 1:** el d'`ScreenScaffold` només apareix en arribar al final de la llista; el mòdul usa `PinnedEdgeButton` (sempre visible, amb degradat).
 - [ ] Cronologia buida (P3).
 - [ ] Detecció de «mòbil no connectat» amb `NodeClient`/`CapabilityClient`.
 - [ ] Navegació amb `SwipeDismissableNavHost`.
