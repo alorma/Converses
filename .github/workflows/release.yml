@@ -44,7 +44,7 @@ jobs:
       - name: Get version
         id: version
         run: |
-          VERSION=$(./gradlew -q printVersionName)
+          VERSION=$(./gradlew -q :app:printVersionName)
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
           echo "**Version:** \`$VERSION\`" >> "$GITHUB_STEP_SUMMARY"
 
