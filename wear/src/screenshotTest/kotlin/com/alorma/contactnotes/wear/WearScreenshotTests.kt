@@ -3,6 +3,9 @@ package com.alorma.contactnotes.wear
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
+import com.alorma.contactnotes.wear.ui.DictateErrorPreview
+import com.alorma.contactnotes.wear.ui.DictateListeningPreview
+import com.alorma.contactnotes.wear.ui.DictatePermissionPreview
 import com.alorma.contactnotes.wear.ui.DictatePreview
 import com.alorma.contactnotes.wear.ui.LockRequiredPreview
 import com.alorma.contactnotes.wear.ui.NoDataPreview
@@ -52,6 +55,21 @@ class WearScreenshotTests {
   @PreviewTest
   @Composable
   fun dictate() = DictatePreview()
+
+  @WatchPreviews
+  @PreviewTest
+  @Composable
+  fun dictateListening() = DictateListeningPreview()
+
+  @WatchPreviews
+  @PreviewTest
+  @Composable
+  fun dictatePermission() = DictatePermissionPreview()
+
+  @WatchPreviews
+  @PreviewTest
+  @Composable
+  fun dictateError() = DictateErrorPreview()
 
   @WatchPreviews
   @PreviewTest

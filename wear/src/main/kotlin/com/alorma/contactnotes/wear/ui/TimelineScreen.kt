@@ -181,7 +181,7 @@ fun TimelineLoadingMorePreview() =
 fun TimelineScreen(
   viewModel: TimelineViewModel,
   onBack: () -> Unit,
-  onNote: () -> Unit,
+  onNote: (name: String) -> Unit,
 ) {
   when (val state = viewModel.state.collectAsStateWithLifecycle().value) {
     TimelineUiState.Loading -> Unit
@@ -193,7 +193,7 @@ fun TimelineScreen(
         color = state.color,
         avatarShape = state.avatarShape,
         entries = state.entries,
-        onNote = onNote,
+        onNote = { onNote(state.name) },
         loadingMore = state.loadingMore,
         onLoadMore = viewModel::loadMore,
       )

@@ -13,9 +13,11 @@ import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import androidx.wear.compose.navigation3.rememberSwipeDismissableSceneStrategy
+import com.alorma.contactnotes.wear.data.AndroidSpeechSource
 import com.alorma.contactnotes.wear.data.GmsMoreEntriesSource
 import com.alorma.contactnotes.wear.data.GmsPhoneConnection
 import com.alorma.contactnotes.wear.data.WearSnapshotStore
+import java.util.Locale
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -26,6 +28,13 @@ data class PersonRoute(
   val id: Long,
 ) : NavKey
 
+/** Només es crea per a persones no protegides; les protegides arriben a la fase 5. */
+@Serializable
+data class DictateRoute(
+  val personId: Long,
+  val name: String,
+) : NavKey
+
 @Composable
 fun WearNavigation() {
   val context = LocalContext.current.applicationContext
@@ -33,6 +42,7 @@ fun WearNavigation() {
   val phone = remember { GmsPhoneConnection(context) }
   val labels = remember { AndroidWearLabels(context) }
   val moreEntries = remember { GmsMoreEntriesSource(context) }
+  val speech = remember { AndroidSpeechSource(context) }
   val backStack = rememberNavBackStack(PeopleRoute)
 
   NavDisplay(
@@ -70,7 +80,23 @@ fun WearNavigation() {
                   }
                 },
             )
-          TimelineScreen(viewModel = vm, onBack = { backStack.removeLastOrNull() }, onNote = {})
+          TimelineScreen(
+            viewModel = vm,
+            onBack = { backStack.removeLastOrNull() },
+            onNote = { name -> backStack.add(DictateRoute(route.id, name)) },
+          )
+        }
+        entry<DictateRoute> { route ->
+          val vm =
+            viewModel<DictationViewModel>(
+              key = "dictate-${route.personId}",
+              factory =
+                viewModelFactory {
+                  initializer { DictationViewModel(speech, Locale.getDefault().toLanguageTag()) }
+                },
+            )
+          // La fase 7 envia el text a «Qui»; de moment «Acaba» torna a la cronologia
+          DictateScreen(viewModel = vm, personName = route.name, onClose = { backStack.removeLastOrNull() })
         }
       },
   )

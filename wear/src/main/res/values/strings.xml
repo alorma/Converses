@@ -37,4 +37,18 @@
     <string name="lock_required_title">Lock required</string>
     <string name="lock_required_hint">Set a PIN on your watch.</string>
     <string name="lock_required_action">Set up</string>
+
+    <string name="dictate_listening">Listening</string>
+    <string name="dictate_retry">Retry</string>
+    <string name="dictate_permission_title">Microphone needed</string>
+    <string name="dictate_permission_hint">Allow it to dictate your notes.</string>
+    <string name="dictate_permission_action">Allow</string>
+    <string name="dictate_error_no_speech_title">Didn\'t catch that</string>
+    <string name="dictate_error_no_speech_hint">Speak a little closer to the watch.</string>
+    <string name="dictate_error_unavailable_title">No voice input</string>
+    <string name="dictate_error_unavailable_hint">This watch can\'t recognise speech.</string>
+    <string name="dictate_error_microphone_title">Microphone problem</string>
+    <string name="dictate_error_microphone_hint">Check that nothing else is using it.</string>
+    <string name="dictate_error_failed_title">Couldn\'t dictate</string>
+    <string name="dictate_error_failed_hint">Something went wrong. Try again.</string>
 </resources>
