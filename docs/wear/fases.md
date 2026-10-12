@@ -9,7 +9,7 @@ Context, abast, arquitectura, decisions (P0–P16) i riscos són a `docs/wear/RE
 | 2 | Contracte i sincronització mòbil → rellotge | 0 | Feta |
 | 3 | Pantalles de lectura: Persones, Cronologia, Sense mòbil | 1, 2 | Feta |
 | 4 | Més entrades sota demanda | 3 | Feta |
-| 5 | Bloqueig de l'app i persones protegides | 0 (P0, P10), 3, 4 | Pendent |
+| 5 | Bloqueig de l'app i persones protegides | 0 (P0, P10), 3, 4 | Feta |
 | 6 | Dictat | 1 | Feta |
 | 7 | Qui, Desat i nota rellotge → mòbil amb cua | 2, 3, 6 | Feta |
 | 8 | Estats d'error i casos límit | 5, 7 | Pendent |
@@ -128,6 +128,8 @@ Depèn de **P0** i **P10**.
 - [x] **Emulador de punta a punta** (telèfon + Wear XL Round), amb els APK finals: aprovar amb l'app oberta (prompt directe, la pantalla es tanca, el rellotge obre la cronologia sense rastre al disc), aprovar des de la notificació genèrica (app en segon pla), cancel·lar el prompt (apareix «Confirma» / «Denega» i «Confirma» el reobre), «Denega» (rellotge: «Denegat»), caducar (rellotge: «Ha caducat», el mòbil tanca el prompt; «Reintenta» fa una petició nova i s'aprova), cancel·lar al rellotge (el mòbil tanca el prompt) i passar a segon pla (la protegida torna a estar tancada). **No provat:** mòbil realment absent (pantalla 12, només tests de JVM), dictat i nota a una protegida de punta a punta, i tot el que depèn d'un rellotge real (biometria, clau Keystore en bloquejar-lo i treure el PIN → fase 9).
 
 **Sortida:** amb el bloqueig actiu i rellotge sense PIN, només es veu la pantalla 9; amb PIN, una protegida s'obre i no queda rastre en sortir.
+
+Validada per Bernat. Provada a l'emulador (telèfon + Wear XL Round); el rellotge físic no s'ha provat: biometria real, clau Keystore en bloquejar el rellotge i en treure el PIN, i dictat i nota a una protegida de punta a punta queden per a la fase 9. Falta la referència de la captura `approvalConfirm` de l'app (etiqueta `update-screenshots` a la PR).
 
 ## Fase 6 · Dictat
 
