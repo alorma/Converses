@@ -8,14 +8,18 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.EditNote
 import androidx.compose.material.icons.rounded.Person
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.wear.compose.foundation.lazy.TransformingLazyColumn
 import androidx.wear.compose.foundation.lazy.rememberTransformingLazyColumnState
 import androidx.wear.compose.material3.Icon
@@ -29,6 +33,7 @@ import com.alorma.contactnotes.wear.components.WhoOption
 import com.alorma.contactnotes.wear.theme.ButtonLabelStyle
 import com.alorma.contactnotes.wear.theme.WearColors
 import com.alorma.contactnotes.wear.theme.WhoTitleStyle
+import kotlinx.coroutines.delay
 
 /** Pantalla 4: Jo / {persona} / Apunt; per defecte, la persona (índex 1). */
 @Composable
@@ -95,3 +100,39 @@ fun WhoPreview() =
       onSave = {},
     )
   }
+
+/** Segons que es veu «Desat» abans de tornar a la cronologia. */
+private const val SavedVisibleMillis = 2_000L
+
+/** Pantalles 4, 5 i 6: tria qui ho diu, desa a la cua i confirma. [onDone] torna a la cronologia. */
+@Composable
+fun WhoScreen(
+  viewModel: WhoViewModel,
+  onDone: () -> Unit,
+  modifier: Modifier = Modifier,
+) {
+  val state by viewModel.state.collectAsStateWithLifecycle()
+  val haptics = LocalHapticFeedback.current
+  when (val current = state) {
+    WhoUiState.Loading -> Unit
+    WhoUiState.Unavailable -> LaunchedEffect(Unit) { onDone() }
+    is WhoUiState.Choosing ->
+      WhoContent(
+        personName = current.name,
+        personInitials = current.initials,
+        personColor = current.color,
+        selectedIndex = current.selectedIndex,
+        onSelect = viewModel::select,
+        onSave = viewModel::save,
+        modifier = modifier,
+      )
+    is WhoUiState.Saved -> {
+      LaunchedEffect(Unit) {
+        haptics.performHapticFeedback(HapticFeedbackType.Confirm)
+        delay(SavedVisibleMillis)
+        onDone()
+      }
+      SavedContent(pendingPhone = current.pendingPhone, modifier = modifier)
+    }
+  }
+}

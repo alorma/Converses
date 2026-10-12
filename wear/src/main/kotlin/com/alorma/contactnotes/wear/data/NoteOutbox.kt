@@ -60,6 +60,11 @@ class GmsNoteSender(
   }
 }
 
+/** El que necessita la pantalla «Qui»: deixar una nota a la cua sense preocupar-se de l'entrega. */
+fun interface NoteSubmitter {
+  suspend fun submit(note: WearNote)
+}
+
 /** Demana que s'intenti l'entrega de la cua. La implementació real és un `WorkManager` (sobreviu al tancament de l'app). */
 fun interface DeliveryScheduler {
   fun schedule()
@@ -73,9 +78,9 @@ class NoteOutbox(
   private val queue: PendingNoteQueue,
   private val sender: NoteSender,
   private val scheduler: DeliveryScheduler,
-) {
+) : NoteSubmitter {
   /** Desa la nota a la cua i en programa l'entrega. Quan torna, la nota ja no es perd encara que l'app es tanqui. */
-  suspend fun submit(note: WearNote) {
+  override suspend fun submit(note: WearNote) {
     queue.add(note)
     scheduler.schedule()
   }

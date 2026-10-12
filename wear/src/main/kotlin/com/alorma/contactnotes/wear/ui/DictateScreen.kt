@@ -74,13 +74,13 @@ private const val MinBarFraction = 0.45f
 
 /**
  * Pantalla 3 amb el reconeixedor: demana el permís del micròfon, escolta i mostra la transcripció en directe. En
- * acabar es queda amb el text definitiu fins que l'usuari toca «Acaba» ([onClose]).
+ * acabar es queda amb el text definitiu fins que l'usuari toca «Acaba» ([onDone], que passa el text a «Qui»).
  */
 @Composable
 fun DictateScreen(
   viewModel: DictationViewModel,
   personName: String,
-  onClose: () -> Unit,
+  onDone: (String) -> Unit,
   modifier: Modifier = Modifier,
 ) {
   val context = LocalContext.current
@@ -125,7 +125,7 @@ fun DictateScreen(
         personName = personName,
         text = current.text,
         level = null,
-        onFinish = onClose,
+        onFinish = { onDone(current.text) },
         modifier = modifier,
       )
     current is DictationUiState.Listening ->
