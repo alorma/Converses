@@ -28,6 +28,8 @@
     <string name="no_data_hint">Open Converses on your phone to sync.</string>
     <string name="phone_not_connected">Phone not connected</string>
     <string name="data_from_minutes">Data from %1$d min ago</string>
+    <string name="data_just_now">Data from just now</string>
+    <string name="data_from_hours">Data from %1$d h ago</string>
     <string name="protected_person_title">Protected person</string>
     <string name="protected_person_hint">Unlock it with your watch PIN.</string>
     <string name="unlock">Unlock</string>

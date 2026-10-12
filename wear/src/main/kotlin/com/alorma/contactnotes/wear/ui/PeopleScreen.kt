@@ -123,7 +123,12 @@ private fun PhoneOfflineBanner(
         color = WearColors.OnSurface,
       )
       Text(
-        text = stringResource(R.string.data_from_minutes, dataAgeMinutes),
+        text =
+          when {
+            dataAgeMinutes < 1 -> stringResource(R.string.data_just_now)
+            dataAgeMinutes < 60 -> stringResource(R.string.data_from_minutes, dataAgeMinutes)
+            else -> stringResource(R.string.data_from_hours, dataAgeMinutes / 60)
+          },
         style = RowSubtitleStyle,
         color = WearColors.OnSurfaceVariant,
       )
