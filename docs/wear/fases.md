@@ -174,10 +174,19 @@ Validada per Bernat amb les proves de l'emulador i els tests; el rellotge físic
 - [x] Còpia i cua fora del backup d'Android: `BackupRulesTest` comprova `allowBackup=false` i que els tres fitxers de regles exclouen tots els dominis. L'emulador Wear no té servei de backup (`dumpsys backup`), així que no s'ha provat en viu. — `1467c56`
 - [x] Large i Small Round, mida de lletra gran, ambient, ca/es/en. Les captures ja cobreixen Large i Small Round (ca); a l'**emulador** (Wear XL Round) s'ha provat lletra a 1,3 (llista i cronologia sense talls) i l'app en en/ca/es (cadenes: 55 a cada idioma). **Ambient:** l'app no el gestiona (cap codi d'ambient): en passar a ambient el sistema la deixa i el contingut no queda a la pantalla; es deixa així per privacitat. **Pendent:** retall de la capçalera d'entrada (veure «Diferències amb el disseny» si s'anota).
 - [x] TalkBack al rellotge (parcial). Trobat i arreglat: una persona protegida només tenia el cadenat decoratiu (TalkBack no deia que ho fos) i les inicials de l'avatar es llegirien abans del nom; ara la fila diu «Persona protegida» (`stateDescription`, ca/es/en) i les inicials s'amaguen. L'avís «N notes descartades» té `Role.Button`. Validat amb l'arbre d'`uiautomator` i els tests. **No verificat:** la veu real de TalkBack (l'emulador no mostra el text parlat i el tutorial bloqueja la prova) → ho ha de mirar Bernat al rellotge real. — `fc1c5e7`
-- [ ] Rellotge real: bateria, latència, desconnexions, bloqueig i desbloqueig reals.
+- [ ] Rellotge real: bateria, latència, desconnexions, bloqueig i desbloqueig reals. **Pendent, no es pot fer sense rellotge físic** (no s'engega). Llista per quan es pugui:
+  - Clau Keystore: la còpia és il·legible amb el rellotge bloquejat i la clau desapareix en treure el PIN (P10, `minSdk` 30).
+  - Biometria real a l'aprovació d'una protegida, i dictat + nota a una protegida de punta a punta.
+  - Català al reconeixedor de veu i «Sense mòbil» real; desconnexió i reconnexió amb notes a la cua.
+  - Release R8: dictat i entrega d'una nota, i aprovació (no es poden exercitar a l'emulador).
+  - TalkBack: què diu la fila d'una persona protegida («Persona protegida») i que no repeteix les inicials.
+  - Bateria i latència de la sincronització; ambient (l'app hauria de desaparèixer, sense deixar contingut a la pantalla).
 - [x] Release amb R8: Koin, serialització i Data Layer. **Trobat:** `:wear:assembleRelease` no compilava (`WearScaffolds.kt` usa `ui-tooling-preview` i només hi era a debug); arreglat. **Emulador** (parella release mòbil + rellotge signats amb la clau de debug, ids sense `.dev`): els dos arrenquen sense crashes, el mòbil sincronitza una persona i una entrada nova i el rellotge les mostra (Data Layer, serialització, DataStore i desxifrat amb Keystore sota R8). Al mapping hi són el worker, els serveis i els codecs de protocol. **No provat sota R8:** dictat i entrega d'una nota del rellotge al mòbil, aprovació d'una protegida (necessita biometria) → rellotge real/fase 10. Koin no s'usa al rellotge. — `e0ff1ac`
 - [x] Permisos: només els imprescindibles (`RECORD_AUDIO`). Revisat amb `aapt2 dump permissions` sobre l'APK de release: l'únic permís propi és `RECORD_AUDIO`; la resta (`WAKE_LOCK`, `ACCESS_NETWORK_STATE`, `RECEIVE_BOOT_COMPLETED`, `FOREGROUND_SERVICE`) els fusiona WorkManager i es mantenen perquè la cua de notes es reprogrami en reiniciar el rellotge. Sense `INTERNET`, ubicació ni notificacions.
-- [ ] Comparar la implementació amb `docs/wear/screenshots/` i anotar les diferències.
+- [x] Comparar la implementació amb `docs/wear/screenshots/` i anotar les diferències. Comparades la llista de persones (01) i la cronologia (02) a l'emulador (Wear XL Round, en-US):
+  - **Capçalera d'entrada retallada:** al disseny és «JO · 21:40 · XAT»; amb hora de 12 h i canal llarg es talla («MARTA · 6:07 PM · IN P…») i el canal es perd. Més visible amb lletra gran. **Decisió pendent de Bernat** (abreujar el canal, treure l'hora o deixar-ho així).
+  - El títol de debug porta «(D)» (només debug) i les files de la llista tenen l'efecte d'escala de la vora de la pantalla; són coherents amb el disseny.
+  - No comparades en viu: dictat (03), Qui (04), Desat (05–06), aprovació (07–12) i les del mòbil (13–16); les cobreixen les captures i les proves d'emulador de les fases 6–8.
 
 ## Fase 10 · CI i publicació
 
