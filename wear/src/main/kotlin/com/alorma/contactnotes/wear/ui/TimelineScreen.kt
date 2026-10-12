@@ -1,24 +1,32 @@
 package com.alorma.contactnotes.wear.ui
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Mic
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.wear.compose.foundation.lazy.TransformingLazyColumn
 import androidx.wear.compose.foundation.lazy.rememberTransformingLazyColumnState
 import androidx.wear.compose.material3.Button
+import androidx.wear.compose.material3.CircularProgressIndicator
 import androidx.wear.compose.material3.Icon
 import androidx.wear.compose.material3.ScreenScaffold
 import androidx.wear.compose.material3.Text
@@ -32,6 +40,10 @@ import com.alorma.contactnotes.wear.components.TimelineEntry
 import com.alorma.contactnotes.wear.theme.ButtonLabelStyle
 import com.alorma.contactnotes.wear.theme.PersonNameStyle
 import com.alorma.contactnotes.wear.theme.WearColors
+import kotlinx.coroutines.flow.filter
+
+/** Quants elements abans del final de la llista es demana la pàgina següent. */
+private const val LoadMoreThreshold = 3
 
 /** Entrada ja formatada per mostrar: qui, «qui · hora · canal» i text. */
 data class EntryItem(
@@ -51,6 +63,8 @@ fun TimelineContent(
   entries: List<EntryItem>,
   onNote: () -> Unit,
   modifier: Modifier = Modifier,
+  loadingMore: Boolean = false,
+  onLoadMore: () -> Unit = {},
 ) {
   if (entries.isEmpty()) {
     EmptyTimelineContent(
@@ -65,6 +79,16 @@ fun TimelineContent(
   }
   val state = rememberTransformingLazyColumnState()
   val spec = rememberTransformationSpec()
+  val loadingDescription = stringResource(R.string.loading_more_entries)
+  // En acostar-se al final de la llista, demana la pàgina següent (el ViewModel ignora el que ja no cal)
+  val currentOnLoadMore by rememberUpdatedState(onLoadMore)
+  LaunchedEffect(state) {
+    snapshotFlow {
+      val info = state.layoutInfo
+      val last = info.visibleItems.lastOrNull()?.index ?: -1
+      info.totalItemsCount > 0 && last >= info.totalItemsCount - LoadMoreThreshold
+    }.filter { it }.collect { currentOnLoadMore() }
+  }
   ScreenScaffold(
     scrollState = state,
     modifier = modifier,
@@ -92,6 +116,16 @@ fun TimelineContent(
           text = entry.text,
           modifier = Modifier.scrollTransformed(this, spec),
         )
+      }
+      if (loadingMore) {
+        item(key = "loading-more") {
+          Box(modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp), contentAlignment = Alignment.Center) {
+            CircularProgressIndicator(
+              modifier = Modifier.size(24.dp).semantics { contentDescription = loadingDescription },
+              strokeWidth = 3.dp,
+            )
+          }
+        }
       }
     }
     PinnedEdgeButton(onClick = onNote) {
@@ -126,6 +160,22 @@ fun TimelinePreview() =
     )
   }
 
+/** P16: mentre es demanen més entrades al mòbil, un indicador discret al final de la llista. */
+@WearScreenPreviews
+@Composable
+fun TimelineLoadingMorePreview() =
+  WearPreview {
+    TimelineContent(
+      name = "Kael",
+      initials = "K",
+      color = AvatarColor.Sky,
+      avatarShape = AvatarShape.Clover4Leaf,
+      entries = sampleEntries().take(1),
+      onNote = {},
+      loadingMore = true,
+    )
+  }
+
 /** Pantalla 2 connectada al ViewModel; si la persona ja no és disponible, torna enrere. */
 @Composable
 fun TimelineScreen(
@@ -144,6 +194,8 @@ fun TimelineScreen(
         avatarShape = state.avatarShape,
         entries = state.entries,
         onNote = onNote,
+        loadingMore = state.loadingMore,
+        onLoadMore = viewModel::loadMore,
       )
   }
 }
