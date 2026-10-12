@@ -16,6 +16,7 @@ import androidx.wear.compose.navigation3.rememberSwipeDismissableSceneStrategy
 import com.alorma.contactnotes.wear.data.AndroidSpeechSource
 import com.alorma.contactnotes.wear.data.GmsMoreEntriesSource
 import com.alorma.contactnotes.wear.data.GmsPhoneConnection
+import com.alorma.contactnotes.wear.data.WearNotes
 import com.alorma.contactnotes.wear.data.WearSnapshotStore
 import java.util.Locale
 import kotlinx.serialization.Serializable
@@ -35,6 +36,13 @@ data class DictateRoute(
   val name: String,
 ) : NavKey
 
+/** «Qui» i «Desat»: [text] és la transcripció del dictat, que només viu en memòria i després a la cua. */
+@Serializable
+data class WhoRoute(
+  val personId: Long,
+  val text: String,
+) : NavKey
+
 @Composable
 fun WearNavigation() {
   val context = LocalContext.current.applicationContext
@@ -43,6 +51,7 @@ fun WearNavigation() {
   val labels = remember { AndroidWearLabels(context) }
   val moreEntries = remember { GmsMoreEntriesSource(context) }
   val speech = remember { AndroidSpeechSource(context) }
+  val outbox = remember { WearNotes.get(context) }
   val backStack = rememberNavBackStack(PeopleRoute)
 
   NavDisplay(
@@ -95,8 +104,29 @@ fun WearNavigation() {
                   initializer { DictationViewModel(speech, Locale.getDefault().toLanguageTag()) }
                 },
             )
-          // La fase 7 envia el text a «Qui»; de moment «Acaba» torna a la cronologia
-          DictateScreen(viewModel = vm, personName = route.name, onClose = { backStack.removeLastOrNull() })
+          DictateScreen(
+            viewModel = vm,
+            personName = route.name,
+            onDone = { text -> backStack.add(WhoRoute(route.personId, text)) },
+          )
+        }
+        entry<WhoRoute> { route ->
+          val vm =
+            viewModel<WhoViewModel>(
+              key = "who-${route.personId}",
+              factory =
+                viewModelFactory {
+                  initializer { WhoViewModel(route.personId, route.text, store.stored, outbox, phone) }
+                },
+            )
+          // Després de «Desat» es torna a la cronologia: es treuen «Qui» i el dictat
+          WhoScreen(
+            viewModel = vm,
+            onDone = {
+              backStack.removeLastOrNull()
+              backStack.removeLastOrNull()
+            },
+          )
         }
       },
   )
