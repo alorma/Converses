@@ -212,15 +212,19 @@ fun LockRequiredPreview() = WearPreview { LockRequiredContent(onSetUp = {}) }
 
 private const val CookieRotationMillis = 24_000
 
+/** `false` si l'usuari ha desactivat les animacions del sistema («reduir animacions»). */
+@Composable
+fun rememberAnimationsOn(): Boolean {
+  val context = LocalContext.current
+  return remember(context) {
+    Settings.Global.getFloat(context.contentResolver, Settings.Global.ANIMATOR_DURATION_SCALE, 1f) > 0f
+  }
+}
+
 /** Gir lent i continu de la Galeta (una volta cada 24 s). Sense gir si l'usuari ha desactivat les animacions del sistema. */
 @Composable
 private fun rememberCookieRotation(): State<Float> {
-  val context = LocalContext.current
-  val animationsOn =
-    remember(context) {
-      Settings.Global.getFloat(context.contentResolver, Settings.Global.ANIMATOR_DURATION_SCALE, 1f) > 0f
-    }
-  if (!animationsOn) return remember { mutableStateOf(0f) }
+  if (!rememberAnimationsOn()) return remember { mutableStateOf(0f) }
   val transition = rememberInfiniteTransition(label = "cookieRotation")
   return transition.animateFloat(
     initialValue = 0f,

@@ -37,4 +37,18 @@
     <string name="lock_required_title">Cal un bloqueig</string>
     <string name="lock_required_hint">Activa un PIN al rellotge.</string>
     <string name="lock_required_action">Configura</string>
+
+    <string name="dictate_listening">Escoltant</string>
+    <string name="dictate_retry">Reintenta</string>
+    <string name="dictate_permission_title">Cal el micròfon</string>
+    <string name="dictate_permission_hint">Permet-lo per dictar les notes.</string>
+    <string name="dictate_permission_action">Permet</string>
+    <string name="dictate_error_no_speech_title">No t\'he entès</string>
+    <string name="dictate_error_no_speech_hint">Parla una mica més a prop del rellotge.</string>
+    <string name="dictate_error_unavailable_title">Sense entrada de veu</string>
+    <string name="dictate_error_unavailable_hint">Aquest rellotge no pot reconèixer la veu.</string>
+    <string name="dictate_error_microphone_title">Problema amb el micròfon</string>
+    <string name="dictate_error_microphone_hint">Comprova que no el faci servir res més.</string>
+    <string name="dictate_error_failed_title">No s\'ha pogut dictar</string>
+    <string name="dictate_error_failed_hint">Alguna cosa ha fallat. Torna-ho a provar.</string>
 </resources>
