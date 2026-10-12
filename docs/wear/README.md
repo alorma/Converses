@@ -8,16 +8,24 @@ Captures a 720×720, fons transparent. Són una aproximació: la tipografia hi s
 
 | Fitxer | Pantalla |
 | --- | --- |
-| `screenshots/00-overview.png` | Visió general |
+| `screenshots/00-overview-rellotge.png` | Visió general del rellotge |
+| `screenshots/00-overview-mobil.png` | Visió general del mòbil (flux d'aprovació) |
 | `screenshots/01-persones.png` | Persones |
 | `screenshots/02-cronologia.png` | Cronologia |
 | `screenshots/03-dictat.png` | Dictat |
 | `screenshots/04-qui.png` | Qui |
 | `screenshots/05-desat.png` | Desat |
 | `screenshots/06-desat-sense-mobil.png` | Desat sense mòbil |
-| `screenshots/07-persona-protegida.png` | Persona protegida (desbloqueig al rellotge) |
+| `screenshots/07-confirma-ho-al-mobil.png` | Confirma-ho al mòbil (espera, compte enrere ≈ 60 s) |
 | `screenshots/08-persones-sense-mobil.png` | Persones sense mòbil |
 | `screenshots/09-cal-bloqueig-rellotge.png` | Cal un bloqueig al rellotge |
+| `screenshots/10-denegat.png` | Denegat |
+| `screenshots/11-ha-caducat.png` | Ha caducat |
+| `screenshots/12-no-disponible-sense-mobil.png` | No disponible sense el mòbil |
+| `screenshots/13-mobil-notificacio.png` | Mòbil: notificació genèrica |
+| `screenshots/14-mobil-confirma.png` | Mòbil: Confirma / Denega |
+| `screenshots/15-mobil-empremta.png` | Mòbil: BiometricPrompt (referència) |
+| `screenshots/16-mobil-fet.png` | Mòbil: Fet |
 
 ## Objectiu
 
@@ -28,7 +36,7 @@ Un mirall del mòbil al rellotge: veure les persones i les últimes entrades, i 
 1. **No és una app autònoma.** El mòbil (Room) és l'única font de veritat; el rellotge en té una còpia reduïda.
 2. **Sense núvol.** Sincronització només amb la Wearable Data Layer; cap servidor propi ni Firebase. `allowBackup` desactivat.
 3. **Només lectura + una acció.** L'única escriptura és una nota per veu a una persona existent.
-4. **Persones protegides:** exigeixen **desbloqueig al rellotge** (PIN, patró o contrasenya del rellotge) cada cop que s'obren. El rellotge no n'emmagatzema les entrades.
+4. **Persones protegides:** exigeixen **aprovació biomètrica al mòbil** (`BiometricPrompt`) cada cop que s'obren. El rellotge no n'emmagatzema les entrades.
 5. **Bloqueig de l'app:** si és actiu al mòbil, el rellotge ha de tenir bloqueig de pantalla propi; si no, no mostra ni desa res.
 6. **Sempre fosc**, fons negre pur (OLED), sense color de tema ni Pro. El color només és identitat (avatars).
 
@@ -40,10 +48,10 @@ Un mirall del mòbil al rellotge: veure les persones i les últimes entrades, i 
 - **Cronologia** (només lectura; qui, hora, canal i text) amb l'`EdgeButton` «Nota» sempre visible. Mostra les 5 últimes de la còpia local i **en carrega més sota demanda** (pàgines de 20) en entrar i en arribar al final.
 - **Nota per veu:** Dictat (transcripció en directe) → «Qui» (Jo / {persona} / Apunt; per defecte, la persona) → Desat.
 - **Cua fora de línia** amb reintents i estat «S'enviarà al mòbil quan hi hagi connexió».
-- **Persona protegida:** pantalla 7 → «Desbloqueja» → credencial de dispositiu del sistema → Cronologia amb entrades demanades al mòbil **només en memòria**.
+- **Persona protegida:** pantalla 7 «Confirma-ho al mòbil» → notificació i `BiometricPrompt` al mòbil → Cronologia amb entrades demanades al mòbil **només en memòria**; o «Denegat», «Ha caducat» o «No disponible sense el mòbil».
 - **Bloqueig de l'app:** pantalla 9 («Cal un bloqueig») si el rellotge no és segur.
 - **Mòbil no connectat:** avís i dades de la còpia local («Dades de fa N min»).
-- Textos en ca/es/en; els nous són `Nota`, `Acaba`, `Qui ho ha dit?`, `Nota per a {nom}`, `Desat`, `Enviada al mòbil`, `S'enviarà al mòbil quan hi hagi connexió`, `Mòbil no connectat`, `Dades de fa {n} min`, `Persona protegida`, `Desbloqueja-la amb el PIN del rellotge.`, `Desbloqueja`, `Cal un bloqueig`, `Activa un PIN al rellotge.`, `Configura`.
+- Textos en ca/es/en; els nous són `Nota`, `Acaba`, `Qui ho ha dit?`, `Nota per a {nom}`, `Desat`, `Enviada al mòbil`, `S'enviarà al mòbil quan hi hagi connexió`, `Mòbil no connectat`, `Dades de fa {n} min`, `Persona protegida`, `Confirma-ho al mòbil`, `Queden {n} s`, `Cancel·la`, `Denegat`, `S'ha rebutjat al mòbil.`, `Ha caducat`, `No s'ha confirmat a temps.`, `Reintenta`, `No disponible sense el mòbil`, `El rellotge no troba el mòbil.`, `Tanca`, i al mòbil `El rellotge demana obrir una persona protegida`, `El rellotge vol obrir una persona protegida`, `Confirma que ets tu amb l'empremta.`, `Confirma`, `Denega`, `Confirma l'accés`, `Obre una persona protegida al rellotge.`, `Fet`, `Ja pots veure la persona al rellotge.`, `Cal un bloqueig`, `Activa un PIN al rellotge.`, `Configura`.
 
 ### Fora
 
@@ -51,7 +59,7 @@ Crear, editar, arxivar o esborrar res; Ajustos; color de tema; Pro; tile i compl
 
 ## Pantalles i flux
 
-Persones → Cronologia → Dictat → Qui → Desat, més els estats d'excepció. Rutes: `people`, `person/{id}`, `dictate/{personId}`, `who/{personId}`, `saved/{pending}`, `protected`.
+Persones → Cronologia → Dictat → Qui → Desat, més els estats d'excepció. Rutes: `people`, `person/{id}`, `dictate/{personId}`, `who/{personId}`, `saved/{pending}`, `approval/{personId}`, `locked`.
 
 | # | Pantalla | Notes |
 | --- | --- | --- |
@@ -61,9 +69,14 @@ Persones → Cronologia → Dictat → Qui → Desat, més els estats d'excepci�
 | 4 | Qui | Grup connectat de 3; «Desa» |
 | 5 | Desat | Confirmació; es tanca sola i torna a la Cronologia |
 | 6 | Desat sense mòbil | Mateix, amb icona de rellotge |
-| 7 | Persona protegida | `EdgeButton` «Desbloqueja» → credencial del sistema; en èxit → Cronologia |
+| 7 | Confirma-ho al mòbil | Anell de compte enrere (≈ 60 s), «Queden N s» i «Cancel·la»; en èxit → Cronologia |
 | 8 | Persones sense mòbil | Avís «Mòbil no connectat · Dades de fa N min» |
 | 9 | Cal un bloqueig | Substitueix qualsevol altra pantalla; sense dades; «Configura» |
+| 10 | Denegat | «S'ha rebutjat al mòbil.» + «Tanca»; neutre, sense vermell |
+| 11 | Ha caducat | «No s'ha confirmat a temps.» + «Reintenta» (petició nova) |
+| 12 | No disponible sense el mòbil | «El rellotge no troba el mòbil.» + «Tanca» |
+
+Mòbil: 13 notificació genèrica, 14 «Confirma» / «Denega», 15 `BiometricPrompt` (el pinta el sistema), 16 «Fet». Si la petició ja ha caducat en obrir-la, o si es cancel·la al rellotge amb el prompt obert, el mòbil tanca la pantalla i mostra un missatge breu («No s'ha pogut completar la petició»), sense disseny propi.
 
 Amb el mòbil connectat no es mostra cap indicador de sincronització; només a les excepcions (6 i 8).
 
@@ -74,7 +87,7 @@ Amb el mòbil connectat no es mostra cap indicador de sincronització; només a 
 - **UI:** Wear Compose Material 3 (`AppScaffold`, `ScreenScaffold`, `TransformingLazyColumn`, `EdgeButton`, `TimeText`) i `compose-navigation` per a Wear. Versions: les estables vigents, comprovades a la documentació oficial (regla de `CLAUDE.md`).
 - **Mòbil → rellotge (instantani):** `DataClient`. Persona: `id`, nom, color i forma d'avatar, `protected`, hora de l'última entrada. Entrades: **només les últimes 5 per persona**. Protegides: només `id`, nom, color i `protected = true`. A més, l'**estat del Bloqueig de l'app** (actiu/inactiu). Es republica quan canvien les dades i en connectar-se.
 - **Més entrades (sota demanda):** petició/resposta per `MessageClient`, pàgines de 20; viuen **només en memòria** (ViewModel) i s'obliden en sortir. Si el mòbil no és accessible, es veuen només les 5 i la llista s'acaba sense error destacat.
-- **Persones protegides:** doble desbloqueig (vegeu P0). Primer, la credencial del dispositiu al rellotge (`KeyguardManager.createConfirmDeviceCredentialIntent` o l'equivalent de Wear OS; cal verificar-lo a l'API mínima) cada cop que s'obre la persona; després, el rellotge demana les entrades al mòbil, que les serveix només després d'aprovar-ho amb `BiometricPrompt`; el rellotge les mostra només en memòria; en sortir o passar a segon pla, s'esborren. Sense bloqueig al rellotge: pantalla 9. Sense mòbil després del desbloqueig: «No disponible sense el mòbil» (no dissenyat). Gravar una nota a una protegida només és possible després del desbloqueig.
+- **Persones protegides:** aprovació biomètrica al mòbil a cada obertura (vegeu P0); ja no hi ha credencial al rellotge. El rellotge demana les entrades al mòbil, que les serveix només després d'aprovar-ho amb `BiometricPrompt`; el rellotge les mostra només en memòria; en sortir o passar a segon pla, s'esborren. Sense bloqueig al rellotge amb el Bloqueig de l'app actiu: pantalla 9. Sense mòbil: pantalla 12. Gravar una nota a una protegida només és possible dins una sessió aprovada.
 - **Bloqueig de l'app:** si és actiu, el rellotge ha de ser segur (`KeyguardManager.isDeviceSecure`). Si no, pantalla 9 i ni es mostra ni es desa cap entrada. La còpia local (les 5 últimes) es xifra amb una clau d'Android Keystore lligada a l'autenticació del dispositiu, si l'API ho permet; si es treu el bloqueig del rellotge, **s'esborra la còpia** en obrir l'app i a cada sincronització. Si no es pot verificar l'estat, s'assumeix **actiu**. La cua de pendents i «més entrades» segueixen les mateixes regles.
 - **Rellotge → mòbil (nota):** `MessageClient`, camí `/converses/note`, payload `{ id (UUID), personId, who, text, timestamp }`. El mòbil la rep amb un `WearableListenerService`, valida que la persona existeixi i la desa com una entrada nova. Idempotent per UUID. Cua al rellotge (WorkManager o pròpia) amb reintents; s'esborra en entregar-se.
 - **Còpia local al rellotge:** DataStore o Room petita pròpia (preferible no tocar l'esquema del mòbil), amb l'hora de l'última sincronització, fora del backup.
@@ -89,7 +102,7 @@ Amb el mòbil connectat no es mostra cap indicador de sincronització; només a 
 - Sense tile ni complicacions a la v1.
 - Sempre fosc; sense color de tema ni Pro.
 - Còpia local reduïda a **5 entrades** per persona; la resta, sota demanda i en memòria.
-- Protegides: desbloqueig al rellotge cada cop; res de contingut persistit.
+- Protegides: aprovació biomètrica al mòbil cada cop; res de contingut persistit.
 
 ### P0 · Qui autoritza veure una protegida al rellotge
 
@@ -97,21 +110,20 @@ El brief posa el desbloqueig al rellotge i diu que el mòbil serveix les entrade
 
 **Decidit:** el mòbil demana confirmació (opció 2). Les altres opcions (acceptar el brief tal com és, o deixar les protegides fora del rellotge) es descarten. No cal cap emparellament nou: la Data Layer ja només parla amb el rellotge emparellat, i el mòbil només ha de comprovar que el node és el del parell. El que falta és **la presència de l'usuari al mòbil**.
 
-**Decidit el 12 d'oct. de 2026:** vigència de l'aprovació de **5 minuts** per persona, i la **notificació** com a camí.
+**Decidit el 12 d'oct. de 2026 (revisat després del disseny):** l'aprovació és **només al mòbil** (`BiometricPrompt`); **s'elimina el primer desbloqueig amb la credencial del rellotge**, que el disseny no recull. La **notificació** és el camí. **Una aprovació nova a cada obertura** d'una protegida: la finestra de 5 min queda descartada (P11).
 
-**Mecanisme:**
+**Mecanisme** (pantalles 7, 10–12 al rellotge, 13–16 al mòbil):
 
-1. Rellotge: toc a la protegida → pantalla 7 → «Desbloqueja» → credencial del rellotge (primer desbloqueig).
-2. Rellotge: envia al mòbil una petició amb un identificador d'un sol ús que caduca en ~60 s, i mostra «Confirma-ho al mòbil».
-3. Mòbil: notificació **genèrica, sense nom** («El rellotge demana obrir una persona protegida»). En tocar-la s'obre el `BiometricPrompt` de sempre (segon desbloqueig).
-4. Mòbil: si va bé, respon només a aquella petició amb les entrades d'aquella persona; si falla o caduca, no envia res.
-5. Rellotge: mostra les entrades només en memòria.
-6. **Notes a una protegida:** l'aprovació dona un testimoni de vigència curta que el rellotge adjunta a la nota; el mòbil rebutja les notes a protegides sense testimoni vàlid. Cobreix la cua fora de línia.
-7. Cal limitar la freqüència de peticions (sense spam de notificacions) i no registrar cap contingut.
+1. Rellotge: toc a la protegida → pantalla 7 «Confirma-ho al mòbil», amb compte enrere de ~60 s i «Cancel·la». Sense mòbil accessible: pantalla 12.
+2. El rellotge envia al mòbil una petició amb un identificador d'un sol ús (`requestId` + `personId`) que caduca en ~60 s.
+3. Mòbil: notificació **genèrica, sense nom** («El rellotge demana obrir una persona protegida», pantalla 13). En tocar-la, pantalla 14 («Confirma» / «Denega», tampoc amb nom); «Confirma» llança el `BiometricPrompt` de sempre (pantalla 15).
+4. Èxit: pantalla 16 «Fet»; el mòbil respon només a aquella petició amb les entrades d'aquella persona. «Denega», cancel·lar el prompt o fallar la biometria: pantalla 10 «Denegat» al rellotge. Sense aprovació en ~60 s: pantalla 11 «Ha caducat» amb «Reintenta» (petició nova). El temps el valida el mòbil; el rellotge només dibuixa el compte enrere.
+5. Rellotge: mostra les entrades només en memòria; la sessió acaba en sortir de la persona o amb l'app en segon pla.
+6. **Casos sense disseny:** petició ja caducada oberta des de la notificació, i cancel·lació al rellotge amb el prompt obert. El mòbil tanca la pantalla i mostra un missatge breu («No s'ha pogut completar la petició»), sense nom ni dades.
+7. **Notes a una protegida:** només dins una sessió aprovada. L'aprovació dona un testimoni de vigència curta que el rellotge adjunta a la nota; el mòbil rebutja les notes a protegides sense testimoni vàlid. La vigència del testimoni i com cobreix la cua fora de línia es decideixen en proposar les tasques de la fase 5.
+8. Cal limitar la freqüència de peticions (sense spam de notificacions) i no registrar cap contingut.
 
-**Vigència configurable?** Idea oberta: un ajust a Ajustos → Seguretat del mòbil, amb 5 min per defecte. Aniria a DataStore (sense migració de Room). Cal decidir si es fa a la v1 del rellotge o es deixa fixa a 5 min i es mou a un ajust més endavant; i, si es fa, quines opcions hi ha.
-
-**Caldrà disseny** (es demana quan faci falta, a la fase 5): pantalles «Confirma-ho al mòbil», «Denegat» i «Ha caducat» al rellotge; la notificació i el flux d'aprovació al mòbil; i, si hi ha l'ajust, la fila d'Ajustos.
+Disseny rebut el 12 d'oct. de 2026 (`docs/wear/handoff/`).
 
 ### Decidides a la fase 0 (12 d'oct. de 2026)
 
@@ -121,7 +133,7 @@ El brief posa el desbloqueig al rellotge i diu que el mòbil serveix les entrade
 | P6 | Haptic `Confirm` en desar, respectant el sistema i l'interruptor de l'app. |
 | P7 | Pàgines de «més entrades» de 20; límit de memòria de **100 entrades extra per persona** (fixat a la fase 4), a més de les 5 de la còpia. |
 | P9 | La nota des del rellotge té **el canal per defecte de la nota ràpida**. |
-| P11 | Vigència de l'aprovació **fixa a 5 min** a la v1; ajust més endavant si cal. |
+| P11 | ~~Vigència de 5 min~~ **Revisat:** aprovació nova a cada obertura (sense finestra); sense ajust. |
 | P14 | Les notes pendents es queden al rellotge fins entregar-se (fora del backup; xifrat/esborrat segons la fase 5). |
 | P15 | Bloqueig de l'app actiu: **no es demana el PIN en obrir**; es confia en el bloqueig del rellotge (pantalla 9 si no és segur). |
 | Navegació | **Navigation 3 per a Wear** (`NavDisplay` + `rememberSwipeDismissableSceneStrategy`), coherent amb el mòbil. Cost: `navigation3-runtime/ui` **1.3.0-alpha02** (alpha) al rellotge; el mòbil continua amb la 1.2.0 estable (claus separades al catàleg). |
@@ -152,7 +164,7 @@ La documentació oficial no confirma el català (ca-ES) al reconeixedor del rell
 | P5 | **Català al reconeixedor:** si no el suporta, avisar abans de buscar alternativa | Sense confirmar; cal rellotge real (vegeu a dalt) |
 | P8 | **Política de privacitat i «Sense núvol»:** verificar com viatgen les dades a la Data Layer i ajustar-ne el text (esborrany al brief) abans de dir res a la fitxa de Play | Fase 8 |
 | P10 | **Versions mínimes de Wear OS**, i que `isDeviceSecure` i el xifratge amb Keystore lligat a autenticació hi funcionin; si no, esborrar la còpia en lloc de xifrar-la | Comprovat a l'emulador (API 37); `minSdk` 30; falta rellotge real (fase 9) |
-| P12 | **Pantalles no dissenyades de protegides:** «No disponible sense el mòbil», «Confirma-ho al mòbil», «Denegat» i «Ha caducat» | Caldrà disseny; es demana quan faci falta |
+| P12 | ~~Pantalles no dissenyades de protegides~~ | **Resolt:** disseny rebut el 12 d'oct. de 2026 (pantalles 7, 10–12 al rellotge i 13–16 al mòbil) |
 | P13 | **Mòbil inaccessible a «més entrades»:** la llista s'acaba sense error (suposició del brief, la frase original es va tallar) | Confirmar |
 | P16 | **Indicador de càrrega** de «més entrades» (no dissenyat) | Coherent amb Wear M3 |
 

@@ -11,9 +11,16 @@
     "Qui.dc.html": { "x": 960, "y": 0, "w": 240, "h": 240, "title": "4 · Qui", "radius": 120, "is_interactive": true },
     "Desat.dc.html": { "x": 1280, "y": 0, "w": 240, "h": 240, "title": "5 · Desat", "radius": 120, "is_interactive": true },
     "DesatPendent.dc.html": { "x": 1600, "y": 0, "w": 240, "h": 240, "title": "5b · Desat sense mòbil", "radius": 120, "is_interactive": true },
-    "Protegida.dc.html": { "x": 1920, "y": 0, "w": 240, "h": 240, "title": "Persona protegida", "radius": 120, "is_interactive": true },
+    "Protegida.dc.html": { "x": 1920, "y": 0, "w": 240, "h": 240, "title": "7 · Confirma-ho al mòbil", "radius": 120, "is_interactive": true },
     "SenseMobil.dc.html": { "x": 2240, "y": 0, "w": 240, "h": 240, "title": "Persones sense mòbil", "radius": 120, "is_interactive": true },
-    "Bloquejada.dc.html": { "x": 2560, "y": 0, "w": 240, "h": 240, "title": "Cal bloqueig al rellotge", "radius": 120, "is_interactive": true }
+    "Bloquejada.dc.html": { "x": 2560, "y": 0, "w": 240, "h": 240, "title": "Cal bloqueig al rellotge", "radius": 120, "is_interactive": true },
+    "Denegat.dc.html": { "x": 0, "y": 600, "w": 240, "h": 240, "title": "Denegat", "radius": 120, "is_interactive": true },
+    "Caducat.dc.html": { "x": 320, "y": 600, "w": 240, "h": 240, "title": "Ha caducat", "radius": 120, "is_interactive": true },
+    "NoDisponible.dc.html": { "x": 640, "y": 600, "w": 240, "h": 240, "title": "No disponible sense el mòbil", "radius": 120, "is_interactive": true },
+    "Notificacio.dc.html": { "x": 0, "y": 1200, "w": 390, "h": 140, "title": "Mòbil · Notificació", "is_interactive": true },
+    "MobilConfirma.dc.html": { "x": 470, "y": 1200, "w": 390, "h": 844, "title": "Mòbil · Confirma", "is_interactive": true },
+    "MobilBiometria.dc.html": { "x": 940, "y": 1200, "w": 390, "h": 844, "title": "Mòbil · Empremta", "is_interactive": true },
+    "MobilFet.dc.html": { "x": 1410, "y": 1200, "w": 390, "h": 844, "title": "Mòbil · Fet", "is_interactive": true }
   },
   "order": [
     "Main.dc.html",
@@ -24,10 +31,19 @@
     "DesatPendent.dc.html",
     "Protegida.dc.html",
     "SenseMobil.dc.html",
-    "Bloquejada.dc.html"
+    "Bloquejada.dc.html",
+    "Denegat.dc.html",
+    "Caducat.dc.html",
+    "NoDisponible.dc.html",
+    "Notificacio.dc.html",
+    "MobilConfirma.dc.html",
+    "MobilBiometria.dc.html",
+    "MobilFet.dc.html"
   ],
   "notes": {
-    "t1": { "x": 0, "y": -260, "text": "Converses · Wear OS", "kind": "title1", "maxW": 2800 }
+    "t1": { "x": 0, "y": -260, "text": "Converses · Wear OS", "kind": "title1", "maxW": 2800 },
+    "t2": { "x": 0, "y": 340, "text": "Persona protegida · altres estats al rellotge", "kind": "title1", "maxW": 880 },
+    "t3": { "x": 0, "y": 940, "text": "Persona protegida · confirmació al mòbil", "kind": "title1", "maxW": 1800 }
   },
   "designSystems": [
     {
