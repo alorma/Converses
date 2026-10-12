@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Capacitat que anuncia el rellotge perquè el mòbil sàpiga que té l'app (WEAR_WATCH_CAPABILITY a :shared) -->
+    <string-array name="android_wear_capabilities" translatable="false">
+        <item>converses_watch</item>
+    </string-array>
+</resources>

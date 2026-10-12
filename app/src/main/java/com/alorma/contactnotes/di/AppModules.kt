@@ -18,6 +18,9 @@ import com.alorma.contactnotes.data.settings.DataStoreSettingsRepository
 import com.alorma.contactnotes.data.settings.OnboardingFlag
 import com.alorma.contactnotes.data.settings.SecureWindow
 import com.alorma.contactnotes.data.settings.SettingsRepository
+import com.alorma.contactnotes.data.wear.GmsWearLink
+import com.alorma.contactnotes.data.wear.WearLink
+import com.alorma.contactnotes.data.wear.WearSnapshotPublisher
 import com.alorma.contactnotes.ui.edit.EditPersonViewModel
 import com.alorma.contactnotes.ui.entry.PersonSelectionBridge
 import com.alorma.contactnotes.ui.entry.QuickNoteViewModel
@@ -27,6 +30,9 @@ import com.alorma.contactnotes.ui.person.PersonExporter
 import com.alorma.contactnotes.ui.person.PersonLockViewModel
 import com.alorma.contactnotes.ui.person.PersonViewModel
 import com.alorma.contactnotes.ui.settings.SettingsViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.runBlocking
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.dsl.singleOf
@@ -81,4 +87,17 @@ val viewModelModule =
     viewModel { (personId: Long) -> EditPersonViewModel(personId, get(), get()) }
   }
 
-val appModules = listOf(databaseModule, settingsModule, viewModelModule)
+val wearModule =
+  module {
+    single<WearLink> { GmsWearLink(androidContext()) }
+    single {
+      WearSnapshotPublisher(
+        repository = get(),
+        settings = get(),
+        link = get(),
+        scope = CoroutineScope(SupervisorJob() + Dispatchers.Default),
+      )
+    }
+  }
+
+val appModules = listOf(databaseModule, settingsModule, wearModule, viewModelModule)
