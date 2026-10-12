@@ -1,4 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Converses</string>
+
+    <!-- Reutilitzats del mòbil (mateixes claus i textos) -->
+    <string name="yesterday">Ahir</string>
+    <string name="channel_chat">Xat</string>
+    <string name="channel_social">Xarxes</string>
+    <string name="channel_other">Altres</string>
+    <string name="channel_phone">Telèfon</string>
+    <string name="channel_in_person">En persona</string>
+    <string name="save">Desa</string>
+    <string name="entry_who_me">Jo</string>
+    <string name="entry_who_note">Apunt</string>
+
+    <!-- Nous del rellotge -->
+    <string name="note_button">Nota</string>
+    <string name="dictate_finish">Acaba</string>
+    <string name="who_title">Qui ho ha dit?</string>
+    <string name="note_for">Nota per a %1$s</string>
+    <string name="saved_title">Desat</string>
+    <string name="saved_sent">Enviada al mòbil</string>
+    <string name="saved_pending">S\'enviarà al mòbil quan hi hagi connexió</string>
+    <string name="phone_not_connected">Mòbil no connectat</string>
+    <string name="data_from_minutes">Dades de fa %1$d min</string>
+    <string name="protected_person_title">Persona protegida</string>
+    <string name="protected_person_hint">Desbloqueja-la amb el PIN del rellotge.</string>
+    <string name="unlock">Desbloqueja</string>
+    <string name="lock_required_title">Cal un bloqueig</string>
+    <string name="lock_required_hint">Activa un PIN al rellotge.</string>
+    <string name="lock_required_action">Configura</string>
 </resources>
