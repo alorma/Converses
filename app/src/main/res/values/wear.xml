@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Capacitat que anuncia el mòbil perquè el rellotge sàpiga que és accessible (WEAR_PHONE_CAPABILITY a :shared) -->
+    <string-array name="android_wear_capabilities" translatable="false">
+        <item>converses_phone</item>
+    </string-array>
+</resources>

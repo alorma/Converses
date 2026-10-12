@@ -7,6 +7,15 @@ import kotlinx.serialization.json.Json
 /** Versió del contracte mòbil → rellotge. Es puja quan el format deixa de ser compatible. */
 const val WEAR_PROTOCOL_VERSION = 1
 
+/** Camí del `DataItem` amb l'instantani a la Data Layer. */
+const val WEAR_SNAPSHOT_PATH = "/converses/snapshot"
+
+/** Capacitat que anuncia el mòbil (el rellotge la fa servir per saber si el mòbil és accessible). */
+const val WEAR_PHONE_CAPABILITY = "converses_phone"
+
+/** Capacitat que anuncia el rellotge (el mòbil la fa servir per saber que n'hi ha un amb l'app). */
+const val WEAR_WATCH_CAPABILITY = "converses_watch"
+
 /** Entrades per persona que viatgen al rellotge; la resta es demanen sota demanda i no es desen. */
 const val WEAR_MAX_ENTRIES_PER_PERSON = 5
 
