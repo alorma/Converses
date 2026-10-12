@@ -171,7 +171,7 @@ Validada per Bernat amb les proves de l'emulador i els tests; el rellotge físic
 ## Fase 9 · Qualitat, privacitat i accessibilitat
 
 - [x] Repàs de privacitat de punta a punta: res de protegides al disc del rellotge (còpia, logs, backup, notificacions). Test que ho comprova (`PrivacyAuditTest`: un instantani amb contingut d'una protegida no arriba al fitxer ni amb un xifrat que deixi el text en clar, i el codi del rellotge no usa logs, notificacions ni altre emmagatzematge). **Emulador:** `files/` només té la còpia xifrada i la cua buida, la base de WorkManager no duu text de notes i les notes a protegides ja no passen per la cua (WhoViewModel). — `0a39811`
-- [ ] Còpia i cua fora del backup d'Android.
+- [x] Còpia i cua fora del backup d'Android: `BackupRulesTest` comprova `allowBackup=false` i que els tres fitxers de regles exclouen tots els dominis. L'emulador Wear no té servei de backup (`dumpsys backup`), així que no s'ha provat en viu. — `1467c56`
 - [ ] Large i Small Round, mida de lletra gran, ambient, ca/es/en.
 - [ ] TalkBack al rellotge.
 - [ ] Rellotge real: bateria, latència, desconnexions, bloqueig i desbloqueig reals.
