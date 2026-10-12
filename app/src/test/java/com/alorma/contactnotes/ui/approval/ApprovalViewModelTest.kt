@@ -10,6 +10,7 @@ import com.alorma.contactnotes.shared.WearApprovalDecision
 import com.alorma.contactnotes.shared.WearApprovalRequest
 import com.alorma.contactnotes.testing.FakeDb
 import com.alorma.contactnotes.testing.MainDispatcherRule
+import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -103,7 +104,7 @@ class ApprovalViewModelTest {
     }
 
   @Test
-  fun theRequestWasCancelledOnTheWatchWhileThePromptWasOpen() =
+  fun aLateBiometricAfterTheWatchCancelledIsIgnored() =
     runTest {
       pendingRequest()
       val vm = ApprovalViewModel("req", coordinator)
@@ -111,8 +112,56 @@ class ApprovalViewModelTest {
 
       vm.onAuthenticated()
 
-      assertEquals(ApprovalUiState.Failed, vm.state.value)
+      assertEquals(ApprovalUiState.Closed, vm.state.value)
       assertTrue(sent.isEmpty())
+    }
+
+  @Test
+  fun whenTheWatchCancelsTheOpenScreenClosesByItself() =
+    runTest {
+      pendingRequest()
+      val vm = ApprovalViewModel("req", coordinator)
+
+      coordinator.onCancel(WearApprovalCodec.encodeCancel(WearApprovalCancel(requestId = "req")))
+
+      assertEquals(ApprovalUiState.Closed, vm.state.value)
+      assertTrue(sent.isEmpty())
+    }
+
+  @Test
+  fun whenTheWatchCancelsWhileTheScreenWithButtonsIsShownItAlsoCloses() =
+    runTest {
+      pendingRequest()
+      val vm = ApprovalViewModel("req", coordinator)
+      vm.takePromptRequest()
+      vm.onPromptCancelled()
+
+      coordinator.onCancel(WearApprovalCodec.encodeCancel(WearApprovalCancel(requestId = "req")))
+
+      assertEquals(ApprovalUiState.Closed, vm.state.value)
+    }
+
+  @Test
+  fun aCancellationOfAnotherRequestIsIgnored() =
+    runTest {
+      pendingRequest()
+      val vm = ApprovalViewModel("req", coordinator)
+
+      coordinator.onCancel(WearApprovalCodec.encodeCancel(WearApprovalCancel(requestId = "altra")))
+
+      assertEquals(ApprovalUiState.Prompting, vm.state.value)
+    }
+
+  @Test
+  fun whenTheRequestExpiresWhileOpenTheScreenCloses() =
+    runTest {
+      pendingRequest()
+      val vm = ApprovalViewModel("req", coordinator)
+
+      now += WEAR_APPROVAL_TTL_MS + 2_000
+      advanceTimeBy(WEAR_APPROVAL_TTL_MS + 1_500)
+
+      assertEquals(ApprovalUiState.Closed, vm.state.value)
     }
 
   @Test

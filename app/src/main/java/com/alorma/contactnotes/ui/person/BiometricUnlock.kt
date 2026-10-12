@@ -19,13 +19,16 @@ fun FragmentActivity.canUnlockWithDevice(): Boolean =
 /** Codi de `BiometricManager.canAuthenticate` per a biometria forta o credencial del dispositiu. */
 fun FragmentActivity.unlockAvailability(): Int = BiometricManager.from(this).canAuthenticate(Authenticators)
 
-/** `onError` rep el codi d'`onAuthenticationError`; un dit que no coincideix no fa res i el prompt continua obert. */
+/**
+ * `onError` rep el codi d'`onAuthenticationError`; un dit que no coincideix no fa res i el prompt continua obert. Retorna el
+ * prompt perquè qui el necessiti el pugui cancel·lar (el diàleg és del sistema i no es tanca sol amb l'activitat).
+ */
 fun FragmentActivity.promptUnlock(
   title: String,
   subtitle: String,
   onError: (code: Int) -> Unit = {},
   onSuccess: () -> Unit,
-) {
+): BiometricPrompt {
   val callback =
     object : BiometricPrompt.AuthenticationCallback() {
       override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) = onSuccess()
@@ -42,7 +45,7 @@ fun FragmentActivity.promptUnlock(
       .setSubtitle(subtitle)
       .setAllowedAuthenticators(Authenticators)
       .build()
-  BiometricPrompt(this, ContextCompat.getMainExecutor(this), callback).authenticate(info)
+  return BiometricPrompt(this, ContextCompat.getMainExecutor(this), callback).also { it.authenticate(info) }
 }
 
 /** Obre l'alta d'empremta o bloqueig de pantalla; si el sistema no la té, la configuració de seguretat. */

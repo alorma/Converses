@@ -235,7 +235,7 @@
     <string name="approval_hint">Confirm it\'s you with your fingerprint.</string>
     <string name="approval_confirm">Confirm</string>
     <string name="approval_deny">Deny</string>
-    <string name="approval_prompt_title">Confirm access</string>
-    <string name="approval_prompt_subtitle">Opens a protected person on the watch.</string>
+    <string name="approval_prompt_title">%1$s wants to unlock %2$s</string>
+    <string name="approval_watch_fallback">Your watch</string>
     <string name="approval_failed">Couldn\'t complete the request</string>
 </resources>

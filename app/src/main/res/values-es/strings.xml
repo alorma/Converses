@@ -234,7 +234,7 @@
     <string name="approval_hint">Confirma que eres tú con la huella.</string>
     <string name="approval_confirm">Confirmar</string>
     <string name="approval_deny">Denegar</string>
-    <string name="approval_prompt_title">Confirma el acceso</string>
-    <string name="approval_prompt_subtitle">Abre una persona protegida en el reloj.</string>
+    <string name="approval_prompt_title">%1$s quiere desbloquear a %2$s</string>
+    <string name="approval_watch_fallback">Tu reloj</string>
     <string name="approval_failed">No se pudo completar la petición</string>
 </resources>
