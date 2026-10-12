@@ -8,7 +8,7 @@ Context, abast, arquitectura, decisions (P0–P16) i riscos són a `docs/wear/RE
 | 1 | Mòdul `:wear`, tema i previews amb dades fictícies | 0 | Feta |
 | 2 | Contracte i sincronització mòbil → rellotge | 0 | Feta |
 | 3 | Pantalles de lectura: Persones, Cronologia, Sense mòbil | 1, 2 | Feta |
-| 4 | Més entrades sota demanda | 3 | Pendent |
+| 4 | Més entrades sota demanda | 3 | Feta |
 | 5 | Bloqueig de l'app i persones protegides | 0 (P0, P10), 3, 4 | Pendent |
 | 6 | Dictat | 1 | Pendent |
 | 7 | Qui, Desat i nota rellotge → mòbil amb cua | 2, 3, 6 | Pendent |
@@ -131,7 +131,7 @@ Decidit en proposar la fase (12 d'oct. de 2026): les persones **arxivades no van
 - [x] `TimelineViewModel`: les entrades extra viuen **només en memòria** i s'obliden en sortir; mòbil inaccessible: la llista s'acaba sense error (P13); límit de memòria (P7: 100 extra per persona); tests de JVM (paginació, final de llista, mòbil absent, límit, sense duplicats, res al disc). — `f660f2d`
 - [x] UI: en acostar-se al final es demana la pàgina següent; indicador de càrrega al final (P16) amb captura de referència. Validat a l'emulador (Marta Soler amb 65 entrades: carrega fins a l'última i s'atura sense error). — `42a61d5`
 
-Pendent de la fase: provar-ho amb el mòbil realment inaccessible (només cobert per tests de JVM) i la validació de Bernat.
+Validada per Bernat. El cas del mòbil realment inaccessible només està cobert per tests de JVM.
 
 **Sortida:** una persona amb moltes entrades les va carregant mentre es fa scroll.
 
