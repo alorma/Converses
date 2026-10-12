@@ -117,8 +117,8 @@ Depèn de **P0** i **P10**.
 - [ ] Toc a una protegida → pantalla 7 «Confirma-ho al mòbil» (compte enrere ~60 s, «Cancel·la»). Sense credencial al rellotge i sense finestra de vigència: una aprovació nova a cada obertura (P0, P11).
 - [ ] **Aprovació al mòbil (P0):** petició amb identificador d'un sol ús i caducitat (~60 s) → notificació genèrica (13) → «Confirma» / «Denega» (14) → `BiometricPrompt` (15) → «Fet» (16) → resposta amb les entrades només d'aquella persona. «Denegat» (10) i «Ha caducat» (11, amb «Reintenta») al rellotge.
 - [ ] Mòbil: petició caducada oberta des de la notificació, o cancel·lada al rellotge amb el prompt obert: tanca la pantalla amb un missatge breu («No s'ha pogut completar la petició»), sense nom.
-- [ ] Limitar la freqüència de peticions i no registrar contingut.
-- [ ] Testimoni de vigència curta per a notes a protegides; el mòbil rebutja les que no en tenen un de vàlid.
+- [x] Mòbil: `WearApprovalService` + `WearApprovalCoordinator` (petició d'un sol ús, caducitat de 60 s validada pel mòbil, màxim 3 pendents i 5 per minut, ack immediat, cancel·lació, resultat al rellotge per `MessageClient`, sense registrar contingut) i `ApprovalTokens` (testimoni de 5 min per persona, en memòria). La notificació és un `NoApprovalNotifier` provisional: la real arriba a la tasca de la pantalla del mòbil. Tests de JVM (14 + 3). — `be87ace`
+- [ ] Testimoni de vigència curta per a notes a protegides: **emès** (`be87ace`); falta que el mòbil rebutgi les notes sense un testimoni vàlid i que el rellotge l'adjunti.
 - [ ] Mostrar les entrades **només en memòria**; esborrar-les en sortir o amb l'app en segon pla.
 - [ ] Sense mòbil: pantalla 12 «No disponible sense el mòbil».
 - [ ] Gravar una nota a una protegida només dins una sessió aprovada.
