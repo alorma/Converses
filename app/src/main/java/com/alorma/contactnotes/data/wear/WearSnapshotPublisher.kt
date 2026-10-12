@@ -12,15 +12,12 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.launch
 
 /**
- * Publica l'instantani al rellotge cada cop que canvien les dades (persones, entrades o Bloqueig de l'app) i quan el
- * rellotge es connecta. No registra mai contingut: ni al log ni en cap error.
+ * Publica l'instantani al rellotge cada cop que canvien les dades (persones, entrades o Bloqueig de l'app), però només
+ * si hi ha un rellotge emparellat amb l'app. No registra mai contingut: ni al log ni en cap error.
  */
 @OptIn(FlowPreview::class)
 class WearSnapshotPublisher(
@@ -33,14 +30,11 @@ class WearSnapshotPublisher(
 ) {
   fun start() {
     scope.launch {
-      // Una primera passada en arrencar i una de nova cada cop que el rellotge es connecta: tornen a publicar encara
-      // que no hi hagi canvis, perquè el rellotge que torna d'estar fora de línia quedi al dia.
-      val connections =
-        link.watchAvailable
-          .distinctUntilChanged()
-          .filter { it }
-          .map { }
-      merge(flowOf(Unit), connections).collectLatest { snapshots().collect(::publish) }
+      // Només es publica si hi ha un rellotge amb l'app. Cada cop que n'apareix un es torna a publicar encara que no hi
+      // hagi canvis, i si desapareix s'esborra l'instantani de la Data Layer perquè no hi quedi res de les persones.
+      link.watchPresent.distinctUntilChanged().collectLatest { present ->
+        if (present) snapshots().collect(::publish) else clear()
+      }
     }
   }
 
@@ -61,6 +55,16 @@ class WearSnapshotPublisher(
       throw e
     } catch (_: Exception) {
       // El següent canvi o la propera connexió ho tornarà a provar; no es registra res perquè podria dur contingut
+    }
+  }
+
+  private suspend fun clear() {
+    try {
+      link.clear()
+    } catch (e: CancellationException) {
+      throw e
+    } catch (_: Exception) {
+      // Si no hi ha Play Services no hi ha res a esborrar
     }
   }
 
