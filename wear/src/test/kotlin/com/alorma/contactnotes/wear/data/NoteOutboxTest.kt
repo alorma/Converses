@@ -7,6 +7,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -185,5 +186,24 @@ class NoteOutboxTest {
 
       assertTrue(restarted.deliverAll())
       assertEquals(emptyList<WearNote>(), queue.notes)
+    }
+
+  @Test
+  fun aRejectedNoteIsCountedAsDiscarded() =
+    runTest {
+      val counter =
+        DataStoreDiscardedNotes(
+          PreferenceDataStoreFactory.create(scope = scope) { folder.newFile("discarded.preferences_pb") },
+        )
+      val counting = NoteOutbox(queue, sender, counter) { scheduled++ }
+      sender.answer = { if (it.id == "a") NoteDelivery.Rejected else NoteDelivery.Delivered }
+      counting.submit(note("a"))
+      counting.submit(note("b"))
+
+      assertTrue(counting.deliverAll())
+
+      assertEquals(1, counter.count.first())
+      counter.clear()
+      assertEquals(0, counter.count.first())
     }
 }

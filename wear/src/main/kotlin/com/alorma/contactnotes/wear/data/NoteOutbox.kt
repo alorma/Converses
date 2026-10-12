@@ -77,6 +77,7 @@ fun interface DeliveryScheduler {
 class NoteOutbox(
   private val queue: PendingNoteQueue,
   private val sender: NoteSender,
+  private val discarded: DiscardedNotes? = null,
   private val scheduler: DeliveryScheduler,
 ) : NoteSubmitter {
   /** Desa la nota a la cua i en programa l'entrega. Quan torna, la nota ja no es perd encara que l'app es tanqui. */
@@ -95,7 +96,11 @@ class NoteOutbox(
   suspend fun deliverAll(): Boolean {
     for (note in queue.all()) {
       when (sender.send(note)) {
-        NoteDelivery.Delivered, NoteDelivery.Rejected -> queue.remove(note.id)
+        NoteDelivery.Delivered -> queue.remove(note.id)
+        NoteDelivery.Rejected -> {
+          queue.remove(note.id)
+          discarded?.add(1)
+        }
         NoteDelivery.Unavailable -> return false
       }
     }

@@ -13,6 +13,7 @@ import com.alorma.contactnotes.wear.ui.DictatePermissionPreview
 import com.alorma.contactnotes.wear.ui.DictatePreview
 import com.alorma.contactnotes.wear.ui.LockRequiredPreview
 import com.alorma.contactnotes.wear.ui.NoDataPreview
+import com.alorma.contactnotes.wear.ui.PeopleDiscardedNotesPreview
 import com.alorma.contactnotes.wear.ui.PeoplePhoneOfflinePreview
 import com.alorma.contactnotes.wear.ui.PeoplePreview
 import com.alorma.contactnotes.wear.ui.SavedPendingPreview
@@ -113,6 +114,11 @@ class WearScreenshotTests {
   @PreviewTest
   @Composable
   fun peoplePhoneOffline() = PeoplePhoneOfflinePreview()
+
+  @WatchPreviews
+  @PreviewTest
+  @Composable
+  fun peopleDiscardedNotes() = PeopleDiscardedNotesPreview()
 
   @WatchPreviews
   @PreviewTest

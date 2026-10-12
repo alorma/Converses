@@ -116,7 +116,9 @@ class WearSnapshotStore(
           AndroidDeviceLock(context),
           KeystoreSnapshotCipher(),
           onLockRequired = { DataStorePendingNoteQueue.get(context).clear() },
-          onPeopleSynced = { DataStorePendingNoteQueue.get(context).retainOnly(it) },
+          onPeopleSynced = {
+            DataStoreDiscardedNotes.get(context).add(DataStorePendingNoteQueue.get(context).retainOnly(it))
+          },
         ).also { instance = it }
       }
   }

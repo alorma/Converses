@@ -1,6 +1,7 @@
 package com.alorma.contactnotes.wear.ui
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -11,11 +12,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Info
 import androidx.compose.material.icons.rounded.PhonelinkOff
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -56,6 +59,8 @@ fun PeopleContent(
   onPersonClick: (PersonItem) -> Unit,
   modifier: Modifier = Modifier,
   dataAgeMinutes: Int? = null,
+  discardedNotes: Int = 0,
+  onDiscardedNotesClick: () -> Unit = {},
 ) {
   val state = rememberTransformingLazyColumnState()
   val spec = rememberTransformationSpec()
@@ -77,6 +82,15 @@ fun PeopleContent(
       if (dataAgeMinutes != null) {
         item { PhoneOfflineBanner(dataAgeMinutes = dataAgeMinutes, modifier = Modifier.padding(bottom = 4.dp)) }
       }
+      if (discardedNotes > 0) {
+        item {
+          DiscardedNotesBanner(
+            count = discardedNotes,
+            onClick = onDiscardedNotesClick,
+            modifier = Modifier.padding(bottom = 4.dp),
+          )
+        }
+      }
       items(people.size, key = { people[it].id }) { index ->
         val person = people[index]
         PersonRow(
@@ -91,6 +105,47 @@ fun PeopleContent(
           modifier = Modifier.scrollTransformed(this, spec),
         )
       }
+    }
+  }
+}
+
+@Composable
+private fun DiscardedNotesBanner(
+  count: Int,
+  onClick: () -> Unit,
+  modifier: Modifier = Modifier,
+) {
+  Row(
+    modifier =
+      modifier
+        .fillMaxWidth()
+        .heightIn(min = 48.dp)
+        .clip(RoundedCornerShape(24.dp))
+        .background(WearColors.SurfaceCardHigh)
+        .clickable(onClick = onClick)
+        .padding(horizontal = 14.dp, vertical = 6.dp),
+    horizontalArrangement = Arrangement.spacedBy(10.dp),
+    verticalAlignment = Alignment.CenterVertically,
+  ) {
+    Icon(
+      Icons.Rounded.Info,
+      contentDescription = null,
+      tint = WearColors.OnSurfaceVariant,
+      modifier = Modifier.size(22.dp),
+    )
+    Column {
+      Text(
+        text = pluralStringResource(R.plurals.discarded_notes_title, count, count),
+        fontSize = 13.sp,
+        lineHeight = 18.sp,
+        fontWeight = FontWeight.SemiBold,
+        color = WearColors.OnSurface,
+      )
+      Text(
+        text = stringResource(R.string.discarded_notes_hint),
+        style = RowSubtitleStyle,
+        color = WearColors.OnSurfaceVariant,
+      )
     }
   }
 }
@@ -155,6 +210,11 @@ fun PeoplePreview() = WearPreview { PeopleContent(people = SamplePeople, onPerso
 fun PeoplePhoneOfflinePreview() =
   WearPreview { PeopleContent(people = SamplePeople.take(2), onPersonClick = {}, dataAgeMinutes = 14) }
 
+@WearScreenPreviews
+@Composable
+fun PeopleDiscardedNotesPreview() =
+  WearPreview { PeopleContent(people = SamplePeople, onPersonClick = {}, discardedNotes = 1) }
+
 /** Pantalla 1/8 connectada al ViewModel; sense instantani encara, explica què cal fer. */
 @Composable
 fun PeopleScreen(
@@ -165,7 +225,13 @@ fun PeopleScreen(
     PeopleUiState.Loading -> Unit
     PeopleUiState.NoData -> NoDataContent()
     is PeopleUiState.Loaded ->
-      PeopleContent(people = state.people, onPersonClick = onPersonClick, dataAgeMinutes = state.dataAgeMinutes)
+      PeopleContent(
+        people = state.people,
+        onPersonClick = onPersonClick,
+        dataAgeMinutes = state.dataAgeMinutes,
+        discardedNotes = state.discardedNotes,
+        onDiscardedNotesClick = viewModel::dismissDiscardedNotes,
+      )
   }
 }
 

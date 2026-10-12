@@ -52,6 +52,7 @@ object WearNotes {
         queue = DataStorePendingNoteQueue.get(context),
         sender = GmsNoteSender(context),
         scheduler = WorkManagerDeliveryScheduler(context),
+        discarded = DataStoreDiscardedNotes.get(context),
       ).also { instance = it }
     }
 }

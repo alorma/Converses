@@ -25,6 +25,7 @@ import com.alorma.contactnotes.wear.data.AndroidDeviceLock
 import com.alorma.contactnotes.wear.data.AndroidSpeechSource
 import com.alorma.contactnotes.wear.data.AppLockGate
 import com.alorma.contactnotes.wear.data.ApprovalResults
+import com.alorma.contactnotes.wear.data.DataStoreDiscardedNotes
 import com.alorma.contactnotes.wear.data.GmsApprovalClient
 import com.alorma.contactnotes.wear.data.GmsMoreEntriesSource
 import com.alorma.contactnotes.wear.data.GmsNoteSender
@@ -123,7 +124,7 @@ fun WearNavigation() {
     entryProvider =
       entryProvider {
         entry<PeopleRoute> {
-          val vm = viewModel { PeopleViewModel(store.stored, phone, labels) }
+          val vm = viewModel { PeopleViewModel(store.stored, phone, labels, DataStoreDiscardedNotes.get(context)) }
           PeopleScreen(
             viewModel = vm,
             // Una protegida s'obre només amb l'aprovació al mòbil; una de normal, directament

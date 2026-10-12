@@ -7,6 +7,7 @@ import com.alorma.contactnotes.shared.EntryKind
 import com.alorma.contactnotes.shared.WearEntry
 import com.alorma.contactnotes.shared.WearPerson
 import com.alorma.contactnotes.shared.WearSnapshot
+import com.alorma.contactnotes.wear.data.DiscardedNotes
 import com.alorma.contactnotes.wear.data.PhoneConnection
 import com.alorma.contactnotes.wear.data.StoredSnapshot
 import kotlinx.coroutines.Dispatchers
@@ -43,6 +44,23 @@ class ViewModelsTest {
       override fun clock(timestamp: Long) = "21:40"
     }
 
+  private class FakeDiscarded(
+    initial: Int = 0,
+  ) : DiscardedNotes {
+    val flow = MutableStateFlow(initial)
+    override val count: Flow<Int> = flow
+
+    override suspend fun add(amount: Int) {
+      flow.value += amount
+    }
+
+    override suspend fun clear() {
+      flow.value = 0
+    }
+  }
+
+  private val discarded = FakeDiscarded()
+
   private class FakePhone(
     initial: Boolean,
   ) : PhoneConnection {
@@ -76,7 +94,7 @@ class ViewModelsTest {
   @Test
   fun peopleStartsLoadingThenNoData() =
     runTest {
-      val vm = PeopleViewModel(MutableStateFlow(null), FakePhone(true), labels) { now }
+      val vm = PeopleViewModel(MutableStateFlow(null), FakePhone(true), labels, discarded) { now }
       assertEquals(PeopleUiState.Loading, vm.state.value)
       assertEquals(PeopleUiState.NoData, vm.state.first { it != PeopleUiState.Loading })
     }
@@ -84,7 +102,7 @@ class ViewModelsTest {
   @Test
   fun peopleConnectedHasNoAgeBanner() =
     runTest {
-      val vm = PeopleViewModel(MutableStateFlow(stored(kael, marta)), FakePhone(true), labels) { now }
+      val vm = PeopleViewModel(MutableStateFlow(stored(kael, marta)), FakePhone(true), labels, discarded) { now }
       val loaded = vm.state.first { it is PeopleUiState.Loaded } as PeopleUiState.Loaded
       assertNull(loaded.dataAgeMinutes)
       assertEquals(listOf("Kael", "Marta"), loaded.people.map { it.name })
@@ -92,10 +110,30 @@ class ViewModelsTest {
     }
 
   @Test
+  fun peopleShowsDiscardedNotesUntilDismissed() =
+    runTest {
+      val notes = FakeDiscarded(initial = 2)
+      val vm = PeopleViewModel(MutableStateFlow(stored(kael)), FakePhone(true), labels, notes) { now }
+      backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { vm.state.collect {} }
+      assertEquals(2, (vm.state.value as PeopleUiState.Loaded).discardedNotes)
+
+      vm.dismissDiscardedNotes()
+
+      assertEquals(0, (vm.state.value as PeopleUiState.Loaded).discardedNotes)
+    }
+
+  @Test
   fun peopleOfflineShowsDataAge() =
     runTest {
       val vm =
-        PeopleViewModel(MutableStateFlow(stored(kael, syncedAt = now - 14 * 60_000L)), FakePhone(false), labels) { now }
+        PeopleViewModel(
+          MutableStateFlow(stored(kael, syncedAt = now - 14 * 60_000L)),
+          FakePhone(false),
+          labels,
+          discarded,
+        ) {
+          now
+        }
       val loaded = vm.state.first { it is PeopleUiState.Loaded } as PeopleUiState.Loaded
       assertEquals(14, loaded.dataAgeMinutes)
     }
@@ -104,7 +142,7 @@ class ViewModelsTest {
   fun peopleReactsToConnectionChanges() =
     runTest {
       val phone = FakePhone(true)
-      val vm = PeopleViewModel(MutableStateFlow(stored(kael)), phone, labels) { now }
+      val vm = PeopleViewModel(MutableStateFlow(stored(kael)), phone, labels, discarded) { now }
       backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { vm.state.collect {} }
       phone.flow.value = false
       assertTrue((vm.state.value as PeopleUiState.Loaded).dataAgeMinutes != null)
