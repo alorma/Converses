@@ -29,7 +29,7 @@ import com.alorma.contactnotes.wear.theme.WearColors
 
 /** Entrada ja formatada per mostrar: qui, «qui · hora · canal» i text. */
 data class EntryItem(
-  val id: String,
+  val id: Long,
   val author: EntryAuthor,
   val meta: String,
   val text: String,
@@ -88,9 +88,9 @@ private fun sampleEntries(): List<EntryItem> {
   val me = stringResource(R.string.entry_who_me)
   val chat = stringResource(R.string.channel_chat)
   return listOf(
-    EntryItem("1", EntryAuthor.Me, "$me · 21:40 · $chat", "Perfecte, a les cinc al parc."),
-    EntryItem("2", EntryAuthor.Person("K", AvatarColor.Sky), "Kael · 21:36 · $chat", "Dissabte em va bé."),
-    EntryItem("3", EntryAuthor.Me, "$me · 21:30 · $chat", "Et ve de gust anar al parc?"),
+    EntryItem(1, EntryAuthor.Me, "$me · 21:40 · $chat", "Perfecte, a les cinc al parc."),
+    EntryItem(2, EntryAuthor.Person("K", AvatarColor.Sky), "Kael · 21:36 · $chat", "Dissabte em va bé."),
+    EntryItem(3, EntryAuthor.Me, "$me · 21:30 · $chat", "Et ve de gust anar al parc?"),
   )
 }
 

@@ -37,7 +37,7 @@ import com.alorma.contactnotes.wear.theme.WearColors
 
 /** Una persona a la llista. Si és protegida, `lastEntry` ha de ser sempre `null`: no se'n mostra res més que el nom. */
 data class PersonItem(
-  val id: String,
+  val id: Long,
   val name: String,
   val initials: String,
   val color: AvatarColor,
@@ -131,9 +131,9 @@ private fun PhoneOfflineBanner(
 
 internal val SamplePeople =
   listOf(
-    PersonItem("kael", "Kael", "K", AvatarColor.Sky, "Fa 2 h", isProtected = false),
-    PersonItem("luna", "Luna Roja", "LR", AvatarColor.Lavender, "Ahir", isProtected = false),
-    PersonItem("marta", "Marta", "M", AvatarColor.Peach, null, isProtected = true),
+    PersonItem(1, "Kael", "K", AvatarColor.Sky, "Fa 2 h", isProtected = false),
+    PersonItem(2, "Luna Roja", "LR", AvatarColor.Lavender, "Ahir", isProtected = false),
+    PersonItem(3, "Marta", "M", AvatarColor.Peach, null, isProtected = true),
   )
 
 @WearScreenPreviews
