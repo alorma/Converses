@@ -9,6 +9,7 @@ Android app to remember what I said, what people said to me and what happened wi
 ## References (source of truth)
 
 - `docs/backlog.md`: pending bugs and features (Iteration 2). It is written in Catalan.
+- `docs/wear/` and `docs/auto/`: plans per form factor (`README.md` with scope and decisions, `fases.md` with the phases).
 - `docs/pro/`: what is free forever and what will be Pro (behind feature flags); future paid-tier notes go here.
 
 ## Stack
