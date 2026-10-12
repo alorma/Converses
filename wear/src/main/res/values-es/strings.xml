@@ -64,4 +64,5 @@
         <item quantity="other">%d notas descartadas</item>
     </plurals>
     <string name="discarded_notes_hint">Toca para cerrar</string>
+    <string name="person_protected">Persona protegida</string>
 </resources>
