@@ -11,7 +11,6 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import com.alorma.contactnotes.R
-import com.alorma.contactnotes.data.db.EntryKind
 import com.alorma.contactnotes.data.db.PersonEntity
 import com.alorma.contactnotes.data.db.color
 import com.alorma.contactnotes.data.db.shape
@@ -19,6 +18,7 @@ import com.alorma.contactnotes.designsystem.components.Avatar
 import com.alorma.contactnotes.designsystem.components.TimelineMarker
 import com.alorma.contactnotes.designsystem.components.TimelineMarkerSize
 import com.alorma.contactnotes.designsystem.components.TimelineMarkerStyle
+import com.alorma.contactnotes.shared.EntryKind
 
 private const val MaxFirstNameLength = 12
 

@@ -1,6 +1,6 @@
 package com.alorma.contactnotes.data.db
 
-import com.alorma.contactnotes.designsystem.components.AvatarShape
+import com.alorma.contactnotes.shared.AvatarShape
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test

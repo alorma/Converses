@@ -1,13 +1,13 @@
 package com.alorma.contactnotes.data
 
-import com.alorma.contactnotes.data.db.ChannelType
 import com.alorma.contactnotes.data.db.ConversesDatabase
 import com.alorma.contactnotes.data.db.EntryEntity
-import com.alorma.contactnotes.data.db.EntryKind
 import com.alorma.contactnotes.data.db.PersonEntity
 import com.alorma.contactnotes.data.db.PinnedFactEntity
-import com.alorma.contactnotes.designsystem.components.AvatarColor
-import com.alorma.contactnotes.designsystem.components.AvatarShape
+import com.alorma.contactnotes.shared.AvatarColor
+import com.alorma.contactnotes.shared.AvatarShape
+import com.alorma.contactnotes.shared.ChannelType
+import com.alorma.contactnotes.shared.EntryKind
 import java.util.concurrent.TimeUnit
 
 internal suspend fun ConversesDatabase.insertSampleData(now: Long = System.currentTimeMillis()) {

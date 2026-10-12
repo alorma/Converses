@@ -1,8 +1,8 @@
 package com.alorma.contactnotes.ui.person
 
 import android.content.ContextWrapper
-import com.alorma.contactnotes.data.db.ChannelType
-import com.alorma.contactnotes.data.db.EntryKind
+import com.alorma.contactnotes.shared.ChannelType
+import com.alorma.contactnotes.shared.EntryKind
 import com.alorma.contactnotes.testing.FakeDb
 import com.alorma.contactnotes.testing.MainDispatcherRule
 import java.time.LocalDate

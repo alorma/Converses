@@ -1,6 +1,6 @@
 package com.alorma.contactnotes.ui.person
 
-import com.alorma.contactnotes.data.db.EntryKind
+import com.alorma.contactnotes.shared.EntryKind
 import org.junit.Assert.assertEquals
 import org.junit.Test
 

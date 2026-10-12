@@ -25,4 +25,5 @@ dependencyResolutionManagement {
 rootProject.name = "converses"
 include(":app")
 include(":designsystem")
- include(":wear")
+include(":shared")
+include(":wear")

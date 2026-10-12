@@ -20,48 +20,14 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import java.text.Normalizer
+import com.alorma.contactnotes.shared.AvatarColor
+import com.alorma.contactnotes.shared.AvatarShape
 
-/** Pastel fix de l'avatar i llavor de l'esquema de color de la persona. */
-enum class AvatarColor(
-  val color: Color,
-  val seed: Color,
-) {
-  Lavender(Color(0xFFDCD3F5), Color(0xFF6B55B5)),
-  Mint(Color(0xFFC9EBD6), Color(0xFF2F7A52)),
-  Peach(Color(0xFFFFD6BF), Color(0xFFB5602E)),
-  Sky(Color(0xFFCBE3F7), Color(0xFF2D6FA3)),
-  Rose(Color(0xFFF7CFDD), Color(0xFFB04670)),
-  Lemon(Color(0xFFF1E9A8), Color(0xFF8A7A12)),
-  Sand(Color(0xFFE8DDCB), Color(0xFF86704C)),
-  ;
+/** Color pastel de l'avatar. */
+val AvatarColor.color: Color get() = Color(argb)
 
-  companion object {
-    /** Color automàtic: el mateix nom (sense majúscules, accents ni espais als extrems) dona sempre el mateix color. */
-    fun forName(name: String): AvatarColor {
-      val normalized = Normalizer.normalize(name.trim().lowercase(), Normalizer.Form.NFD).replace(Regex("\\p{M}+"), "")
-      // FNV-1a: estable entre execucions i reparteix millor els noms curts que `String.hashCode`
-      var hash = -0x7ee3623b
-      for (char in normalized) hash = (hash xor char.code) * 16777619
-      return entries[Math.floorMod(hash, entries.size)]
-    }
-  }
-}
-
-enum class AvatarShape {
-  Cookie9Sided,
-  Clover4Leaf,
-  Clover8Leaf,
-  Sunny,
-  Ghostish,
-  PuffyDiamond,
-  ;
-
-  companion object {
-    /** Forma de l'avatar estàndard, la mateixa per a tothom. */
-    val Standard = Cookie9Sided
-  }
-}
+/** Llavor de l'esquema de color de la persona. */
+val AvatarColor.seed: Color get() = Color(seedArgb)
 
 internal val AvatarInitialsColor = Color(0xFF1E1D24)
 

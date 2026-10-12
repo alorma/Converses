@@ -1,7 +1,7 @@
 package com.alorma.contactnotes.data
 
-import com.alorma.contactnotes.data.db.ChannelType
-import com.alorma.contactnotes.data.db.EntryKind
+import com.alorma.contactnotes.shared.ChannelType
+import com.alorma.contactnotes.shared.EntryKind
 import com.alorma.contactnotes.testing.FakeDb
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest

@@ -3,9 +3,9 @@ package com.alorma.contactnotes.ui.people
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.alorma.contactnotes.data.ConversesRepository
-import com.alorma.contactnotes.data.db.ChannelType
 import com.alorma.contactnotes.data.db.PersonListItem
 import com.alorma.contactnotes.data.settings.SettingsRepository
+import com.alorma.contactnotes.shared.ChannelType
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow

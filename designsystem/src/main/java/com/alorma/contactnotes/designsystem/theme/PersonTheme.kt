@@ -10,7 +10,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.graphics.Color
-import com.alorma.contactnotes.designsystem.components.AvatarColor
+import com.alorma.contactnotes.designsystem.components.seed
+import com.alorma.contactnotes.shared.AvatarColor
 import com.materialkolor.PaletteStyle
 import com.materialkolor.rememberDynamicColorScheme
 

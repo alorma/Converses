@@ -2,7 +2,8 @@ package com.alorma.contactnotes.designsystem.theme
 
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
-import com.alorma.contactnotes.designsystem.components.AvatarColor
+import com.alorma.contactnotes.designsystem.components.seed
+import com.alorma.contactnotes.shared.AvatarColor
 import com.materialkolor.PaletteStyle
 import com.materialkolor.dynamicColorScheme
 import org.junit.Assert.assertTrue

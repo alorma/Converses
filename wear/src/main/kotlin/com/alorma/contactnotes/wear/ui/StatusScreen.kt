@@ -36,9 +36,9 @@ import androidx.compose.ui.unit.dp
 import androidx.wear.compose.material3.Icon
 import androidx.wear.compose.material3.ScreenScaffold
 import androidx.wear.compose.material3.Text
+import com.alorma.contactnotes.shared.AvatarColor
 import com.alorma.contactnotes.wear.R
 import com.alorma.contactnotes.wear.components.CookieShape
-import com.alorma.contactnotes.wear.theme.AvatarColor
 import com.alorma.contactnotes.wear.theme.AvatarInk
 import com.alorma.contactnotes.wear.theme.ButtonLabelStyle
 import com.alorma.contactnotes.wear.theme.PersonNameStyle
@@ -46,6 +46,7 @@ import com.alorma.contactnotes.wear.theme.RowSubtitleStyle
 import com.alorma.contactnotes.wear.theme.SavedTitleStyle
 import com.alorma.contactnotes.wear.theme.WearColors
 import com.alorma.contactnotes.wear.theme.WhoTitleStyle
+import com.alorma.contactnotes.wear.theme.color
 
 /** Pantalla centrada: icona sobre una Galeta, títol, text i, opcionalment, un `EdgeButton`. Serveix per a Desat, Protegida i Bloqueig. */
 @Composable

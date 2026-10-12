@@ -6,16 +6,10 @@ import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import androidx.room.Relation
-import com.alorma.contactnotes.designsystem.components.AvatarColor
-import com.alorma.contactnotes.designsystem.components.AvatarShape
-
-/**
- * Els 5 grups fixos de canals. L'ordre de declaració és l'ordre fix amb què es mostren, del més habitual al menys.
- * Els valors es desen pel nom: la migració 1 → 2 va fusionar els antics (WhatsApp, X…) al seu grup.
- */
-enum class ChannelType { IN_PERSON, PHONE, CHAT, SOCIAL, OTHER }
-
-enum class EntryKind { SAID, HEARD, HAPPENED }
+import com.alorma.contactnotes.shared.AvatarColor
+import com.alorma.contactnotes.shared.AvatarShape
+import com.alorma.contactnotes.shared.ChannelType
+import com.alorma.contactnotes.shared.EntryKind
 
 @Entity(tableName = "person")
 data class PersonEntity(

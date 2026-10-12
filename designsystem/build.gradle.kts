@@ -34,6 +34,7 @@ tasks.withType<PreviewScreenshotValidationTask>().configureEach {
 }
 
 dependencies {
+  api(project(":shared"))
   api(platform(libs.androidx.compose.bom))
   api(libs.androidx.compose.ui)
   api(libs.androidx.compose.foundation)

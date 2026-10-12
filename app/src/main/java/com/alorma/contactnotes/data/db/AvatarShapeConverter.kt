@@ -1,7 +1,7 @@
 package com.alorma.contactnotes.data.db
 
 import androidx.room.TypeConverter
-import com.alorma.contactnotes.designsystem.components.AvatarShape
+import com.alorma.contactnotes.shared.AvatarShape
 
 /**
  * Desa la forma de l'avatar com a text, i desacobla el valor desat del nom de l'enum: els noms antics
