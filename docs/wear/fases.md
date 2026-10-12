@@ -176,7 +176,7 @@ Validada per Bernat amb les proves de l'emulador i els tests; el rellotge físic
 - [ ] TalkBack al rellotge.
 - [ ] Rellotge real: bateria, latència, desconnexions, bloqueig i desbloqueig reals.
 - [x] Release amb R8: Koin, serialització i Data Layer. **Trobat:** `:wear:assembleRelease` no compilava (`WearScaffolds.kt` usa `ui-tooling-preview` i només hi era a debug); arreglat. **Emulador** (parella release mòbil + rellotge signats amb la clau de debug, ids sense `.dev`): els dos arrenquen sense crashes, el mòbil sincronitza una persona i una entrada nova i el rellotge les mostra (Data Layer, serialització, DataStore i desxifrat amb Keystore sota R8). Al mapping hi són el worker, els serveis i els codecs de protocol. **No provat sota R8:** dictat i entrega d'una nota del rellotge al mòbil, aprovació d'una protegida (necessita biometria) → rellotge real/fase 10. Koin no s'usa al rellotge. — `e0ff1ac`
-- [ ] Permisos: només els imprescindibles (`RECORD_AUDIO`).
+- [x] Permisos: només els imprescindibles (`RECORD_AUDIO`). Revisat amb `aapt2 dump permissions` sobre l'APK de release: l'únic permís propi és `RECORD_AUDIO`; la resta (`WAKE_LOCK`, `ACCESS_NETWORK_STATE`, `RECEIVE_BOOT_COMPLETED`, `FOREGROUND_SERVICE`) els fusiona WorkManager i es mantenen perquè la cua de notes es reprogrami en reiniciar el rellotge. Sense `INTERNET`, ubicació ni notificacions.
 - [ ] Comparar la implementació amb `docs/wear/screenshots/` i anotar les diferències.
 
 ## Fase 10 · CI i publicació
