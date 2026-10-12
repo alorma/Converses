@@ -38,8 +38,16 @@ class WearSnapshotStoreTest {
   }
   private var deviceSecure = true
   private var queueErasures = 0
+  private var syncedPeople: Set<Long>? = null
   private val store by lazy {
-    WearSnapshotStore(dataStore, { deviceSecure }, cipher, onLockRequired = { queueErasures++ }, clock = { now })
+    WearSnapshotStore(
+      dataStore,
+      { deviceSecure },
+      cipher,
+      onLockRequired = { queueErasures++ },
+      onPeopleSynced = { syncedPeople = it },
+      clock = { now },
+    )
   }
 
   // Xifrat de mentida (invertit i amb prefix), amb interruptors per a un rellotge bloquejat
@@ -76,6 +84,23 @@ class WearSnapshotStoreTest {
 
   private fun payload(vararg people: WearPerson) =
     WearSnapshotCodec.encode(WearSnapshot(generatedAt = 1, appLockActive = true, people = people.toList()))
+
+  @Test
+  fun everySyncReportsOnlyThePeopleThatCanKeepQueuedNotes() =
+    runTest {
+      store.save(payload(person(1), person(2, isProtected = true), person(3)))
+
+      assertEquals(setOf(1L, 3L), syncedPeople)
+    }
+
+  @Test
+  fun aSnapshotThatIsNotSavedDoesNotTouchTheQueue() =
+    runTest {
+      deviceSecure = false
+      store.save(payload(person(1)))
+
+      assertNull(syncedPeople)
+    }
 
   @Test
   fun startsEmpty() =
