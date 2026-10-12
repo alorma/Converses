@@ -24,7 +24,9 @@ private class FakeRegistry : NoteIdRegistry {
 class WearNoteReceiverTest {
   private val db = FakeDb()
   private val registry = FakeRegistry()
-  private val receiver = WearNoteReceiver(db.repository, registry)
+  private var now = 1_000_000L
+  private val tokens = ApprovalTokens(clock = { now })
+  private val receiver = WearNoteReceiver(db.repository, registry, tokens)
 
   private suspend fun send(
     personId: Long,
@@ -32,10 +34,11 @@ class WearNoteReceiverTest {
     who: EntryKind = EntryKind.HEARD,
     text: String = "  Hola  ",
     timestamp: Long = 5_000,
+    token: String? = null,
   ): WearNoteResult? {
     val payload =
       WearNoteCodec.encodeNote(
-        WearNote(id = id, personId = personId, who = who, text = text, timestamp = timestamp),
+        WearNote(id = id, personId = personId, who = who, text = text, timestamp = timestamp, approvalToken = token),
       )
     return receiver.receive(payload)?.let { WearNoteCodec.decodeResponse(it)!!.result }
   }
@@ -85,7 +88,7 @@ class WearNoteReceiverTest {
     }
 
   @Test
-  fun protectedArchivedAndUnknownPeopleAreRejected() =
+  fun protectedWithoutTokenArchivedAndUnknownPeopleAreRejected() =
     runTest {
       val secret = db.addPerson("Secret", isProtected = true)
       val old = db.addPerson("Old", archived = true)
@@ -94,6 +97,48 @@ class WearNoteReceiverTest {
       assertEquals(WearNoteResult.REJECTED, send(999, id = "c"))
       assertEquals(0, db.repository.getEntries(secret.id).size + db.repository.getEntries(old.id).size)
       assertEquals(emptySet<String>(), registry.ids)
+    }
+
+  @Test
+  fun aProtectedPersonAcceptsANoteWithAValidTokenForThatPerson() =
+    runTest {
+      val secret = db.addPerson("Secret", isProtected = true)
+      val token = tokens.issue(secret.id)
+
+      assertEquals(WearNoteResult.SAVED, send(secret.id, id = "a", token = token.value))
+
+      assertEquals(
+        "Hola",
+        db.repository
+          .getEntries(secret.id)
+          .single()
+          .text,
+      )
+    }
+
+  @Test
+  fun aTokenOfAnotherPersonAnExpiredOneOrAMadeUpOneIsRejected() =
+    runTest {
+      val secret = db.addPerson("Secret", isProtected = true)
+      val other = db.addPerson("Other", isProtected = true)
+
+      assertEquals(WearNoteResult.REJECTED, send(secret.id, id = "a", token = tokens.issue(other.id).value))
+      assertEquals(WearNoteResult.REJECTED, send(secret.id, id = "b", token = "inventat"))
+      val expiring = tokens.issue(secret.id)
+      now += 6 * 60_000L
+      assertEquals(WearNoteResult.REJECTED, send(secret.id, id = "c", token = expiring.value))
+
+      assertEquals(0, db.repository.getEntries(secret.id).size)
+      assertEquals(emptySet<String>(), registry.ids)
+    }
+
+  @Test
+  fun aTokenDoesNotHelpANormalPersonOrAnArchivedOne() =
+    runTest {
+      val old = db.addPerson("Old", isProtected = true, archived = true)
+      val token = tokens.issue(old.id)
+
+      assertEquals(WearNoteResult.REJECTED, send(old.id, id = "a", token = token.value))
     }
 
   @Test

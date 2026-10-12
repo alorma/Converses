@@ -22,13 +22,15 @@ data class WearNote(
   val who: EntryKind,
   val text: String,
   val timestamp: Long,
+  /** Testimoni de vigència curta que dona una aprovació del mòbil: només cal per a notes a persones protegides. */
+  val approvalToken: String? = null,
 )
 
 enum class WearNoteResult {
   /** Desada, o ja desada abans (mateix UUID). El rellotge l'esborra de la cua. */
   SAVED,
 
-  /** La persona no existeix, és arxivada o és protegida, o la nota no és vàlida. No té sentit reintentar. */
+  /** La persona no existeix, és arxivada, o és protegida i la nota no porta un testimoni vàlid, o la nota no és vàlida. No té sentit reintentar. */
   REJECTED,
 }
 
@@ -40,7 +42,11 @@ data class WearNoteResponse(
 
 /** Una nota és vàlida si té UUID, persona i un text no buit que no passa del límit. */
 fun WearNote.isValid(): Boolean =
-  id.isNotBlank() && id.length <= 64 && text.isNotBlank() && text.length <= WEAR_MAX_NOTE_TEXT_LENGTH
+  id.isNotBlank() &&
+    id.length <= 64 &&
+    text.isNotBlank() &&
+    text.length <= WEAR_MAX_NOTE_TEXT_LENGTH &&
+    (approvalToken?.length ?: 0) <= 64
 
 /** Serialització de la nota i la resposta; tolerant amb camps nous, com [WearEntriesCodec]. */
 object WearNoteCodec {

@@ -41,6 +41,20 @@ class WearNoteTest {
   }
 
   @Test
+  fun theApprovalTokenTravelsWithTheNoteAndIsOptional() {
+    val withToken = note().copy(approvalToken = "tok")
+    assertEquals(withToken, WearNoteCodec.decodeNote(WearNoteCodec.encodeNote(withToken)))
+    // Una nota d'abans de l'aprovació, sense el camp, continua llegint-se
+    val old = """{"version":1,"id":"a","personId":1,"who":"SAID","text":"x","timestamp":1}"""
+    assertNull(WearNoteCodec.decodeNote(old)!!.approvalToken)
+  }
+
+  @Test
+  fun anAbsurdlyLongTokenIsRejected() {
+    assertNull(WearNoteCodec.decodeNote(WearNoteCodec.encodeNote(note().copy(approvalToken = "x".repeat(65)))))
+  }
+
+  @Test
   fun responseRoundTrip() {
     val response = WearNoteResponse(result = WearNoteResult.REJECTED)
     assertEquals(response, WearNoteCodec.decodeResponse(WearNoteCodec.encodeResponse(response)))

@@ -11,13 +11,15 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
 /**
- * Desa les notes que arriben del rellotge. Només a persones existents, no arxivades i no protegides (una protegida
- * no rep res del rellotge fins que la fase 5 en tingui l'aprovació). Idempotent per UUID. No registra contingut.
+ * Desa les notes que arriben del rellotge. Només a persones existents i no arxivades; una protegida només si la nota
+ * porta un testimoni vigent d'una aprovació biomètrica d'aquella persona ([ApprovalTokens]). Idempotent per UUID. No registra
+ * contingut.
  * El canal és el de la nota ràpida: l'últim usat amb la persona, o el primer.
  */
 class WearNoteReceiver(
   private val repository: ConversesRepository,
   private val registry: NoteIdRegistry,
+  private val tokens: ApprovalTokens = ApprovalTokens(),
 ) {
   // Dos reenviaments alhora no poden desar la nota dues vegades
   private val lock = Mutex()
@@ -30,7 +32,9 @@ class WearNoteReceiver(
         val person = repository.getPerson(note.personId)
         when {
           registry.contains(note.id) -> WearNoteResult.SAVED
-          person == null || person.isProtected || person.archived -> WearNoteResult.REJECTED
+          person == null || person.archived -> WearNoteResult.REJECTED
+          // Una protegida només rep notes dins d'una sessió aprovada al mòbil: sense testimoni vàlid, es rebutja
+          person.isProtected && !tokens.isValid(note.approvalToken, person.id) -> WearNoteResult.REJECTED
           else -> {
             val channel =
               repository
