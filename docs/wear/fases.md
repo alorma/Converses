@@ -102,6 +102,9 @@ Validada per Bernat. El cas del mòbil realment inaccessible només està cobert
 
 Depèn de **P0** i **P10**.
 
+**Contracte**
+- [x] `:shared`: `WearApproval` (petició, cancel·lació, ack, resultat amb entrades i testimoni de nota, `sanitized()` i codec) i tests (9). Camins `/converses/approval`, `/cancel` i `/result`; resultat del mòbil al rellotge per `MessageClient`. — `61546d6`
+
 **Bloqueig de l'app**
 - [ ] Llegir l'estat del bloqueig de l'instantani; si no es pot verificar, assumir **actiu**.
 - [ ] Si és actiu i el rellotge no és segur (`isDeviceSecure`): pantalla 9 («Cal un bloqueig», «Configura», que obre els ajustos de seguretat si el sistema ho permet). No mostra ni desa cap entrada.
