@@ -114,12 +114,12 @@ Decidit en proposar la fase (12 d'oct. de 2026): les persones **arxivades no van
 
 ## Fase 3 · Pantalles de lectura
 
-- [ ] Persones (1) i Persones sense mòbil (8), amb «Dades de fa N min». Les protegides només mostren nom i cadenat.
-- [ ] Cronologia (2) amb l'`EdgeButton` «Nota»: comprovar P2 i, si cal, forçar que sigui sempre visible. **P2 ja comprovat a la fase 1:** el d'`ScreenScaffold` només apareix en arribar al final de la llista; el mòdul usa `PinnedEdgeButton` (sempre visible, amb degradat).
-- [ ] Cronologia buida (P3).
-- [ ] Detecció de «mòbil no connectat» amb `NodeClient`/`CapabilityClient`.
-- [ ] Navegació amb `SwipeDismissableNavHost`.
-- [ ] ViewModels amb tests de JVM; captures de preview.
+- [x] Persones (1) i Persones sense mòbil (8), amb «Dades de fa N min» (o «Dades d'ara mateix» i hores). Les protegides només mostren nom i cadenat; el toc no fa res fins a la fase 5. — `877e978`, `ac82280`, `1b86288`
+- [x] Cronologia (2) amb l'`EdgeButton` «Nota» (sense destí fins a la fase 6/7) — `ac82280`: comprovar P2 i, si cal, forçar que sigui sempre visible. **P2 ja comprovat a la fase 1:** el d'`ScreenScaffold` només apareix en arribar al final de la llista; el mòdul usa `PinnedEdgeButton` (sempre visible, amb degradat).
+- [x] Cronologia buida (P3): només el botó «Nota» gran al centre; sense disseny, pendent de confirmar. — `ac82280`
+- [x] Detecció de «mòbil no connectat» amb `NodeClient`/`CapabilityClient`: als emuladors les capacitats no es propaguen, així que també compten els nodes connectats. — `d1bca50`, `eb13d67`
+- [x] Navegació amb Navigation 3 (`NavDisplay` + `rememberSwipeDismissableSceneStrategy`), decidida a la fase 0. — `1b6af5e`, `ac82280`
+- [x] ViewModels amb tests de JVM (`SnapshotMappingTest`, `ViewModelsTest`); captures de preview noves (cronologia buida i sense dades). — `1577d2d`, `877e978`, `ac82280`
 
 **Sortida:** navegar Persones → Cronologia amb dades reals; estat sense mòbil correcte.
 
