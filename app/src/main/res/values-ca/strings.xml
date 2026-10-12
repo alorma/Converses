@@ -41,6 +41,8 @@
     <string name="settings_person_color_summary">Les pantalles de cada persona prenen el color del seu avatar</string>
     <string name="settings_haptic">Feedback tàctil</string>
     <string name="settings_haptic_summary">Vibra en desar, canviar un ajust o confirmar</string>
+    <string name="settings_watch_notifications">Notificacions del rellotge</string>
+    <string name="settings_watch_notifications_summary">Avisa quan el rellotge demana obrir una persona protegida amb l\'app tancada</string>
     <string name="settings_dynamic_color">Color dinàmic</string>
     <string name="settings_dynamic_color_summary">Pren el to del fons de pantalla</string>
     <string name="settings_language">Idioma</string>

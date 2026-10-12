@@ -1,11 +1,15 @@
 package com.alorma.contactnotes.ui.approval
 
+import android.Manifest
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricPrompt
 import androidx.compose.runtime.getValue
@@ -75,11 +79,24 @@ class ApprovalActivity : FragmentActivity() {
   // El diàleg del BiometricPrompt és del sistema i no es tanca sol amb l'activitat: s'ha de cancel·lar explícitament
   private var activePrompt: BiometricPrompt? = null
 
+  private var approvedByUser = false
+
+  // La notificació només cal quan l'app és en segon pla: es demana el permís en context, després de la primera aprovació
+  private val requestNotifications = registerForActivityResult(ActivityResultContracts.RequestPermission()) { finish() }
+
   private fun close() {
     activePrompt?.cancelAuthentication()
     activePrompt = null
-    finish()
+    if (approvedByUser && needsNotificationPermission()) {
+      requestNotifications.launch(Manifest.permission.POST_NOTIFICATIONS)
+    } else {
+      finish()
+    }
   }
+
+  private fun needsNotificationPermission() =
+    Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+      checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED
 
   override fun onDestroy() {
     if (!isChangingConfigurations) activePrompt?.cancelAuthentication()
@@ -104,7 +121,10 @@ class ApprovalActivity : FragmentActivity() {
           ),
         subtitle = getString(R.string.unlock_subtitle),
         onError = { viewModel.onPromptCancelled() },
-      ) { viewModel.onAuthenticated() }
+      ) {
+        approvedByUser = true
+        viewModel.onAuthenticated()
+      }
   }
 
   companion object {
