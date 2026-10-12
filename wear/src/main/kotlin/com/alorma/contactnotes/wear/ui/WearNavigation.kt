@@ -76,7 +76,7 @@ fun WearNavigation() {
   val outbox = remember { WearNotes.get(context) }
   val backStack = rememberNavBackStack(PeopleRoute)
   val gate =
-    remember { AppLockGate(store.stored, AndroidDeviceLock(context), store::clear) }
+    remember { AppLockGate(store.stored, AndroidDeviceLock(context)) { store.enforceLock() } }
   // El bloqueig es revisa en tornar a primer pla: l'usuari pot haver-lo tret mentre l'app era fora
   LifecycleEventEffect(Lifecycle.Event.ON_RESUME) { gate.recheck() }
   val lockRequired by gate.lockRequired.collectAsStateWithLifecycle(initialValue = null)

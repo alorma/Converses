@@ -35,7 +35,10 @@ class WearSnapshotStoreTest {
     PreferenceDataStoreFactory.create(scope = scope) { folder.newFile("snapshot.preferences_pb") }
   }
   private var deviceSecure = true
-  private val store by lazy { WearSnapshotStore(dataStore, { deviceSecure }, clock = { now }) }
+  private var queueErasures = 0
+  private val store by lazy {
+    WearSnapshotStore(dataStore, { deviceSecure }, onLockRequired = { queueErasures++ }, clock = { now })
+  }
 
   @After
   fun tearDown() = scope.cancel()
@@ -162,6 +165,38 @@ class WearSnapshotStoreTest {
       assertFalse(store.save(payload(person(2))))
 
       assertNull(store.stored.first())
+      assertEquals(1, queueErasures)
+    }
+
+  @Test
+  fun enforceLockErasesTheCopyAndThePendingNotesOnlyWhenALockIsRequired() =
+    runTest {
+      store.save(payload(person(1)))
+
+      assertFalse(store.enforceLock())
+      assertEquals(0, queueErasures)
+      assertEquals(
+        1,
+        store.stored
+          .first()!!
+          .snapshot.people.size,
+      )
+
+      deviceSecure = false
+      assertTrue(store.enforceLock())
+
+      assertNull(store.stored.first())
+      assertEquals(1, queueErasures)
+    }
+
+  @Test
+  fun enforceLockWithNoSnapshotAssumesTheAppLockIsActive() =
+    runTest {
+      deviceSecure = false
+
+      assertTrue(store.enforceLock())
+
+      assertEquals(1, queueErasures)
     }
 
   @Test
