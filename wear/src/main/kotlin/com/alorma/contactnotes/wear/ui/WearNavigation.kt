@@ -1,8 +1,16 @@
 package com.alorma.contactnotes.wear.ui
 
+import android.content.ActivityNotFoundException
+import android.content.Context
+import android.content.Intent
+import android.provider.Settings
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LifecycleEventEffect
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
@@ -13,7 +21,9 @@ import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import androidx.wear.compose.navigation3.rememberSwipeDismissableSceneStrategy
+import com.alorma.contactnotes.wear.data.AndroidDeviceLock
 import com.alorma.contactnotes.wear.data.AndroidSpeechSource
+import com.alorma.contactnotes.wear.data.AppLockGate
 import com.alorma.contactnotes.wear.data.GmsMoreEntriesSource
 import com.alorma.contactnotes.wear.data.GmsPhoneConnection
 import com.alorma.contactnotes.wear.data.WearNotes
@@ -43,6 +53,18 @@ data class WhoRoute(
   val text: String,
 ) : NavKey
 
+/** Obre els ajustos de seguretat del rellotge; si el sistema no els ofereix, els ajustos generals; si no, res. */
+private fun openSecuritySettings(context: Context) {
+  for (action in listOf(Settings.ACTION_SECURITY_SETTINGS, Settings.ACTION_SETTINGS)) {
+    try {
+      context.startActivity(Intent(action).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+      return
+    } catch (_: ActivityNotFoundException) {
+      // Es prova amb el següent
+    }
+  }
+}
+
 @Composable
 fun WearNavigation() {
   val context = LocalContext.current.applicationContext
@@ -53,6 +75,21 @@ fun WearNavigation() {
   val speech = remember { AndroidSpeechSource(context) }
   val outbox = remember { WearNotes.get(context) }
   val backStack = rememberNavBackStack(PeopleRoute)
+  val gate =
+    remember { AppLockGate(store.stored, AndroidDeviceLock(context), store::clear) }
+  // El bloqueig es revisa en tornar a primer pla: l'usuari pot haver-lo tret mentre l'app era fora
+  LifecycleEventEffect(Lifecycle.Event.ON_RESUME) { gate.recheck() }
+  val lockRequired by gate.lockRequired.collectAsStateWithLifecycle(initialValue = null)
+
+  // Mentre no se sap, no es mostra res; amb «Cal un bloqueig» no es compon cap altra pantalla
+  when (lockRequired) {
+    null -> return
+    true -> {
+      LockRequiredContent(onSetUp = { openSecuritySettings(context) })
+      return
+    }
+    false -> Unit
+  }
 
   NavDisplay(
     backStack = backStack,
