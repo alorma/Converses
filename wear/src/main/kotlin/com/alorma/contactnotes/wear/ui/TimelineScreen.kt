@@ -24,6 +24,7 @@ import androidx.wear.compose.material3.ScreenScaffold
 import androidx.wear.compose.material3.Text
 import androidx.wear.compose.material3.lazy.rememberTransformationSpec
 import com.alorma.contactnotes.shared.AvatarColor
+import com.alorma.contactnotes.shared.AvatarShape
 import com.alorma.contactnotes.wear.R
 import com.alorma.contactnotes.wear.components.EntryAuthor
 import com.alorma.contactnotes.wear.components.PersonAvatar
@@ -46,12 +47,20 @@ fun TimelineContent(
   name: String,
   initials: String,
   color: AvatarColor,
+  avatarShape: AvatarShape,
   entries: List<EntryItem>,
   onNote: () -> Unit,
   modifier: Modifier = Modifier,
 ) {
   if (entries.isEmpty()) {
-    EmptyTimelineContent(name = name, initials = initials, color = color, onNote = onNote, modifier = modifier)
+    EmptyTimelineContent(
+      name = name,
+      initials = initials,
+      color = color,
+      avatarShape = avatarShape,
+      onNote = onNote,
+      modifier = modifier,
+    )
     return
   }
   val state = rememberTransformingLazyColumnState()
@@ -71,7 +80,7 @@ fun TimelineContent(
           horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
           verticalAlignment = Alignment.CenterVertically,
         ) {
-          PersonAvatar(initials = initials, color = color, size = 30.dp)
+          PersonAvatar(initials = initials, color = color, shape = avatarShape, size = 30.dp)
           Text(text = name, style = PersonNameStyle, color = WearColors.OnSurface, maxLines = 1)
         }
       }
@@ -107,7 +116,14 @@ private fun sampleEntries(): List<EntryItem> {
 @Composable
 fun TimelinePreview() =
   WearPreview {
-    TimelineContent(name = "Kael", initials = "K", color = AvatarColor.Sky, entries = sampleEntries(), onNote = {})
+    TimelineContent(
+      name = "Kael",
+      initials = "K",
+      color = AvatarColor.Sky,
+      avatarShape = AvatarShape.Clover4Leaf,
+      entries = sampleEntries(),
+      onNote = {},
+    )
   }
 
 /** Pantalla 2 connectada al ViewModel; si la persona ja no és disponible, torna enrere. */
@@ -125,6 +141,7 @@ fun TimelineScreen(
         name = state.name,
         initials = state.initials,
         color = state.color,
+        avatarShape = state.avatarShape,
         entries = state.entries,
         onNote = onNote,
       )
@@ -135,7 +152,14 @@ fun TimelineScreen(
 @Composable
 fun TimelineEmptyPreview() =
   WearPreview {
-    TimelineContent(name = "Kael", initials = "K", color = AvatarColor.Sky, entries = emptyList(), onNote = {})
+    TimelineContent(
+      name = "Kael",
+      initials = "K",
+      color = AvatarColor.Sky,
+      avatarShape = AvatarShape.Clover4Leaf,
+      entries = emptyList(),
+      onNote = {},
+    )
   }
 
 /** P3: sense entrades només hi ha el botó «Nota», gran i al centre. */
@@ -144,6 +168,7 @@ private fun EmptyTimelineContent(
   name: String,
   initials: String,
   color: AvatarColor,
+  avatarShape: AvatarShape,
   onNote: () -> Unit,
   modifier: Modifier = Modifier,
 ) {
@@ -154,7 +179,7 @@ private fun EmptyTimelineContent(
       verticalArrangement = Arrangement.spacedBy(14.dp, Alignment.CenterVertically),
     ) {
       Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
-        PersonAvatar(initials = initials, color = color, size = 30.dp)
+        PersonAvatar(initials = initials, color = color, shape = avatarShape, size = 30.dp)
         Text(text = name, style = PersonNameStyle, color = WearColors.OnSurface, maxLines = 1)
       }
       Button(onClick = onNote) {

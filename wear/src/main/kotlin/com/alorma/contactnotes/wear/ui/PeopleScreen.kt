@@ -29,6 +29,7 @@ import androidx.wear.compose.material3.ScreenScaffold
 import androidx.wear.compose.material3.Text
 import androidx.wear.compose.material3.lazy.rememberTransformationSpec
 import com.alorma.contactnotes.shared.AvatarColor
+import com.alorma.contactnotes.shared.AvatarShape
 import com.alorma.contactnotes.wear.R
 import com.alorma.contactnotes.wear.components.PersonRow
 import com.alorma.contactnotes.wear.components.groupedItemShape
@@ -43,6 +44,7 @@ data class PersonItem(
   val name: String,
   val initials: String,
   val color: AvatarColor,
+  val avatarShape: AvatarShape,
   val lastEntry: String?,
   val isProtected: Boolean,
 )
@@ -81,6 +83,7 @@ fun PeopleContent(
           name = person.name,
           initials = person.initials,
           color = person.color,
+          avatarShape = person.avatarShape,
           lastEntry = person.lastEntry,
           isProtected = person.isProtected,
           shape = groupedItemShape(index, people.size),
@@ -138,9 +141,9 @@ private fun PhoneOfflineBanner(
 
 internal val SamplePeople =
   listOf(
-    PersonItem(1, "Kael", "K", AvatarColor.Sky, "Fa 2 h", isProtected = false),
-    PersonItem(2, "Luna Roja", "LR", AvatarColor.Lavender, "Ahir", isProtected = false),
-    PersonItem(3, "Marta", "M", AvatarColor.Peach, null, isProtected = true),
+    PersonItem(1, "Kael", "K", AvatarColor.Sky, AvatarShape.Cookie9Sided, "Fa 2 h", isProtected = false),
+    PersonItem(2, "Luna Roja", "LR", AvatarColor.Lavender, AvatarShape.Clover4Leaf, "Ahir", isProtected = false),
+    PersonItem(3, "Marta", "M", AvatarColor.Peach, AvatarShape.Sunny, null, isProtected = true),
   )
 
 @WearScreenPreviews
