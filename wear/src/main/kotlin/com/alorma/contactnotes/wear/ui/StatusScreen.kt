@@ -36,10 +36,8 @@ import androidx.compose.ui.unit.dp
 import androidx.wear.compose.material3.Icon
 import androidx.wear.compose.material3.ScreenScaffold
 import androidx.wear.compose.material3.Text
-import com.alorma.contactnotes.shared.AvatarColor
 import com.alorma.contactnotes.wear.R
 import com.alorma.contactnotes.wear.components.CookieShape
-import com.alorma.contactnotes.wear.theme.AvatarInk
 import com.alorma.contactnotes.wear.theme.ButtonLabelStyle
 import com.alorma.contactnotes.wear.theme.PersonNameStyle
 import com.alorma.contactnotes.wear.theme.RowSubtitleStyle
@@ -61,6 +59,8 @@ fun StatusContent(
   iconSize: Dp = 32.dp,
   titleStyle: androidx.compose.ui.text.TextStyle = WhoTitleStyle,
   action: String? = null,
+  actionTonal: Boolean = false,
+  compact: Boolean = false,
   onAction: () -> Unit = {},
 ) {
   // Les mides del brief són per a una pantalla de 240 dp; a Small Round (192 dp) la Galeta s'encongeix perquè hi càpiga tot
@@ -72,7 +72,7 @@ fun StatusContent(
         Modifier.fillMaxSize().padding(
           start = 12.dp + 8.dp * scale,
           end = 12.dp + 8.dp * scale,
-          top = 38.dp * scale,
+          top = (if (compact) 26.dp else 38.dp) * scale,
           bottom = if (action != null) PinnedEdgeButtonSpace else 12.dp,
         ),
       horizontalAlignment = Alignment.CenterHorizontally,
@@ -116,7 +116,7 @@ fun StatusContent(
       )
     }
     if (action != null) {
-      PinnedEdgeButton(onClick = onAction) {
+      PinnedEdgeButton(onClick = onAction, tonal = actionTonal) {
         Text(text = action, style = ButtonLabelStyle)
       }
     }
@@ -156,25 +156,6 @@ fun SavedContent(
   }
 }
 
-/** Pantalla 7: persona protegida, a l'espera del desbloqueig del rellotge. */
-@Composable
-fun ProtectedPersonContent(
-  color: AvatarColor,
-  onUnlock: () -> Unit,
-  modifier: Modifier = Modifier,
-) {
-  StatusContent(
-    icon = Icons.Rounded.Lock,
-    iconBackground = color.color,
-    iconTint = AvatarInk,
-    title = stringResource(R.string.protected_person_title),
-    subtitle = stringResource(R.string.protected_person_hint),
-    modifier = modifier,
-    action = stringResource(R.string.unlock),
-    onAction = onUnlock,
-  )
-}
-
 /** Pantalla 9: cal un bloqueig de pantalla al rellotge; substitueix qualsevol altra pantalla. */
 @Composable
 fun LockRequiredContent(
@@ -201,10 +182,6 @@ fun SavedPreview() = WearPreview { SavedContent(pendingPhone = false) }
 @WearScreenPreviews
 @Composable
 fun SavedPendingPreview() = WearPreview { SavedContent(pendingPhone = true) }
-
-@WearScreenPreviews
-@Composable
-fun ProtectedPersonPreview() = WearPreview { ProtectedPersonContent(color = AvatarColor.Peach, onUnlock = {}) }
 
 @WearScreenPreviews
 @Composable

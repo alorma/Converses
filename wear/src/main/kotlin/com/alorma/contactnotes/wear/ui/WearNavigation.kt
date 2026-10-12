@@ -24,10 +24,14 @@ import androidx.wear.compose.navigation3.rememberSwipeDismissableSceneStrategy
 import com.alorma.contactnotes.wear.data.AndroidDeviceLock
 import com.alorma.contactnotes.wear.data.AndroidSpeechSource
 import com.alorma.contactnotes.wear.data.AppLockGate
+import com.alorma.contactnotes.wear.data.ApprovalResults
+import com.alorma.contactnotes.wear.data.GmsApprovalClient
 import com.alorma.contactnotes.wear.data.GmsMoreEntriesSource
 import com.alorma.contactnotes.wear.data.GmsPhoneConnection
+import com.alorma.contactnotes.wear.data.ProtectedSessions
 import com.alorma.contactnotes.wear.data.WearNotes
 import com.alorma.contactnotes.wear.data.WearSnapshotStore
+import com.alorma.contactnotes.wear.data.withProtectedSessions
 import java.util.Locale
 import kotlinx.serialization.Serializable
 
@@ -39,7 +43,12 @@ data class PersonRoute(
   val id: Long,
 ) : NavKey
 
-/** Només es crea per a persones no protegides; les protegides arriben a la fase 5. */
+/** Espera l'aprovació al mòbil d'una persona protegida (pantalles 7, 10, 11 i 12). */
+@Serializable
+data class ApprovalRoute(
+  val personId: Long,
+) : NavKey
+
 @Serializable
 data class DictateRoute(
   val personId: Long,
@@ -74,7 +83,16 @@ fun WearNavigation() {
   val moreEntries = remember { GmsMoreEntriesSource(context) }
   val speech = remember { AndroidSpeechSource(context) }
   val outbox = remember { WearNotes.get(context) }
+  val approvals = remember { GmsApprovalClient(context) }
+  val sessions = remember { ProtectedSessions.shared }
+  // Una protegida aprovada es veu com una persona normal mentre la seva sessió és oberta, i només en memòria
+  val openSnapshots = remember { store.stored.withProtectedSessions(sessions.all) }
   val backStack = rememberNavBackStack(PeopleRoute)
+  // En sortir d'una persona se n'oblida la sessió (si era protegida, les entrades marxen de la memòria)
+  val pop: () -> Unit = {
+    val top = backStack.removeLastOrNull()
+    if (top is PersonRoute) sessions.close(top.id)
+  }
   val gate =
     remember { AppLockGate(store.stored, AndroidDeviceLock(context)) { store.enforceLock() } }
   // El bloqueig es revisa en tornar a primer pla: l'usuari pot haver-lo tret mentre l'app era fora
@@ -93,7 +111,7 @@ fun WearNavigation() {
 
   NavDisplay(
     backStack = backStack,
-    onBack = { backStack.removeLastOrNull() },
+    onBack = pop,
     sceneStrategies = listOf(rememberSwipeDismissableSceneStrategy()),
     entryDecorators =
       listOf(
@@ -106,8 +124,28 @@ fun WearNavigation() {
           val vm = viewModel { PeopleViewModel(store.stored, phone, labels) }
           PeopleScreen(
             viewModel = vm,
-            // Les protegides s'obriran a la fase 5 (desbloqueig); fins llavors el toc no fa res
-            onPersonClick = { if (!it.isProtected) backStack.add(PersonRoute(it.id)) },
+            // Una protegida s'obre només amb l'aprovació al mòbil; una de normal, directament
+            onPersonClick = { backStack.add(if (it.isProtected) ApprovalRoute(it.id) else PersonRoute(it.id)) },
+          )
+        }
+        entry<ApprovalRoute> { route ->
+          val vm =
+            viewModel<ApprovalViewModel>(
+              key = "approval-${route.personId}",
+              factory =
+                viewModelFactory {
+                  initializer { ApprovalViewModel(route.personId, approvals, ApprovalResults.results, sessions) }
+                },
+            )
+          ApprovalScreen(
+            viewModel = vm,
+            onCancel = pop,
+            onClose = pop,
+            // Aprovada: la pantalla d'espera se substitueix per la cronologia, i en tornar enrere es va a la llista
+            onApproved = {
+              backStack.removeLastOrNull()
+              backStack.add(PersonRoute(route.personId))
+            },
           )
         }
         entry<PersonRoute> { route ->
@@ -119,7 +157,7 @@ fun WearNavigation() {
                   initializer {
                     TimelineViewModel(
                       route.id,
-                      store.stored,
+                      openSnapshots,
                       labels,
                       moreEntries,
                     )
@@ -128,7 +166,7 @@ fun WearNavigation() {
             )
           TimelineScreen(
             viewModel = vm,
-            onBack = { backStack.removeLastOrNull() },
+            onBack = pop,
             onNote = { name -> backStack.add(DictateRoute(route.id, name)) },
           )
         }
@@ -153,7 +191,7 @@ fun WearNavigation() {
               key = "who-${route.personId}",
               factory =
                 viewModelFactory {
-                  initializer { WhoViewModel(route.personId, route.text, store.stored, outbox, phone) }
+                  initializer { WhoViewModel(route.personId, route.text, openSnapshots, outbox, phone) }
                 },
             )
           // Després de «Desat» es torna a la cronologia: es treuen «Qui» i el dictat

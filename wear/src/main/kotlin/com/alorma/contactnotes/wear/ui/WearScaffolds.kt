@@ -17,6 +17,7 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.wear.compose.material3.AppScaffold
+import androidx.wear.compose.material3.ButtonDefaults
 import androidx.wear.compose.material3.EdgeButton
 import androidx.wear.compose.material3.TimeSource
 import androidx.wear.compose.material3.TimeText
@@ -79,6 +80,7 @@ val PinnedEdgeButtonSpace = 56.dp
 @Composable
 fun BoxScope.PinnedEdgeButton(
   onClick: () -> Unit,
+  tonal: Boolean = false,
   content: @Composable RowScope.() -> Unit,
 ) {
   Box(
@@ -89,5 +91,10 @@ fun BoxScope.PinnedEdgeButton(
         .height(64.dp)
         .background(Brush.verticalGradient(0f to Color.Transparent, 0.75f to WearColors.Background)),
   )
-  EdgeButton(onClick = onClick, modifier = Modifier.align(Alignment.BottomCenter), content = content)
+  EdgeButton(
+    onClick = onClick,
+    modifier = Modifier.align(Alignment.BottomCenter),
+    colors = if (tonal) ButtonDefaults.filledTonalButtonColors() else ButtonDefaults.buttonColors(),
+    content = content,
+  )
 }

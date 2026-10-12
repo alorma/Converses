@@ -41,6 +41,19 @@
             </intent-filter>
         </service>
 
+        <!-- Resultat de l'aprovació d'una persona protegida, enviat pel mòbil -->
+        <service
+            android:name=".data.ApprovalResultListenerService"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.google.android.gms.wearable.MESSAGE_RECEIVED" />
+                <data
+                    android:host="*"
+                    android:path="/converses/approval/result"
+                    android:scheme="wear" />
+            </intent-filter>
+        </service>
+
         <activity
             android:name=".MainActivity"
             android:exported="true">

@@ -3,6 +3,10 @@ package com.alorma.contactnotes.wear
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
+import com.alorma.contactnotes.wear.ui.ApprovalDeniedPreview
+import com.alorma.contactnotes.wear.ui.ApprovalExpiredPreview
+import com.alorma.contactnotes.wear.ui.ApprovalNoPhonePreview
+import com.alorma.contactnotes.wear.ui.ApprovalWaitingPreview
 import com.alorma.contactnotes.wear.ui.DictateErrorPreview
 import com.alorma.contactnotes.wear.ui.DictateListeningPreview
 import com.alorma.contactnotes.wear.ui.DictatePermissionPreview
@@ -11,7 +15,6 @@ import com.alorma.contactnotes.wear.ui.LockRequiredPreview
 import com.alorma.contactnotes.wear.ui.NoDataPreview
 import com.alorma.contactnotes.wear.ui.PeoplePhoneOfflinePreview
 import com.alorma.contactnotes.wear.ui.PeoplePreview
-import com.alorma.contactnotes.wear.ui.ProtectedPersonPreview
 import com.alorma.contactnotes.wear.ui.SavedPendingPreview
 import com.alorma.contactnotes.wear.ui.SavedPreview
 import com.alorma.contactnotes.wear.ui.TimelineEmptyPreview
@@ -89,7 +92,22 @@ class WearScreenshotTests {
   @WatchPreviews
   @PreviewTest
   @Composable
-  fun protectedPerson() = ProtectedPersonPreview()
+  fun approvalWaiting() = ApprovalWaitingPreview()
+
+  @WatchPreviews
+  @PreviewTest
+  @Composable
+  fun approvalDenied() = ApprovalDeniedPreview()
+
+  @WatchPreviews
+  @PreviewTest
+  @Composable
+  fun approvalExpired() = ApprovalExpiredPreview()
+
+  @WatchPreviews
+  @PreviewTest
+  @Composable
+  fun approvalNoPhone() = ApprovalNoPhonePreview()
 
   @WatchPreviews
   @PreviewTest
