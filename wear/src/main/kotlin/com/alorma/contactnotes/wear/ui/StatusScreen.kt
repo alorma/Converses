@@ -1,5 +1,11 @@
 package com.alorma.contactnotes.wear.ui
 
+import android.provider.Settings
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -12,12 +18,17 @@ import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material.icons.rounded.Lock
 import androidx.compose.material.icons.rounded.Schedule
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
@@ -53,6 +64,7 @@ fun StatusContent(
 ) {
   // Les mides del brief són per a una pantalla de 240 dp; a Small Round (192 dp) la Galeta s'encongeix perquè hi càpiga tot
   val scale = (LocalConfiguration.current.screenHeightDp / 240f).coerceIn(0.7f, 1f)
+  val cookieRotation = rememberCookieRotation()
   ScreenScaffold(modifier = modifier) {
     Column(
       modifier =
@@ -65,10 +77,17 @@ fun StatusContent(
       horizontalAlignment = Alignment.CenterHorizontally,
       verticalArrangement = Arrangement.spacedBy(6.dp, Alignment.CenterVertically),
     ) {
-      Box(
-        modifier = Modifier.size(cookieSize * scale * scale * 0.85f).clip(CookieShape).background(iconBackground),
-        contentAlignment = Alignment.Center,
-      ) {
+      val cookie = cookieSize * scale * scale * 0.85f
+      Box(modifier = Modifier.size(cookie), contentAlignment = Alignment.Center) {
+        // Només gira la Galeta; la icona es queda quieta
+        Box(
+          modifier =
+            Modifier
+              .fillMaxSize()
+              .graphicsLayer { rotationZ = cookieRotation.value }
+              .clip(CookieShape)
+              .background(iconBackground),
+        )
         Icon(
           icon,
           contentDescription = null,
@@ -189,3 +208,23 @@ fun ProtectedPersonPreview() = WearPreview { ProtectedPersonContent(color = Avat
 @WearScreenPreviews
 @Composable
 fun LockRequiredPreview() = WearPreview { LockRequiredContent(onSetUp = {}) }
+
+private const val CookieRotationMillis = 24_000
+
+/** Gir lent i continu de la Galeta (una volta cada 24 s). Sense gir si l'usuari ha desactivat les animacions del sistema. */
+@Composable
+private fun rememberCookieRotation(): State<Float> {
+  val context = LocalContext.current
+  val animationsOn =
+    remember(context) {
+      Settings.Global.getFloat(context.contentResolver, Settings.Global.ANIMATOR_DURATION_SCALE, 1f) > 0f
+    }
+  if (!animationsOn) return remember { mutableStateOf(0f) }
+  val transition = rememberInfiniteTransition(label = "cookieRotation")
+  return transition.animateFloat(
+    initialValue = 0f,
+    targetValue = 360f,
+    animationSpec = infiniteRepeatable(tween(CookieRotationMillis, easing = LinearEasing)),
+    label = "cookieRotation",
+  )
+}
