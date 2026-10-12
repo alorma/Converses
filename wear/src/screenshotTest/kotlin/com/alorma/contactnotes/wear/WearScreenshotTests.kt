@@ -12,6 +12,7 @@ import com.alorma.contactnotes.wear.ui.ProtectedPersonPreview
 import com.alorma.contactnotes.wear.ui.SavedPendingPreview
 import com.alorma.contactnotes.wear.ui.SavedPreview
 import com.alorma.contactnotes.wear.ui.TimelineEmptyPreview
+import com.alorma.contactnotes.wear.ui.TimelineLoadingMorePreview
 import com.alorma.contactnotes.wear.ui.TimelinePreview
 import com.alorma.contactnotes.wear.ui.WhoPreview
 import com.android.tools.screenshot.PreviewTest
@@ -31,6 +32,11 @@ class WearScreenshotTests {
   @PreviewTest
   @Composable
   fun timeline() = TimelinePreview()
+
+  @WatchPreviews
+  @PreviewTest
+  @Composable
+  fun timelineLoadingMore() = TimelineLoadingMorePreview()
 
   @WatchPreviews
   @PreviewTest
