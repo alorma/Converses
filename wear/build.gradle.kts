@@ -6,6 +6,7 @@ plugins {
   alias(libs.plugins.kotlin.serialization)
   alias(libs.plugins.compose.screenshot)
   alias(libs.plugins.version)
+  alias(libs.plugins.play.publisher)
 }
 
 // El versionCode és el del mòbil + 2 (així és únic entre form factors a Play)
@@ -41,6 +42,16 @@ android {
       keyAlias = "androiddebugkey"
       keyPassword = "android"
     }
+    // Mateixa keystore de release que el mòbil (fora del repo); Play exigeix la mateixa signatura
+    val releaseKeystore = rootProject.file("certs/release.keystore")
+    if (releaseKeystore.exists() && System.getenv("KEYSTORE_PASSWORD") != null) {
+      create("release") {
+        storeFile = releaseKeystore
+        storePassword = System.getenv("KEYSTORE_PASSWORD")
+        keyAlias = System.getenv("KEY_ALIAS")
+        keyPassword = System.getenv("KEY_PASSWORD")
+      }
+    }
   }
 
   buildTypes {
@@ -52,6 +63,7 @@ android {
       optimization {
         enable = true
       }
+      signingConfigs.findByName("release")?.let { signingConfig = it }
     }
   }
 

@@ -64,8 +64,8 @@ jobs:
           mkdir -p certs
           echo "$RELEASE_KEYSTORE_BASE64" | base64 -d > certs/release.keystore
 
-      - name: Build signed release APK and AAB
-        run: ./gradlew :app:assembleRelease :app:bundleRelease
+      - name: Build signed release APK and AABs
+        run: ./gradlew :app:assembleRelease :app:bundleRelease :wear:bundleRelease
         env:
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
@@ -78,13 +78,19 @@ jobs:
           path: |
             app/build/outputs/bundle/release/*.aab
             app/build/outputs/mapping/release/mapping.txt
+            wear/build/outputs/bundle/release/*.aab
+            wear/build/outputs/mapping/release/mapping.txt
           if-no-files-found: error
           retention-days: 30
 
-      # Gradle Play Publisher: puja l'AAB i, de app/src/main/play/release-notes, les notes de cada idioma.
+      # Gradle Play Publisher: puja els AAB del mòbil i del rellotge i, de app/src/main/play/release-notes, les notes
+      # de cada idioma. Una sola invocació perquè comparteixin edició (un AAB no ha d'esborrar l'altre de la pista).
       # El mapping de R8 va dins l'AAB
       - name: Upload to Google Play
-        run: ./gradlew :app:publishReleaseBundle --track "${{ inputs.track }}" --release-name "${{ steps.version.outputs.version }}"
+        run: >-
+          ./gradlew
+          :app:publishReleaseBundle --track "${{ inputs.track }}" --release-name "${{ steps.version.outputs.version }}"
+          :wear:publishReleaseBundle --track "${{ inputs.track }}" --release-name "${{ steps.version.outputs.version }}"
         env:
           ANDROID_PUBLISHER_CREDENTIALS: ${{ secrets.SERVICE_ACCOUNT_JSON }}
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
