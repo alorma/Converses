@@ -110,7 +110,7 @@ Depèn de **P0** i **P10**.
 - [x] Si és actiu i el rellotge no és segur (`isDeviceSecure`): pantalla 9 («Cal un bloqueig», «Configura», que obre els ajustos de seguretat si el sistema ho permet). No mostra ni desa cap entrada. — `a8d5178`
 - [ ] Còpia local xifrada amb Keystore lligada a l'autenticació del dispositiu (o esborrada, segons P10).
 - [x] Esborrar la còpia si es treu el bloqueig del rellotge, en obrir l'app (en tornar a primer pla) i a cada sincronització. — `a8d5178`. **Emulador** (telèfon + Wear XL Round): amb el bloqueig actiu i sense PIN es veu la pantalla 9 i la còpia s'esborra; «Configura» obre Seguretat → Bloqueig de pantalla; amb PIN, l'app s'obre; en treure'l, torna la pantalla 9; amb el bloqueig desactivat, tot torna. Tests de JVM (`AppLockGateTest`, 6; `WearSnapshotStoreTest`, 2 nous).
-- [ ] La cua de pendents i «més entrades» segueixen les mateixes regles.
+- [x] La cua de pendents segueix les mateixes regles: **s'esborra** (decidit el 12 d'oct. de 2026: les notes es perden, no es xifren) quan cal bloqueig i el rellotge no en té, en sincronitzar o en intentar entregar-la (`enforceLock`). «Més entrades» ja viu només en memòria i no es pot arribar a la pantalla amb la pantalla 9. Tests de JVM (3 nous a `WearSnapshotStoreTest`, 1 a `NoteOutboxTest`). — `9c14da8`
 
 **Persones protegides**
 - [x] **Disseny (P12):** rebut (pantalles 7, 10–12 al rellotge i 13–16 al mòbil).
