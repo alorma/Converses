@@ -117,7 +117,7 @@ val wearModule =
       )
     }
     single<NoteIdRegistry> { DataStoreNoteIdRegistry(androidContext()) }
-    single { WearNoteReceiver(repository = get(), registry = get()) }
+    single { WearNoteReceiver(repository = get(), registry = get(), tokens = get()) }
     single {
       WearSnapshotPublisher(
         repository = get(),
