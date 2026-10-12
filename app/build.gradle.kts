@@ -1,4 +1,5 @@
 import com.android.compose.screenshot.tasks.PreviewScreenshotValidationTask
+import com.github.triplet.gradle.play.PlayPublisherExtension
 
 plugins {
   alias(libs.plugins.android.application)
@@ -91,6 +92,19 @@ android {
 // El plugin de captures no té DSL per al llindar des d'AGP 9; es posa a la tasca de validació
 tasks.withType<PreviewScreenshotValidationTask>().configureEach {
   testEngineInput.threshold.set(0.01f)
+}
+
+// Les dues apps comparteixen edició i pista a Play: cada tasca ha de retenir el versionCode de l'altra
+// o l'última en publicar s'enduu l'altra de la release. El del rellotge és el del mòbil + 2 (FormFactor.WEAR).
+androidComponents {
+  onVariants(selector().withBuildType("release")) { variant ->
+    val otherVersionCode =
+      variant.outputs
+        .single()
+        .versionCode
+        .map { listOf(it!!.toLong() + 2) }
+    extensions.configure<PlayPublisherExtension>("play") { retain.artifacts.set(otherVersionCode) }
+  }
 }
 
 dependencies {
