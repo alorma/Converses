@@ -20,10 +20,15 @@ import org.junit.Test
 @OptIn(ExperimentalCoroutinesApi::class)
 class WearSnapshotPublisherTest {
   private class FakeWearLink : WearLink {
-    val available = MutableStateFlow(false)
-    override val watchAvailable: Flow<Boolean> = available
+    val present = MutableStateFlow(true)
+    override val watchPresent: Flow<Boolean> = present
     val payloads = mutableListOf<String>()
+    var clears = 0
     var failNext = false
+
+    override suspend fun clear() {
+      clears++
+    }
 
     override suspend fun publish(payload: ByteArray) {
       if (failNext) {
@@ -128,16 +133,87 @@ class WearSnapshotPublisherTest {
     }
 
   @Test
-  fun republishesWhenTheWatchConnectsEvenWithoutChanges() =
+  fun publishesNothingWhileThereIsNoWatch() =
+    runTest {
+      val kael = db.addPerson("Kael")
+      link.present.value = false
+      startPublisher()
+      settle()
+
+      db.addEntry(kael.id, text = "hola", occurredAt = 5)
+      settle()
+
+      assertTrue(link.payloads.isEmpty())
+    }
+
+  @Test
+  fun publishesWhenAWatchAppearsEvenWithoutChanges() =
+    runTest {
+      db.addPerson("Kael")
+      link.present.value = false
+      startPublisher()
+      settle()
+
+      link.present.value = true
+      settle()
+
+      assertEquals(1, link.payloads.size)
+    }
+
+  @Test
+  fun republishesWhenTheWatchComesBack() =
     runTest {
       db.addPerson("Kael")
       startPublisher()
       settle()
 
-      link.available.value = true
+      link.present.value = false
+      settle()
+      link.present.value = true
       settle()
 
       assertEquals(2, link.payloads.size)
+    }
+
+  @Test
+  fun clearsTheSnapshotWhenTheWatchGoesAway() =
+    runTest {
+      db.addPerson("Kael")
+      startPublisher()
+      settle()
+      assertEquals(0, link.clears)
+
+      link.present.value = false
+      settle()
+
+      assertEquals(1, link.clears)
+    }
+
+  @Test
+  fun changesWhileThereIsNoWatchAreNotPublishedAfterwardsEither() =
+    runTest {
+      val laia = db.addPerson("Laia")
+      db.addEntry(laia.id, text = "molt secret", occurredAt = 10)
+      startPublisher()
+      settle()
+      link.present.value = false
+      settle()
+
+      db.people.update { list -> list.map { if (it.id == laia.id) it.copy(isProtected = true) else it } }
+      settle()
+      link.present.value = true
+      settle()
+
+      // La que es publica en tornar ja porta la protegida sense contingut
+      assertFalse("molt secret" in link.payloads.last())
+      assertTrue(
+        link
+          .snapshots()
+          .last()
+          .people
+          .single()
+          .isProtected,
+      )
     }
 
   @Test
