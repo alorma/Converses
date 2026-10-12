@@ -1,19 +1,24 @@
 package com.alorma.contactnotes.wear.ui
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Mic
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.wear.compose.foundation.lazy.TransformingLazyColumn
 import androidx.wear.compose.foundation.lazy.rememberTransformingLazyColumnState
+import androidx.wear.compose.material3.Button
 import androidx.wear.compose.material3.Icon
 import androidx.wear.compose.material3.ScreenScaffold
 import androidx.wear.compose.material3.Text
@@ -45,6 +50,10 @@ fun TimelineContent(
   onNote: () -> Unit,
   modifier: Modifier = Modifier,
 ) {
+  if (entries.isEmpty()) {
+    EmptyTimelineContent(name = name, initials = initials, color = color, onNote = onNote, modifier = modifier)
+    return
+  }
   val state = rememberTransformingLazyColumnState()
   val spec = rememberTransformationSpec()
   ScreenScaffold(
@@ -100,3 +109,58 @@ fun TimelinePreview() =
   WearPreview {
     TimelineContent(name = "Kael", initials = "K", color = AvatarColor.Sky, entries = sampleEntries(), onNote = {})
   }
+
+/** Pantalla 2 connectada al ViewModel; si la persona ja no és disponible, torna enrere. */
+@Composable
+fun TimelineScreen(
+  viewModel: TimelineViewModel,
+  onBack: () -> Unit,
+  onNote: () -> Unit,
+) {
+  when (val state = viewModel.state.collectAsStateWithLifecycle().value) {
+    TimelineUiState.Loading -> Unit
+    TimelineUiState.Unavailable -> LaunchedEffect(Unit) { onBack() }
+    is TimelineUiState.Loaded ->
+      TimelineContent(
+        name = state.name,
+        initials = state.initials,
+        color = state.color,
+        entries = state.entries,
+        onNote = onNote,
+      )
+  }
+}
+
+@WearScreenPreviews
+@Composable
+fun TimelineEmptyPreview() =
+  WearPreview {
+    TimelineContent(name = "Kael", initials = "K", color = AvatarColor.Sky, entries = emptyList(), onNote = {})
+  }
+
+/** P3: sense entrades només hi ha el botó «Nota», gran i al centre. */
+@Composable
+private fun EmptyTimelineContent(
+  name: String,
+  initials: String,
+  color: AvatarColor,
+  onNote: () -> Unit,
+  modifier: Modifier = Modifier,
+) {
+  ScreenScaffold(modifier = modifier) {
+    Column(
+      modifier = Modifier.fillMaxSize().padding(horizontal = 24.dp),
+      horizontalAlignment = Alignment.CenterHorizontally,
+      verticalArrangement = Arrangement.spacedBy(14.dp, Alignment.CenterVertically),
+    ) {
+      Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+        PersonAvatar(initials = initials, color = color, size = 30.dp)
+        Text(text = name, style = PersonNameStyle, color = WearColors.OnSurface, maxLines = 1)
+      }
+      Button(onClick = onNote) {
+        Icon(Icons.Rounded.Mic, contentDescription = null, modifier = Modifier.padding(end = 6.dp))
+        Text(text = stringResource(R.string.note_button), style = ButtonLabelStyle)
+      }
+    }
+  }
+}

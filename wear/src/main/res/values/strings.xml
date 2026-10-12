@@ -21,6 +21,11 @@
     <string name="saved_title">Saved</string>
     <string name="saved_sent">Sent to your phone</string>
     <string name="saved_pending">It will be sent to your phone when it\'s connected</string>
+    <string name="just_now">Now</string>
+    <string name="minutes_ago">%1$d min ago</string>
+    <string name="hours_ago">%1$d h ago</string>
+    <string name="no_data_title">Nothing yet</string>
+    <string name="no_data_hint">Open Converses on your phone to sync.</string>
     <string name="phone_not_connected">Phone not connected</string>
     <string name="data_from_minutes">Data from %1$d min ago</string>
     <string name="protected_person_title">Protected person</string>

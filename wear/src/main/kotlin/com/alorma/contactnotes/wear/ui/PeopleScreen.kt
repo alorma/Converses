@@ -21,6 +21,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.wear.compose.foundation.lazy.TransformingLazyColumn
 import androidx.wear.compose.foundation.lazy.rememberTransformingLazyColumnState
 import androidx.wear.compose.material3.Icon
@@ -32,6 +33,7 @@ import com.alorma.contactnotes.wear.R
 import com.alorma.contactnotes.wear.components.PersonRow
 import com.alorma.contactnotes.wear.components.groupedItemShape
 import com.alorma.contactnotes.wear.theme.ListTitleStyle
+import com.alorma.contactnotes.wear.theme.PersonNameStyle
 import com.alorma.contactnotes.wear.theme.RowSubtitleStyle
 import com.alorma.contactnotes.wear.theme.WearColors
 
@@ -144,3 +146,35 @@ fun PeoplePreview() = WearPreview { PeopleContent(people = SamplePeople, onPerso
 @Composable
 fun PeoplePhoneOfflinePreview() =
   WearPreview { PeopleContent(people = SamplePeople.take(2), onPersonClick = {}, dataAgeMinutes = 14) }
+
+/** Pantalla 1/8 connectada al ViewModel; sense instantani encara, explica què cal fer. */
+@Composable
+fun PeopleScreen(
+  viewModel: PeopleViewModel,
+  onPersonClick: (PersonItem) -> Unit,
+) {
+  when (val state = viewModel.state.collectAsStateWithLifecycle().value) {
+    PeopleUiState.Loading -> Unit
+    PeopleUiState.NoData -> NoDataContent()
+    is PeopleUiState.Loaded ->
+      PeopleContent(people = state.people, onPersonClick = onPersonClick, dataAgeMinutes = state.dataAgeMinutes)
+  }
+}
+
+/** El mòbil encara no ha enviat cap instantani. */
+@Composable
+fun NoDataContent(modifier: Modifier = Modifier) {
+  StatusContent(
+    icon = Icons.Rounded.PhonelinkOff,
+    iconBackground = WearColors.SurfaceCardHigh,
+    iconTint = WearColors.OnSurface,
+    title = stringResource(R.string.no_data_title),
+    subtitle = stringResource(R.string.no_data_hint),
+    modifier = modifier,
+    titleStyle = PersonNameStyle,
+  )
+}
+
+@WearScreenPreviews
+@Composable
+fun NoDataPreview() = WearPreview { NoDataContent() }
