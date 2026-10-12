@@ -19,44 +19,7 @@ Context, abast, arquitectura, decisions (P0–P16) i riscos són a `docs/wear/RE
 
 ---
 
-## Com es treballa cada fase
-
-Regles d'execució, per a Claude i per a Bernat. Valen per a totes les fases.
-
-1. **Una fase, una sessió.** Cada fase es fa de manera individual. Un cop executada, validada i aprovada, **no es reutilitza la sessió de Claude**: la fase següent comença en una sessió nova o després d'un `/clear`. El que cal recordar va al pla (aquest document i el `README.md`), no a la conversa.
-2. **Abans d'iniciar, plantejar les tasques i esperar aprovació.** Claude llegeix el pla i la fase, proposa la llista de tasques concreta (adaptant la de la fase si cal) i **no comença fins que Bernat l'aprova**.
-3. **Les tasques es fan en sèrie i de manera autònoma**, d'una en una, validant cada una abans de passar a la següent (regla de `CLAUDE.md`: passos petits).
-4. **Cada tasca declara com es valida**, sense dependre de Bernat quan es pot:
-   - **Tests** (JVM): `./gradlew testDebugUnitTest` i els tests nous de la tasca.
-   - **ktlint:** `./gradlew ktlintCheck`.
-   - **Captures de pantalla:** previews i captures comparades amb `docs/wear/screenshots/`; Claude les valida ell mateix.
-   - **Emulador:** Claude valida els canvis de UI al parell d'emuladors Wear + telèfon.
-   - **Humana**, només quan no es pot fer sol (rellotge real, desbloqueig biomètric, TalkBack, sensació d'ús).
-5. **Plantejar com s'executa cada fase**, i deixar-ho dit en proposar les tasques (Bernat ho aprova amb la resta):
-   - **Model:** si val la pena un de més petit (p. ex. Haiku) per a tasques mecàniques, o cal un de més capaç per a les delicades (seguretat, sincronització).
-   - **Agents:** si algun tros es beneficia d'un subagent (exploració, investigació de documentació) o es fa tot en la sessió principal.
-   - **Paral·lelisme:** les tasques que es poden fer en paral·lel (no toquen els mateixos fitxers ni depenen l'una de l'altra) **es fan en paral·lel amb agents**, cadascun en el seu worktree aïllat per evitar conflictes. Claude marca a la proposta quines tasques són paral·lelitzables i quines van en sèrie, i integra i valida el resultat de cada agent abans de seguir. Les tasques dependents continuen en sèrie.
-   - **Model dels agents:** per a cada agent d'implementació, Claude **valora si val la pena fer-lo amb Haiku** i ho diu a la proposta. Haiku és candidat quan la tasca és mecànica i ben acotada (components i previews a partir d'un disseny, strings en tres idiomes, plomeria de Gradle o CI, tests a partir d'un patró clar). Es manté un model més capaç (Sonnet o superior) per a tot el que és delicat: privacitat i protegides, sincronització, Keystore i desbloqueig, migracions. Si Haiku no ho resol bé a la primera, es reassigna a un model més capaç en lloc d'insistir. En qualsevol cas, **la validació del resultat la fa el model de la sessió principal**, no l'agent que ha implementat.
-6. **Marcar el progrés al pla.** Quan una tasca està feta i validada, es marca a la fase (`- [x]`) amb el hash del seu commit al costat, per exemple `- [x] Tasca — \`abc1234\``. Així el pla diu què hi ha fet i on és.
-7. **Commits.** A la proposta d'inici, Claude diu quina estratègia de commits proposa: **un commit per tasca** (per defecte, quan la tasca té sentit sola) o **un commit de tancament de la fase**. L'aprovació de la proposta per part de Bernat autoritza aquests commits, i només aquests. Les tasques són independents: **quan una tasca està feta i validada (tests, ktlint, captures i emulador segons toqui), Claude la commiteja directament, sense tornar a preguntar**; si alguna validació falla, no es commiteja. El push continua sent només amb la fase validada (regla 9). Missatges en anglès, petits, amb l'atribució habitual.
-8. **Al acabar totes les tasques de la fase, demanar la validació de Bernat.** Claude presenta què s'ha fet, com s'ha validat i què queda pendent, i **no dona la fase per tancada** fins que Bernat l'aprova. Només llavors s'actualitza l'estat de la taula.
-9. **Push només amb la fase validada.** Quan Bernat valida la fase, es fa el push. **Mai en mig d'una tasca, de manera autònoma**, tret que Bernat ho demani expressament (per exemple, per validar en un dispositiu real). Cap canvi a Google Play sense permís.
-10. **Les decisions obertes es pregunten, no s'inventen.** Si una fase depèn d'una decisió (P0–P16) o d'un disseny que falta, es demana abans de començar.
-11. **Quan una fase ho necessita, es demana disseny** a Claude Design; no es dissenya sobre la marxa.
-
-### Plantilla de proposta per a l'inici de cada fase
-
-Claude presenta, abans de tocar res:
-
-| Camp | Contingut |
-| --- | --- |
-| Fase | Número i títol |
-| Decisions i disseny que cal tenir | Quines P# i quin disseny falten |
-| Tasques (en ordre) | Llista numerada; cadascuna amb la seva **validació** (tests / captures / emulador / humana) |
-| Execució | Model, agents i quines tasques van en paral·lel o en sèrie, i per què |
-| Commits | Un per tasca o un de tancament de la fase |
-| Riscos | Què pot anar malament i com es detecta |
-| Sortida | Què es pot provar en acabar |
+Com es treballa cada fase (tasques, commits, validació, proposta d'inici): `.claude/rules/phased-work.md`.
 
 ---
 
