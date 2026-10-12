@@ -48,8 +48,9 @@ private class PolygonShape(
     val bounds = polygon.calculateBounds()
     val path = polygon.toPath().asComposePath()
     val matrix = Matrix()
-    matrix.translate(-bounds[0], -bounds[1])
+    // Les operacions s'apliquen als punts en ordre invers: primer es trasllada a l'origen i després s'escala
     matrix.scale(size.width / (bounds[2] - bounds[0]), size.height / (bounds[3] - bounds[1]))
+    matrix.translate(-bounds[0], -bounds[1])
     path.transform(matrix)
     return Outline.Generic(path)
   }

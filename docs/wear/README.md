@@ -146,7 +146,7 @@ La documentació oficial no confirma el català (ca-ES) al reconeixedor del rell
 
 | # | Decisió | Inclinació |
 | --- | --- | --- |
-| P2 | **`EdgeButton` i scroll:** ha de ser sempre visible; comprovar si `ScreenScaffold` el plega | Verificar a la fase 3 |
+| P2 | **`EdgeButton` i scroll:** ha de ser sempre visible | **Resolt a la fase 1:** `ScreenScaffold` l'amaga fins al final de la llista; es fa servir `PinnedEdgeButton` |
 | P3 | **Cronologia buida:** només el botó «Nota» gran al centre (no dissenyat) | Acceptar |
 | P4 | **Micròfon denegat i error del reconeixedor:** no dissenyats | Estat simple |
 | P5 | **Català al reconeixedor:** si no el suporta, avisar abans de buscar alternativa | Sense confirmar; cal rellotge real (vegeu a dalt) |
