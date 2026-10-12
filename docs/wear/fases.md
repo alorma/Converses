@@ -99,14 +99,15 @@ La part més delicada: privacitat.
 Decidit en proposar la fase (12 d'oct. de 2026): les persones **arxivades no van al rellotge**; el text de les entrades es **talla a ~280 caràcters**; `:shared` és el **domini compartit** (enums d'avatar i entrada, contracte i constants).
 
 - [x] **Domini compartit:** mòdul `:shared` (Kotlin/JVM pur) amb `AvatarColor` (ARGB), `AvatarShape`, `ChannelType` i `EntryKind`; `:designsystem` i `:wear` només hi afegeixen la conversió a `Color`; el rellotge perd la seva còpia d'`AvatarColor`. Schema de Room intacte. — `d32269a`
-- [ ] Contracte (a `:shared`): models d'instantani amb **versió de protocol**, serialització kotlinx.serialization.
-- [ ] `WearSnapshotPublisher` al mòbil: construeix l'instantani des de Room i el publica amb `DataClient`; republica en canviar les dades i en connectar-se.
-- [ ] Contingut: persones (`id`, nom, color i forma d'avatar, `protected`, hora de l'última entrada), **5 últimes entrades** per persona no protegida, i l'**estat del Bloqueig de l'app**.
-- [ ] **Filtre de protegides al mòbil:** només `id`, nom, color i `protected = true`; cap entrada, canal ni hora.
-- [ ] Capacitat `converses_phone` anunciada al mòbil.
-- [ ] Còpia local al rellotge (DataStore o Room petita pròpia) fora del backup, amb l'hora de l'última sincronització.
-- [ ] Tests de JVM: una protegida no porta mai contingut; una persona que passa a protegida perd les entrades a la següent publicació; límit de 5; ordre; l'estat del bloqueig s'inclou.
-- [ ] Si alguna cosa toca Room → migració, schema i test (regla de `CLAUDE.md`).
+- [x] Contracte (a `:shared`): models d'instantani amb **versió de protocol**, serialització kotlinx.serialization; `sanitized()` aplica la privacitat en codificar i en descodificar; text tallat a 280. — `3dce9ef`, `866cfed` (la versió s'ha d'escriure sempre: trobat a l'emulador)
+- [x] `WearSnapshotPublisher` al mòbil: construeix l'instantani des de Room i el publica amb `DataClient` (darrere de `WearLink`); debounce, no republica si res no ha canviat, republica en connectar-se. — `a5ead83`
+- [x] Contingut: persones no arxivades (`id`, nom, color i forma d'avatar, `protected`, hora de l'última entrada), **5 últimes entrades** per persona no protegida, i l'**estat del Bloqueig de l'app**. — `5b8ebaf`
+- [x] **Filtre de protegides al mòbil:** només `id`, nom, color i `protected = true`; cap entrada, canal ni hora (consulta SQL, constructor i `sanitized()`). — `5b8ebaf`
+- [x] Capacitats `converses_phone` (mòbil) i `converses_watch` (rellotge). — `a5ead83`
+- [x] Còpia local al rellotge (DataStore a `files/`, fora del backup) amb l'hora de l'última sincronització, i `SnapshotListenerService`. Sense xifrar: és de la fase 5. — `b98f8c6`
+- [x] Tests de JVM: protegida sense contingut, passa a protegida i perd les entrades, límit de 5, ordre, text tallat, versió, bloqueig, debounce i errors d'enviament (`:shared` 12, `:app` 18, `:wear` 7).
+- [x] Room: **no es toca** (només una consulta nova de DAO; `app/schemas` intacte). Cap migració.
+- [x] **Emulador** (telèfon + Wear XL Round, dades d'exemple): el rellotge rep i desa l'instantani; la protegida (Luna Roja) arriba només amb nom, color i forma; en tornar a obrir el mòbil, es republica.
 
 **Sortida:** amb dades reals del mòbil, el rellotge rep i desa un instantani correcte; els tests de privacitat passen.
 
