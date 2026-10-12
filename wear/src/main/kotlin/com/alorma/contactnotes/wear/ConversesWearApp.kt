@@ -5,6 +5,7 @@ import com.alorma.contactnotes.shared.WEAR_WATCH_CAPABILITY
 import com.alorma.contactnotes.wear.data.DeliveryScheduler
 import com.alorma.contactnotes.wear.data.GmsPhoneConnection
 import com.alorma.contactnotes.wear.data.WearNotes
+import com.alorma.contactnotes.wear.data.WearSnapshotStore
 import com.alorma.contactnotes.wear.data.WorkManagerDeliveryScheduler
 import com.google.android.gms.wearable.Wearable
 import kotlinx.coroutines.CoroutineScope
@@ -22,6 +23,7 @@ class ConversesWearApp : Application() {
     // rellegit el recurs en instal·lar-la. És idempotent i no falla si no hi ha Play Services.
     Wearable.getCapabilityClient(this).addLocalCapability(WEAR_WATCH_CAPABILITY)
     retryPendingNotesWhenPhoneIsNear()
+    scope.launch { WearSnapshotStore.get(this@ConversesWearApp).removeLegacyCopy() }
   }
 
   // En arrencar, i cada cop que el mòbil torna, es reintenta l'entrega de les notes que queden a la cua

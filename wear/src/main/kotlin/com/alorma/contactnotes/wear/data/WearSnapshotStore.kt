@@ -25,23 +25,29 @@ data class StoredSnapshot(
  *
  * Si el Bloqueig de l'app és actiu i el rellotge no té bloqueig de pantalla, no es desa res i s'esborra el que hi
  * hagués ([AppLockGate]), i també la cua de notes pendents ([onLockRequired]): sense bloqueig no en queda cap text.
+ *
+ * L'instantani es desa **xifrat** ([cipher], Keystore): amb el rellotge bloquejat és il·legible. Si no es pot xifrar,
+ * no es desa res i es conserva la còpia anterior; si no es pot desxifrar, la còpia es tracta com si no hi fos.
  */
 class WearSnapshotStore(
   private val dataStore: DataStore<Preferences>,
   private val deviceLock: DeviceLock,
+  private val cipher: SnapshotCipher,
   private val onLockRequired: suspend () -> Unit = {},
   private val clock: () -> Long = System::currentTimeMillis,
 ) {
   val stored: Flow<StoredSnapshot?> =
     dataStore.data.map { prefs ->
-      val json = prefs[SnapshotKey] ?: return@map null
+      val encrypted = prefs[SnapshotKey] ?: return@map null
+      val json = cipher.decrypt(encrypted) ?: return@map null
       val snapshot = WearSnapshotCodec.decode(json) ?: return@map null
       StoredSnapshot(snapshot, prefs[SyncedAtKey] ?: 0L)
     }
 
   /**
    * Desa el que arriba del mòbil. Retorna `false` i conserva la còpia anterior si no es pot entendre (text malmès o
-   * versió del protocol desconeguda), i `false` **esborrant** la còpia si cal bloqueig i el rellotge no en té.
+   * versió del protocol desconeguda) o no es pot xifrar (rellotge bloquejat), i `false` **esborrant** la còpia si cal
+   * bloqueig i el rellotge no en té.
    */
   suspend fun save(payload: String): Boolean {
     val snapshot = WearSnapshotCodec.decode(payload) ?: return false
@@ -49,10 +55,13 @@ class WearSnapshotStore(
       eraseEverything()
       return false
     }
+    // Es desa el text ja filtrat, no el que ha arribat
+    val encrypted = cipher.encrypt(WearSnapshotCodec.encode(snapshot)) ?: return false
     dataStore.edit { prefs ->
-      // Es desa el text ja filtrat, no el que ha arribat
-      prefs[SnapshotKey] = WearSnapshotCodec.encode(snapshot)
+      prefs[SnapshotKey] = encrypted
       prefs[SyncedAtKey] = clock()
+      // Clau de l'època sense xifratge, que quedava en clar
+      prefs.remove(LegacySnapshotKey)
     }
     return true
   }
@@ -72,13 +81,19 @@ class WearSnapshotStore(
     return required
   }
 
+  /** Esborra la còpia en clar de quan l'instantani encara no es xifrava. Es crida en arrencar l'app. */
+  suspend fun removeLegacyCopy() {
+    dataStore.edit { it.remove(LegacySnapshotKey) }
+  }
+
   private suspend fun eraseEverything() {
     clear()
     onLockRequired()
   }
 
   companion object {
-    private val SnapshotKey = stringPreferencesKey("snapshot")
+    private val SnapshotKey = stringPreferencesKey("snapshot_encrypted")
+    private val LegacySnapshotKey = stringPreferencesKey("snapshot")
     private val SyncedAtKey = longPreferencesKey("synced_at")
 
     @Volatile
@@ -89,6 +104,7 @@ class WearSnapshotStore(
         instance ?: WearSnapshotStore(
           context.applicationContext.snapshotDataStore,
           AndroidDeviceLock(context),
+          KeystoreSnapshotCipher(),
           onLockRequired = { DataStorePendingNoteQueue.get(context).clear() },
         ).also { instance = it }
       }
