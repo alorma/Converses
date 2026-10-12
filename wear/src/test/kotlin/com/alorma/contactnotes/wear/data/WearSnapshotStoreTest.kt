@@ -1,6 +1,8 @@
 package com.alorma.contactnotes.wear.data
 
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
+import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.stringPreferencesKey
 import com.alorma.contactnotes.shared.AvatarColor
 import com.alorma.contactnotes.shared.AvatarShape
 import com.alorma.contactnotes.shared.ChannelType
@@ -37,8 +39,19 @@ class WearSnapshotStoreTest {
   private var deviceSecure = true
   private var queueErasures = 0
   private val store by lazy {
-    WearSnapshotStore(dataStore, { deviceSecure }, onLockRequired = { queueErasures++ }, clock = { now })
+    WearSnapshotStore(dataStore, { deviceSecure }, cipher, onLockRequired = { queueErasures++ }, clock = { now })
   }
+
+  // Xifrat de mentida (invertit i amb prefix), amb interruptors per a un rellotge bloquejat
+  private val cipher =
+    object : SnapshotCipher {
+      var locked = false
+
+      override fun encrypt(plain: String) = if (locked) null else "enc:" + plain.reversed()
+
+      override fun decrypt(encoded: String) =
+        if (locked || !encoded.startsWith("enc:")) null else encoded.removePrefix("enc:").reversed()
+    }
 
   @After
   fun tearDown() = scope.cancel()
@@ -122,6 +135,94 @@ class WearSnapshotStoreTest {
           .values
           .joinToString()
       assertFalse("molt secret" in raw)
+      val decrypted = cipher.decrypt(dataStore.data.first()[stringPreferencesKey("snapshot_encrypted")]!!)!!
+      assertFalse("molt secret" in decrypted)
+    }
+
+  @Test
+  fun theCopyIsStoredEncryptedNeverInTheClear() =
+    runTest {
+      store.save(payload(person(1, entries = listOf(entry(1)))))
+
+      val raw =
+        dataStore.data
+          .first()
+          .asMap()
+          .values
+          .joinToString()
+      assertFalse("P1" in raw)
+      assertFalse("text 1" in raw)
+    }
+
+  @Test
+  fun aLockedWatchCannotEncryptSoTheCopyIsKeptAndNothingIsSaved() =
+    runTest {
+      store.save(payload(person(1)))
+      cipher.locked = true
+
+      assertFalse(store.save(payload(person(2))))
+
+      cipher.locked = false
+      assertEquals(
+        listOf("P1"),
+        store.stored
+          .first()!!
+          .snapshot.people
+          .map { it.name },
+      )
+    }
+
+  @Test
+  fun aLockedWatchCannotReadTheCopy() =
+    runTest {
+      store.save(payload(person(1)))
+      cipher.locked = true
+
+      assertNull(store.stored.first())
+
+      cipher.locked = false
+      assertEquals(
+        1,
+        store.stored
+          .first()!!
+          .snapshot.people.size,
+      )
+    }
+
+  @Test
+  fun removeLegacyCopyDeletesTheClearTextCopyWithoutTouchingTheEncryptedOne() =
+    runTest {
+      store.save(payload(person(1)))
+      dataStore.edit { it[stringPreferencesKey("snapshot")] = payload(person(9)) }
+
+      store.removeLegacyCopy()
+
+      assertFalse(dataStore.data.first().contains(stringPreferencesKey("snapshot")))
+      assertEquals(
+        listOf("P1"),
+        store.stored
+          .first()!!
+          .snapshot.people
+          .map { it.name },
+      )
+    }
+
+  @Test
+  fun aLegacyCopyInTheClearIsIgnoredAndRemovedOnTheNextSave() =
+    runTest {
+      dataStore.edit { it[stringPreferencesKey("snapshot")] = payload(person(9)) }
+      assertNull(store.stored.first())
+
+      store.save(payload(person(1)))
+
+      assertFalse(dataStore.data.first().contains(stringPreferencesKey("snapshot")))
+      assertEquals(
+        listOf("P1"),
+        store.stored
+          .first()!!
+          .snapshot.people
+          .map { it.name },
+      )
     }
 
   @Test
