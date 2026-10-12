@@ -113,7 +113,7 @@ class ViewModelsTest {
   @Test
   fun timelineShowsEntriesOfPerson() =
     runTest {
-      val vm = TimelineViewModel(1, MutableStateFlow(stored(kael, marta)), labels)
+      val vm = TimelineViewModel(1, MutableStateFlow(stored(kael, marta)), labels, NoMoreEntries)
       val loaded = vm.state.first { it is TimelineUiState.Loaded } as TimelineUiState.Loaded
       assertEquals("Kael", loaded.name)
       assertEquals(1, loaded.entries.size)
@@ -122,14 +122,14 @@ class ViewModelsTest {
   @Test
   fun timelineOfProtectedPersonIsUnavailable() =
     runTest {
-      val vm = TimelineViewModel(2, MutableStateFlow(stored(kael, marta)), labels)
+      val vm = TimelineViewModel(2, MutableStateFlow(stored(kael, marta)), labels, NoMoreEntries)
       assertEquals(TimelineUiState.Unavailable, vm.state.first { it != TimelineUiState.Loading })
     }
 
   @Test
   fun timelineOfMissingPersonIsUnavailable() =
     runTest {
-      val vm = TimelineViewModel(99, MutableStateFlow(stored(kael)), labels)
+      val vm = TimelineViewModel(99, MutableStateFlow(stored(kael)), labels, NoMoreEntries)
       assertEquals(TimelineUiState.Unavailable, vm.state.first { it != TimelineUiState.Loading })
     }
 }

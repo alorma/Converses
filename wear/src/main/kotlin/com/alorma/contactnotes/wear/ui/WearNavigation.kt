@@ -13,6 +13,7 @@ import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import androidx.wear.compose.navigation3.rememberSwipeDismissableSceneStrategy
+import com.alorma.contactnotes.wear.data.GmsMoreEntriesSource
 import com.alorma.contactnotes.wear.data.GmsPhoneConnection
 import com.alorma.contactnotes.wear.data.WearSnapshotStore
 import kotlinx.serialization.Serializable
@@ -31,6 +32,7 @@ fun WearNavigation() {
   val store = remember { WearSnapshotStore.get(context) }
   val phone = remember { GmsPhoneConnection(context) }
   val labels = remember { AndroidWearLabels(context) }
+  val moreEntries = remember { GmsMoreEntriesSource(context) }
   val backStack = rememberNavBackStack(PeopleRoute)
 
   NavDisplay(
@@ -56,7 +58,17 @@ fun WearNavigation() {
           val vm =
             viewModel<TimelineViewModel>(
               key = "person-${route.id}",
-              factory = viewModelFactory { initializer { TimelineViewModel(route.id, store.stored, labels) } },
+              factory =
+                viewModelFactory {
+                  initializer {
+                    TimelineViewModel(
+                      route.id,
+                      store.stored,
+                      labels,
+                      moreEntries,
+                    )
+                  }
+                },
             )
           TimelineScreen(viewModel = vm, onBack = { backStack.removeLastOrNull() }, onNote = {})
         }
