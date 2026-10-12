@@ -17,6 +17,7 @@ import androidx.wear.compose.foundation.lazy.rememberTransformingLazyColumnState
 import androidx.wear.compose.material3.Icon
 import androidx.wear.compose.material3.ScreenScaffold
 import androidx.wear.compose.material3.Text
+import androidx.wear.compose.material3.lazy.rememberTransformationSpec
 import com.alorma.contactnotes.wear.R
 import com.alorma.contactnotes.wear.components.EntryAuthor
 import com.alorma.contactnotes.wear.components.PersonAvatar
@@ -45,6 +46,7 @@ fun TimelineContent(
   modifier: Modifier = Modifier,
 ) {
   val state = rememberTransformingLazyColumnState()
+  val spec = rememberTransformationSpec()
   ScreenScaffold(
     scrollState = state,
     modifier = modifier,
@@ -66,7 +68,12 @@ fun TimelineContent(
       }
       items(entries.size, key = { entries[it].id }) { index ->
         val entry = entries[index]
-        TimelineEntry(author = entry.author, meta = entry.meta, text = entry.text)
+        TimelineEntry(
+          author = entry.author,
+          meta = entry.meta,
+          text = entry.text,
+          modifier = Modifier.scrollTransformed(this, spec),
+        )
       }
     }
     PinnedEdgeButton(onClick = onNote) {
