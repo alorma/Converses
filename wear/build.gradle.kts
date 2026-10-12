@@ -1,5 +1,4 @@
 import com.android.compose.screenshot.tasks.PreviewScreenshotValidationTask
-import com.github.triplet.gradle.play.PlayPublisherExtension
 
 plugins {
   alias(libs.plugins.android.application)
@@ -81,23 +80,8 @@ tasks.withType<PreviewScreenshotValidationTask>().configureEach {
   testEngineInput.threshold.set(0.01f)
 }
 
-// Les dues apps comparteixen edició i pista a Play: el rellotge publica després del mòbil (així el
-// seu bundle ja és a l'edició) i en reté el versionCode, que és el del rellotge - 2 (FormFactor.WEAR).
-// Si les dues tasques van en paral·lel, retenir un versionCode no pujat encara dona un 404.
-tasks.matching { it.name == "publishReleaseBundle" }.configureEach {
-  mustRunAfter(":app:publishReleaseBundle")
-}
-
-androidComponents {
-  onVariants(selector().withBuildType("release")) { variant ->
-    val otherVersionCode =
-      variant.outputs
-        .single()
-        .versionCode
-        .map { listOf(it!!.toLong() - 2) }
-    extensions.configure<PlayPublisherExtension>("play") { retain.artifacts.set(otherVersionCode) }
-  }
-}
+// El rellotge es publica a la seva pròpia pista de Play (`wear:<pista>`, vegeu release.yml): Play no
+// admet un bundle que exigeix android.hardware.type.watch a la pista del mòbil.
 
 dependencies {
   implementation(platform(libs.androidx.compose.bom))

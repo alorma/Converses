@@ -93,10 +93,6 @@ tasks.withType<PreviewScreenshotValidationTask>().configureEach {
   testEngineInput.threshold.set(0.01f)
 }
 
-// Les dues apps comparteixen edició i pista a Play. El mòbil publica primer i no retén res: el
-// rellotge (`:wear:publishReleaseBundle`, que va després) retén el versionCode del mòbil i deixa
-// la pista amb els dos. Retenir un versionCode que encara no s'ha pujat a l'edició dona un 404.
-
 dependencies {
   implementation(project(":designsystem"))
   implementation(project(":shared"))
