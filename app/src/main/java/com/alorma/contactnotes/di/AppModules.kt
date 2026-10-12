@@ -19,6 +19,7 @@ import com.alorma.contactnotes.data.settings.OnboardingFlag
 import com.alorma.contactnotes.data.settings.SecureWindow
 import com.alorma.contactnotes.data.settings.SettingsRepository
 import com.alorma.contactnotes.data.wear.GmsWearLink
+import com.alorma.contactnotes.data.wear.WearEntriesResponder
 import com.alorma.contactnotes.data.wear.WearLink
 import com.alorma.contactnotes.data.wear.WearSnapshotPublisher
 import com.alorma.contactnotes.ui.edit.EditPersonViewModel
@@ -90,6 +91,7 @@ val viewModelModule =
 val wearModule =
   module {
     single<WearLink> { GmsWearLink(androidContext()) }
+    single { WearEntriesResponder(repository = get()) }
     single {
       WearSnapshotPublisher(
         repository = get(),
