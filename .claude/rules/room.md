@@ -32,7 +32,6 @@ DAO-only changes (new queries) are not schema changes.
    - anything else: a manual `Migration(N, N + 1)` in `data/db/` (e.g. `Migrations.kt`), registered with `.addMigrations(...)` in `databaseModule` (`di/AppModules.kt`).
    - New `NOT NULL` columns need a `DEFAULT` so existing rows stay valid.
 5. Add a migration test in `app/src/androidTest/` with `MigrationTestHelper` (`room-testing` is already in `androidTestImplementation`; the Room Gradle plugin exposes `app/schemas` to the test assets): create the DB at version N, insert representative rows, run the migration to N + 1 and assert the data survived. Also run `runMigrationsAndValidate` from version 1 to the latest.
-6. Update `docs/plan.md` («Regla de la base de dades» and «Model de dades», which states the current version).
 
 ## Never
 
