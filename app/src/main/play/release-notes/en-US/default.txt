@@ -1,4 +1,4 @@
-Version 1.6.0:
-• Settings now tells you which version you have and has an «About» section with a way to write to us. The app is barely two weeks old and was already keeping secrets. Impressive, in a way.
-• Switches that are on now show a check mark. They were always on, we just never had the courage to prove it.
-• In the quick note, the «Person» chip now lets you pick the person. Until now it was just there looking pretty. We have all been there.
+Version 1.7.0:
+• Converses now has a Wear OS app. Your people and their latest notes on your wrist, where you were going to look at your phone anyway.
+• Dictate a note on the watch and it lands on your phone. If the phone is out of reach, it waits its turn.
+• Protected people open on the watch only after you approve it with your fingerprint on the phone.
