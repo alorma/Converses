@@ -64,4 +64,5 @@
         <item quantity="other">%d notes discarded</item>
     </plurals>
     <string name="discarded_notes_hint">Tap to dismiss</string>
+    <string name="person_protected">Protected person</string>
 </resources>

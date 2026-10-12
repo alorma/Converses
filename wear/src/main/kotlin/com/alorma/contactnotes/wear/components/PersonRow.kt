@@ -16,12 +16,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.unit.dp
 import androidx.wear.compose.material3.Icon
 import androidx.wear.compose.material3.Text
 import com.alorma.contactnotes.shared.AvatarColor
 import com.alorma.contactnotes.shared.AvatarShape
+import com.alorma.contactnotes.wear.R
 import com.alorma.contactnotes.wear.theme.RowSubtitleStyle
 import com.alorma.contactnotes.wear.theme.RowTitleStyle
 import com.alorma.contactnotes.wear.theme.WearColors
@@ -42,9 +47,11 @@ fun PersonRow(
   onClick: () -> Unit,
   modifier: Modifier = Modifier,
 ) {
+  val protectedLabel = stringResource(R.string.person_protected)
   Row(
     modifier =
       modifier
+        .semantics(mergeDescendants = true) { if (isProtected) stateDescription = protectedLabel }
         .fillMaxWidth()
         .height(52.dp)
         .clip(shape)
@@ -54,7 +61,14 @@ fun PersonRow(
     horizontalArrangement = Arrangement.spacedBy(10.dp),
     verticalAlignment = Alignment.CenterVertically,
   ) {
-    PersonAvatar(initials = initials, color = color, shape = avatarShape, size = 36.dp)
+    // Les inicials repetirien el nom a TalkBack
+    PersonAvatar(
+      initials = initials,
+      color = color,
+      shape = avatarShape,
+      size = 36.dp,
+      modifier = Modifier.clearAndSetSemantics {},
+    )
     Column(modifier = Modifier.weight(1f)) {
       Text(text = name, style = RowTitleStyle, color = WearColors.OnSurface, maxLines = 1)
       if (!isProtected && lastEntry != null) {
