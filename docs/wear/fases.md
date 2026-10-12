@@ -4,7 +4,7 @@ Context, abast, arquitectura, decisions (P0–P16) i riscos són a `docs/wear/RE
 
 | Fase | Títol | Depèn de | Estat |
 | --- | --- | --- | --- |
-| 0 | Decisions i investigació | — | Pendent |
+| 0 | Decisions i investigació | — | Feta, amb 3 pendents que no bloquegen (català i mecanisme de dictat: abans de la fase 6; AVD i Data Layer: fases 1–2) |
 | 1 | Mòdul `:wear`, tema i previews amb dades fictícies | 0 | Pendent |
 | 2 | Contracte i sincronització mòbil → rellotge | 0 | Pendent |
 | 3 | Pantalles de lectura: Persones, Cronologia, Sense mòbil | 1, 2 | Pendent |
@@ -65,15 +65,17 @@ Claude presenta, abans de tocar res:
 Sense codi de producte.
 
 - [x] **P0:** aprovació al mòbil amb empremta, vigència de 5 min i notificació com a camí (decidit).
-- [ ] Decidir si la vigència és un ajust (Ajustos → Seguretat) o queda fixa a 5 min (P11).
+- [x] Decidir si la vigència és un ajust (Ajustos → Seguretat) o queda fixa a 5 min (P11): fixa a 5 min.
 - [ ] Demanar el disseny de les pantalles noves (P12) **quan s'arribi a la fase 5**, no abans.
-- [ ] Tancar P1, P6, P7, P9, P11, P14 i P15 (vegeu `README.md`).
-- [ ] Consultar la documentació oficial: Wear Compose Material 3 i navegació, Data Layer (`play-services-wearable`), `EdgeButton`, `TransformingLazyColumn`, reconeixement de veu i requisits de Play per a apps de Wear. Anotar-hi les versions escollides i afegir-les al version catalog.
-- [ ] **P10:** comprovar a l'API mínima que `KeyguardManager.isDeviceSecure`, `createConfirmDeviceCredentialIntent` i el xifratge amb Keystore lligat a autenticació funcionen a Wear OS. Si no, esborrar la còpia en lloc de xifrar-la, i dir-ho.
-- [ ] Comprovar si el reconeixedor de veu del rellotge suporta **català** (P5); si no, avisar abans de cercar alternatives.
-- [ ] Triar el mecanisme de dictat (`SpeechRecognizer` amb parcials o `ACTION_RECOGNIZE_SPEECH`) i explicar-ne el motiu.
-- [ ] Preparar emuladors: parell Wear (Large i Small Round) + telèfon amb Google Play, i comprovar que el Data Layer hi funciona.
-- [ ] Confirmar com es publica una app de Wear emparellada a la mateixa fitxa de Play.
+- [x] Tancar P1, P6, P7, P9, P11, P14 i P15 (vegeu `README.md`).
+- [x] Consultar la documentació oficial: Wear Compose Material 3 i navegació, Data Layer (`play-services-wearable`), `EdgeButton`, `TransformingLazyColumn`, reconeixement de veu i requisits de Play per a apps de Wear. Versions anotades al `README.md` i afegides al version catalog.
+- [x] **Versionat:** s'amplia `alorma/VersionPlugin` amb `appVersion { versionCodeOffset }` (0..8, passos de 2; `:wear` = 2). Document per a Claude en aquell projecte: `~/projects/personal/VersionPlugin/docs/version-code-offset.md`. **Dependència:** la fase 1 necessita el plugin publicat (o `includeBuild` local mentrestant).
+- [x] `minSdk` de `:wear`: **30** (Wear OS 3+).
+- [x] **P10:** comprovat amb una app de prova descartable a l'emulador Wear OS 7 (API 37), `minSdk` 30 acordat. Resultats: sense bloqueig `isDeviceSecure=false`, el credencial intent és `null` i **no es pot crear una clau que exigeixi autenticació** (cal el bloqueig de pantalla); amb PIN, `isDeviceSecure=true`, el credencial intent apunta als ajustos del rellotge, la clau es crea, i el xifratge queda **bloquejat** (`UserNotAuthenticatedException`) un cop caducada la finestra d'autenticació (provat a 40 s amb una finestra de 30 s); en treure el PIN, **la clau desapareix sola**. Limitacions: és un emulador (`insideSecureHardware=false`, Keystore per programari) i no hi ha prova a l'API 30; cal repetir-ho al rellotge real a la fase 9. Conclusió: s'adopta el xifratge amb Keystore lligat a autenticació.
+- [ ] Comprovar si el reconeixedor de veu del rellotge suporta **català** (P5); si no, avisar abans de cercar alternatives. **Pendent:** la documentació no ho confirma; cal rellotge real (abans de la fase 6).
+- [ ] Triar el mecanisme de dictat (`SpeechRecognizer` amb parcials o `ACTION_RECOGNIZE_SPEECH`) i explicar-ne el motiu. **Pendent**, depèn de la prova anterior; plantejament: `SpeechRecognizer` amb parcials, pla B `ACTION_RECOGNIZE_SPEECH`.
+- [ ] Preparar emuladors: parell Wear + telèfon amb Google Play. Fet: telèfon (Android 17) i `Wear_OS_XL_Round` ja **emparellats**. Pendent: AVD Large Round i Small Round (fase 1) i comprovar que la Data Layer hi funciona (fase 2).
+- [x] Confirmar com es publica una app de Wear emparellada a la mateixa fitxa de Play: investigat; els punts no verificats (mateixa release, GPP, formulari de dades) passen a la fase 10.
 
 **Sortida:** decisions escrites i versions fixades.
 

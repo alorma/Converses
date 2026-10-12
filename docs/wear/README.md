@@ -113,27 +113,47 @@ El brief posa el desbloqueig al rellotge i diu que el mòbil serveix les entrade
 
 **Caldrà disseny** (es demana quan faci falta, a la fase 5): pantalles «Confirma-ho al mòbil», «Denegat» i «Ha caducat» al rellotge; la notificació i el flux d'aprovació al mòbil; i, si hi ha l'ajust, la fila d'Ajustos.
 
-### Obertes — la resta
+### Decidides a la fase 0 (12 d'oct. de 2026)
+
+| # | Decisió |
+| --- | --- |
+| P1 | Les protegides mostren **nom i cadenat** a la llista; cap entrada, canal ni hora. |
+| P6 | Haptic `Confirm` en desar, respectant el sistema i l'interruptor de l'app. |
+| P7 | Pàgines de «més entrades» de 20; el límit de memòria es fixa a la fase 4. |
+| P9 | La nota des del rellotge té **el canal per defecte de la nota ràpida**. |
+| P11 | Vigència de l'aprovació **fixa a 5 min** a la v1; ajust més endavant si cal. |
+| P14 | Les notes pendents es queden al rellotge fins entregar-se (fora del backup; xifrat/esborrat segons la fase 5). |
+| P15 | Bloqueig de l'app actiu: **no es demana el PIN en obrir**; es confia en el bloqueig del rellotge (pantalla 9 si no és segur). |
+| Navegació | **Navigation 3 per a Wear** (`NavDisplay` + `rememberSwipeDismissableSceneStrategy`), coherent amb el mòbil. Cost: `navigation3-runtime/ui` **1.3.0-alpha02** (alpha) al rellotge; el mòbil continua amb la 1.2.0 estable (claus separades al catàleg). |
+
+### Versions fixades (Google Maven, 12 d'oct. de 2026)
+
+`androidx.wear.compose:compose-material3`, `-foundation`, `-navigation3` i `-ui-tooling`: **1.7.1** (estable; la 1.8.0-alpha01 no s'usa). `androidx.wear:wear-tooling-preview` **1.0.0**. `com.google.android.gms:play-services-wearable` **20.0.1**. `navigation3-runtime/ui` del rellotge **1.3.0-alpha02**. `EdgeButton`, `TransformingLazyColumn`, `ScreenScaffold` i `AppScaffold` són estables; Horologist no cal. `compileSdk`/`targetSdk` 37 (Wear OS 7). **`minSdk` del rellotge: pendent** (els docs no en recomanen cap). Ja són al `gradle/libs.versions.toml` (claus `wear*`).
+
+### Versionat (`alorma/VersionPlugin`)
+
+El plugin calcula `versionCode` només de `version.properties` (`major·minor·patch` + `1` release / `0` snapshot), així que `:wear` tindria **el mateix `versionCode` que `:app`**, i Play exigeix que sigui únic entre form factors. **Pendent de decidir (fase 1/10):** opció al plugin (`versionCodeOffset` o similar), o compensar-ho al `:wear` (p. ex. el del plugin + 2). El `versionName` pot ser el mateix.
+
+### Publicació a Play (investigat, no tot verificat)
+
+Mateix package i mateixa clau de signatura (WO-G7). Form factor Wear OS a Advanced settings de la Play Console, amb captures 1:1 sense marc (WO-G5), icona (WO-G3) i descripció que esmenti Wear OS (WO-G2). **No verificat:** si mòbil i rellotge poden anar en la mateixa release, si Gradle Play Publisher pot pujar els dos AAB sense que l'un esborri l'altre (`retain`), i si la Data Layer canvia el formulari de seguretat de les dades. Es comprova a la fase 10 amb una prova real.
+
+### Dictat i català (P5) — sense confirmar
+
+La documentació oficial no confirma el català (ca-ES) al reconeixedor del rellotge, ni en línia ni fora de línia, ni el comportament de `EXTRA_PARTIAL_RESULTS` a Wear. L'única via documentada és `ACTION_RECOGNIZE_SPEECH` (sense text parcial en directe). Cal una **prova en un rellotge real** amb ca/es/en, amb i sense connexió (`checkRecognitionSupport`). Si el català no hi és, s'avisa abans de buscar alternatives.
 
 ### Obertes — la resta
 
 | # | Decisió | Inclinació |
 | --- | --- | --- |
-| P1 | **Nom de les protegides a la llista:** ocultar-lo? | Confirmar |
 | P2 | **`EdgeButton` i scroll:** ha de ser sempre visible; comprovar si `ScreenScaffold` el plega | Verificar a la fase 3 |
 | P3 | **Cronologia buida:** només el botó «Nota» gran al centre (no dissenyat) | Acceptar |
 | P4 | **Micròfon denegat i error del reconeixedor:** no dissenyats | Estat simple |
-| P5 | **Català al reconeixedor:** si no el suporta, avisar abans de buscar alternativa | Comprovar a la fase 0 |
-| P6 | **Haptic:** `Confirm` en desar, respectant el sistema i l'interruptor de l'app | Aprovar |
-| P7 | **Pàgina de «més entrades»** (20) i límit de memòria | Aprovar |
+| P5 | **Català al reconeixedor:** si no el suporta, avisar abans de buscar alternativa | Sense confirmar; cal rellotge real (vegeu a dalt) |
 | P8 | **Política de privacitat i «Sense núvol»:** verificar com viatgen les dades a la Data Layer i ajustar-ne el text (esborrany al brief) abans de dir res a la fitxa de Play | Fase 8 |
-| P9 | **Canal de la nota** des del rellotge: buit o el per defecte de la nota ràpida | Decidir |
-| P10 | **Versions mínimes de Wear OS**, i que `isDeviceSecure` i el xifratge amb Keystore lligat a autenticació hi funcionin; si no, esborrar la còpia en lloc de xifrar-la | Comprovar |
-| P11 | **Vigència de l'aprovació:** decidida, 5 min (vegeu P0); falta decidir si és configurable | 5 min fixos o ajust |
+| P10 | **Versions mínimes de Wear OS**, i que `isDeviceSecure` i el xifratge amb Keystore lligat a autenticació hi funcionin; si no, esborrar la còpia en lloc de xifrar-la | Comprovat a l'emulador (API 37); `minSdk` 30; falta rellotge real (fase 9) |
 | P12 | **Pantalles no dissenyades de protegides:** «No disponible sense el mòbil», «Confirma-ho al mòbil», «Denegat» i «Ha caducat» | Caldrà disseny; es demana quan faci falta |
 | P13 | **Mòbil inaccessible a «més entrades»:** la llista s'acaba sense error (suposició del brief, la frase original es va tallar) | Confirmar |
-| P14 | **Notes pendents amb el bloqueig actiu:** es queden al rellotge fins entregar-se; és acceptable? | Confirmar |
-| P15 | **Bloqueig de l'app:** no es demana el PIN en obrir l'app, es confia en el bloqueig del rellotge (variant: demanar-lo en obrir) | Confirmar |
 | P16 | **Indicador de càrrega** de «més entrades» (no dissenyat) | Coherent amb Wear M3 |
 
 ## Riscos
