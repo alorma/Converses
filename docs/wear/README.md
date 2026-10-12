@@ -1,6 +1,6 @@
 # Converses per a Wear OS — Pla
 
-Actualitzat el 12 d'oct. de 2026 (2.ª versió del brief) · @Bernat · **ja hi ha disseny.** Les captures de referència són a `docs/wear/screenshots/` (per fer comparatives amb la implementació). La resta del brief (instruccions, tokens i fonts `.dc.html`, que manen en mides, radis i colors) és a `~/Downloads/converses-wear-handoff/`. Aquest document en recull l'abast, l'arquitectura, les decisions i els riscos; les fases són a `docs/wear/fases.md`.
+Actualitzat el 12 d'oct. de 2026 (2.ª versió del brief) · @Bernat · **ja hi ha disseny.** Les captures de referència són a `docs/wear/screenshots/` (per fer comparatives amb la implementació). La resta del brief (instruccions, tokens i fonts `.dc.html`, que manen en mides, radis i colors) és a `docs/wear/handoff/` (còpia del zip `converses-wear-handoff`; les captures són a `docs/wear/screenshots/`). Aquest document en recull l'abast, l'arquitectura, les decisions i els riscos; les fases són a `docs/wear/fases.md`.
 
 ## Referència visual
 
