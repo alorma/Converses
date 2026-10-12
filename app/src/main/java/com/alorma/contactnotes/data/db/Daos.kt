@@ -6,6 +6,8 @@ import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
+import com.alorma.contactnotes.shared.ChannelType
+import com.alorma.contactnotes.shared.EntryKind
 import kotlinx.coroutines.flow.Flow
 
 @Dao

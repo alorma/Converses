@@ -9,10 +9,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.alorma.contactnotes.data.db.EntryKind
 import com.alorma.contactnotes.data.db.color
 import com.alorma.contactnotes.designsystem.preview.ConversesPreviewTheme
 import com.alorma.contactnotes.designsystem.theme.PersonTheme
+import com.alorma.contactnotes.shared.EntryKind
 import com.alorma.contactnotes.ui.preview.PreviewData
 
 private val Channels = PreviewData.martaChannels

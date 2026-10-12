@@ -23,7 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.wear.compose.material3.Icon
 import androidx.wear.compose.material3.Text
-import com.alorma.contactnotes.wear.theme.AvatarColor
+import com.alorma.contactnotes.shared.AvatarColor
 import com.alorma.contactnotes.wear.theme.EntryTextStyle
 import com.alorma.contactnotes.wear.theme.OverlineStyle
 import com.alorma.contactnotes.wear.theme.WearColors

@@ -2,10 +2,10 @@ package com.alorma.contactnotes.ui.edit
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
-import com.alorma.contactnotes.designsystem.components.AvatarColor
-import com.alorma.contactnotes.designsystem.components.AvatarShape
 import com.alorma.contactnotes.designsystem.preview.ConversesPreviewTheme
 import com.alorma.contactnotes.designsystem.theme.PersonTheme
+import com.alorma.contactnotes.shared.AvatarColor
+import com.alorma.contactnotes.shared.AvatarShape
 
 private object NoOpEditPersonActions : EditPersonActions {
   override fun onName(value: String) = Unit

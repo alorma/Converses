@@ -47,10 +47,11 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.alorma.contactnotes.R
-import com.alorma.contactnotes.designsystem.components.AvatarColor
-import com.alorma.contactnotes.designsystem.components.AvatarShape
 import com.alorma.contactnotes.designsystem.components.asShape
+import com.alorma.contactnotes.designsystem.components.color
 import com.alorma.contactnotes.designsystem.theme.SheetTitleStyle
+import com.alorma.contactnotes.shared.AvatarColor
+import com.alorma.contactnotes.shared.AvatarShape
 import com.alorma.contactnotes.ui.people.colorNameRes
 import com.alorma.contactnotes.ui.people.initialsOf
 

@@ -2,6 +2,7 @@ package com.alorma.contactnotes.wear.theme
 
 import androidx.compose.ui.graphics.Color
 import androidx.wear.compose.material3.ColorScheme
+import com.alorma.contactnotes.shared.AvatarColor
 
 /** Tokens del brief de Wear: el rellotge és sempre fosc i el fons és negre pur (OLED), no el `surface` del mòbil. */
 object WearColors {
@@ -18,18 +19,8 @@ object WearColors {
   val OnPrimaryContainer = Color(0xFFEBEBEB)
 }
 
-/** Pastels d'identitat dels avatars; el text o la icona a sobre sempre va en `AvatarInk`, també al mode fosc. */
-enum class AvatarColor(
-  val color: Color,
-) {
-  Lavender(Color(0xFFDCD3F5)),
-  Mint(Color(0xFFC9EBD6)),
-  Peach(Color(0xFFFFD6BF)),
-  Sky(Color(0xFFCBE3F7)),
-  Rose(Color(0xFFF7CFDD)),
-  Lemon(Color(0xFFF1E9A8)),
-  Sand(Color(0xFFE8DDCB)),
-}
+/** Pastel d'identitat de l'avatar; el text o la icona a sobre sempre va en `AvatarInk`, també al mode fosc. */
+val AvatarColor.color: Color get() = Color(argb)
 
 val AvatarInk = Color(0xFF1E1D24)
 

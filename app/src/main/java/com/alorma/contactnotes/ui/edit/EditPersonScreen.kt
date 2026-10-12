@@ -91,8 +91,6 @@ import com.alorma.contactnotes.R
 import com.alorma.contactnotes.data.flags.CustomAvatarFeature
 import com.alorma.contactnotes.data.flags.rememberFeatureEnabled
 import com.alorma.contactnotes.data.settings.SecureWindow
-import com.alorma.contactnotes.designsystem.components.AvatarColor
-import com.alorma.contactnotes.designsystem.components.AvatarShape
 import com.alorma.contactnotes.designsystem.components.ConversesSaveButton
 import com.alorma.contactnotes.designsystem.components.ConversesSwitch
 import com.alorma.contactnotes.designsystem.components.ConversesTopBar
@@ -103,6 +101,8 @@ import com.alorma.contactnotes.designsystem.components.rememberConversesHaptics
 import com.alorma.contactnotes.designsystem.components.rememberTopBarScrollBehavior
 import com.alorma.contactnotes.designsystem.theme.DialogTitleStyle
 import com.alorma.contactnotes.designsystem.theme.PersonTheme
+import com.alorma.contactnotes.shared.AvatarColor
+import com.alorma.contactnotes.shared.AvatarShape
 import com.alorma.contactnotes.ui.people.label
 import com.alorma.contactnotes.ui.person.canUnlockWithDevice
 import com.alorma.contactnotes.ui.person.icon

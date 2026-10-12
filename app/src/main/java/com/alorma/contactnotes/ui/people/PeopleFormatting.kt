@@ -2,7 +2,7 @@ package com.alorma.contactnotes.ui.people
 
 import androidx.annotation.StringRes
 import com.alorma.contactnotes.R
-import com.alorma.contactnotes.data.db.ChannelType
+import com.alorma.contactnotes.shared.ChannelType
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId

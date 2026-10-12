@@ -62,7 +62,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.alorma.contactnotes.R
-import com.alorma.contactnotes.data.db.ChannelType
 import com.alorma.contactnotes.data.db.PersonEntity
 import com.alorma.contactnotes.data.db.PersonListItem
 import com.alorma.contactnotes.data.db.color
@@ -78,6 +77,7 @@ import com.alorma.contactnotes.designsystem.components.WelcomeEmptyState
 import com.alorma.contactnotes.designsystem.components.groupedItems
 import com.alorma.contactnotes.designsystem.components.rememberConversesHaptics
 import com.alorma.contactnotes.designsystem.theme.ListTitleStyle
+import com.alorma.contactnotes.shared.ChannelType
 import com.alorma.contactnotes.ui.person.channelName
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf

@@ -20,7 +20,7 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import androidx.wear.compose.material3.Icon
 import androidx.wear.compose.material3.Text
-import com.alorma.contactnotes.wear.theme.AvatarColor
+import com.alorma.contactnotes.shared.AvatarColor
 import com.alorma.contactnotes.wear.theme.RowSubtitleStyle
 import com.alorma.contactnotes.wear.theme.RowTitleStyle
 import com.alorma.contactnotes.wear.theme.WearColors

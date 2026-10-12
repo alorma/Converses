@@ -45,6 +45,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.alorma.contactnotes.designsystem.theme.DialogTitleStyle
+import com.alorma.contactnotes.shared.AvatarColor
+import com.alorma.contactnotes.shared.AvatarShape
 import kotlin.random.Random
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch

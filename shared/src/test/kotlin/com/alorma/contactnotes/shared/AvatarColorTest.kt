@@ -1,4 +1,4 @@
-package com.alorma.contactnotes.designsystem.components
+package com.alorma.contactnotes.shared
 
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue

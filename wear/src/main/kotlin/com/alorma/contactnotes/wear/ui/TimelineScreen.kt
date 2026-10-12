@@ -18,11 +18,11 @@ import androidx.wear.compose.material3.Icon
 import androidx.wear.compose.material3.ScreenScaffold
 import androidx.wear.compose.material3.Text
 import androidx.wear.compose.material3.lazy.rememberTransformationSpec
+import com.alorma.contactnotes.shared.AvatarColor
 import com.alorma.contactnotes.wear.R
 import com.alorma.contactnotes.wear.components.EntryAuthor
 import com.alorma.contactnotes.wear.components.PersonAvatar
 import com.alorma.contactnotes.wear.components.TimelineEntry
-import com.alorma.contactnotes.wear.theme.AvatarColor
 import com.alorma.contactnotes.wear.theme.ButtonLabelStyle
 import com.alorma.contactnotes.wear.theme.PersonNameStyle
 import com.alorma.contactnotes.wear.theme.WearColors

@@ -55,11 +55,11 @@ import com.alorma.contactnotes.data.db.color
 import com.alorma.contactnotes.data.db.shape
 import com.alorma.contactnotes.data.settings.SecureWindow
 import com.alorma.contactnotes.designsystem.components.Avatar
-import com.alorma.contactnotes.designsystem.components.AvatarColor
-import com.alorma.contactnotes.designsystem.components.AvatarShape
 import com.alorma.contactnotes.designsystem.components.ConversesLoadingIndicator
 import com.alorma.contactnotes.designsystem.theme.PersonNameStyle
 import com.alorma.contactnotes.designsystem.theme.PersonTheme
+import com.alorma.contactnotes.shared.AvatarColor
+import com.alorma.contactnotes.shared.AvatarShape
 import com.alorma.contactnotes.ui.people.initialsOf
 import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel

@@ -11,7 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import com.alorma.contactnotes.R
-import com.alorma.contactnotes.data.db.ChannelType
+import com.alorma.contactnotes.shared.ChannelType
 import com.alorma.contactnotes.ui.people.label
 import java.time.Instant
 import java.time.LocalDate

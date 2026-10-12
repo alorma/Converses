@@ -27,11 +27,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.alorma.contactnotes.R
-import com.alorma.contactnotes.data.db.EntryKind
 import com.alorma.contactnotes.data.db.PersonEntity
 import com.alorma.contactnotes.designsystem.components.GhostTimelineMarker
 import com.alorma.contactnotes.designsystem.components.GroupedListDefaults
 import com.alorma.contactnotes.designsystem.components.TimelineRow
+import com.alorma.contactnotes.shared.EntryKind
 
 private val OuterCorner = 22.dp
 private val InnerCorner = 8.dp

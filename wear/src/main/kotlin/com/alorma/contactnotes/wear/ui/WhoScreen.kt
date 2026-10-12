@@ -21,11 +21,11 @@ import androidx.wear.compose.foundation.lazy.rememberTransformingLazyColumnState
 import androidx.wear.compose.material3.Icon
 import androidx.wear.compose.material3.ScreenScaffold
 import androidx.wear.compose.material3.Text
+import com.alorma.contactnotes.shared.AvatarColor
 import com.alorma.contactnotes.wear.R
 import com.alorma.contactnotes.wear.components.PersonAvatar
 import com.alorma.contactnotes.wear.components.WhoGroup
 import com.alorma.contactnotes.wear.components.WhoOption
-import com.alorma.contactnotes.wear.theme.AvatarColor
 import com.alorma.contactnotes.wear.theme.ButtonLabelStyle
 import com.alorma.contactnotes.wear.theme.WearColors
 import com.alorma.contactnotes.wear.theme.WhoTitleStyle

@@ -24,6 +24,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.alorma.contactnotes.designsystem.preview.ConversesPreviewSurface
+import com.alorma.contactnotes.shared.AvatarColor
+import com.alorma.contactnotes.shared.AvatarShape
 
 // Previews dels components amb dades fixes. Els tests de captures de `screenshotTest` les reutilitzen.
 

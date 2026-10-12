@@ -60,9 +60,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.alorma.contactnotes.R
-import com.alorma.contactnotes.data.db.ChannelType
 import com.alorma.contactnotes.data.db.EntryEntity
-import com.alorma.contactnotes.data.db.EntryKind
 import com.alorma.contactnotes.data.db.PersonEntity
 import com.alorma.contactnotes.data.db.PinnedFactEntity
 import com.alorma.contactnotes.data.db.color
@@ -83,6 +81,8 @@ import com.alorma.contactnotes.designsystem.components.rememberConversesHaptics
 import com.alorma.contactnotes.designsystem.theme.PersonNameStyle
 import com.alorma.contactnotes.designsystem.theme.PersonTheme
 import com.alorma.contactnotes.designsystem.theme.SectionTitleStyle
+import com.alorma.contactnotes.shared.ChannelType
+import com.alorma.contactnotes.shared.EntryKind
 import com.alorma.contactnotes.ui.edit.EditFocus
 import com.alorma.contactnotes.ui.entry.NewEntrySheet
 import com.alorma.contactnotes.ui.people.initialsOf

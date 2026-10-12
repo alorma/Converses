@@ -62,13 +62,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.alorma.contactnotes.R
 import com.alorma.contactnotes.designsystem.components.Avatar
-import com.alorma.contactnotes.designsystem.components.AvatarColor
-import com.alorma.contactnotes.designsystem.components.AvatarShape
 import com.alorma.contactnotes.designsystem.components.TimelineMarker
 import com.alorma.contactnotes.designsystem.components.TimelineMarkerStyle
 import com.alorma.contactnotes.designsystem.components.TimelineRow
 import com.alorma.contactnotes.designsystem.components.asShape
+import com.alorma.contactnotes.designsystem.components.color
 import com.alorma.contactnotes.designsystem.theme.SuccessColors
+import com.alorma.contactnotes.shared.AvatarColor
+import com.alorma.contactnotes.shared.AvatarShape
 import kotlin.math.PI
 import kotlin.math.sin
 import kotlin.math.sqrt

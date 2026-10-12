@@ -27,10 +27,10 @@ import androidx.wear.compose.material3.Icon
 import androidx.wear.compose.material3.ScreenScaffold
 import androidx.wear.compose.material3.Text
 import androidx.wear.compose.material3.lazy.rememberTransformationSpec
+import com.alorma.contactnotes.shared.AvatarColor
 import com.alorma.contactnotes.wear.R
 import com.alorma.contactnotes.wear.components.PersonRow
 import com.alorma.contactnotes.wear.components.groupedItemShape
-import com.alorma.contactnotes.wear.theme.AvatarColor
 import com.alorma.contactnotes.wear.theme.ListTitleStyle
 import com.alorma.contactnotes.wear.theme.RowSubtitleStyle
 import com.alorma.contactnotes.wear.theme.WearColors
