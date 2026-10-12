@@ -106,10 +106,10 @@ Depèn de **P0** i **P10**.
 - [x] `:shared`: `WearApproval` (petició, cancel·lació, ack, resultat amb entrades i testimoni de nota, `sanitized()` i codec) i tests (9). Camins `/converses/approval`, `/cancel` i `/result`; resultat del mòbil al rellotge per `MessageClient`. — `61546d6`
 
 **Bloqueig de l'app**
-- [ ] Llegir l'estat del bloqueig de l'instantani; si no es pot verificar, assumir **actiu**.
-- [ ] Si és actiu i el rellotge no és segur (`isDeviceSecure`): pantalla 9 («Cal un bloqueig», «Configura», que obre els ajustos de seguretat si el sistema ho permet). No mostra ni desa cap entrada.
+- [x] Llegir l'estat del bloqueig de l'instantani; si no es pot verificar, assumir **actiu**. — `a8d5178` (`AppLockGate`)
+- [x] Si és actiu i el rellotge no és segur (`isDeviceSecure`): pantalla 9 («Cal un bloqueig», «Configura», que obre els ajustos de seguretat si el sistema ho permet). No mostra ni desa cap entrada. — `a8d5178`
 - [ ] Còpia local xifrada amb Keystore lligada a l'autenticació del dispositiu (o esborrada, segons P10).
-- [ ] Esborrar la còpia si es treu el bloqueig del rellotge, en obrir l'app i a cada sincronització.
+- [x] Esborrar la còpia si es treu el bloqueig del rellotge, en obrir l'app (en tornar a primer pla) i a cada sincronització. — `a8d5178`. **Emulador** (telèfon + Wear XL Round): amb el bloqueig actiu i sense PIN es veu la pantalla 9 i la còpia s'esborra; «Configura» obre Seguretat → Bloqueig de pantalla; amb PIN, l'app s'obre; en treure'l, torna la pantalla 9; amb el bloqueig desactivat, tot torna. Tests de JVM (`AppLockGateTest`, 6; `WearSnapshotStoreTest`, 2 nous).
 - [ ] La cua de pendents i «més entrades» segueixen les mateixes regles.
 
 **Persones protegides**
