@@ -125,12 +125,13 @@ Decidit en proposar la fase (12 d'oct. de 2026): les persones **arxivades no van
 
 ## Fase 4 · Més entrades sota demanda
 
-- [ ] Petició/resposta per `MessageClient` al mòbil (pàgines de 20) en entrar a la Cronologia i en arribar al final.
-- [ ] Les entrades extra viuen **només en memòria** (ViewModel) i s'obliden en sortir.
-- [ ] Indicador de càrrega al final de la llista (P16).
-- [ ] Mòbil inaccessible: només les 5 de la còpia, la llista s'acaba sense error destacat (P13).
-- [ ] Límit de memòria (P7).
-- [ ] Tests de JVM: paginació, final de llista, mòbil absent, res al disc.
+- [x] Contracte a `:shared` (`/converses/entries`, petició amb cursor `occurredAt`+`id`, resposta amb `hasMore`/`denied`, pàgines de 20) i tests del codec. — `5b8eb25`
+- [x] Mòbil: `WearEntriesService` + `WearEntriesResponder` (`MessageClient.sendRequest`/`onRequest`); consulta paginada al DAO (sense canvi d'esquema, sense migració). Rebutja protegides, arxivades i inexistents; tests de JVM. — `3f52dfa`
+- [x] Rellotge: `MoreEntriesSource` (`GmsMoreEntriesSource`, temps màxim de 8 s). — `f788b51`
+- [x] `TimelineViewModel`: les entrades extra viuen **només en memòria** i s'obliden en sortir; mòbil inaccessible: la llista s'acaba sense error (P13); límit de memòria (P7: 100 extra per persona); tests de JVM (paginació, final de llista, mòbil absent, límit, sense duplicats, res al disc). — `f660f2d`
+- [x] UI: en acostar-se al final es demana la pàgina següent; indicador de càrrega al final (P16) amb captura de referència. Validat a l'emulador (Marta Soler amb 65 entrades: carrega fins a l'última i s'atura sense error). — `42a61d5`
+
+Pendent de la fase: provar-ho amb el mòbil realment inaccessible (només cobert per tests de JVM) i la validació de Bernat.
 
 **Sortida:** una persona amb moltes entrades les va carregant mentre es fa scroll.
 

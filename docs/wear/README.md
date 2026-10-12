@@ -119,7 +119,7 @@ El brief posa el desbloqueig al rellotge i diu que el mòbil serveix les entrade
 | --- | --- |
 | P1 | Les protegides mostren **nom i cadenat** a la llista; cap entrada, canal ni hora. |
 | P6 | Haptic `Confirm` en desar, respectant el sistema i l'interruptor de l'app. |
-| P7 | Pàgines de «més entrades» de 20; el límit de memòria es fixa a la fase 4. |
+| P7 | Pàgines de «més entrades» de 20; límit de memòria de **100 entrades extra per persona** (fixat a la fase 4), a més de les 5 de la còpia. |
 | P9 | La nota des del rellotge té **el canal per defecte de la nota ràpida**. |
 | P11 | Vigència de l'aprovació **fixa a 5 min** a la v1; ajust més endavant si cal. |
 | P14 | Les notes pendents es queden al rellotge fins entregar-se (fora del backup; xifrat/esborrat segons la fase 5). |
@@ -159,7 +159,7 @@ La documentació oficial no confirma el català (ca-ES) al reconeixedor del rell
 ## Riscos
 
 - **R1 · Fuga de protegides.** Cal el filtre al mòbil abans de publicar l'instantani (cap entrada de protegides), amb test de JVM, i que el mòbil només serveixi una protegida amb l'aprovació biomètrica de P0. La notificació de l'aprovació no pot dur el nom.
-- **R2 · Dades de text al rellotge.** Les últimes 5 entrades de cada persona no protegida es desen al rellotge, i fins a 20 més en memòria. Reduït respecte de la 1.ª versió del brief, però és una novetat de privacitat: recollir-ho a la política (P8).
+- **R2 · Dades de text al rellotge.** Les últimes 5 entrades de cada persona no protegida es desen al rellotge, i fins a 100 més en memòria, només mentre la persona és oberta. Reduït respecte de la 1.ª versió del brief, però és una novetat de privacitat: recollir-ho a la política (P8).
 - **R3 · Persona que passa a protegida** amb la còpia al rellotge o amb notes encuades: el rellotge esborra les entrades i les notes pendents no s'apliquen sense decisió.
 - **R4 · Persona esborrada al mòbil amb notes pendents:** rebuig o descart amb avís.
 - **R5 · Duplicats** per reintents: UUID idempotent.
