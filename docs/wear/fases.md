@@ -69,7 +69,7 @@ Sense codi de producte.
 - [ ] Demanar el disseny de les pantalles noves (P12) **quan s'arribi a la fase 5**, no abans.
 - [x] Tancar P1, P6, P7, P9, P11, P14 i P15 (vegeu `README.md`).
 - [x] Consultar la documentació oficial: Wear Compose Material 3 i navegació, Data Layer (`play-services-wearable`), `EdgeButton`, `TransformingLazyColumn`, reconeixement de veu i requisits de Play per a apps de Wear. Versions anotades al `README.md` i afegides al version catalog.
-- [x] **Versionat:** s'amplia `alorma/VersionPlugin` (1.1.0, encara no publicada) amb `appVersion { formFactor = FormFactor.WEAR }`: enum PHONE=0 (per defecte), WEAR=2, TV=4, AUTOMOTIVE=6, i `versionCode` = base + offset (1.2.3 → 10020031; WEAR → 10020033). `:app` no canvia. Document inicial: `~/projects/personal/VersionPlugin/docs/version-code-offset.md` (parlava de `versionCodeOffset`; el disseny final és `formFactor`). **Dependència:** la fase 1 necessita la 1.1.0 publicada (o `includeBuild` local mentrestant), pujar `versionPlugin` al catàleg i confirmar que `FormFactor` s'hi pot usar des del build script sense import.
+- [x] **Versionat:** s'amplia `alorma/VersionPlugin` (1.1.0, encara no publicada) amb `appVersion { formFactor = FormFactor.WEAR }`: enum PHONE=0 (per defecte), WEAR=2, TV=4, AUTOMOTIVE=6, i `versionCode` = base + offset (1.2.3 → 10020031; WEAR → 10020033). `:app` no canvia. Document inicial: `~/projects/personal/VersionPlugin/docs/version-code-offset.md` (parlava de `versionCodeOffset`; el disseny final és `formFactor`). **Dependència (actualitzada):** la fase 1 treballa amb valors estàtics; la integració del plugin (1.1.0 publicada, `versionPlugin` al catàleg, `FormFactor` sense import) passa a la fase 10.
 - [x] `minSdk` de `:wear`: **30** (Wear OS 3+).
 - [x] **P10:** comprovat amb una app de prova descartable a l'emulador Wear OS 7 (API 37), `minSdk` 30 acordat. Resultats: sense bloqueig `isDeviceSecure=false`, el credencial intent és `null` i **no es pot crear una clau que exigeixi autenticació** (cal el bloqueig de pantalla); amb PIN, `isDeviceSecure=true`, el credencial intent apunta als ajustos del rellotge, la clau es crea, i el xifratge queda **bloquejat** (`UserNotAuthenticatedException`) un cop caducada la finestra d'autenticació (provat a 40 s amb una finestra de 30 s); en treure el PIN, **la clau desapareix sola**. Limitacions: és un emulador (`insideSecureHardware=false`, Keystore per programari) i no hi ha prova a l'API 30; cal repetir-ho al rellotge real a la fase 9. Conclusió: s'adopta el xifratge amb Keystore lligat a autenticació.
 - [ ] Comprovar si el reconeixedor de veu del rellotge suporta **català** (P5); si no, avisar abans de cercar alternatives. **Pendent:** la documentació no ho confirma; cal rellotge real (abans de la fase 6).
@@ -83,6 +83,7 @@ Sense codi de producte.
 
 - [ ] Afegir `:wear` (i `:shared` si es confirma) a `settings.gradle.kts` i al catàleg de versions.
 - [ ] Mateix `applicationId` que `:app`, amb sufix `.dev` i signatura de debug com al mòbil; manifest amb `type.watch` i `standalone = false`; `allowBackup=false` i regles de backup.
+- [ ] **Versionat provisional:** `VersionPlugin` 1.1.0 (`FormFactor.WEAR`) encara no està publicada, així que `:wear` usa **valors estàtics** (`versionCode`/`versionName` fixos, amb un `TODO` visible al `build.gradle.kts`). La integració del plugin és a la fase 10.
 - [ ] `ConversesWearTheme` amb els tokens del brief (negre pur, `surface-card`, `surface-card-high`, `primary`, `on-surface`…, avatars pastel i tinta `#1E1D24`) i Roboto Flex (subconjunt llatí, com al mòbil).
 - [ ] Components: llista agrupada (separació 2, radi 24 fora i 6 dins), fila de persona, entrada de cronologia (radi 18), grup connectat del «Qui», Galeta d'avatar.
 - [ ] Les 9 pantalles com a previews amb dades fictícies, a Large i Small Round, i captures de preview comparades amb `docs/wear/screenshots/`.
@@ -197,6 +198,7 @@ Depèn de **P0** i **P10**.
 
 ## Fase 10 · CI i publicació
 
+- [ ] **Integrar `VersionPlugin` a `:wear`:** quan la 1.1.0 estigui publicada, pujar `versionPlugin` al catàleg, aplicar-lo a `:wear` amb `appVersion { formFactor = FormFactor.WEAR }` (comprovar que `FormFactor` s'hi pot usar sense import), treure els valors estàtics de la fase 1 i verificar que el `versionCode` surt `base + 2` i diferent del d'`:app`.
 - [ ] `pr-build.yml`: tests, ktlint i APK de `:wear`.
 - [ ] `screenshot-tests.yml`: referències de `:wear` (etiqueta `update-screenshots`).
 - [ ] `release.yml`: AAB del rellotge i Gradle Play Publisher; confirmar el flux de la Play Console.
