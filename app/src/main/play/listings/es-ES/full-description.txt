@@ -12,10 +12,16 @@ RÁPIDA DE USAR
 • Edita o elimina cualquier entrada, con opción de deshacer si te arrepientes.
 
 PRIVADA POR DISEÑO
-• Todo se queda en tu dispositivo. La app no tiene acceso a internet, ni cuentas, ni anuncios, ni seguimiento.
+• Todo se queda en tu dispositivo y en el reloj emparejado. La app no tiene acceso a internet, ni cuentas, ni anuncios, ni seguimiento.
 • Protege a las personas sensibles con la huella, la cara o el bloqueo de pantalla. Sus notas permanecen ocultas hasta que las desbloqueas y se bloquean las capturas de pantalla.
 • Tus notas quedan excluidas de las copias de seguridad en la nube.
 • Exporta las notas de una persona como texto plano cuando quieras y compártelas con la app que elijas.
+
+EN LA MUÑECA (WEAR OS)
+• Consulta tus personas y sus últimas notas desde el reloj.
+• Dicta una nota con la voz. Si el móvil está lejos, espera y se entrega en cuanto vuelve.
+• Las personas protegidas solo se abren en el reloj cuando lo apruebas con la huella en el móvil.
+• Necesita la app Converses en el móvil, y nada pasa por la nube.
 
 TODO ORDENADO
 • Archiva a las personas con las que ya no hablas, sin perder su historial.
