@@ -12,10 +12,16 @@ QUICK TO CAPTURE
 • Edit or delete any entry, with undo if you change your mind.
 
 PRIVATE BY DESIGN
-• Everything stays on your device. The app has no internet access, no accounts, no ads and no tracking.
+• Everything stays on your device and your paired watch. The app has no internet access, no accounts, no ads and no tracking.
 • Protect sensitive people with your fingerprint, face or screen lock. Their notes stay hidden until you unlock them, and screenshots are blocked.
 • Your notes are excluded from cloud backups.
 • Export a person's notes as plain text whenever you want, and share them with the app you choose.
+
+ON YOUR WRIST (WEAR OS)
+• Browse your people and their latest notes from your watch.
+• Dictate a note by voice. If your phone is out of reach, it waits and is delivered as soon as it's back.
+• Protected people open on the watch only after you approve it with your fingerprint on the phone.
+• Needs the Converses phone app, and nothing goes through the cloud.
 
 KEEP IT TIDY
 • Archive people you no longer talk to, without losing their history.
