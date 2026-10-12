@@ -62,6 +62,8 @@ dependencies {
   implementation(libs.androidx.core.ktx)
   implementation(libs.androidx.activity.compose)
   implementation(libs.androidx.compose.ui)
+  implementation(libs.androidx.compose.material.icons.extended)
+  implementation(libs.androidx.graphics.shapes)
   implementation(libs.wear.compose.foundation)
   implementation(libs.wear.compose.material3)
   implementation(libs.wear.tooling.preview)
