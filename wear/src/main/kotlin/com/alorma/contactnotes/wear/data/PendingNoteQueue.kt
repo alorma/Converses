@@ -92,4 +92,4 @@ class DataStorePendingNoteQueue(
   }
 }
 
-private val Context.pendingNotesDataStore by preferencesDataStore(name = "wear_pending_notes")
+internal val Context.pendingNotesDataStore by preferencesDataStore(name = "wear_pending_notes")

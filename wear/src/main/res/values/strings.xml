@@ -59,4 +59,9 @@
     <string name="dictate_error_microphone_hint">Check that nothing else is using it.</string>
     <string name="dictate_error_failed_title">Couldn\'t dictate</string>
     <string name="dictate_error_failed_hint">Something went wrong. Try again.</string>
+    <plurals name="discarded_notes_title">
+        <item quantity="one">%d note discarded</item>
+        <item quantity="other">%d notes discarded</item>
+    </plurals>
+    <string name="discarded_notes_hint">Tap to dismiss</string>
 </resources>

@@ -59,4 +59,9 @@
     <string name="dictate_error_microphone_hint">Comprova que no el faci servir res més.</string>
     <string name="dictate_error_failed_title">No s\'ha pogut dictar</string>
     <string name="dictate_error_failed_hint">Alguna cosa ha fallat. Torna-ho a provar.</string>
+    <plurals name="discarded_notes_title">
+        <item quantity="one">%d nota descartada</item>
+        <item quantity="other">%d notes descartades</item>
+    </plurals>
+    <string name="discarded_notes_hint">Toca per tancar</string>
 </resources>
