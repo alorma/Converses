@@ -26,6 +26,7 @@ import androidx.wear.compose.foundation.lazy.rememberTransformingLazyColumnState
 import androidx.wear.compose.material3.Icon
 import androidx.wear.compose.material3.ScreenScaffold
 import androidx.wear.compose.material3.Text
+import androidx.wear.compose.material3.lazy.rememberTransformationSpec
 import com.alorma.contactnotes.wear.R
 import com.alorma.contactnotes.wear.components.PersonRow
 import com.alorma.contactnotes.wear.components.groupedItemShape
@@ -53,6 +54,7 @@ fun PeopleContent(
   dataAgeMinutes: Int? = null,
 ) {
   val state = rememberTransformingLazyColumnState()
+  val spec = rememberTransformationSpec()
   ScreenScaffold(scrollState = state, modifier = modifier) { padding ->
     TransformingLazyColumn(
       state = state,
@@ -81,6 +83,7 @@ fun PeopleContent(
           isProtected = person.isProtected,
           shape = groupedItemShape(index, people.size),
           onClick = { onPersonClick(person) },
+          modifier = Modifier.scrollTransformed(this, spec),
         )
       }
     }

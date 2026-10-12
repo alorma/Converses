@@ -59,17 +59,22 @@ fun StatusContent(
         Modifier.fillMaxSize().padding(
           start = 12.dp + 8.dp * scale,
           end = 12.dp + 8.dp * scale,
-          top = 28.dp * scale,
+          top = 38.dp * scale,
           bottom = if (action != null) PinnedEdgeButtonSpace else 12.dp,
         ),
       horizontalAlignment = Alignment.CenterHorizontally,
       verticalArrangement = Arrangement.spacedBy(6.dp, Alignment.CenterVertically),
     ) {
       Box(
-        modifier = Modifier.size(cookieSize * scale * scale).clip(CookieShape).background(iconBackground),
+        modifier = Modifier.size(cookieSize * scale * scale * 0.85f).clip(CookieShape).background(iconBackground),
         contentAlignment = Alignment.Center,
       ) {
-        Icon(icon, contentDescription = null, tint = iconTint, modifier = Modifier.size(iconSize * scale * scale))
+        Icon(
+          icon,
+          contentDescription = null,
+          tint = iconTint,
+          modifier = Modifier.size(iconSize * scale * scale * 0.85f),
+        )
       }
       Text(
         text = title,
