@@ -22,10 +22,12 @@ data class StoredSnapshot(
  * Còpia local del rellotge. Només desa el que ha passat pel filtre de privacitat de [WearSnapshotCodec]: les protegides
  * no hi duen mai contingut. Viu a `files/`, que queda fora de qualsevol còpia de seguretat.
  *
- * El xifratge amb Keystore (Bloqueig de l'app) i l'esborrat si es treu el bloqueig del rellotge són de la fase 5.
+ * Si el Bloqueig de l'app és actiu i el rellotge no té bloqueig de pantalla, no es desa res i s'esborra el que hi
+ * hagués ([AppLockGate]). El xifratge amb Keystore és de la tasca següent de la fase 5.
  */
 class WearSnapshotStore(
   private val dataStore: DataStore<Preferences>,
+  private val deviceLock: DeviceLock,
   private val clock: () -> Long = System::currentTimeMillis,
 ) {
   val stored: Flow<StoredSnapshot?> =
@@ -37,10 +39,14 @@ class WearSnapshotStore(
 
   /**
    * Desa el que arriba del mòbil. Retorna `false` i conserva la còpia anterior si no es pot entendre (text malmès o
-   * versió del protocol desconeguda).
+   * versió del protocol desconeguda), i `false` **esborrant** la còpia si cal bloqueig i el rellotge no en té.
    */
   suspend fun save(payload: String): Boolean {
     val snapshot = WearSnapshotCodec.decode(payload) ?: return false
+    if (isLockRequired(snapshot.appLockActive, deviceLock.isSecure())) {
+      clear()
+      return false
+    }
     dataStore.edit { prefs ->
       // Es desa el text ja filtrat, no el que ha arribat
       prefs[SnapshotKey] = WearSnapshotCodec.encode(snapshot)
@@ -62,7 +68,10 @@ class WearSnapshotStore(
 
     fun get(context: Context): WearSnapshotStore =
       instance ?: synchronized(this) {
-        instance ?: WearSnapshotStore(context.applicationContext.snapshotDataStore).also { instance = it }
+        instance ?: WearSnapshotStore(
+          context.applicationContext.snapshotDataStore,
+          AndroidDeviceLock(context),
+        ).also { instance = it }
       }
   }
 }
