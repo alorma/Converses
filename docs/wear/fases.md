@@ -175,13 +175,15 @@ Validada per Bernat. Provada a l'emulador Wear (permís, escolta, error i reinte
 
 ## Fase 7 · Qui, Desat i nota rellotge → mòbil
 
-- [ ] «Qui» (4): Jo / {persona} / Apunt amb els mateixos textos que `whoLabel(...)`; per defecte la persona; «Desa».
-- [ ] Cua de pendents amb reintents (WorkManager o pròpia), amb UUID per nota; les notes queden a la cua fins entregar-se (P14).
-- [ ] Enviament amb `MessageClient` a `/converses/note`.
-- [ ] `WearableListenerService` al mòbil: valida que la persona existeixi, desa com una entrada nova i ignora duplicats per UUID. Decidir el canal (P9). Si cal una columna (p. ex. origen) → migració, schema i test; preferible no tocar l'esquema.
-- [ ] Desat (5) i Desat sense mòbil (6): es tanca sola i torna a la Cronologia; en entregar, s'esborra de la cua.
-- [ ] Haptic `Confirm` en desar (P6).
-- [ ] Tests de JVM: cua, reintents, idempotència.
+- [x] «Qui» (4): Jo / {persona} / Apunt amb els mateixos textos que `whoLabel(...)`; per defecte la persona; «Desa». — `6cd9421`
+- [x] Cua de pendents amb UUID per nota, a DataStore (`files/`, fora del backup), i entrega amb **WorkManager 2.12.0** (sobreviu al tancament de l'app; *backoff* exponencial de 30 s; es reprogramen en arrencar i quan torna el mòbil). Les notes queden a la cua fins que el mòbil les confirma o les rebutja (P14). — `300204a`
+- [x] Enviament amb `MessageClient.sendRequest` a `/converses/note`, amb contracte a `:shared` (`WearNote`, text de fins a 4.000 caràcters: no es talla com les entrades, es rebutja si hi passa). — `9de440e`, `300204a`
+- [x] `WearNoteService` + `WearNoteReceiver` al mòbil: valida que la persona existeixi, no sigui arxivada ni protegida, desa com una entrada nova i ignora duplicats per UUID (registre de les últimes 500 id a DataStore). **Canal (P9):** el de la nota ràpida, és a dir, l'últim usat amb la persona o el primer. **Cap canvi d'esquema de Room: sense migració.** — `584f415`
+- [x] Desat (5) i Desat sense mòbil (6): es tanca sola als 2 s i torna a la Cronologia. «Sense mòbil» es mostra si en desar el mòbil no era accessible; l'esborrat de la cua passa quan el mòbil confirma. — `6cd9421`
+- [x] Haptic `Confirm` en desar (P6), pel sistema de feedback de Compose (el rellotge no té cap interruptor propi de l'app). — `6cd9421`
+- [x] Tests de JVM: contracte (5), mòbil (5: desa, canal, duplicat, protegida/arxivada/inexistent, il·legible), cua i reintents (7) i «Qui» (6). Captures de referència intactes (`validateDebugScreenshotTest`).
+- [x] **Emulador** (telèfon + Wear XL Round): amb el mòbil a prop, la nota arriba al mòbil i el rellotge torna a la cronologia; amb el mòbil sense resposta la nota queda a la cua i s'entrega sola en ~30 s en tornar, sense duplicats (4 «Desa» = 4 entrades). El dictat real no es pot fer a l'emulador (no genera text): per provar «Qui» s'ha arrencat temporalment a `WhoRoute` amb text fix (canvi no commitejat). **Pendent amb rellotge real:** dictat de punta a punta i «Sense mòbil» real.
+- Les notes a persones **protegides** no es poden crear (la fase 5 és pendent) i el mòbil les rebutja; el descart de notes a persones esborrades o fetes protegides és de la fase 8 (R3, R4).
 
 **Sortida:** apuntar una nota des del rellotge i veure-la al mòbil, amb i sense connexió.
 
