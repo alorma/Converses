@@ -1,5 +1,6 @@
 plugins {
   alias(libs.plugins.kotlin.jvm)
+  alias(libs.plugins.kotlin.serialization)
 }
 
 // Domini compartit entre el mòbil i el rellotge: Kotlin pur, sense Android, Compose ni Room
@@ -8,5 +9,6 @@ kotlin {
 }
 
 dependencies {
+  api(libs.kotlinx.serialization.json)
   testImplementation(libs.junit)
 }
