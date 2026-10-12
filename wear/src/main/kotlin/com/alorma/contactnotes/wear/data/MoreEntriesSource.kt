@@ -2,13 +2,11 @@ package com.alorma.contactnotes.wear.data
 
 import android.content.Context
 import com.alorma.contactnotes.shared.WEAR_ENTRIES_PATH
-import com.alorma.contactnotes.shared.WEAR_PHONE_CAPABILITY
 import com.alorma.contactnotes.shared.WearEntriesCodec
 import com.alorma.contactnotes.shared.WearEntriesRequest
 import com.alorma.contactnotes.shared.WearEntriesResponse
 import com.alorma.contactnotes.shared.WearEntry
 import com.google.android.gms.common.api.ApiException
-import com.google.android.gms.wearable.CapabilityClient
 import com.google.android.gms.wearable.Wearable
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.tasks.await
@@ -51,7 +49,7 @@ class GmsMoreEntriesSource(
     beforeId: Long,
   ): MoreEntriesResult =
     try {
-      val nodeId = phoneNodeId() ?: return MoreEntriesResult.Unavailable
+      val nodeId = nearbyPhoneNodeId(appContext) ?: return MoreEntriesResult.Unavailable
       val request =
         WearEntriesCodec
           .encodeRequest(
@@ -67,22 +65,6 @@ class GmsMoreEntriesSource(
     } catch (_: TimeoutCancellationException) {
       MoreEntriesResult.Unavailable
     }
-
-  /** El mòbil a prop: node amb l'app o, si les capacitats no es propaguen (emuladors), qualsevol node connectat. */
-  private suspend fun phoneNodeId(): String? {
-    val withApp =
-      Wearable
-        .getCapabilityClient(appContext)
-        .getCapability(WEAR_PHONE_CAPABILITY, CapabilityClient.FILTER_REACHABLE)
-        .await()
-    withApp.nodes.firstOrNull { it.isNearby }?.let { return it.id }
-    return Wearable
-      .getNodeClient(appContext)
-      .connectedNodes
-      .await()
-      .firstOrNull { it.isNearby }
-      ?.id
-  }
 
   private companion object {
     const val TIMEOUT_MILLIS = 8_000L
