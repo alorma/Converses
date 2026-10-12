@@ -12,7 +12,7 @@ Context, abast, arquitectura, decisions (P0–P16) i riscos són a `docs/wear/RE
 | 5 | Bloqueig de l'app i persones protegides | 0 (P0, P10), 3, 4 | Feta |
 | 6 | Dictat | 1 | Feta |
 | 7 | Qui, Desat i nota rellotge → mòbil amb cua | 2, 3, 6 | Feta |
-| 8 | Estats d'error i casos límit | 5, 7 | Pendent |
+| 8 | Estats d'error i casos límit | 5, 7 | Feta |
 | 9 | Qualitat, privacitat i accessibilitat | 8 | Pendent |
 | 10 | CI i publicació | 9 | Pendent |
 | 11 | Més endavant | 10 | Idees |
