@@ -1,5 +1,4 @@
 import com.android.compose.screenshot.tasks.PreviewScreenshotValidationTask
-import com.github.triplet.gradle.play.PlayPublisherExtension
 
 plugins {
   alias(libs.plugins.android.application)
@@ -94,18 +93,9 @@ tasks.withType<PreviewScreenshotValidationTask>().configureEach {
   testEngineInput.threshold.set(0.01f)
 }
 
-// Les dues apps comparteixen edició i pista a Play: cada tasca ha de retenir el versionCode de l'altra
-// o l'última en publicar s'enduu l'altra de la release. El del rellotge és el del mòbil + 2 (FormFactor.WEAR).
-androidComponents {
-  onVariants(selector().withBuildType("release")) { variant ->
-    val otherVersionCode =
-      variant.outputs
-        .single()
-        .versionCode
-        .map { listOf(it!!.toLong() + 2) }
-    extensions.configure<PlayPublisherExtension>("play") { retain.artifacts.set(otherVersionCode) }
-  }
-}
+// Les dues apps comparteixen edició i pista a Play. El mòbil publica primer i no retén res: el
+// rellotge (`:wear:publishReleaseBundle`, que va després) retén el versionCode del mòbil i deixa
+// la pista amb els dos. Retenir un versionCode que encara no s'ha pujat a l'edició dona un 404.
 
 dependencies {
   implementation(project(":designsystem"))

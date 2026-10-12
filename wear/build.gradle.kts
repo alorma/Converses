@@ -81,8 +81,13 @@ tasks.withType<PreviewScreenshotValidationTask>().configureEach {
   testEngineInput.threshold.set(0.01f)
 }
 
-// Les dues apps comparteixen edició i pista a Play: cada tasca ha de retenir el versionCode de l'altra
-// o l'última en publicar s'enduu l'altra de la release. El del mòbil és el del rellotge - 2 (FormFactor.WEAR).
+// Les dues apps comparteixen edició i pista a Play: el rellotge publica després del mòbil (així el
+// seu bundle ja és a l'edició) i en reté el versionCode, que és el del rellotge - 2 (FormFactor.WEAR).
+// Si les dues tasques van en paral·lel, retenir un versionCode no pujat encara dona un 404.
+tasks.matching { it.name == "publishReleaseBundle" }.configureEach {
+  mustRunAfter(":app:publishReleaseBundle")
+}
+
 androidComponents {
   onVariants(selector().withBuildType("release")) { variant ->
     val otherVersionCode =
