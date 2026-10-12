@@ -192,11 +192,11 @@ Validada per Bernat amb les proves de l'emulador i els tests. Queda pendent nom�
 
 ## Fase 10 · CI i publicació
 
-- [ ] `pr-build.yml`: tests, ktlint i APK de `:wear`.
-- [ ] `screenshot-tests.yml`: referències de `:wear` (etiqueta `update-screenshots`).
-- [ ] `release.yml`: AAB del rellotge i Gradle Play Publisher; confirmar el flux de la Play Console.
-- [ ] **Política de privacitat i «Sense núvol» (P8):** verificar com viatgen les dades a la Data Layer i ajustar l'esborrany del brief abans de publicar-lo; traduir a ca/es.
-- [ ] Fitxa de Play: captures i text per a Wear OS en en/ca/es (`app/src/main/play`); formulari de seguretat de les dades si cal.
+- [x] `pr-build.yml`: tests, ktlint i APK de `:wear`. `ktlintCheck` i `testDebugUnitTest` ja cobrien `:wear`; s'hi afegeixen `:wear:assembleDebug` i `:wear:assembleRelease` (també a `build-apk.yml`). — `3bf36dd`, `99df544`
+- [x] `screenshot-tests.yml`: referències de `:wear` (etiqueta `update-screenshots`). Sense canvis: `validateDebugScreenshotTest` ja inclou `:wear`, el glob de referències és multimòdul i el script de l'informe també.
+- [x] `release.yml`: AAB del rellotge i Gradle Play Publisher. `:wear` signa amb la keystore de release i aplica el plugin; el workflow construeix els dos AAB, els puja com a artefactes i publica `:app` i `:wear` en una sola invocació de Gradle. **No verificat:** que comparteixin edició i un AAB no esborri l'altre de la pista (no s'ha pogut fer ni un `--dry-run` de `publish*`); es comprova amb la primera release a `internal`. Si no, afegir `retain` amb el `versionCode` de l'altre. **Pendent:** el flux de la Play Console (form factor Wear OS). — `99df544`
+- [ ] **Política de privacitat i «Sense núvol» (P8):** el text de la landing el canvia Bernat. La fitxa de Play ja diu «dispositiu i rellotge emparellat».
+- [ ] Fitxa de Play: text per a Wear OS en en/ca/es i 4 captures 720×720 per idioma a `wear-screenshots` (`4f7cab2`, `4f6aa1a`, `d88c412`). **Pendent:** comprovar que GPP les puja i el formulari de seguretat de les dades.
 - [ ] Pista inicial `internal`, després `beta`.
 - [ ] Notes de versió: proposar el punt; no es toquen sense acord.
 
