@@ -3,9 +3,12 @@ package com.alorma.contactnotes.ui.approval
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.alorma.contactnotes.data.wear.WearApprovalCoordinator
+import com.alorma.contactnotes.shared.WEAR_APPROVAL_TTL_MS
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 /** Estat de l'aprovació. No porta mai res de la persona: ni el nom ni cap contingut. */
@@ -36,8 +39,31 @@ class ApprovalViewModel(
 
   private var promptRequested = _state.value == ApprovalUiState.Prompting
 
+  init {
+    if (_state.value == ApprovalUiState.Prompting) {
+      // Si el rellotge cancel·la, o la petició caduca, amb la pantalla (o el prompt) oberts, es tanca sola
+      viewModelScope.launch {
+        coordinator.cancelledByWatch.first { it == requestId }
+        closeIfOpen()
+      }
+      viewModelScope.launch {
+        delay(WEAR_APPROVAL_TTL_MS + EXPIRY_MARGIN_MS)
+        if (!coordinator.isPending(requestId)) closeIfOpen()
+      }
+    }
+  }
+
+  private fun closeIfOpen() {
+    if (_state.value == ApprovalUiState.Prompting || _state.value == ApprovalUiState.Confirm) {
+      _state.value = ApprovalUiState.Closed
+    }
+  }
+
   /** L'activitat el crida en veure [ApprovalUiState.Prompting]: només un cop per intent (girar la pantalla no reobre res). */
   fun takePromptRequest(): Boolean = promptRequested.also { promptRequested = false }
+
+  /** Persona i rellotge per al text del prompt; `null` si la petició ja no és viva. */
+  suspend fun details() = coordinator.details(requestId)
 
   /** La biometria ha anat bé. */
   fun onAuthenticated() {
@@ -68,3 +94,6 @@ class ApprovalViewModel(
     }
   }
 }
+
+// Una mica més que la vigència: el mòbil valida el temps i la petició ja no hi és
+private const val EXPIRY_MARGIN_MS = 1_000L

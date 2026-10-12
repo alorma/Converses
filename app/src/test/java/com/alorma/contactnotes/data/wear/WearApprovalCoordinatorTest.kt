@@ -44,6 +44,7 @@ class WearApprovalCoordinatorTest {
       sender = { nodeId, payload -> sent += nodeId to payload },
       tokens = tokens,
       clock = { now },
+      watchNames = { nodeId -> if (nodeId == "watch") "Pixel Watch 3" else null },
     )
 
   private suspend fun request(
@@ -229,6 +230,38 @@ class WearApprovalCoordinatorTest {
 
       assertEquals(WearApprovalStatus.REJECTED, request(person.id).status)
       assertEquals(1, shown.size)
+    }
+
+  @Test
+  fun detailsGiveThePersonAndTheWatchNameWhileTheRequestIsPending() =
+    runTest {
+      val person = db.addPerson("Luna Roja", isProtected = true)
+      request(person.id)
+
+      val details = coordinator.details("req-1")!!
+
+      assertEquals("Luna Roja", details.personName)
+      assertEquals("Pixel Watch 3", details.watchName)
+    }
+
+  @Test
+  fun theWatchNameIsNullWhenTheSystemDoesNotKnowIt() =
+    runTest {
+      val person = db.addPerson("Luna Roja", isProtected = true)
+      request(person.id, node = "altre")
+
+      assertNull(coordinator.details("req-1")!!.watchName)
+    }
+
+  @Test
+  fun detailsOfAnUnknownExpiredOrAlreadyUsedRequestAreNull() =
+    runTest {
+      val person = db.addPerson("Luna Roja", isProtected = true)
+      assertNull(coordinator.details("nope"))
+
+      request(person.id)
+      coordinator.approve("req-1")
+      assertNull(coordinator.details("req-1"))
     }
 
   @Test

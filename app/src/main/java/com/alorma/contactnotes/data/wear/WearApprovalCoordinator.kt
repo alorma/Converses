@@ -10,6 +10,15 @@ import com.alorma.contactnotes.shared.WearApprovalRequest
 import com.alorma.contactnotes.shared.WearApprovalResult
 import com.alorma.contactnotes.shared.WearApprovalStatus
 import com.alorma.contactnotes.shared.WearEntry
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
+
+/** Nom de la persona i del rellotge d'una petició pendent; [watchName] és `null` si el sistema no el dona. */
+data class ApprovalDetails(
+  val personName: String,
+  val watchName: String?,
+)
 
 /** Avisa l'usuari al mòbil. La notificació és genèrica: no pot dur mai el nom de la persona ni cap contingut. */
 interface ApprovalNotifier {
@@ -42,6 +51,7 @@ class WearApprovalCoordinator(
   private val sender: ApprovalResultSender,
   private val tokens: ApprovalTokens,
   private val clock: () -> Long = System::currentTimeMillis,
+  private val watchNames: WatchNames = WatchNames { null },
 ) {
   private class Pending(
     val personId: Long,
@@ -50,6 +60,11 @@ class WearApprovalCoordinator(
   )
 
   private val pending = mutableMapOf<String, Pending>()
+
+  private val _cancelledByWatch = MutableSharedFlow<String>(extraBufferCapacity = 8)
+
+  /** Peticions que el rellotge ha cancel·lat: la pantalla del mòbil que les tingui oberta es tanca. */
+  val cancelledByWatch: Flow<String> = _cancelledByWatch.asSharedFlow()
   private val used = ArrayDeque<String>()
   private val recentRequests = ArrayDeque<Long>()
 
@@ -90,6 +105,16 @@ class WearApprovalCoordinator(
     return WearApprovalStatus.PENDING
   }
 
+  /**
+   * Qui demana què, per al text del `BiometricPrompt` («{rellotge} vol desbloquejar {persona}»). **Només per a aquest
+   * prompt, que surt després que l'usuari actuï**: la notificació no duu mai el nom. `null` si la petició ja no és viva.
+   */
+  suspend fun details(requestId: String): ApprovalDetails? {
+    val request = synchronized(this) { pending[requestId] } ?: return null
+    val person = repository.getPerson(request.personId) ?: return null
+    return ApprovalDetails(personName = person.name, watchName = watchNames.nameOf(request.nodeId))
+  }
+
   /** Si la petició encara espera l'aprovació de l'usuari: la pantalla del mòbil ho comprova en obrir-se. */
   @Synchronized
   fun isPending(requestId: String): Boolean {
@@ -100,7 +125,10 @@ class WearApprovalCoordinator(
   /** El rellotge ha cancel·lat la petició (toc a «Cancel·la»): s'invalida i es retira la notificació. */
   fun onCancel(payload: String) {
     val cancel = WearApprovalCodec.decodeCancel(payload) ?: return
-    if (take(cancel.requestId) != null) notifier.cancel(cancel.requestId)
+    if (take(cancel.requestId) != null) {
+      notifier.cancel(cancel.requestId)
+      _cancelledByWatch.tryEmit(cancel.requestId)
+    }
   }
 
   /**

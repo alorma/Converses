@@ -24,6 +24,7 @@ import com.alorma.contactnotes.data.wear.ApprovalResultSender
 import com.alorma.contactnotes.data.wear.ApprovalTokens
 import com.alorma.contactnotes.data.wear.DataStoreNoteIdRegistry
 import com.alorma.contactnotes.data.wear.GmsApprovalResultSender
+import com.alorma.contactnotes.data.wear.GmsWatchNames
 import com.alorma.contactnotes.data.wear.GmsWearLink
 import com.alorma.contactnotes.data.wear.NoteIdRegistry
 import com.alorma.contactnotes.data.wear.WearApprovalCoordinator
@@ -107,7 +108,13 @@ val wearModule =
     single<ApprovalNotifier> { AndroidApprovalNotifier(androidContext()) }
     single<ApprovalResultSender> { GmsApprovalResultSender(androidContext()) }
     single {
-      WearApprovalCoordinator(repository = get(), notifier = get(), sender = get(), tokens = get())
+      WearApprovalCoordinator(
+        repository = get(),
+        notifier = get(),
+        sender = get(),
+        tokens = get(),
+        watchNames = GmsWatchNames(androidContext()),
+      )
     }
     single<NoteIdRegistry> { DataStoreNoteIdRegistry(androidContext()) }
     single { WearNoteReceiver(repository = get(), registry = get()) }

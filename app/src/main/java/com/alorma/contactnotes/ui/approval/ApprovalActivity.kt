@@ -7,6 +7,7 @@ import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.biometric.BiometricManager
+import androidx.biometric.BiometricPrompt
 import androidx.compose.runtime.getValue
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -49,11 +50,11 @@ class ApprovalActivity : FragmentActivity() {
         when (state) {
           ApprovalUiState.Prompting -> if (viewModel.takePromptRequest()) prompt(viewModel)
           ApprovalUiState.Confirm -> Unit
-          ApprovalUiState.Closed -> finish()
+          ApprovalUiState.Closed -> close()
           ApprovalUiState.Failed -> {
             // Petició caducada, cancel·lada al rellotge o desconeguda: no hi ha res a aprovar
             Toast.makeText(applicationContext, R.string.approval_failed, Toast.LENGTH_SHORT).show()
-            finish()
+            close()
           }
         }
       }
@@ -71,17 +72,39 @@ class ApprovalActivity : FragmentActivity() {
     }
   }
 
-  private fun prompt(viewModel: ApprovalViewModel) {
+  // El diàleg del BiometricPrompt és del sistema i no es tanca sol amb l'activitat: s'ha de cancel·lar explícitament
+  private var activePrompt: BiometricPrompt? = null
+
+  private fun close() {
+    activePrompt?.cancelAuthentication()
+    activePrompt = null
+    finish()
+  }
+
+  override fun onDestroy() {
+    if (!isChangingConfigurations) activePrompt?.cancelAuthentication()
+    super.onDestroy()
+  }
+
+  private suspend fun prompt(viewModel: ApprovalViewModel) {
     // Sense biometria ni bloqueig de pantalla no es pot aprovar: es tracta com una denegació
     if (unlockAvailability() != BiometricManager.BIOMETRIC_SUCCESS) {
       viewModel.onDeny()
       return
     }
-    promptUnlock(
-      title = getString(R.string.approval_prompt_title),
-      subtitle = getString(R.string.approval_prompt_subtitle),
-      onError = { viewModel.onPromptCancelled() },
-    ) { viewModel.onAuthenticated() }
+    // El nom de la persona només surt aquí, un cop l'usuari ha actuat; la notificació no el duu mai
+    val details = viewModel.details()
+    activePrompt =
+      promptUnlock(
+        title =
+          getString(
+            R.string.approval_prompt_title,
+            details?.watchName ?: getString(R.string.approval_watch_fallback),
+            details?.personName.orEmpty(),
+          ),
+        subtitle = getString(R.string.unlock_subtitle),
+        onError = { viewModel.onPromptCancelled() },
+      ) { viewModel.onAuthenticated() }
   }
 
   companion object {

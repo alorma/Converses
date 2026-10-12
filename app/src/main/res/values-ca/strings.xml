@@ -234,7 +234,7 @@
     <string name="approval_hint">Confirma que ets tu amb l\'empremta.</string>
     <string name="approval_confirm">Confirma</string>
     <string name="approval_deny">Denega</string>
-    <string name="approval_prompt_title">Confirma l\'accés</string>
-    <string name="approval_prompt_subtitle">Obre una persona protegida al rellotge.</string>
+    <string name="approval_prompt_title">%1$s vol desbloquejar %2$s</string>
+    <string name="approval_watch_fallback">El rellotge</string>
     <string name="approval_failed">No s\'ha pogut completar la petició</string>
 </resources>
