@@ -94,6 +94,15 @@ class ConversesRepository(
     to: Long,
   ): Int = entryDao.deleteInRange(personId, channel, from, to)
 
+  suspend fun getPerson(id: Long): PersonEntity? = personDao.get(id)
+
+  suspend fun getEntriesBefore(
+    personId: Long,
+    beforeOccurredAt: Long,
+    beforeId: Long,
+    limit: Int,
+  ): List<EntryEntity> = entryDao.getPageBefore(personId, beforeOccurredAt, beforeId, limit)
+
   suspend fun getEntries(personId: Long): List<EntryEntity> =
     entryDao.observeTimeline(personId, EntryKind.entries.toSet()).first()
 }
