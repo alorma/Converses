@@ -26,6 +26,10 @@ Captures a 720×720, fons transparent. Són una aproximació: la tipografia hi s
 | `screenshots/14-mobil-confirma.png` | Mòbil: Confirma / Denega |
 | `screenshots/15-mobil-empremta.png` | Mòbil: BiometricPrompt (referència) |
 | `screenshots/16-mobil-fet.png` | Mòbil: Fet |
+| `screenshots/17-falta-app-mobil.png` | Rellotge: Falta l'app del mòbil |
+| `screenshots/18-obert-al-mobil.png` | Rellotge: Mira el mòbil (Play obert) |
+| `screenshots/19-mobil-proposa-instal-lar.png` | Mòbil: full «Instal·la Converses al rellotge» |
+| `screenshots/20-mobil-acaba-al-rellotge.png` | Mòbil: Acaba al rellotge |
 
 ## Objectiu
 
@@ -79,6 +83,20 @@ Persones → Cronologia → Dictat → Qui → Desat, més els estats d'excepci�
 Mòbil: 13 notificació genèrica, 14 «Confirma» / «Denega», 15 `BiometricPrompt` (el pinta el sistema), 16 «Fet». Si la petició ja ha caducat en obrir-la, o si es cancel·la al rellotge amb el prompt obert, el mòbil tanca la pantalla i mostra un missatge breu («No s'ha pogut completar la petició»), sense disseny propi.
 
 Amb el mòbil connectat no es mostra cap indicador de sincronització; només a les excepcions (6 i 8).
+
+**Instal·lació creuada** (l'app només és a un dels dos; segon lliurament del disseny, 13 d'oct. de 2026):
+
+| # | Pantalla | Notes |
+| --- | --- | --- |
+| 17 | Falta l'app (rellotge) | El rellotge té l'app i el mòbil emparellat no: «Instal·la Converses al mòbil.» + EdgeButton «Obre al mòbil». Substitueix la llista; sense dades |
+| 18 | Mira el mòbil (rellotge) | Després del toc: «Hem obert Google Play.» + «Tanca» |
+| 19 | Proposta d'instal·lar (mòbil) | Full inferior a l'arrencada si hi ha un Wear OS connectat **sense** l'app: «Instal·la al rellotge» / «Ara no» / «No m'ho tornis a demanar» |
+| 20 | Acaba al rellotge (mòbil) | Després d'«Instal·la al rellotge»: «Hem obert Google Play al teu {model}…» + «Entesos» |
+
+- **Detecció:** `CapabilityClient` (`converses_phone` / `converses_watch`, ja declarades) i, si falta la de l'altre costat, `NodeClient.connectedNodes` per saber si hi ha un dispositiu emparellat. Sense emparellat: pantalla 12.
+- **Obrir Play a l'altre dispositiu:** `RemoteActivityHelper.startRemoteActivity` amb `ACTION_VIEW` a `market://details?id=<applicationId>`, adreçat al node.
+- **«No m'ho tornis a demanar»:** booleà a DataStore del mòbil (no Room, **sense migració**). «Ara no» només tanca fins a la propera arrencada.
+- `{model}` ve de `Node.displayName` (P17).
 
 ## Arquitectura
 
@@ -167,6 +185,7 @@ La documentació oficial no confirma el català (ca-ES) al reconeixedor del rell
 | P12 | ~~Pantalles no dissenyades de protegides~~ | **Resolt:** disseny rebut el 12 d'oct. de 2026 (pantalles 7, 10–12 al rellotge i 13–16 al mòbil) |
 | P13 | **Mòbil inaccessible a «més entrades»:** la llista s'acaba sense error (suposició del brief, la frase original es va tallar) | Confirmar |
 | P16 | **Indicador de càrrega** de «més entrades» (no dissenyat) | Coherent amb Wear M3 |
+| P17 | **Instal·lació creuada:** `Node.displayName` com a `{model}` (és prou llegible?); l'obertura remota de Play depèn del dispositiu; no dissenyat: instal·lació que no s'acaba (només es torna a proposar a la propera arrencada) | Provar amb rellotge real; fase 11 |
 
 ## Riscos
 

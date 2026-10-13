@@ -6,7 +6,7 @@ Disseny de la versió de rellotge de **Converses** (i del flux de confirmació a
 
 | Carpeta | Contingut |
 |---|---|
-| `screenshots/` | 16 pantalles en PNG (rellotge a 720×720 amb fons transparent; mòbil a 2×) + `00-overview-rellotge.png` i `00-overview-mobil.png`. |
+| `screenshots/` | 20 pantalles en PNG (rellotge a 720×720 amb fons transparent; mòbil a 2×) + `00-overview-rellotge.png` i `00-overview-mobil.png`. |
 | `design/` | Fonts `.dc.html` de cada pantalla i `canvas.json`. Són la **referència exacta** de mides, radis i colors (estils inline). |
 | `tokens/converses-tokens.json` | Tokens del sistema de disseny Converses (clar/fosc, tipografia, espaiats, radis). |
 
@@ -42,8 +42,20 @@ Flux: Persones → Cronologia → Dictat → Qui → Desat. Més dos estats d'ex
 | 16 | `16-mobil-fet` | «Fet · Ja pots veure la persona al rellotge.» + «Tanca». |
 | 8 | `08-persones-sense-mobil` | Llista amb la còpia local i un avís: «Mòbil no connectat · Dades de fa N min». |
 | 9 | `09-cal-bloqueig-rellotge` | Si el Bloqueig de l'app és actiu al mòbil i el rellotge **no té bloqueig**: «Cal un bloqueig · Activa un PIN al rellotge.» + EdgeButton «Configura». Substitueix qualsevol altra pantalla; no mostra cap dada. |
+| 17 | `17-falta-app-mobil` | Rellotge sense l'app del mòbil (el rellotge té l'app, el mòbil no): «Falta l'app · Instal·la Converses al mòbil.» + EdgeButton «Obre al mòbil». Substitueix la llista; no mostra cap dada. |
+| 18 | `18-obert-al-mobil` | Confirmació després del toc: «Mira el mòbil · Hem obert Google Play.» + «Tanca». |
+| 19 | `19-mobil-proposa-instal-lar` | Full inferior al mòbil, quan l'app arrenca i hi ha un rellotge Wear OS connectat **sense** l'app: «Instal·la Converses al rellotge» + «Instal·la al rellotge» / «Ara no» / «No m'ho tornis a demanar». |
+| 20 | `20-mobil-acaba-al-rellotge` | Després de «Instal·la al rellotge»: «Acaba al rellotge · Hem obert Google Play al teu {model}. Toca Instal·la al rellotge per acabar.» + «Entesos». |
 
 Amb el mòbil connectat **no es mostra cap indicador de sincronització**; només apareix a les excepcions (6 i 8).
+
+## Instal·lació creuada (l'app només és a un dels dos)
+
+- **Detecció.** `CapabilityClient`: el mòbil declara `converses_phone` i el rellotge `converses_watch` (`wear.xml`, `android_wear_capabilities`). Cada costat consulta `getCapability(..., FILTER_ALL)` i, si no hi ha cap node amb la capability de l'altre, comprova amb `NodeClient.connectedNodes` si hi ha un dispositiu emparellat.
+- **Mòbil → proposa (pantalla 19).** A l'arrencada, si hi ha un node Wear connectat sense `converses_watch`, mostra el full. «Instal·la al rellotge» obre la fitxa de Play al rellotge amb `RemoteActivityHelper.startRemoteActivity` (intent `ACTION_VIEW` a `market://details?id=<applicationId>`, adreçat al node) i passa a la pantalla 20. «Ara no» el tanca fins al proper arrencada; «No m'ho tornis a demanar» desa un booleà a DataStore (preferència local, **no** Room).
+- **Rellotge → demana (pantalles 17-18).** Si el rellotge no troba `converses_phone` però el mòbil és emparellat, mostra la pantalla 17. «Obre al mòbil» fa el mateix amb `RemoteActivityHelper` cap al mòbil i passa a la 18. Si no hi ha mòbil emparellat, usa la pantalla 12 (no disponible sense el mòbil).
+- Textos nous: `Falta l'app` · `Instal·la Converses al mòbil.` · `Obre al mòbil` · `Mira el mòbil` · `Hem obert Google Play.` · `Instal·la Converses al rellotge` · `Hem detectat el teu {model}. Hi veuràs les teves persones i podràs apuntar notes amb la veu.` · `Instal·la al rellotge` · `Ara no` · `No m'ho tornis a demanar` · `Acaba al rellotge` · `Hem obert Google Play al teu {model}. Toca Instal·la al rellotge per acabar.` · `Entesos`.
+- Pendent: el nom del model (`{model}`) ve del `Node.displayName`; verifica que és prou llegible. Prova-ho amb rellotge real: l'obertura remota de Play depèn del dispositiu. No dissenyat: què passa si la instal·lació no s'acaba (només es torna a proposar a la propera arrencada).
 
 ## Arquitectura proposada
 
@@ -147,7 +159,7 @@ Regla de color del sistema: el color només és **identitat** (avatars) o **erro
 
 Segona persona, frases curtes, verbs en imperatiu, sense exclamacions ni emojis. Reutilitza els recursos existents del mòbil (Jo, Apunt, Desa, grups de canal) i afegeix només els nous:
 
-`Nota` · `Acaba` · `Qui ho ha dit?` · `Nota per a {nom}` · `Desat` · `Enviada al mòbil` · `S'enviarà al mòbil quan hi hagi connexió` · `Mòbil no connectat` · `Dades de fa {n} min` · `Persona protegida` · `Confirma-ho al mòbil` · `Queden {n} s` · `Cancel·la` · `Denegat` · `S'ha rebutjat al mòbil.` · `Ha caducat` · `No s'ha confirmat a temps.` · `Reintenta` · `No disponible sense el mòbil` · `El rellotge no troba el mòbil.` · `El rellotge demana obrir una persona protegida` · `El rellotge vol obrir una persona protegida` · `Confirma que ets tu amb l'empremta.` · `Confirma` · `Denega` · `Confirma l'accés` · `Obre una persona protegida al rellotge.` · `Fet` · `Ja pots veure la persona al rellotge.` · `Cal un bloqueig` · `Activa un PIN al rellotge.` · `Configura`
+`Nota` · `Acaba` · `Qui ho ha dit?` · `Nota per a {nom}` · `Desat` · `Enviada al mòbil` · `S'enviarà al mòbil quan hi hagi connexió` · `Mòbil no connectat` · `Dades de fa {n} min` · `Persona protegida` · `Confirma-ho al mòbil` · `Queden {n} s` · `Cancel·la` · `Denegat` · `S'ha rebutjat al mòbil.` · `Ha caducat` · `No s'ha confirmat a temps.` · `Reintenta` · `No disponible sense el mòbil` · `El rellotge no troba el mòbil.` · `El rellotge demana obrir una persona protegida` · `El rellotge vol obrir una persona protegida` · `Confirma que ets tu amb l'empremta.` · `Confirma` · `Denega` · `Confirma l'accés` · `Obre una persona protegida al rellotge.` · `Fet` · `Ja pots veure la persona al rellotge.` · `Cal un bloqueig` · `Activa un PIN al rellotge.` · `Configura` · (veure «Instal·lació creuada» per als textos d'instal·lació)
 
 Tradueix-los a castellà i anglès amb el mateix criteri que la resta de l'app.
 

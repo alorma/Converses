@@ -1,26 +1,285 @@
 {
   "v": 3,
-  "createdOnFiles": { "v": 1, "at": "2026-10-12T10:40:00Z" },
+  "createdOnFiles": {
+    "v": 1,
+    "at": "2026-10-12T10:40:00Z"
+  },
   "title": "Converses · Wear OS",
-  "launch": { "view": "canvas" },
+  "launch": {
+    "view": "canvas"
+  },
   "pages": [],
   "boards": {
-    "Main.dc.html": { "x": 0, "y": 0, "w": 240, "h": 240, "title": "1 · Persones", "radius": 120, "is_interactive": true },
-    "Cronologia.dc.html": { "x": 320, "y": 0, "w": 240, "h": 240, "title": "2 · Cronologia", "radius": 120, "is_interactive": true },
-    "Dictat.dc.html": { "x": 640, "y": 0, "w": 240, "h": 240, "title": "3 · Dictat", "radius": 120, "is_interactive": true },
-    "Qui.dc.html": { "x": 960, "y": 0, "w": 240, "h": 240, "title": "4 · Qui", "radius": 120, "is_interactive": true },
-    "Desat.dc.html": { "x": 1280, "y": 0, "w": 240, "h": 240, "title": "5 · Desat", "radius": 120, "is_interactive": true },
-    "DesatPendent.dc.html": { "x": 1600, "y": 0, "w": 240, "h": 240, "title": "5b · Desat sense mòbil", "radius": 120, "is_interactive": true },
-    "Protegida.dc.html": { "x": 1920, "y": 0, "w": 240, "h": 240, "title": "7 · Confirma-ho al mòbil", "radius": 120, "is_interactive": true },
-    "SenseMobil.dc.html": { "x": 2240, "y": 0, "w": 240, "h": 240, "title": "Persones sense mòbil", "radius": 120, "is_interactive": true },
-    "Bloquejada.dc.html": { "x": 2560, "y": 0, "w": 240, "h": 240, "title": "Cal bloqueig al rellotge", "radius": 120, "is_interactive": true },
-    "Denegat.dc.html": { "x": 0, "y": 600, "w": 240, "h": 240, "title": "Denegat", "radius": 120, "is_interactive": true },
-    "Caducat.dc.html": { "x": 320, "y": 600, "w": 240, "h": 240, "title": "Ha caducat", "radius": 120, "is_interactive": true },
-    "NoDisponible.dc.html": { "x": 640, "y": 600, "w": 240, "h": 240, "title": "No disponible sense el mòbil", "radius": 120, "is_interactive": true },
-    "Notificacio.dc.html": { "x": 0, "y": 1200, "w": 390, "h": 140, "title": "Mòbil · Notificació", "is_interactive": true },
-    "MobilConfirma.dc.html": { "x": 470, "y": 1200, "w": 390, "h": 844, "title": "Mòbil · Confirma", "is_interactive": true },
-    "MobilBiometria.dc.html": { "x": 940, "y": 1200, "w": 390, "h": 844, "title": "Mòbil · Empremta", "is_interactive": true },
-    "MobilFet.dc.html": { "x": 1410, "y": 1200, "w": 390, "h": 844, "title": "Mòbil · Fet", "is_interactive": true }
+    "Main.dc.html": {
+      "x": 0,
+      "y": 0,
+      "w": 240,
+      "h": 240,
+      "title": "1 · Persones",
+      "radius": 120,
+      "is_interactive": true
+    },
+    "Cronologia.dc.html": {
+      "x": 320,
+      "y": 0,
+      "w": 240,
+      "h": 240,
+      "title": "2 · Cronologia",
+      "radius": 120,
+      "is_interactive": true
+    },
+    "Dictat.dc.html": {
+      "x": 640,
+      "y": 0,
+      "w": 240,
+      "h": 240,
+      "title": "3 · Dictat",
+      "radius": 120,
+      "is_interactive": true
+    },
+    "Qui.dc.html": {
+      "x": 960,
+      "y": 0,
+      "w": 240,
+      "h": 240,
+      "title": "4 · Qui",
+      "radius": 120,
+      "is_interactive": true
+    },
+    "Desat.dc.html": {
+      "x": 1280,
+      "y": 0,
+      "w": 240,
+      "h": 240,
+      "title": "5 · Desat",
+      "radius": 120,
+      "is_interactive": true
+    },
+    "DesatPendent.dc.html": {
+      "x": 1600,
+      "y": 0,
+      "w": 240,
+      "h": 240,
+      "title": "5b · Desat sense mòbil",
+      "radius": 120,
+      "is_interactive": true
+    },
+    "Protegida.dc.html": {
+      "x": 1920,
+      "y": 0,
+      "w": 240,
+      "h": 240,
+      "title": "7 · Confirma-ho al mòbil",
+      "radius": 120,
+      "is_interactive": true
+    },
+    "SenseMobil.dc.html": {
+      "x": 2240,
+      "y": 0,
+      "w": 240,
+      "h": 240,
+      "title": "Persones sense mòbil",
+      "radius": 120,
+      "is_interactive": true
+    },
+    "Bloquejada.dc.html": {
+      "x": 2560,
+      "y": 0,
+      "w": 240,
+      "h": 240,
+      "title": "Cal bloqueig al rellotge",
+      "radius": 120,
+      "is_interactive": true
+    },
+    "Denegat.dc.html": {
+      "x": 0,
+      "y": 600,
+      "w": 240,
+      "h": 240,
+      "title": "Denegat",
+      "radius": 120,
+      "is_interactive": true
+    },
+    "Caducat.dc.html": {
+      "x": 320,
+      "y": 600,
+      "w": 240,
+      "h": 240,
+      "title": "Ha caducat",
+      "radius": 120,
+      "is_interactive": true
+    },
+    "NoDisponible.dc.html": {
+      "x": 640,
+      "y": 600,
+      "w": 240,
+      "h": 240,
+      "title": "No disponible sense el mòbil",
+      "radius": 120,
+      "is_interactive": true
+    },
+    "Notificacio.dc.html": {
+      "x": 0,
+      "y": 1200,
+      "w": 390,
+      "h": 140,
+      "title": "Mòbil · Notificació",
+      "is_interactive": true
+    },
+    "MobilConfirma.dc.html": {
+      "x": 470,
+      "y": 1200,
+      "w": 390,
+      "h": 844,
+      "title": "Mòbil · Confirma",
+      "is_interactive": true
+    },
+    "MobilBiometria.dc.html": {
+      "x": 940,
+      "y": 1200,
+      "w": 390,
+      "h": 844,
+      "title": "Mòbil · Empremta",
+      "is_interactive": true
+    },
+    "MobilFet.dc.html": {
+      "x": 1410,
+      "y": 1200,
+      "w": 390,
+      "h": 844,
+      "title": "Mòbil · Fet",
+      "is_interactive": true
+    },
+    "WPlay1.dc.html": {
+      "x": 0,
+      "y": 2400,
+      "w": 360,
+      "h": 360,
+      "title": "wear-play-01-notebook-en",
+      "is_interactive": false
+    },
+    "WPlay2.dc.html": {
+      "x": 440,
+      "y": 2400,
+      "w": 360,
+      "h": 360,
+      "title": "wear-play-02-glance-en",
+      "is_interactive": false
+    },
+    "WPlay3.dc.html": {
+      "x": 880,
+      "y": 2400,
+      "w": 360,
+      "h": 360,
+      "title": "wear-play-03-voice-en",
+      "is_interactive": false
+    },
+    "WPlay4.dc.html": {
+      "x": 1320,
+      "y": 2400,
+      "w": 360,
+      "h": 360,
+      "title": "wear-play-04-protected-en",
+      "is_interactive": false
+    },
+    "WPlay1Ca.dc.html": {
+      "x": 0,
+      "y": 3060,
+      "w": 360,
+      "h": 360,
+      "title": "wear-play-01-notebook-ca",
+      "is_interactive": false
+    },
+    "WPlay2Ca.dc.html": {
+      "x": 440,
+      "y": 3060,
+      "w": 360,
+      "h": 360,
+      "title": "wear-play-02-glance-ca",
+      "is_interactive": false
+    },
+    "WPlay3Ca.dc.html": {
+      "x": 880,
+      "y": 3060,
+      "w": 360,
+      "h": 360,
+      "title": "wear-play-03-voice-ca",
+      "is_interactive": false
+    },
+    "WPlay4Ca.dc.html": {
+      "x": 1320,
+      "y": 3060,
+      "w": 360,
+      "h": 360,
+      "title": "wear-play-04-protected-ca",
+      "is_interactive": false
+    },
+    "WPlay1Es.dc.html": {
+      "x": 0,
+      "y": 3720,
+      "w": 360,
+      "h": 360,
+      "title": "wear-play-01-notebook-es",
+      "is_interactive": false
+    },
+    "WPlay2Es.dc.html": {
+      "x": 440,
+      "y": 3720,
+      "w": 360,
+      "h": 360,
+      "title": "wear-play-02-glance-es",
+      "is_interactive": false
+    },
+    "WPlay3Es.dc.html": {
+      "x": 880,
+      "y": 3720,
+      "w": 360,
+      "h": 360,
+      "title": "wear-play-03-voice-es",
+      "is_interactive": false
+    },
+    "WPlay4Es.dc.html": {
+      "x": 1320,
+      "y": 3720,
+      "w": 360,
+      "h": 360,
+      "title": "wear-play-04-protected-es",
+      "is_interactive": false
+    },
+    "SenseAppMobil.dc.html": {
+      "x": 960,
+      "y": 600,
+      "w": 240,
+      "h": 240,
+      "title": "Falta l'app al mòbil",
+      "is_interactive": true,
+      "radius": 120
+    },
+    "ObertMobil.dc.html": {
+      "x": 1280,
+      "y": 600,
+      "w": 240,
+      "h": 240,
+      "title": "Obert al mòbil",
+      "is_interactive": true,
+      "radius": 120
+    },
+    "MobilInstalaWear.dc.html": {
+      "x": 1880,
+      "y": 1200,
+      "w": 390,
+      "h": 844,
+      "title": "Mòbil · Proposa instal·lar al rellotge",
+      "is_interactive": true
+    },
+    "MobilWearObert.dc.html": {
+      "x": 2350,
+      "y": 1200,
+      "w": 390,
+      "h": 844,
+      "title": "Mòbil · Acaba al rellotge",
+      "is_interactive": true
+    }
   },
   "order": [
     "Main.dc.html",
@@ -38,12 +297,81 @@
     "Notificacio.dc.html",
     "MobilConfirma.dc.html",
     "MobilBiometria.dc.html",
-    "MobilFet.dc.html"
+    "MobilFet.dc.html",
+    "WPlay1.dc.html",
+    "WPlay2.dc.html",
+    "WPlay3.dc.html",
+    "WPlay4.dc.html",
+    "WPlay1Ca.dc.html",
+    "WPlay2Ca.dc.html",
+    "WPlay3Ca.dc.html",
+    "WPlay4Ca.dc.html",
+    "WPlay1Es.dc.html",
+    "WPlay2Es.dc.html",
+    "WPlay3Es.dc.html",
+    "WPlay4Es.dc.html",
+    "SenseAppMobil.dc.html",
+    "ObertMobil.dc.html",
+    "MobilInstalaWear.dc.html",
+    "MobilWearObert.dc.html"
   ],
   "notes": {
-    "t1": { "x": 0, "y": -260, "text": "Converses · Wear OS", "kind": "title1", "maxW": 2800 },
-    "t2": { "x": 0, "y": 340, "text": "Persona protegida · altres estats al rellotge", "kind": "title1", "maxW": 880 },
-    "t3": { "x": 0, "y": 940, "text": "Persona protegida · confirmació al mòbil", "kind": "title1", "maxW": 1800 }
+    "t1": {
+      "x": 0,
+      "y": -260,
+      "text": "Converses · Wear OS",
+      "kind": "title1",
+      "maxW": 2800
+    },
+    "t2": {
+      "x": 0,
+      "y": 340,
+      "text": "Persona protegida · altres estats al rellotge",
+      "kind": "title1",
+      "maxW": 880
+    },
+    "t3": {
+      "x": 0,
+      "y": 940,
+      "text": "Persona protegida · confirmació al mòbil",
+      "kind": "title1",
+      "maxW": 1800
+    },
+    "p_en": {
+      "x": 0,
+      "y": 2140,
+      "text": "Google Play · Wear OS · English",
+      "kind": "title1",
+      "maxW": 1680
+    },
+    "p_ca": {
+      "x": 0,
+      "y": 2800,
+      "text": "Google Play · Wear OS · català",
+      "kind": "title1",
+      "maxW": 1680
+    },
+    "p_es": {
+      "x": 0,
+      "y": 3460,
+      "text": "Google Play · Wear OS · castellano",
+      "kind": "title1",
+      "maxW": 1680
+    },
+    "t4": {
+      "x": 960,
+      "y": 340,
+      "text": "Instal·lació creuada",
+      "kind": "title1",
+      "maxW": 560
+    },
+    "t5": {
+      "x": 1880,
+      "y": 940,
+      "text": "Mòbil · proposa instal·lar l'app del rellotge",
+      "kind": "title1",
+      "maxW": 900
+    }
   },
   "designSystems": [
     {

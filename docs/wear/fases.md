@@ -15,7 +15,8 @@ Context, abast, arquitectura, decisions (P0–P16) i riscos són a `docs/wear/RE
 | 8 | Estats d'error i casos límit | 5, 7 | Feta |
 | 9 | Qualitat, privacitat i accessibilitat | 8 | Pendent |
 | 10 | CI i publicació | 9 | Pendent |
-| 11 | Més endavant | 10 | Idees |
+| 11 | Instal·lació creuada (pantalles 17–20) | 8 | Pendent (disseny rebut el 13 d'oct. de 2026) |
+| 12 | Més endavant | 10 | Idees |
 
 ---
 
@@ -200,7 +201,21 @@ Validada per Bernat amb les proves de l'emulador i els tests. Queda pendent nom�
 - [ ] Pista inicial `internal`, després `beta`.
 - [ ] Notes de versió: proposar el punt; no es toquen sense acord.
 
-## Fase 11 · Més endavant
+## Fase 11 · Instal·lació creuada
+
+Disseny: pantalles 17–20 (`docs/wear/screenshots/`, fonts a `docs/wear/handoff/design/`). Detalls a `README.md` (P17). Pot anar abans o en paral·lel a la fase 10; cal fer-la abans de publicar a `beta`.
+
+- [ ] Detecció (`CapabilityClient` + `NodeClient.connectedNodes`) darrere d'una interfície com `WearLink`, amb tests de JVM: sense l'altre costat però emparellat, sense emparellat, i amb l'altre costat.
+- [ ] Rellotge: pantalla 17 «Falta l'app» (substitueix la llista, sense dades) amb «Obre al mòbil» → `RemoteActivityHelper` → pantalla 18; sense mòbil emparellat, pantalla 12. Previews i captures a Large i Small Round.
+- [ ] Mòbil: full inferior (19) a l'arrencada si hi ha un Wear OS connectat sense `converses_watch`; «Instal·la al rellotge» → Play al rellotge → pantalla 20; «Ara no» (fins a la propera arrencada); «No m'ho tornis a demanar» (booleà a DataStore, sense Room ni migració). Captures de referència a `:app`.
+- [ ] Textos nous en en/ca/es (llista al brief, «Instal·lació creuada»), reutilitzant els existents.
+- [ ] Privacitat: el full no ha de portar res de dades; només el nom del dispositiu (`Node.displayName`).
+- [ ] **Emulador** (parell telèfon + Wear): comprovar la detecció amb l'app només a un costat. **Pendent amb rellotge real:** l'obertura remota de Play i la llegibilitat de `{model}`.
+- [ ] Notes de versió: proposar el punt (visible per a l'usuari); no es toquen sense acord.
+
+**Sortida:** amb l'app només a un dels dos dispositius, l'altre proposa instal·lar-la i obre Play.
+
+## Fase 12 · Més endavant
 
 - Tile i complicació de nota ràpida (no dissenyats).
 - Respostes predefinides, o triar el canal des del rellotge.
