@@ -15,7 +15,7 @@ Context, abast, arquitectura, decisions (P0–P16) i riscos són a `docs/wear/RE
 | 8 | Estats d'error i casos límit | 5, 7 | Feta |
 | 9 | Qualitat, privacitat i accessibilitat | 8 | Pendent |
 | 10 | CI i publicació | 9 | Pendent |
-| 11 | Instal·lació creuada (pantalles 17–20) | 8 | Pendent (disseny rebut el 13 d'oct. de 2026) |
+| 11 | Instal·lació creuada (pantalles 17–20) | 8 | Feta (notes de versió pendents d'acord) |
 | 12 | Més endavant | 10 | Idees |
 
 ---
@@ -214,6 +214,8 @@ Disseny: pantalles 17–20 (`docs/wear/screenshots/`, fonts a `docs/wear/handoff
 - [ ] Notes de versió: proposar el punt (visible per a l'usuari); no es toquen sense acord.
 
 **Sortida:** amb l'app només a un dels dos dispositius, l'altre proposa instal·lar-la i obre Play.
+
+Validada per Bernat amb les proves de l'emulador i dels dispositius reals (Pixel 8a + Xiaomi Watch 2). No vist: la pantalla de Play al rellotge real ni una instal·lació completa; el botó «Obre al mòbil» es parteix en dues línies a Large Round i al Xiaomi.
 
 ## Fase 12 · Més endavant
 
