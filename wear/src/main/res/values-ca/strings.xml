@@ -27,6 +27,8 @@
     <string name="hours_ago">Fa %1$d h</string>
     <string name="no_data_title">Encara no hi ha res</string>
     <string name="no_data_hint">Obre Converses al mòbil per sincronitzar.</string>
+    <string name="no_people_title">Encara no hi ha ningú</string>
+    <string name="no_people_hint">Afegeix la primera persona al mòbil.</string>
     <string name="phone_not_connected">Mòbil no connectat</string>
     <string name="data_from_minutes">Dades de fa %1$d min</string>
     <string name="data_just_now">Dades d\'ara mateix</string>

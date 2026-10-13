@@ -100,6 +100,13 @@ class ViewModelsTest {
     }
 
   @Test
+  fun peopleSyncedWithoutPeopleShowsEmptyState() =
+    runTest {
+      val vm = PeopleViewModel(MutableStateFlow(stored()), FakePhone(true), labels, discarded) { now }
+      assertEquals(PeopleUiState.NoPeople, vm.state.first { it != PeopleUiState.Loading })
+    }
+
+  @Test
   fun peopleConnectedHasNoAgeBanner() =
     runTest {
       val vm = PeopleViewModel(MutableStateFlow(stored(kael, marta)), FakePhone(true), labels, discarded) { now }

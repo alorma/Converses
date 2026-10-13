@@ -27,6 +27,8 @@
     <string name="hours_ago">%1$d h ago</string>
     <string name="no_data_title">Nothing yet</string>
     <string name="no_data_hint">Open Converses on your phone to sync.</string>
+    <string name="no_people_title">No one here yet</string>
+    <string name="no_people_hint">Add the first person on your phone.</string>
     <string name="phone_not_connected">Phone not connected</string>
     <string name="data_from_minutes">Data from %1$d min ago</string>
     <string name="data_just_now">Data from just now</string>

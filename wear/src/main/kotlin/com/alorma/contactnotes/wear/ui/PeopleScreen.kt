@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Info
+import androidx.compose.material.icons.rounded.PersonAdd
 import androidx.compose.material.icons.rounded.PhonelinkOff
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -225,6 +226,7 @@ fun PeopleScreen(
   when (val state = viewModel.state.collectAsStateWithLifecycle().value) {
     PeopleUiState.Loading -> Unit
     PeopleUiState.NoData -> NoDataContent()
+    PeopleUiState.NoPeople -> NoPeopleContent()
     is PeopleUiState.Loaded ->
       PeopleContent(
         people = state.people,
@@ -253,3 +255,21 @@ fun NoDataContent(modifier: Modifier = Modifier) {
 @WearScreenPreviews
 @Composable
 fun NoDataPreview() = WearPreview { NoDataContent() }
+
+/** El mòbil ha sincronitzat però no té cap persona: com l'estat buit del mòbil. */
+@Composable
+fun NoPeopleContent(modifier: Modifier = Modifier) {
+  StatusContent(
+    icon = Icons.Rounded.PersonAdd,
+    iconBackground = WearColors.SurfaceCardHigh,
+    iconTint = WearColors.OnSurface,
+    title = stringResource(R.string.no_people_title),
+    subtitle = stringResource(R.string.no_people_hint),
+    modifier = modifier,
+    titleStyle = PersonNameStyle,
+  )
+}
+
+@WearScreenPreviews
+@Composable
+fun NoPeoplePreview() = WearPreview { NoPeopleContent() }

@@ -27,6 +27,8 @@
     <string name="hours_ago">Hace %1$d h</string>
     <string name="no_data_title">Todavía no hay nada</string>
     <string name="no_data_hint">Abre Converses en el móvil para sincronizar.</string>
+    <string name="no_people_title">Todavía no hay nadie</string>
+    <string name="no_people_hint">Añade a la primera persona en el móvil.</string>
     <string name="phone_not_connected">Móvil no conectado</string>
     <string name="data_from_minutes">Datos de hace %1$d min</string>
     <string name="data_just_now">Datos de ahora mismo</string>

@@ -18,6 +18,9 @@ sealed interface PeopleUiState {
   /** El mòbil encara no ha enviat res. */
   data object NoData : PeopleUiState
 
+  /** El mòbil ha sincronitzat, però encara no hi ha cap persona (ni protegida). */
+  data object NoPeople : PeopleUiState
+
   /** `dataAgeMinutes` només hi és quan el mòbil no és accessible: és l'avís «Dades de fa N min». */
   data class Loaded(
     val people: List<PersonItem>,
@@ -37,6 +40,8 @@ class PeopleViewModel(
     combine(snapshots, phone.connected, discarded.count) { stored, connected, discardedNotes ->
       if (stored == null) {
         PeopleUiState.NoData
+      } else if (stored.snapshot.people.isEmpty()) {
+        PeopleUiState.NoPeople
       } else {
         val now = clock()
         PeopleUiState.Loaded(
