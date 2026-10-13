@@ -44,6 +44,8 @@ import com.alorma.contactnotes.ui.person.PersonLockedNoCredentialsPreview
 import com.alorma.contactnotes.ui.person.PersonLockedWaitingPreview
 import com.alorma.contactnotes.ui.settings.SettingsAppLockPreview
 import com.alorma.contactnotes.ui.settings.SettingsNoLockPreview
+import com.alorma.contactnotes.ui.watchinstall.WatchInstallFinishPreview
+import com.alorma.contactnotes.ui.watchinstall.WatchInstallProposePreview
 import com.android.tools.screenshot.PreviewTest
 
 /** Pantalla d'un mòbil de mida mitjana, en clar i en fosc, amb l'idioma fixat perquè no depengui de la màquina. */
@@ -336,5 +338,21 @@ class ScreensScreenshotTests {
   @Composable
   fun approvalConfirm() {
     ApprovalConfirmPreview()
+  }
+
+  @ScreenPreviews
+  @LocalizedScreenPreviews
+  @PreviewTest
+  @Composable
+  fun watchInstallPropose() {
+    WatchInstallProposePreview()
+  }
+
+  @ScreenPreviews
+  @LocalizedScreenPreviews
+  @PreviewTest
+  @Composable
+  fun watchInstallFinish() {
+    WatchInstallFinishPreview()
   }
 }

@@ -249,4 +249,5 @@
     <string name="install_watch_finish_title">Termina en el reloj</string>
     <string name="install_watch_finish_body">Hemos abierto Google Play en tu %1$s. Toca Instalar en el reloj para terminar.</string>
     <string name="install_watch_done">Entendido</string>
+    <string name="install_watch_fallback_name">reloj</string>
 </resources>

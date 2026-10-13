@@ -250,4 +250,5 @@
     <string name="install_watch_finish_title">Finish on your watch</string>
     <string name="install_watch_finish_body">We opened Google Play on your %1$s. Tap Install on watch to finish.</string>
     <string name="install_watch_done">Got it</string>
+    <string name="install_watch_fallback_name">watch</string>
 </resources>

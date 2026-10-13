@@ -25,6 +25,9 @@ class FakeSettingsRepository : SettingsRepository {
 
   override suspend fun setOnboardingDone(done: Boolean) = state.update { it.copy(onboardingDone = done) }
 
+  override suspend fun setWatchInstallDismissed(dismissed: Boolean) =
+    state.update { it.copy(watchInstallDismissed = dismissed) }
+
   override suspend fun setChannelsNoticePending(pending: Boolean) =
     state.update {
       it.copy(channelsNoticePending = pending)

@@ -249,4 +249,5 @@
     <string name="install_watch_finish_title">Acaba al rellotge</string>
     <string name="install_watch_finish_body">Hem obert Google Play al teu %1$s. Toca Instal·la al rellotge per acabar.</string>
     <string name="install_watch_done">Entesos</string>
+    <string name="install_watch_fallback_name">rellotge</string>
 </resources>

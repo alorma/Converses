@@ -24,9 +24,11 @@ import com.alorma.contactnotes.data.wear.ApprovalResultSender
 import com.alorma.contactnotes.data.wear.ApprovalTokens
 import com.alorma.contactnotes.data.wear.DataStoreNoteIdRegistry
 import com.alorma.contactnotes.data.wear.GmsApprovalResultSender
+import com.alorma.contactnotes.data.wear.GmsWatchInstall
 import com.alorma.contactnotes.data.wear.GmsWatchNames
 import com.alorma.contactnotes.data.wear.GmsWearLink
 import com.alorma.contactnotes.data.wear.NoteIdRegistry
+import com.alorma.contactnotes.data.wear.WatchInstall
 import com.alorma.contactnotes.data.wear.WearApprovalCoordinator
 import com.alorma.contactnotes.data.wear.WearEntriesResponder
 import com.alorma.contactnotes.data.wear.WearLink
@@ -42,6 +44,7 @@ import com.alorma.contactnotes.ui.person.PersonExporter
 import com.alorma.contactnotes.ui.person.PersonLockViewModel
 import com.alorma.contactnotes.ui.person.PersonViewModel
 import com.alorma.contactnotes.ui.settings.SettingsViewModel
+import com.alorma.contactnotes.ui.watchinstall.WatchInstallViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -92,6 +95,7 @@ val viewModelModule =
   module {
     viewModel { (archived: Boolean) -> PeopleListViewModel(archived, get(), get()) }
     viewModelOf(::SettingsViewModel)
+    viewModel { WatchInstallViewModel(get(), get()) }
     viewModel { (personId: Long) -> PersonViewModel(personId, get()) }
     viewModel { PersonLockViewModel() }
     viewModel { (requestId: String) -> ApprovalViewModel(requestId, get()) }
@@ -103,6 +107,7 @@ val viewModelModule =
 val wearModule =
   module {
     single<WearLink> { GmsWearLink(androidContext()) }
+    single<WatchInstall> { GmsWatchInstall(androidContext()) }
     single { WearEntriesResponder(repository = get()) }
     single { ApprovalTokens() }
     single<ApprovalNotifier> { AndroidApprovalNotifier(androidContext()) }

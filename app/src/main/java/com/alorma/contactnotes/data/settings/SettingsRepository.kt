@@ -21,6 +21,8 @@ data class AppSettings(
   val onboardingDone: Boolean = false,
   /** Cert només després de la migració 1 → 2 dels canals (backlog 13); els usuaris nous no hi passen mai. */
   val channelsNoticePending: Boolean = false,
+  /** «No m'ho tornis a demanar» de la proposta d'instal·lar l'app al rellotge. Preferència local, no Room. */
+  val watchInstallDismissed: Boolean = false,
 )
 
 interface SettingsRepository {
@@ -41,6 +43,8 @@ interface SettingsRepository {
   suspend fun setOnboardingDone(done: Boolean)
 
   suspend fun setChannelsNoticePending(pending: Boolean)
+
+  suspend fun setWatchInstallDismissed(dismissed: Boolean)
 }
 
 private val Context.settingsDataStore by preferencesDataStore(name = "settings")
@@ -68,6 +72,8 @@ class DataStoreSettingsRepository(
 
   override suspend fun setChannelsNoticePending(pending: Boolean) = write { it[ChannelsNoticePendingKey] = pending }
 
+  override suspend fun setWatchInstallDismissed(dismissed: Boolean) = write { it[WatchInstallDismissedKey] = dismissed }
+
   private suspend fun write(block: (androidx.datastore.preferences.core.MutablePreferences) -> Unit) {
     dataStore.edit { block(it) }
   }
@@ -83,6 +89,7 @@ class DataStoreSettingsRepository(
       relockAfterSeconds = this[RelockAfterKey] ?: defaults.relockAfterSeconds,
       onboardingDone = this[OnboardingDoneKey] ?: defaults.onboardingDone,
       channelsNoticePending = this[ChannelsNoticePendingKey] ?: defaults.channelsNoticePending,
+      watchInstallDismissed = this[WatchInstallDismissedKey] ?: defaults.watchInstallDismissed,
     )
   }
 
@@ -95,6 +102,7 @@ class DataStoreSettingsRepository(
     val RelockAfterKey = intPreferencesKey("relock_after")
     val OnboardingDoneKey = booleanPreferencesKey("onboarding_done")
     val ChannelsNoticePendingKey = booleanPreferencesKey("channels_notice_pending")
+    val WatchInstallDismissedKey = booleanPreferencesKey("watch_install_dismissed")
   }
 }
 
