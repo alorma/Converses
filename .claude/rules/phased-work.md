@@ -1,6 +1,6 @@
 # Phased work: phases → tasks → commits → validation
 
-No `paths` on purpose: this is how every piece of work is done, not only the Wear OS plan (`docs/wear/fases.md`). For work outside a numbered plan (a backlog item, a bugfix), apply the same loop at small scale: short task list, approval, validated commits, then ask for validation.
+No `paths` on purpose: this is how every piece of work is done, not only a numbered plan such as `docs/auto/fases.md`. For work outside a numbered plan (a backlog item, a bugfix), apply the same loop at small scale: short task list, approval, validated commits, then ask for validation.
 
 ## Rules
 

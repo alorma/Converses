@@ -1,6 +1,6 @@
 # Converses per a Android Auto — Pla
 
-Esborrany del 12 d'oct. de 2026 · @Bernat · **encara no hi ha disseny.** Aquest document recull l'abast, l'arquitectura, les decisions i els riscos; les fases són a `docs/auto/fases.md`. Es basa en el pla de Wear (`docs/wear/`), però **és una plataforma diferent**: Android Auto és una projecció del mòbil, no un dispositiu amb la seva pròpia còpia de les dades.
+Esborrany del 12 d'oct. de 2026 · @Bernat · **encara no hi ha disseny.** Aquest document recull l'abast, l'arquitectura, les decisions i els riscos; les fases són a `docs/auto/fases.md`. Es va inspirar en el pla de Wear (ja esborrat, és a l'historial de git), però **és una plataforma diferent**: Android Auto és una projecció del mòbil, no un dispositiu amb la seva pròpia còpia de les dades.
 
 ## Objectiu
 

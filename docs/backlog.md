@@ -81,3 +81,25 @@ Quan la v1 sigui residual a la Play Console, treure l'avís de la migració dels
 A **Editar persona**, la insígnia del llapis de `NameAvatar` se superposa a la part baixa de la forma `Ghostish`, que té un tall ondulat just allà, i l'avatar sembla tallat. A les altres formes el llapis queda a la vora i no tapa res.
 
 **Què cal fer:** mantenir la insígnia fora de la silueta (moure-la una mica cap a fora o posicionar-la segons la forma) i comprovar-ho a l'emulador amb les 6 formes. Només UI, sense Room. Detectat el 12 d'oct. de 2026 mirant els avatars del rellotge.
+
+## 18 · Wear OS: pendent després de la 1.ª versió
+
+El pla de Wear (fases 0–11) es va tancar el 13 d'oct. de 2026 i `docs/wear/` s'ha esborrat (queda a l'historial de git). Pendent:
+
+- **Beta en revisió:** la versió amb el rellotge és a `beta` esperant la revisió de Play. Quan s'aprovi, passar-la a producció.
+- **Notes de versió:** proposar els punts visibles de les fases 10 i 11 (rellotge, instal·lació creuada); no tocar els fitxers sense acord.
+- **Rellotge real** (Xiaomi Watch 2, quan s'engegui):
+  - Clau Keystore: la còpia és il·legible amb el rellotge bloquejat i la clau desapareix en treure el PIN.
+  - Biometria real a l'aprovació d'una protegida, i dictat + nota a una protegida de punta a punta.
+  - Català al reconeixedor de veu; «Sense mòbil» real; desconnexió i reconnexió amb notes a la cua.
+  - Release amb R8: dictat, entrega d'una nota i aprovació.
+  - TalkBack: la fila d'una persona protegida diu «Persona protegida» i no repeteix les inicials.
+  - Bateria i latència de la sincronització; ambient (l'app hauria de desaparèixer sense deixar contingut).
+  - Pantalla de Play al rellotge i instal·lació completa (instal·lació creuada); el botó «Obre al mòbil» es parteix en dues línies a Large Round i al Xiaomi (límit de l'`EdgeButton`).
+  - Referències de captura de la fila protegida i de `approvalConfirm` (etiqueta `update-screenshots` a la PR).
+- **Més endavant:** tile i complicació de nota ràpida (sense dissenyar), respostes predefinides o triar el canal des del rellotge, notificacions des del mòbil (sense contingut sensible) i rellotge autònom amb base de dades pròpia.
+
+**Decisions que cal recordar** (eren al pla):
+- Les protegides no es desen al rellotge: es mostren només en memòria i només amb una aprovació biomètrica al mòbil; les notes a protegides no passen per la cua.
+- La còpia local del rellotge és xifrada amb Keystore i s'esborra si es treu el bloqueig; la cua de notes s'esborra igual (les notes es perden, no es xifren).
+- El rellotge publica a la pista `wear:<track>` i `:wear` té el `versionCode` amb offset 2 (`FormFactor.WEAR`).
