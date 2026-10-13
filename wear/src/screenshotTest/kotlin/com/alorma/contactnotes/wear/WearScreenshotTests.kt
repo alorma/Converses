@@ -7,6 +7,8 @@ import com.alorma.contactnotes.wear.ui.ApprovalDeniedPreview
 import com.alorma.contactnotes.wear.ui.ApprovalExpiredPreview
 import com.alorma.contactnotes.wear.ui.ApprovalNoPhonePreview
 import com.alorma.contactnotes.wear.ui.ApprovalWaitingPreview
+import com.alorma.contactnotes.wear.ui.CompanionMissingPreview
+import com.alorma.contactnotes.wear.ui.CompanionOpenedPreview
 import com.alorma.contactnotes.wear.ui.DictateErrorPreview
 import com.alorma.contactnotes.wear.ui.DictateListeningPreview
 import com.alorma.contactnotes.wear.ui.DictatePermissionPreview
@@ -124,4 +126,14 @@ class WearScreenshotTests {
   @PreviewTest
   @Composable
   fun lockRequired() = LockRequiredPreview()
+
+  @WatchPreviews
+  @PreviewTest
+  @Composable
+  fun companionMissing() = CompanionMissingPreview()
+
+  @WatchPreviews
+  @PreviewTest
+  @Composable
+  fun companionOpened() = CompanionOpenedPreview()
 }

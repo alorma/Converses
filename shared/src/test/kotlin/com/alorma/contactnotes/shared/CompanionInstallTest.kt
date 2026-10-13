@@ -36,4 +36,9 @@ class CompanionInstallTest {
   fun playStoreUriTargetsApplicationId() {
     assertEquals("market://details?id=com.example.app", playStoreUri("com.example.app"))
   }
+
+  @Test
+  fun playStoreUriDropsTheDebugSuffix() {
+    assertEquals("market://details?id=com.example.app", playStoreUri("com.example.app.dev"))
+  }
 }

@@ -4,6 +4,7 @@ import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.provider.Settings
+import androidx.activity.compose.LocalActivity
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -30,6 +31,7 @@ import com.alorma.contactnotes.wear.data.GmsApprovalClient
 import com.alorma.contactnotes.wear.data.GmsMoreEntriesSource
 import com.alorma.contactnotes.wear.data.GmsNoteSender
 import com.alorma.contactnotes.wear.data.GmsPhoneConnection
+import com.alorma.contactnotes.wear.data.GmsPhoneInstall
 import com.alorma.contactnotes.wear.data.ProtectedSessions
 import com.alorma.contactnotes.wear.data.WearNotes
 import com.alorma.contactnotes.wear.data.WearSnapshotStore
@@ -90,6 +92,22 @@ fun WearNavigation() {
   val sessions = remember { ProtectedSessions.shared }
   // Una protegida aprovada es veu com una persona normal mentre la seva sessió és oberta, i només en memòria
   val openSnapshots = remember { store.stored.withProtectedSessions(sessions.all) }
+  val companion = viewModel { CompanionViewModel(GmsPhoneInstall(context)) }
+  val companionState by companion.state.collectAsStateWithLifecycle()
+  val activity = LocalActivity.current
+  // Sense l'app al mòbil emparellat no hi ha res a mostrar: ni la llista, ni la còpia local, ni el bloqueig
+  when (val state = companionState) {
+    CompanionUiState.Loading -> return
+    is CompanionUiState.Missing -> {
+      CompanionMissingContent(onOpenOnPhone = { companion.openOnPhone(state.node) })
+      return
+    }
+    CompanionUiState.Opened -> {
+      CompanionOpenedContent(onClose = { activity?.finish() })
+      return
+    }
+    CompanionUiState.Ready -> Unit
+  }
   val backStack = rememberNavBackStack(PeopleRoute)
   // En sortir d'una persona se n'oblida la sessió (si era protegida, les entrades marxen de la memòria)
   val pop: () -> Unit = {

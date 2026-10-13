@@ -35,5 +35,8 @@ fun companionStateOf(
   return if (node != null) CompanionState.Missing(node) else CompanionState.NoDevice
 }
 
-/** Fitxa de l'app a Google Play, per obrir-la a l'altre dispositiu. */
-fun playStoreUri(applicationId: String): String = "market://details?id=$applicationId"
+/** Sufix dels builds de debug; no existeix a Google Play. */
+private const val DEBUG_ID_SUFFIX = ".dev"
+
+/** Fitxa de l'app a Google Play, per obrir-la a l'altre dispositiu. Els builds de debug apunten a la fitxa real. */
+fun playStoreUri(applicationId: String): String = "market://details?id=${applicationId.removeSuffix(DEBUG_ID_SUFFIX)}"
