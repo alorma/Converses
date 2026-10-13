@@ -205,12 +205,12 @@ Validada per Bernat amb les proves de l'emulador i els tests. Queda pendent nom�
 
 Disseny: pantalles 17–20 (`docs/wear/screenshots/`, fonts a `docs/wear/handoff/design/`). Detalls a `README.md` (P17). Pot anar abans o en paral·lel a la fase 10; cal fer-la abans de publicar a `beta`.
 
-- [ ] Detecció (`CapabilityClient` + `NodeClient.connectedNodes`) darrere d'una interfície com `WearLink`, amb tests de JVM: sense l'altre costat però emparellat, sense emparellat, i amb l'altre costat.
-- [ ] Rellotge: pantalla 17 «Falta l'app» (substitueix la llista, sense dades) amb «Obre al mòbil» → `RemoteActivityHelper` → pantalla 18; sense mòbil emparellat, pantalla 12. Previews i captures a Large i Small Round.
-- [ ] Mòbil: full inferior (19) a l'arrencada si hi ha un Wear OS connectat sense `converses_watch`; «Instal·la al rellotge» → Play al rellotge → pantalla 20; «Ara no» (fins a la propera arrencada); «No m'ho tornis a demanar» (booleà a DataStore, sense Room ni migració). Captures de referència a `:app`.
-- [ ] Textos nous en en/ca/es (llista al brief, «Instal·lació creuada»), reutilitzant els existents.
-- [ ] Privacitat: el full no ha de portar res de dades; només el nom del dispositiu (`Node.displayName`).
-- [ ] **Emulador** (parell telèfon + Wear): comprovar la detecció amb l'app només a un costat. **Pendent amb rellotge real:** l'obertura remota de Play i la llegibilitat de `{model}`.
+- [x] Detecció (`CapabilityClient` + `NodeClient.connectedNodes`) darrere d'una interfície com `WearLink`, amb tests de JVM: sense l'altre costat però emparellat, sense emparellat, i amb l'altre costat. — `0d20f08`. Detecció compartida a `:shared` (`companionStateOf`, 6 tests); una capacitat que no es propaga (emuladors) surt com a «falta l'app».
+- [x] Rellotge: pantalla 17 «Falta l'app» (substitueix la llista, sense dades) amb «Obre al mòbil» → `RemoteActivityHelper` → pantalla 18; sense mòbil emparellat, pantalla 12. Previews i captures a Large i Small Round. — `f725a7a`. Va abans del bloqueig i de la llista. «Tanca» a la 18 tanca l'app; si Play no s'obre es queda a la 17; sense mòbil emparellat no hi ha pantalla nova (es manté el comportament d'abans, amb la còpia local o «sense dades»). 5 tests. El botó «Obre al mòbil» es parteix en dues línies a Large Round i al Xiaomi (límit de l'`EdgeButton`); el disseny el té en una.
+- [x] Mòbil: full inferior (19) a l'arrencada si hi ha un Wear OS connectat sense `converses_watch`; «Instal·la al rellotge» → Play al rellotge → pantalla 20; «Ara no» (fins a la propera arrencada); «No m'ho tornis a demanar» (booleà a DataStore, sense Room ni migració). Captures de referència a `:app`. — `a474c7f`. S'amaga sobre l'onboarding i el bloqueig; 8 tests.
+- [x] Textos nous en en/ca/es (llista al brief, «Instal·lació creuada»), reutilitzant els existents. — `ad50318`, `a474c7f`.
+- [x] Privacitat: el full no ha de portar res de dades; només el nom del dispositiu (`Node.displayName`). Comprovat: el full només porta el nom del dispositiu.
+- [x] **Emulador** (telèfon + Wear XL Round) i **rellotge real** (Pixel 8a + Xiaomi Watch 2): la 17 → 18 al rellotge obre la fitxa de Converses a Play del Pixel; al mòbil, el full 19 → 20 surt amb «Xiaomi Watch 2» i `RemoteActivityHelper` obre Play. Els builds de debug apunten a la fitxa real (`playStoreUri` treu el `.dev`). **No vist:** la pantalla de Play al rellotge real (`adb` s'ha desconnectat) i la instal·lació completa.
 - [ ] Notes de versió: proposar el punt (visible per a l'usuari); no es toquen sense acord.
 
 **Sortida:** amb l'app només a un dels dos dispositius, l'altre proposa instal·lar-la i obre Play.

@@ -185,7 +185,7 @@ La documentació oficial no confirma el català (ca-ES) al reconeixedor del rell
 | P12 | ~~Pantalles no dissenyades de protegides~~ | **Resolt:** disseny rebut el 12 d'oct. de 2026 (pantalles 7, 10–12 al rellotge i 13–16 al mòbil) |
 | P13 | **Mòbil inaccessible a «més entrades»:** la llista s'acaba sense error (suposició del brief, la frase original es va tallar) | Confirmar |
 | P16 | **Indicador de càrrega** de «més entrades» (no dissenyat) | Coherent amb Wear M3 |
-| P17 | **Instal·lació creuada:** `Node.displayName` com a `{model}` (és prou llegible?); l'obertura remota de Play depèn del dispositiu; no dissenyat: instal·lació que no s'acaba (només es torna a proposar a la propera arrencada) | Provar amb rellotge real; fase 11 |
+| P17 | ~~Instal·lació creuada~~ | **Resolt (fase 11):** `Node.displayName` és llegible al Xiaomi Watch 2; `RemoteActivityHelper` obre Play a l'altre dispositiu. Sense dissenyar: instal·lació que no s'acaba (es torna a proposar a la propera arrencada). A l'emulador el nom és «Wear_OS_XL_Round» |
 
 ## Riscos
 
