@@ -144,4 +144,16 @@ class DictationViewModelTest {
     speech.channel.trySend(SpeechEvent.Final("Ara sí"))
     assertEquals(DictationUiState.Done("Ara sí"), vm.state.value)
   }
+
+  @Test
+  fun `retry after a finished dictation drops the text and listens again`() {
+    val vm = viewModel()
+    vm.start()
+    speech.channel.trySend(SpeechEvent.Final("Text dolent"))
+    assertEquals(DictationUiState.Done("Text dolent"), vm.state.value)
+    speech.channel = Channel(Channel.UNLIMITED)
+    vm.retry()
+    assertEquals(2, speech.listens)
+    assertEquals(DictationUiState.Listening(), vm.state.value)
+  }
 }

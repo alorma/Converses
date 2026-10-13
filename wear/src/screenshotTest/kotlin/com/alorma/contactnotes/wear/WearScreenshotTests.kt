@@ -9,6 +9,7 @@ import com.alorma.contactnotes.wear.ui.ApprovalNoPhonePreview
 import com.alorma.contactnotes.wear.ui.ApprovalWaitingPreview
 import com.alorma.contactnotes.wear.ui.CompanionMissingPreview
 import com.alorma.contactnotes.wear.ui.CompanionOpenedPreview
+import com.alorma.contactnotes.wear.ui.DictateDonePreview
 import com.alorma.contactnotes.wear.ui.DictateErrorPreview
 import com.alorma.contactnotes.wear.ui.DictateListeningPreview
 import com.alorma.contactnotes.wear.ui.DictatePermissionPreview
@@ -72,6 +73,11 @@ class WearScreenshotTests {
   @PreviewTest
   @Composable
   fun dictateListening() = DictateListeningPreview()
+
+  @WatchPreviews
+  @PreviewTest
+  @Composable
+  fun dictateDone() = DictateDonePreview()
 
   @WatchPreviews
   @PreviewTest

@@ -18,12 +18,14 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material.icons.rounded.Mic
 import androidx.compose.material.icons.rounded.MicOff
+import androidx.compose.material.icons.rounded.Refresh
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -45,6 +47,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.wear.compose.material3.FilledTonalIconButton
 import androidx.wear.compose.material3.Icon
 import androidx.wear.compose.material3.ScreenScaffold
 import androidx.wear.compose.material3.Text
@@ -126,6 +129,7 @@ fun DictateScreen(
         text = current.text,
         level = null,
         onFinish = { onDone(current.text) },
+        onRestart = viewModel::retry,
         modifier = modifier,
       )
     current is DictationUiState.Listening ->
@@ -139,7 +143,11 @@ fun DictateScreen(
   }
 }
 
-/** Pantalla 3: la transcripció, les ones i «Acaba». Sense [level] les ones es queden quietes. */
+/**
+ * Pantalla 3: la transcripció, les ones i «Acaba». Sense [level] les ones es queden quietes. Amb [onRestart] (dictat
+ * acabat) les ones se substitueixen per un botó «Torna-ho a dir» (només la icona), que descarta el text i torna
+ * a escoltar.
+ */
 @Composable
 fun DictateContent(
   personName: String,
@@ -147,6 +155,7 @@ fun DictateContent(
   onFinish: () -> Unit,
   modifier: Modifier = Modifier,
   level: Float? = null,
+  onRestart: (() -> Unit)? = null,
 ) {
   ScreenScaffold(modifier = modifier) {
     Column(
@@ -161,7 +170,16 @@ fun DictateContent(
       )
       Text(text = text, style = DictationTextStyle, color = WearColors.OnSurface, textAlign = TextAlign.Center)
     }
-    VoiceWaves(level = level, modifier = Modifier.align(Alignment.Center).padding(top = 56.dp))
+    if (onRestart == null) {
+      VoiceWaves(level = level, modifier = Modifier.align(Alignment.Center).padding(top = 56.dp))
+    } else {
+      FilledTonalIconButton(
+        onClick = onRestart,
+        modifier = Modifier.align(Alignment.Center).padding(top = 72.dp).size(40.dp),
+      ) {
+        Icon(Icons.Rounded.Refresh, contentDescription = stringResource(R.string.dictate_restart))
+      }
+    }
     PinnedEdgeButton(onClick = onFinish) {
       Icon(Icons.Rounded.Check, contentDescription = null, modifier = Modifier.padding(end = 6.dp))
       Text(text = stringResource(R.string.dictate_finish), style = ButtonLabelStyle)
@@ -258,6 +276,18 @@ private fun Context.hasMicrophonePermission() =
 fun DictatePreview() =
   WearPreview {
     DictateContent(personName = "Kael", text = "Li va agradar el llibre que li vaig deixar.", onFinish = {})
+  }
+
+@WearScreenPreviews
+@Composable
+fun DictateDonePreview() =
+  WearPreview {
+    DictateContent(
+      personName = "Kael",
+      text = "Li va agradar el llibre que li vaig deixar.",
+      onFinish = {},
+      onRestart = {},
+    )
   }
 
 @WearScreenPreviews

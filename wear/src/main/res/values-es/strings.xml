@@ -17,6 +17,7 @@
     <string name="note_button">Nota</string>
     <string name="loading_more_entries">Cargando más entradas</string>
     <string name="dictate_finish">Terminar</string>
+    <string name="dictate_restart">Dilo de nuevo</string>
     <string name="who_title">¿Quién lo ha dicho?</string>
     <string name="note_for">Nota para %1$s</string>
     <string name="saved_title">Guardado</string>

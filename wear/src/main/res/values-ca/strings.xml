@@ -17,6 +17,7 @@
     <string name="note_button">Nota</string>
     <string name="loading_more_entries">Carregant més entrades</string>
     <string name="dictate_finish">Acaba</string>
+    <string name="dictate_restart">Torna-ho a dir</string>
     <string name="who_title">Qui ho ha dit?</string>
     <string name="note_for">Nota per a %1$s</string>
     <string name="saved_title">Desat</string>

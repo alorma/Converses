@@ -17,6 +17,7 @@
     <string name="note_button">Note</string>
     <string name="loading_more_entries">Loading more entries</string>
     <string name="dictate_finish">Done</string>
+    <string name="dictate_restart">Say it again</string>
     <string name="who_title">Who said it?</string>
     <string name="note_for">Note for %1$s</string>
     <string name="saved_title">Saved</string>
