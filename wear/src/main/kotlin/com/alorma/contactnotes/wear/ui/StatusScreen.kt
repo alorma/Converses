@@ -30,9 +30,12 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.wear.compose.material3.CircularProgressIndicator
 import androidx.wear.compose.material3.Icon
 import androidx.wear.compose.material3.ScreenScaffold
 import androidx.wear.compose.material3.Text
@@ -45,6 +48,24 @@ import com.alorma.contactnotes.wear.theme.SavedTitleStyle
 import com.alorma.contactnotes.wear.theme.WearColors
 import com.alorma.contactnotes.wear.theme.WhoTitleStyle
 import com.alorma.contactnotes.wear.theme.color
+
+/** Mentre s'arrenca i es llegeix la còpia local: un indicador al centre, perquè la primera pantalla no quedi en blanc. */
+@Composable
+fun LoadingContent(modifier: Modifier = Modifier) {
+  val description = stringResource(R.string.loading)
+  ScreenScaffold(modifier = modifier) {
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+      CircularProgressIndicator(
+        modifier = Modifier.size(32.dp).semantics { contentDescription = description },
+        strokeWidth = 4.dp,
+      )
+    }
+  }
+}
+
+@WearScreenPreviews
+@Composable
+fun LoadingPreview() = WearPreview { LoadingContent() }
 
 /** Pantalla centrada: icona sobre una Galeta, títol, text i, opcionalment, un `EdgeButton`. Serveix per a Desat, Protegida i Bloqueig. */
 @Composable

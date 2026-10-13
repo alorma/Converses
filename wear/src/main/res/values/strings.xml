@@ -15,6 +15,7 @@
 
     <!-- Nous del rellotge -->
     <string name="note_button">Note</string>
+    <string name="loading">Loading</string>
     <string name="loading_more_entries">Loading more entries</string>
     <string name="dictate_finish">Done</string>
     <string name="dictate_restart">Say it again</string>

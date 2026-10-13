@@ -224,7 +224,7 @@ fun PeopleScreen(
   onPersonClick: (PersonItem) -> Unit,
 ) {
   when (val state = viewModel.state.collectAsStateWithLifecycle().value) {
-    PeopleUiState.Loading -> Unit
+    PeopleUiState.Loading -> LoadingContent()
     PeopleUiState.NoData -> NoDataContent()
     PeopleUiState.NoPeople -> NoPeopleContent()
     is PeopleUiState.Loaded ->

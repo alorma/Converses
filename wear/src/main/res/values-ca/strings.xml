@@ -15,6 +15,7 @@
 
     <!-- Nous del rellotge -->
     <string name="note_button">Nota</string>
+    <string name="loading">Carregant</string>
     <string name="loading_more_entries">Carregant més entrades</string>
     <string name="dictate_finish">Acaba</string>
     <string name="dictate_restart">Torna-ho a dir</string>

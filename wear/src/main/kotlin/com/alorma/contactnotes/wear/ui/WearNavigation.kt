@@ -97,7 +97,10 @@ fun WearNavigation() {
   val activity = LocalActivity.current
   // Sense l'app al mòbil emparellat no hi ha res a mostrar: ni la llista, ni la còpia local, ni el bloqueig
   when (val state = companionState) {
-    CompanionUiState.Loading -> return
+    CompanionUiState.Loading -> {
+      LoadingContent()
+      return
+    }
     is CompanionUiState.Missing -> {
       CompanionMissingContent(onOpenOnPhone = { companion.openOnPhone(state.node) })
       return
@@ -122,7 +125,10 @@ fun WearNavigation() {
 
   // Mentre no se sap, no es mostra res; amb «Cal un bloqueig» no es compon cap altra pantalla
   when (lockRequired) {
-    null -> return
+    null -> {
+      LoadingContent()
+      return
+    }
     true -> {
       LockRequiredContent(onSetUp = { openSecuritySettings(context) })
       return

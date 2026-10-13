@@ -14,6 +14,7 @@ import com.alorma.contactnotes.wear.ui.DictateErrorPreview
 import com.alorma.contactnotes.wear.ui.DictateListeningPreview
 import com.alorma.contactnotes.wear.ui.DictatePermissionPreview
 import com.alorma.contactnotes.wear.ui.DictatePreview
+import com.alorma.contactnotes.wear.ui.LoadingPreview
 import com.alorma.contactnotes.wear.ui.LockRequiredPreview
 import com.alorma.contactnotes.wear.ui.NoDataPreview
 import com.alorma.contactnotes.wear.ui.NoPeoplePreview
@@ -53,6 +54,11 @@ class WearScreenshotTests {
   @PreviewTest
   @Composable
   fun timelineEmpty() = TimelineEmptyPreview()
+
+  @WatchPreviews
+  @PreviewTest
+  @Composable
+  fun loading() = LoadingPreview()
 
   @WatchPreviews
   @PreviewTest
