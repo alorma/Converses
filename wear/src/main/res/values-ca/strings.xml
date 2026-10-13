@@ -40,6 +40,11 @@
     <string name="approval_expired_title">Ha caducat</string>
     <string name="approval_expired_hint">No s\'ha confirmat a temps.</string>
     <string name="approval_retry">Reintenta</string>
+    <string name="companion_missing_title">Falta l\'app</string>
+    <string name="companion_missing_hint">Instal·la Converses al mòbil.</string>
+    <string name="companion_open_on_phone">Obre al mòbil</string>
+    <string name="companion_opened_title">Mira el mòbil</string>
+    <string name="companion_opened_hint">Hem obert Google Play.</string>
     <string name="approval_nophone_title">No disponible sense el mòbil</string>
     <string name="approval_nophone_hint">El rellotge no troba el mòbil.</string>
     <string name="lock_required_title">Cal un bloqueig</string>

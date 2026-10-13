@@ -40,6 +40,11 @@
     <string name="approval_expired_title">Expired</string>
     <string name="approval_expired_hint">It wasn\'t confirmed in time.</string>
     <string name="approval_retry">Try again</string>
+    <string name="companion_missing_title">App missing</string>
+    <string name="companion_missing_hint">Install Converses on your phone.</string>
+    <string name="companion_open_on_phone">Open on phone</string>
+    <string name="companion_opened_title">Check your phone</string>
+    <string name="companion_opened_hint">We opened Google Play.</string>
     <string name="approval_nophone_title">Not available without the phone</string>
     <string name="approval_nophone_hint">The watch can\'t find your phone.</string>
     <string name="lock_required_title">Lock required</string>

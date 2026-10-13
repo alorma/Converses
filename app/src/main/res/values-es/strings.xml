@@ -239,4 +239,14 @@
     <string name="approval_prompt_title">%1$s quiere desbloquear a %2$s</string>
     <string name="approval_watch_fallback">Tu reloj</string>
     <string name="approval_failed">No se pudo completar la petición</string>
+
+    <!-- Proposta d'instal·lar l'app al rellotge emparellat -->
+    <string name="install_watch_title">Instala Converses en el reloj</string>
+    <string name="install_watch_body">Hemos detectado tu %1$s. Verás tus personas y podrás apuntar notas con la voz.</string>
+    <string name="install_watch_action">Instalar en el reloj</string>
+    <string name="install_watch_not_now">Ahora no</string>
+    <string name="install_watch_never">No volver a preguntar</string>
+    <string name="install_watch_finish_title">Termina en el reloj</string>
+    <string name="install_watch_finish_body">Hemos abierto Google Play en tu %1$s. Toca Instalar en el reloj para terminar.</string>
+    <string name="install_watch_done">Entendido</string>
 </resources>

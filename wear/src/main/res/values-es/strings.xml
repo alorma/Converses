@@ -40,6 +40,11 @@
     <string name="approval_expired_title">Ha caducado</string>
     <string name="approval_expired_hint">No se confirmó a tiempo.</string>
     <string name="approval_retry">Reintentar</string>
+    <string name="companion_missing_title">Falta la app</string>
+    <string name="companion_missing_hint">Instala Converses en el móvil.</string>
+    <string name="companion_open_on_phone">Abrir en el móvil</string>
+    <string name="companion_opened_title">Mira el móvil</string>
+    <string name="companion_opened_hint">Hemos abierto Google Play.</string>
     <string name="approval_nophone_title">No disponible sin el móvil</string>
     <string name="approval_nophone_hint">El reloj no encuentra el móvil.</string>
     <string name="lock_required_title">Hace falta un bloqueo</string>

@@ -240,4 +240,14 @@
     <string name="approval_prompt_title">%1$s wants to unlock %2$s</string>
     <string name="approval_watch_fallback">Your watch</string>
     <string name="approval_failed">Couldn\'t complete the request</string>
+
+    <!-- Proposta d'instal·lar l'app al rellotge emparellat -->
+    <string name="install_watch_title">Install Converses on your watch</string>
+    <string name="install_watch_body">We found your %1$s. You\'ll see your people there and be able to jot down notes with your voice.</string>
+    <string name="install_watch_action">Install on watch</string>
+    <string name="install_watch_not_now">Not now</string>
+    <string name="install_watch_never">Don\'t ask me again</string>
+    <string name="install_watch_finish_title">Finish on your watch</string>
+    <string name="install_watch_finish_body">We opened Google Play on your %1$s. Tap Install on watch to finish.</string>
+    <string name="install_watch_done">Got it</string>
 </resources>

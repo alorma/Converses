@@ -239,4 +239,14 @@
     <string name="approval_prompt_title">%1$s vol desbloquejar %2$s</string>
     <string name="approval_watch_fallback">El rellotge</string>
     <string name="approval_failed">No s\'ha pogut completar la petició</string>
+
+    <!-- Proposta d'instal·lar l'app al rellotge emparellat -->
+    <string name="install_watch_title">Instal·la Converses al rellotge</string>
+    <string name="install_watch_body">Hem detectat el teu %1$s. Hi veuràs les teves persones i podràs apuntar notes amb la veu.</string>
+    <string name="install_watch_action">Instal·la al rellotge</string>
+    <string name="install_watch_not_now">Ara no</string>
+    <string name="install_watch_never">No m\'ho tornis a demanar</string>
+    <string name="install_watch_finish_title">Acaba al rellotge</string>
+    <string name="install_watch_finish_body">Hem obert Google Play al teu %1$s. Toca Instal·la al rellotge per acabar.</string>
+    <string name="install_watch_done">Entesos</string>
 </resources>
