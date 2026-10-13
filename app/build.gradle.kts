@@ -117,6 +117,8 @@ dependencies {
   implementation(libs.kotlinx.coroutines.android)
   implementation(libs.kotlinx.coroutines.play.services)
   implementation(libs.play.services.wearable)
+  implementation(libs.wear.remote.interactions)
+  implementation(libs.kotlinx.coroutines.guava)
   implementation(libs.androidx.lifecycle.runtime.compose)
   implementation(libs.androidx.lifecycle.viewmodel.compose)
   debugImplementation(libs.androidx.compose.ui.tooling)

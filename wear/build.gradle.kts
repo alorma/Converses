@@ -106,6 +106,8 @@ dependencies {
   implementation(libs.work.runtime)
   implementation(libs.kotlinx.coroutines.android)
   implementation(libs.play.services.wearable)
+  implementation(libs.wear.remote.interactions)
+  implementation(libs.kotlinx.coroutines.guava)
   implementation(libs.androidx.fragment)
   implementation(libs.kotlinx.coroutines.play.services)
   debugImplementation(libs.wear.compose.ui.tooling)
