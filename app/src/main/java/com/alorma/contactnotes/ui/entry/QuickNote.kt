@@ -89,6 +89,8 @@ data class QuickNoteUiState(
   /** Persona protegida triada que encara no s'ha autenticat; no es tria fins que es desbloqueja. */
   val pending: PersonEntity? = null,
   val lastChannel: ChannelType? = null,
+  /** `false` only before the first emission of [people]; an empty list is not «no people» until then. */
+  val loaded: Boolean = true,
 )
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -129,7 +131,7 @@ class QuickNoteViewModel(
           QuickNoteUiState(people = people, selected = selected, pending = pending, lastChannel = last)
         }
       }
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), QuickNoteUiState())
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), QuickNoteUiState(loaded = false))
 
   /** Una protegida queda pendent d'autenticar; la resta es tria a l'acte. */
   fun select(person: PersonEntity) {
@@ -285,8 +287,15 @@ fun QuickNoteContent(
   // El xip «Persona» obre el mateix selector; en triar-ne una, el xip queda seleccionat
   var pickedFromChip by rememberSaveable { mutableStateOf(false) }
 
-  // Sense persones el selector estaria buit: es passa directe a crear-ne una
-  val openPicker = { if (state.people.isEmpty()) onNewPerson() else showSheet = true }
+  // Sense persones el selector estaria buit: es passa directe a crear-ne una (però no mentre encara es carreguen)
+  val noPeople = state.loaded && state.people.isEmpty()
+  val openPicker = {
+    if (noPeople) {
+      onNewPerson()
+    } else if (state.loaded) {
+      showSheet = true
+    }
+  }
 
   // Quan la persona arriba (triada, creada o desbloquejada) després d'haver tocat el xip, el xip es marca
   LaunchedEffect(selected?.id) {
@@ -351,7 +360,7 @@ fun QuickNoteContent(
           header = {
             PersonPicker(
               selected = selected,
-              noPeople = state.people.isEmpty(),
+              noPeople = noPeople,
               onClick = {
                 pickedFromChip = false
                 openPicker()
