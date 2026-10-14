@@ -1,5 +1,6 @@
 package com.alorma.contactnotes.ui
 
+import androidx.activity.compose.LocalActivity
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.ContentTransform
 import androidx.compose.animation.EnterTransition
@@ -17,67 +18,44 @@ import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.unit.IntOffset
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
-import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
-import com.alorma.contactnotes.ui.edit.EditFocus
+import com.alorma.contactnotes.data.db.PersonEntity
 import com.alorma.contactnotes.ui.edit.EditPersonScreen
 import com.alorma.contactnotes.ui.entry.PersonSelectionBridge
 import com.alorma.contactnotes.ui.entry.QuickNoteScreen
+import com.alorma.contactnotes.ui.navigation.AppRoute
+import com.alorma.contactnotes.ui.navigation.ArchivedRoute
+import com.alorma.contactnotes.ui.navigation.EditPersonRoute
+import com.alorma.contactnotes.ui.navigation.OnboardingRoute
+import com.alorma.contactnotes.ui.navigation.PeopleRoute
+import com.alorma.contactnotes.ui.navigation.PersonLockedRoute
+import com.alorma.contactnotes.ui.navigation.PersonRoute
+import com.alorma.contactnotes.ui.navigation.QuickNoteRoute
+import com.alorma.contactnotes.ui.navigation.SettingsRoute
+import com.alorma.contactnotes.ui.navigation.TopLevelBackStack
 import com.alorma.contactnotes.ui.onboarding.OnboardingScreen
 import com.alorma.contactnotes.ui.people.PeopleListRoute
 import com.alorma.contactnotes.ui.person.PersonDetailRoute
 import com.alorma.contactnotes.ui.person.PersonLockedScreen
 import com.alorma.contactnotes.ui.settings.SettingsScreen
-import kotlinx.serialization.Serializable
 import org.koin.compose.koinInject
-
-@Serializable
-data object OnboardingRoute : NavKey
-
-@Serializable
-data object PeopleRoute : NavKey
-
-@Serializable
-data object ArchivedRoute : NavKey
-
-@Serializable
-data object SettingsRoute : NavKey
-
-@Serializable
-data class EditPersonRoute(
-  val personId: Long = 0L,
-  val returnSelection: Boolean = false,
-  val focus: EditFocus? = null,
-) : NavKey
-
-@Serializable
-data class QuickNoteRoute(
-  val personId: Long = 0L,
-) : NavKey
-
-@Serializable
-data class PersonRoute(
-  val id: Long,
-) : NavKey
-
-@Serializable
-data class PersonLockedRoute(
-  val id: Long,
-) : NavKey
 
 @Composable
 fun AppNavigation(startOnboarding: Boolean = false) {
   val backStack = rememberNavBackStack(if (startOnboarding) OnboardingRoute else PeopleRoute)
+  val navigation = remember(backStack) { TopLevelBackStack(backStack) }
+  val activity = LocalActivity.current
   val selectionBridge: PersonSelectionBridge = koinInject()
 
   NavDisplay(
-    backStack = backStack,
-    onBack = { backStack.removeLastOrNull() },
+    backStack = navigation.backStack,
+    onBack = { if (!navigation.pop()) activity?.finish() },
     transitionSpec = { nativeTransition(forward = true, vertical = false) },
     popTransitionSpec = { nativeTransition(forward = false, vertical = false) },
     predictivePopTransitionSpec = { edge -> predictiveBack(edge, vertical = false) },
@@ -89,86 +67,80 @@ fun AppNavigation(startOnboarding: Boolean = false) {
     entryProvider =
       entryProvider {
         entry<OnboardingRoute> {
-          OnboardingScreen(
-            onFinished = {
-              backStack.clear()
-              backStack.add(PeopleRoute)
-            },
-          )
+          OnboardingScreen(onFinished = { navigation.resetTo(PeopleRoute) })
         }
         entry<PeopleRoute> {
           PeopleListRoute(
             archived = false,
-            onToggleArchivedList = { backStack.add(ArchivedRoute) },
-            onPersonClick = { person ->
-              backStack.add(if (person.isProtected) PersonLockedRoute(person.id) else PersonRoute(person.id))
-            },
-            onQuickNote = { backStack.add(QuickNoteRoute()) },
-            onNewPerson = { backStack.add(EditPersonRoute()) },
-            onOpenSettings = { backStack.add(SettingsRoute) },
+            onToggleArchivedList = { navigation.switchTab(ArchivedRoute) },
+            onPersonClick = { person -> navigation.navigate(personRoute(person)) },
+            onQuickNote = { navigation.navigate(QuickNoteRoute()) },
+            onNewPerson = { navigation.navigate(EditPersonRoute()) },
+            onOpenSettings = { navigation.navigate(SettingsRoute) },
           )
         }
         entry<ArchivedRoute> {
           PeopleListRoute(
             archived = true,
-            onToggleArchivedList = { backStack.removeLastOrNull() },
-            onPersonClick = { person ->
-              backStack.add(if (person.isProtected) PersonLockedRoute(person.id) else PersonRoute(person.id))
-            },
-            onQuickNote = { backStack.add(QuickNoteRoute()) },
-            onNewPerson = { backStack.add(EditPersonRoute()) },
-            onOpenSettings = { backStack.add(SettingsRoute) },
+            onToggleArchivedList = { navigation.switchTab(PeopleRoute) },
+            onPersonClick = { person -> navigation.navigate(personRoute(person)) },
+            onQuickNote = { navigation.navigate(QuickNoteRoute()) },
+            onNewPerson = { navigation.navigate(EditPersonRoute()) },
+            onOpenSettings = { navigation.navigate(SettingsRoute) },
           )
         }
         entry<QuickNoteRoute>(metadata = modalTransitions) { route ->
           QuickNoteScreen(
             personId = route.personId,
-            onClose = { backStack.removeLastOrNull() },
-            onNewPerson = { backStack.add(EditPersonRoute(returnSelection = true)) },
+            onClose = { navigation.pop() },
+            onNewPerson = { navigation.navigate(EditPersonRoute(returnSelection = true)) },
           )
         }
         entry<SettingsRoute> {
-          SettingsScreen(onBack = { backStack.removeLastOrNull() })
+          SettingsScreen(onBack = { navigation.pop() })
         }
         entry<PersonLockedRoute> { route ->
           PersonLockedScreen(
             personId = route.id,
-            onBack = { backStack.removeLastOrNull() },
+            onBack = { navigation.pop() },
             onUnlocked = {
-              backStack.removeLastOrNull()
-              backStack.add(PersonRoute(route.id))
+              navigation.pop()
+              navigation.navigate(PersonRoute(route.id))
             },
           )
         }
         entry<PersonRoute> { route ->
           PersonDetailRoute(
             personId = route.id,
-            onBack = { backStack.removeLastOrNull() },
-            onEdit = { focus -> backStack.add(EditPersonRoute(route.id, focus = focus)) },
+            onBack = { navigation.pop() },
+            onEdit = { focus -> navigation.navigate(EditPersonRoute(route.id, focus = focus)) },
           )
         }
         entry<EditPersonRoute>(metadata = modalTransitions) { route ->
           EditPersonScreen(
             personId = route.personId,
             focus = route.focus,
-            onClose = { backStack.removeLastOrNull() },
+            onClose = { navigation.pop() },
             onSaved = { id ->
-              backStack.removeLastOrNull()
+              navigation.pop()
               if (route.returnSelection) {
                 selectionBridge.post(id, authenticated = true)
               } else if (route.personId == 0L) {
-                backStack.add(PersonRoute(id))
+                navigation.navigate(PersonRoute(id))
               }
             },
             onDeleted = {
-              backStack.removeLastOrNull()
-              backStack.removeLastOrNull()
+              navigation.pop()
+              navigation.pop()
             },
           )
         }
       },
   )
 }
+
+private fun personRoute(person: PersonEntity): AppRoute =
+  if (person.isProtected) PersonLockedRoute(person.id) else PersonRoute(person.id)
 
 private const val TransitionMs = 300
 private const val FadeMs = 150
