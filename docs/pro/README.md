@@ -18,6 +18,7 @@ Mai es cobra per **accedir, protegir o treure** les dades pròpies. Al Pro hi va
 - Persones, entrades, cronologia, «Qui» i «Quan».
 - Persones protegides i bloqueig de l'app.
 - Exportar notes.
+- Importar text a la nota ràpida: compartir, seleccionar text i enganxar.
 - Els 5 grups de canals: En persona, Telèfon, Xat, Social i Altres.
 
 ## Pro (fora de la v1 gratuïta)

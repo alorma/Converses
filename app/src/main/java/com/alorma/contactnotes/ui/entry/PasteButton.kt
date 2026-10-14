@@ -38,7 +38,9 @@ fun rememberClipboardHasText(): State<Boolean> {
   val lifecycleOwner = LocalLifecycleOwner.current
   val state = remember { mutableStateOf(false) }
   DisposableEffect(lifecycleOwner) {
-    val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+    // Sense servei de porta-retalls (previews i tests de screenshots) simplement no hi ha botó
+    val clipboard = context.getSystemService(ClipboardManager::class.java)
+    if (clipboard == null) return@DisposableEffect onDispose {}
     val refresh = { state.value = clipboard.hasText() }
     val listener = ClipboardManager.OnPrimaryClipChangedListener { refresh() }
     val observer = LifecycleEventObserver { _, event -> if (event == Lifecycle.Event.ON_RESUME) refresh() }
