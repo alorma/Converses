@@ -357,7 +357,7 @@ fun QuickNoteContent(
             pickedFromChip = true
             openPicker()
           },
-          belowText = { PasteButton(onPasted = { form.text = pasteInto(form.text, it) }) },
+          textFooter = { PasteButton(onPasted = { form.text = pasteInto(form.text, it) }) },
           header = {
             PersonPicker(
               selected = selected,

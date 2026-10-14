@@ -6,11 +6,12 @@ import android.content.Context
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.ContentPaste
-import androidx.compose.material3.AssistChip
+import androidx.compose.material.icons.outlined.ContentPaste
 import androidx.compose.material3.Icon
-import androidx.compose.material3.Text
+import androidx.compose.material3.OutlinedIconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.State
@@ -20,6 +21,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
@@ -73,7 +75,11 @@ fun pasteInto(
   pasted: String,
 ): String = if (current.isBlank()) pasted else current.trimEnd() + "\n\n" + pasted
 
-/** «Paste» chip under the text field; only shown when the clipboard has text. */
+/**
+ * Round outlined icon-only paste button at the bottom end of the text field (its [EntryTextField] footer); only
+ * shown when the clipboard has text. The icon carries the description TalkBack reads, and `OutlinedIconButton`
+ * keeps the button role and the 48dp minimum touch target.
+ */
 @Composable
 fun PasteButton(
   onPasted: (String) -> Unit,
@@ -82,11 +88,13 @@ fun PasteButton(
   val hasText by rememberClipboardHasText()
   if (!hasText) return
   val context = LocalContext.current
-  Row(modifier = modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
-    AssistChip(
-      onClick = { readClipboardText(context)?.let(onPasted) },
-      label = { Text(stringResource(R.string.paste)) },
-      leadingIcon = { Icon(Icons.Rounded.ContentPaste, contentDescription = null) },
-    )
+  Row(modifier = modifier.fillMaxWidth().padding(end = 8.dp, bottom = 4.dp), horizontalArrangement = Arrangement.End) {
+    OutlinedIconButton(onClick = { readClipboardText(context)?.let(onPasted) }) {
+      Icon(
+        Icons.Outlined.ContentPaste,
+        contentDescription = stringResource(R.string.paste),
+        modifier = Modifier.size(18.dp),
+      )
+    }
   }
 }

@@ -18,6 +18,7 @@ import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -119,7 +120,7 @@ fun EntryForm(
   focusText: Boolean = false,
   onPickPerson: (() -> Unit)? = null,
   header: @Composable () -> Unit = {},
-  belowText: @Composable () -> Unit = {},
+  textFooter: @Composable () -> Unit = {},
   saveButton: @Composable () -> Unit = {},
 ) {
   Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(14.dp)) {
@@ -131,8 +132,8 @@ fun EntryForm(
       state,
       placeholder = entryHint(state.kind, person?.name?.let(::firstName).orEmpty()),
       requestFocus = focusText,
+      footer = textFooter,
     )
-    belowText()
     FormSection(title = stringResource(R.string.entry_where_title)) {
       ChannelChips(selected = channel, onSelected = onChannelChange)
     }
@@ -223,27 +224,37 @@ fun EntryTextField(
   placeholder: String,
   modifier: Modifier = Modifier,
   requestFocus: Boolean = false,
+  /** Va dins del contenidor del camp, sota el text (p. ex. el xip «Enganxa»). */
+  footer: @Composable () -> Unit = {},
 ) {
-  val container = MaterialTheme.colorScheme.surfaceContainerHigh
   val focusRequester = remember { FocusRequester() }
   if (requestFocus) LaunchedEffect(Unit) { focusRequester.requestFocus() }
-  TextField(
-    value = state.text,
-    onValueChange = { state.text = it },
-    modifier = modifier.fillMaxWidth().heightIn(min = 120.dp).focusRequester(focusRequester),
-    textStyle = MaterialTheme.typography.bodyLarge.copy(fontSize = 17.sp),
-    placeholder = { Text(placeholder, fontSize = 17.sp) },
+  Surface(
+    modifier = modifier.fillMaxWidth(),
     shape = RoundedCornerShape(24.dp),
-    colors =
-      TextFieldDefaults.colors(
-        focusedContainerColor = container,
-        unfocusedContainerColor = container,
-        focusedIndicatorColor = Color.Transparent,
-        unfocusedIndicatorColor = Color.Transparent,
-        disabledIndicatorColor = Color.Transparent,
-        errorIndicatorColor = Color.Transparent,
-      ),
-  )
+    color = MaterialTheme.colorScheme.surfaceContainerHigh,
+  ) {
+    Column {
+      TextField(
+        value = state.text,
+        onValueChange = { state.text = it },
+        modifier = Modifier.fillMaxWidth().heightIn(min = 120.dp).focusRequester(focusRequester),
+        textStyle = MaterialTheme.typography.bodyLarge.copy(fontSize = 17.sp),
+        placeholder = { Text(placeholder, fontSize = 17.sp) },
+        shape = RoundedCornerShape(24.dp),
+        colors =
+          TextFieldDefaults.colors(
+            focusedContainerColor = Color.Transparent,
+            unfocusedContainerColor = Color.Transparent,
+            focusedIndicatorColor = Color.Transparent,
+            unfocusedIndicatorColor = Color.Transparent,
+            disabledIndicatorColor = Color.Transparent,
+            errorIndicatorColor = Color.Transparent,
+          ),
+      )
+      footer()
+    }
+  }
 }
 
 /** Els 5 grups, sempre en l'ordre fix: l'entrada es pot etiquetar amb qualsevol, tingui o no la persona entrades al grup. */
