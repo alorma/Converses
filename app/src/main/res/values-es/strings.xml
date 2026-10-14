@@ -93,6 +93,8 @@
         <item quantity="other">%d entradas</item>
     </plurals>
     <string name="quick_note">Nota rápida</string>
+    <string name="import_menu_label">Guardar en Converses</string>
+    <string name="import_nothing">No hay nada que importar</string>
     <string name="yesterday">Ayer</string>
 
 

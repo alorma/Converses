@@ -3,6 +3,7 @@ package com.alorma.contactnotes
 import android.graphics.Color
 import android.os.Bundle
 import android.view.WindowManager
+import android.widget.Toast
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -27,6 +28,8 @@ import com.alorma.contactnotes.designsystem.theme.ConversesTheme
 import com.alorma.contactnotes.designsystem.theme.ThemeMode
 import com.alorma.contactnotes.ui.AppNavigation
 import com.alorma.contactnotes.ui.lock.AppLockScreen
+import com.alorma.contactnotes.ui.navigation.isTextImport
+import com.alorma.contactnotes.ui.navigation.toBackStack
 import com.alorma.contactnotes.ui.watchinstall.WatchInstallSheet
 import com.alorma.contactnotes.ui.watchinstall.WatchInstallViewModel
 import kotlinx.coroutines.flow.combine
@@ -47,7 +50,14 @@ class MainActivity : FragmentActivity() {
     super.onCreate(savedInstanceState)
     // Lectura síncrona abans del primer frame per evitar un parpelleig de tema en obrir.
     val initialSettings = runBlocking { settingsRepository.settings.first() }
-    val showOnboarding = onboardingFlag.isEnabled()
+    // Share / select-text: directe a la nota ràpida, sense onboarding (no es marca com a vist)
+    val importStack = intent.toBackStack()
+    if (importStack == null && intent.isTextImport) {
+      Toast.makeText(this, R.string.import_nothing, Toast.LENGTH_SHORT).show()
+      finish()
+      return
+    }
+    val showOnboarding = importStack == null && onboardingFlag.isEnabled()
     val secureFlow =
       combine(settingsRepository.settings.map { it.appLock }, secureWindow.isRequested) { lock, requested ->
         lock || requested
@@ -92,9 +102,9 @@ class MainActivity : FragmentActivity() {
         ) {
           DebugMenuHost {
             Box {
-              AppNavigation(startOnboarding = showOnboarding)
-              // La proposta d'instal·lar l'app al rellotge no s'ensenya sobre l'onboarding ni sobre el bloqueig
-              if (!showOnboarding && !showLock) {
+              AppNavigation(startOnboarding = showOnboarding, initialBackStack = importStack)
+              // La proposta d'instal·lar l'app al rellotge no s'ensenya sobre l'onboarding, el bloqueig ni una importació
+              if (!showOnboarding && !showLock && importStack == null) {
                 val watchInstall = koinViewModel<WatchInstallViewModel>()
                 val watchInstallState by watchInstall.state.collectAsStateWithLifecycle()
                 WatchInstallSheet(

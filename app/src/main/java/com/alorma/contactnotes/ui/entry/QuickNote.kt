@@ -184,10 +184,11 @@ fun QuickNoteScreen(
   personId: Long,
   onClose: () -> Unit,
   onNewPerson: () -> Unit,
+  sharedText: String? = null,
   viewModel: QuickNoteViewModel = koinViewModel(parameters = { parametersOf(personId) }),
 ) {
   val state by viewModel.uiState.collectAsStateWithLifecycle()
-  val form = rememberEntryFormState()
+  val form = rememberEntryFormState(initialText = sharedText.orEmpty())
   val activity = LocalActivity.current as FragmentActivity
   var showNoLock by remember { mutableStateOf(false) }
 

@@ -89,12 +89,13 @@ class EntryFormState(
 fun rememberEntryFormState(
   initial: EntryEntity? = null,
   initialKind: EntryKind = EntryKind.SAID,
+  initialText: String = "",
 ): EntryFormState =
   rememberSaveable(initial?.id, saver = EntryFormState.Saver) {
     EntryFormState(
       kind = initial?.kind ?: initialKind,
       channel = initial?.channelType,
-      text = initial?.text.orEmpty(),
+      text = initial?.text ?: initialText,
       whenChoice = initial?.let { WhenChoice.Stored(it.occurredAt) } ?: WhenChoice.Now,
     )
   }

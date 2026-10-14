@@ -22,7 +22,26 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+            <!-- Compartir text des d'una altra app: obre la nota ràpida amb el text posat -->
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="text/plain" />
+            </intent-filter>
         </activity>
+
+        <!-- Entrada «Desa a Converses» del menú de selecció de text; un àlies per no canviar el nom de l'app al launcher -->
+        <activity-alias
+            android:name=".ProcessTextAlias"
+            android:exported="true"
+            android:label="@string/import_menu_label"
+            android:targetActivity=".MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.PROCESS_TEXT" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="text/plain" />
+            </intent-filter>
+        </activity-alias>
 
         <!-- S'obre en tocar la notificació d'aprovació i llança el BiometricPrompt; transparent, fora de l'historial i de la tasca principal -->
         <activity
