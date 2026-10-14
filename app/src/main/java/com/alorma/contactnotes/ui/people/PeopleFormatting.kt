@@ -20,13 +20,6 @@ fun ChannelType.label(): Int =
     ChannelType.OTHER -> R.string.channel_other
   }
 
-fun initialsOf(name: String): String {
-  val words = name.split(' ', '_', '-', '.').filter { it.isNotBlank() }
-  return listOfNotNull(words.firstOrNull(), words.lastOrNull()?.takeIf { words.size > 1 })
-    .joinToString("") { it.first().uppercase() }
-    .ifEmpty { "?" }
-}
-
 /** Hora si és d'avui, dia abreujat en minúscula els últims 6 dies, data curta aquest any i data completa abans. */
 fun formatLastActivity(
   epochMillis: Long,

@@ -83,9 +83,9 @@ import com.alorma.contactnotes.designsystem.theme.PersonTheme
 import com.alorma.contactnotes.designsystem.theme.SectionTitleStyle
 import com.alorma.contactnotes.shared.ChannelType
 import com.alorma.contactnotes.shared.EntryKind
+import com.alorma.contactnotes.shared.initialsOf
 import com.alorma.contactnotes.ui.edit.EditFocus
 import com.alorma.contactnotes.ui.entry.NewEntrySheet
-import com.alorma.contactnotes.ui.people.initialsOf
 import com.alorma.contactnotes.ui.people.label
 import java.time.LocalDate
 import kotlinx.coroutines.delay

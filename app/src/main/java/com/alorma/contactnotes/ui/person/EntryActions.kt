@@ -44,7 +44,7 @@ import com.alorma.contactnotes.designsystem.components.Avatar
 import com.alorma.contactnotes.designsystem.components.GroupedListDefaults
 import com.alorma.contactnotes.designsystem.components.groupedItemShape
 import com.alorma.contactnotes.designsystem.components.rememberConversesHaptics
-import com.alorma.contactnotes.ui.people.initialsOf
+import com.alorma.contactnotes.shared.initialsOf
 import java.time.LocalDate
 
 /** Full d'accions d'una entrada (PNG 5). */

@@ -47,7 +47,7 @@ import com.alorma.contactnotes.designsystem.components.GroupedListDefaults
 import com.alorma.contactnotes.designsystem.components.groupedItemShape
 import com.alorma.contactnotes.designsystem.theme.AppColors
 import com.alorma.contactnotes.designsystem.theme.SheetTitleStyle
-import com.alorma.contactnotes.ui.people.initialsOf
+import com.alorma.contactnotes.shared.initialsOf
 
 private const val FilterThreshold = 8
 

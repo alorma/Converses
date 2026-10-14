@@ -4,6 +4,7 @@ import com.alorma.contactnotes.shared.ChannelType
 import com.alorma.contactnotes.shared.EntryKind
 import com.alorma.contactnotes.shared.WearEntry
 import com.alorma.contactnotes.shared.WearPerson
+import com.alorma.contactnotes.shared.initialsOf
 import com.alorma.contactnotes.wear.components.EntryAuthor
 import java.time.Instant
 import java.time.ZoneId
@@ -60,16 +61,6 @@ fun relativeTime(
     else -> RelativeTime.Hours(minutes / 60)
   }
 }
-
-/** Fins a dues inicials: «Luna Roja» → «LR», «Kael» → «K». */
-fun initialsOf(name: String): String =
-  name
-    .trim()
-    .split(Regex("\\s+"))
-    .filter { it.isNotEmpty() }
-    .take(2)
-    .joinToString("") { it.first().uppercase() }
-    .ifEmpty { "?" }
 
 /** Una protegida no duu hora ni entrades: tampoc aquí se'n mostra res més que el nom. */
 fun WearPerson.toItem(

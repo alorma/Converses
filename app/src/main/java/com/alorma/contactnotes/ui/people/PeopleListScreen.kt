@@ -73,6 +73,7 @@ import com.alorma.contactnotes.designsystem.components.groupedItems
 import com.alorma.contactnotes.designsystem.components.rememberConversesHaptics
 import com.alorma.contactnotes.designsystem.theme.ListTitleStyle
 import com.alorma.contactnotes.shared.ChannelType
+import com.alorma.contactnotes.shared.initialsOf
 import com.alorma.contactnotes.ui.navigation.LocalFloatingBarPadding
 import com.alorma.contactnotes.ui.person.channelName
 import org.koin.compose.viewmodel.koinViewModel

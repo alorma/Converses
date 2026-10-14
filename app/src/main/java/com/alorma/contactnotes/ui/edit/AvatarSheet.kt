@@ -52,8 +52,8 @@ import com.alorma.contactnotes.designsystem.components.color
 import com.alorma.contactnotes.designsystem.theme.SheetTitleStyle
 import com.alorma.contactnotes.shared.AvatarColor
 import com.alorma.contactnotes.shared.AvatarShape
+import com.alorma.contactnotes.shared.initialsOf
 import com.alorma.contactnotes.ui.people.colorNameRes
-import com.alorma.contactnotes.ui.people.initialsOf
 
 private const val ShapesPerRow = 3
 

@@ -38,7 +38,7 @@ import com.alorma.contactnotes.designsystem.components.ConversesSaveButton
 import com.alorma.contactnotes.designsystem.theme.SheetTitleStyle
 import com.alorma.contactnotes.shared.ChannelType
 import com.alorma.contactnotes.shared.EntryKind
-import com.alorma.contactnotes.ui.people.initialsOf
+import com.alorma.contactnotes.shared.initialsOf
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

@@ -8,6 +8,7 @@ import com.alorma.contactnotes.shared.WEAR_MAX_ENTRIES_PER_PERSON
 import com.alorma.contactnotes.shared.WEAR_MAX_EXTRA_ENTRIES
 import com.alorma.contactnotes.shared.WearEntry
 import com.alorma.contactnotes.shared.WearPerson
+import com.alorma.contactnotes.shared.initialsOf
 import com.alorma.contactnotes.wear.data.MoreEntriesResult
 import com.alorma.contactnotes.wear.data.MoreEntriesSource
 import com.alorma.contactnotes.wear.data.StoredSnapshot

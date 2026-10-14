@@ -46,14 +46,6 @@ class SnapshotMappingTest {
   }
 
   @Test
-  fun initials() {
-    assertEquals("K", initialsOf("Kael"))
-    assertEquals("LR", initialsOf("Luna Roja"))
-    assertEquals("AB", initialsOf("ana  bea carla"))
-    assertEquals("?", initialsOf("  "))
-  }
-
-  @Test
   fun protectedPersonShowsNoLastEntry() {
     val person =
       WearPerson(1, "Marta", AvatarColor.Peach, AvatarShape.entries.first(), isProtected = true, lastEntryAt = ago(5))

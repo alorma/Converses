@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.alorma.contactnotes.shared.AvatarColor
 import com.alorma.contactnotes.shared.EntryKind
 import com.alorma.contactnotes.shared.WearNote
+import com.alorma.contactnotes.shared.initialsOf
 import com.alorma.contactnotes.wear.data.NoteDelivery
 import com.alorma.contactnotes.wear.data.NoteSender
 import com.alorma.contactnotes.wear.data.NoteSubmitter
