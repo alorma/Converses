@@ -2,10 +2,7 @@ package com.alorma.contactnotes.designsystem.components
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -21,6 +18,7 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 
 enum class TimelineMarkerStyle { Filled, Tonal, Outlined }
@@ -118,37 +116,34 @@ fun TimelineRow(
   content: @Composable () -> Unit,
 ) {
   val lineColor = MaterialTheme.colorScheme.outlineVariant
-  Row(modifier = modifier.height(IntrinsicSize.Min)) {
-    Box(
-      modifier =
-        Modifier
-          .width(MarkerSize)
-          .fillMaxHeight()
-          .drawBehind {
-            val x = size.width / 2
-            val markerCenter = MarkerSize.toPx() / 2
-            val start = if (isFirst) (if (marker != null) markerCenter else size.height) else 0f
-            val end = if (isLast) markerCenter.coerceAtMost(size.height) else size.height
-            if (end > start) {
-              val drawnEnd = start + (end - start) * lineProgress()
-              drawLine(
-                lineColor,
-                Offset(x, start),
-                Offset(x, drawnEnd),
-                strokeWidth = LineWidth.toPx(),
-                pathEffect =
-                  if (dashedLine) {
-                    PathEffect.dashPathEffect(
-                      floatArrayOf(6.dp.toPx(), 5.dp.toPx()),
-                    )
-                  } else {
-                    null
-                  },
-              )
-            }
-          },
-      contentAlignment = Alignment.TopCenter,
-    ) {
+  // La línia es dibuixa sobre tota la fila (l'alçada la dona el contingut), així no cal mesurar amb intrínsecs
+  Row(
+    modifier =
+      modifier.drawBehind {
+        val markerCenter = MarkerSize.toPx() / 2
+        val x = if (layoutDirection == LayoutDirection.Rtl) size.width - markerCenter else markerCenter
+        val start = if (isFirst) (if (marker != null) markerCenter else size.height) else 0f
+        val end = if (isLast) markerCenter.coerceAtMost(size.height) else size.height
+        if (end > start) {
+          val drawnEnd = start + (end - start) * lineProgress()
+          drawLine(
+            lineColor,
+            Offset(x, start),
+            Offset(x, drawnEnd),
+            strokeWidth = LineWidth.toPx(),
+            pathEffect =
+              if (dashedLine) {
+                PathEffect.dashPathEffect(
+                  floatArrayOf(6.dp.toPx(), 5.dp.toPx()),
+                )
+              } else {
+                null
+              },
+          )
+        }
+      },
+  ) {
+    Box(modifier = Modifier.width(MarkerSize), contentAlignment = Alignment.TopCenter) {
       marker?.invoke()
     }
     Box(modifier = Modifier.padding(start = 12.dp, bottom = RowGap)) {
