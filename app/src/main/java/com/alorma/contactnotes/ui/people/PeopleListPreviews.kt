@@ -14,12 +14,9 @@ private fun PeopleListScreenPreview(
     PeopleListScreen(
       state = state,
       archived = archived,
-      onToggleArchivedList = {},
       onFilterToggled = {},
       onChannelsNoticeDismissed = {},
       onPersonClick = {},
-      onQuickNote = {},
-      onOpenSettings = {},
       onNewPerson = {},
     )
   }

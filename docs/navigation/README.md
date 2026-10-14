@@ -24,13 +24,13 @@ La barra no mostra dades de cap persona: moure-la no afecta les persones protegi
 
 ## Fase C · Converses
 
-- [ ] **C1.** Treure la lògica de la pila de `ui/AppNavigation.kt` a una classe navegadora amb la mateixa API que la de Caducity (`navigate`, `switchTab`, `pop`, `resetTo`) sobre un `NavBackStack`. `PeopleRoute` i `ArchivedRoute` passen a ser `TopLevelRoute`; `SettingsRoute` és secundària.
+- [x] **C1.** `8567ab8` Treure la lògica de la pila de `ui/AppNavigation.kt` a una classe navegadora amb la mateixa API que la de Caducity (`navigate`, `switchTab`, `pop`, `resetTo`) sobre un `NavBackStack`. `PeopleRoute` i `ArchivedRoute` passen a ser `TopLevelRoute`; `SettingsRoute` és secundària.
   Validació: test JVM nou, mirall del de Caducity; `testDebugUnitTest`, `ktlintCheck`.
-- [ ] **C2.** Barra fixa: moure `ConversesFloatingToolbar` de `PeopleListScreen` a un shell al voltant de `NavDisplay`, amb `AnimatedVisibility` i `LocalFloatingBarPadding` en lloc dels `96.dp` fixos de la llista.
+- [x] **C2.** `4032b86` Barra fixa: moure `ConversesFloatingToolbar` de `PeopleListScreen` a un shell al voltant de `NavDisplay`, amb `AnimatedVisibility` i `LocalFloatingBarPadding` en lloc dels `96.dp` fixos de la llista.
   Validació: actualitzar els screenshots de la llista (hi deixa de sortir la barra) i afegir-ne un del shell; emulador: Persones ↔ Arxivades, obrir una persona i tornar.
-- [ ] **C3.** Fos en canviar de pestanya (metadata a `PeopleRoute` i `ArchivedRoute`).
+- [x] **C3.** `ca9dbf9` Fos en canviar de pestanya, amb les transicions finals de Caducity: entrada opaca, fade tardà en sortir, i el fos només com a metadata d'`ArchivedRoute` (només `transitionSpec`: amb `popTransitionSpec` el back fa un parpelleig). Pendent: sensació d'ús (Bernat).
   Validació: emulador; Bernat per a la sensació d'ús.
-- [ ] **C4.** Actualitzar la norma de `CLAUDE.md`: la toolbar de navegació va al shell, no al slot FAB de cada pantalla.
+- [x] **C4.** `de18fea` Actualitzar la norma de `CLAUDE.md`: la toolbar de navegació va al shell, no al slot FAB de cada pantalla.
   Validació: revisió.
 
 Execució: en sèrie, a la sessió principal, sense agents. Un commit per tasca.

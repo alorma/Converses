@@ -22,6 +22,8 @@ import com.alorma.contactnotes.ui.entry.QuickNoteNoPersonPreview
 import com.alorma.contactnotes.ui.entry.WhenSheetCustomPreview
 import com.alorma.contactnotes.ui.entry.WhenSheetNowPreview
 import com.alorma.contactnotes.ui.lock.AppLockPreview
+import com.alorma.contactnotes.ui.navigation.AppShellArchivedPreview
+import com.alorma.contactnotes.ui.navigation.AppShellPeoplePreview
 import com.alorma.contactnotes.ui.onboarding.OnboardingStep1Preview
 import com.alorma.contactnotes.ui.onboarding.OnboardingStep2Preview
 import com.alorma.contactnotes.ui.onboarding.OnboardingStep3Preview
@@ -66,6 +68,20 @@ annotation class ScreenPreviews
 annotation class LocalizedScreenPreviews
 
 class ScreensScreenshotTests {
+  @ScreenPreviews
+  @PreviewTest
+  @Composable
+  fun appShellPeople() {
+    AppShellPeoplePreview()
+  }
+
+  @ScreenPreviews
+  @PreviewTest
+  @Composable
+  fun appShellArchived() {
+    AppShellArchivedPreview()
+  }
+
   @ScreenPreviews
   @PreviewTest
   @Composable
