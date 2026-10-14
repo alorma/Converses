@@ -1,8 +1,8 @@
 package com.alorma.contactnotes.ui.entry
 
+import com.alorma.contactnotes.ui.dateFormatter
 import java.time.Instant
 import java.time.ZoneId
-import java.time.format.DateTimeFormatter
 import java.util.Locale
 
 /** Opció triada al full «Quan va ser?». `at == null` vol dir «ara», que es resol en desar. */
@@ -80,14 +80,14 @@ fun formatLongDate(
   Instant
     .ofEpochMilli(epochMillis)
     .atZone(zone)
-    .format(DateTimeFormatter.ofPattern("EEEE d MMM", locale))
+    .format(dateFormatter("EEEE d MMM", locale))
     .replaceFirstChar { it.titlecase(locale) }
 
 fun formatTimeOfDay(
   epochMillis: Long,
   zone: ZoneId = ZoneId.systemDefault(),
   locale: Locale = Locale.getDefault(),
-): String = Instant.ofEpochMilli(epochMillis).atZone(zone).format(DateTimeFormatter.ofPattern("HH:mm", locale))
+): String = Instant.ofEpochMilli(epochMillis).atZone(zone).format(dateFormatter("HH:mm", locale))
 
 /** «Dilluns 6 d'oct. · 21:46». */
 fun formatDateTime(

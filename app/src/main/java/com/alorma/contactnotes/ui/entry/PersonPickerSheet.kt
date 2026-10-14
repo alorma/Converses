@@ -117,7 +117,7 @@ fun PersonPickerContent(
       modifier = Modifier.weight(1f, fill = false),
       verticalArrangement = Arrangement.spacedBy(GroupedListDefaults.ItemSpacing),
     ) {
-      itemsIndexed(visible, key = { _, person -> person.id }) { index, person ->
+      itemsIndexed(visible, key = { _, person -> person.id }, contentType = { _, _ -> "person" }) { index, person ->
         Surface(
           onClick = { onSelect(person) },
           shape = groupedItemShape(index, visible.size),

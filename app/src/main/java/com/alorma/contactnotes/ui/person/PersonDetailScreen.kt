@@ -148,7 +148,8 @@ fun PersonDetailRoute(
   var menuExpanded by remember { mutableStateOf(false) }
   var actionEntryId by rememberSaveable { mutableStateOf<Long?>(null) }
   var action by rememberSaveable { mutableStateOf(EntryAction.None) }
-  val actionEntry = state.entries.firstOrNull { it.id == actionEntryId }
+  // Sense acció oberta (el cas habitual) no cal recórrer tota la llista a cada recomposició
+  val actionEntry = actionEntryId?.let { id -> state.entries.firstOrNull { it.id == id } }
   val clipboard = LocalClipboard.current
   val haptics = rememberConversesHaptics()
   val scope = androidx.compose.runtime.rememberCoroutineScope()
@@ -451,12 +452,21 @@ fun PersonDetailScreen(
             )
           }
         }
-        items(items.size, key = { index ->
-          when (val item = items[index]) {
-            is TimelineItem.Day -> "day-${item.date}"
-            is TimelineItem.Entry -> "entry-${item.entry.id}"
-          }
-        }) { index ->
+        items(
+          items.size,
+          key = { index ->
+            when (val item = items[index]) {
+              is TimelineItem.Day -> "day-${item.date}"
+              is TimelineItem.Entry -> "entry-${item.entry.id}"
+            }
+          },
+          contentType = { index ->
+            when (items[index]) {
+              is TimelineItem.Day -> "day"
+              is TimelineItem.Entry -> "entry"
+            }
+          },
+        ) { index ->
           val isFirst = index == 0
           val isLast = index == items.lastIndex
           when (val item = items[index]) {
