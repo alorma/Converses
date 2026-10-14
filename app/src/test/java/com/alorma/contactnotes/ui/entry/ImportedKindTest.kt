@@ -35,3 +35,16 @@ class ImportedKindTest {
     assertEquals(true, form.kindTouched)
   }
 }
+
+class PasteIntoTest {
+  @Test
+  fun `pasting into an empty field replaces it`() {
+    assertEquals("hello", pasteInto("", "hello"))
+    assertEquals("hello", pasteInto("  \n", "hello"))
+  }
+
+  @Test
+  fun `pasting after text adds a blank line`() {
+    assertEquals("one\n\ntwo", pasteInto("one\n", "two"))
+  }
+}

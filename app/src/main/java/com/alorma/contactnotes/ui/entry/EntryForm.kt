@@ -119,6 +119,7 @@ fun EntryForm(
   focusText: Boolean = false,
   onPickPerson: (() -> Unit)? = null,
   header: @Composable () -> Unit = {},
+  belowText: @Composable () -> Unit = {},
   saveButton: @Composable () -> Unit = {},
 ) {
   Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(14.dp)) {
@@ -131,6 +132,7 @@ fun EntryForm(
       placeholder = entryHint(state.kind, person?.name?.let(::firstName).orEmpty()),
       requestFocus = focusText,
     )
+    belowText()
     FormSection(title = stringResource(R.string.entry_where_title)) {
       ChannelChips(selected = channel, onSelected = onChannelChange)
     }
