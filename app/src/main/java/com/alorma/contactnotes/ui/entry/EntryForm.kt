@@ -18,6 +18,7 @@ import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -59,11 +60,15 @@ class EntryFormState(
   channel: ChannelType? = null,
   text: String = "",
   whenChoice: WhenChoice = WhenChoice.Now,
+  kindTouched: Boolean = false,
 ) {
   var kind by mutableStateOf(kind)
   var channel by mutableStateOf(channel)
   var text by mutableStateOf(text)
   var whenChoice by mutableStateOf(whenChoice)
+
+  /** `true` once the user picks «Qui» by hand, so an automatic default never overrides it. */
+  var kindTouched by mutableStateOf(kindTouched)
 
   val occurredAt: Long? get() = whenChoice.at
   val canSave: Boolean get() = text.isNotBlank()
@@ -71,7 +76,7 @@ class EntryFormState(
   companion object {
     val Saver: Saver<EntryFormState, Any> =
       listSaver(
-        save = { listOf(it.kind.name, it.channel?.name, it.text, WhenChoice.encode(it.whenChoice)) },
+        save = { listOf(it.kind.name, it.channel?.name, it.text, WhenChoice.encode(it.whenChoice), it.kindTouched) },
         restore = {
           @Suppress("UNCHECKED_CAST")
           EntryFormState(
@@ -79,6 +84,7 @@ class EntryFormState(
             channel = (it[1] as String?)?.let(ChannelType::valueOf),
             text = it[2] as String,
             whenChoice = WhenChoice.decode(it[3] as List<Any?>),
+            kindTouched = it[4] as Boolean,
           )
         },
       )
@@ -89,12 +95,13 @@ class EntryFormState(
 fun rememberEntryFormState(
   initial: EntryEntity? = null,
   initialKind: EntryKind = EntryKind.SAID,
+  initialText: String = "",
 ): EntryFormState =
   rememberSaveable(initial?.id, saver = EntryFormState.Saver) {
     EntryFormState(
       kind = initial?.kind ?: initialKind,
       channel = initial?.channelType,
-      text = initial?.text.orEmpty(),
+      text = initial?.text ?: initialText,
       whenChoice = initial?.let { WhenChoice.Stored(it.occurredAt) } ?: WhenChoice.Now,
     )
   }
@@ -113,6 +120,7 @@ fun EntryForm(
   focusText: Boolean = false,
   onPickPerson: (() -> Unit)? = null,
   header: @Composable () -> Unit = {},
+  textFooter: @Composable () -> Unit = {},
   saveButton: @Composable () -> Unit = {},
 ) {
   Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(14.dp)) {
@@ -124,6 +132,7 @@ fun EntryForm(
       state,
       placeholder = entryHint(state.kind, person?.name?.let(::firstName).orEmpty()),
       requestFocus = focusText,
+      footer = textFooter,
     )
     FormSection(title = stringResource(R.string.entry_where_title)) {
       ChannelChips(selected = channel, onSelected = onChannelChange)
@@ -197,7 +206,12 @@ fun WhoSelector(
       },
     selected = state.kind,
     onSelect = { kind ->
-      if (kind == EntryKind.HEARD && person == null) onPickPerson?.invoke() else state.kind = kind
+      if (kind == EntryKind.HEARD && person == null) {
+        onPickPerson?.invoke()
+      } else {
+        state.kind = kind
+        state.kindTouched = true
+      }
     },
     modifier = modifier,
     prominent = true,
@@ -210,27 +224,37 @@ fun EntryTextField(
   placeholder: String,
   modifier: Modifier = Modifier,
   requestFocus: Boolean = false,
+  /** Va dins del contenidor del camp, sota el text (p. ex. el xip «Enganxa»). */
+  footer: @Composable () -> Unit = {},
 ) {
-  val container = MaterialTheme.colorScheme.surfaceContainerHigh
   val focusRequester = remember { FocusRequester() }
   if (requestFocus) LaunchedEffect(Unit) { focusRequester.requestFocus() }
-  TextField(
-    value = state.text,
-    onValueChange = { state.text = it },
-    modifier = modifier.fillMaxWidth().heightIn(min = 120.dp).focusRequester(focusRequester),
-    textStyle = MaterialTheme.typography.bodyLarge.copy(fontSize = 17.sp),
-    placeholder = { Text(placeholder, fontSize = 17.sp) },
+  Surface(
+    modifier = modifier.fillMaxWidth(),
     shape = RoundedCornerShape(24.dp),
-    colors =
-      TextFieldDefaults.colors(
-        focusedContainerColor = container,
-        unfocusedContainerColor = container,
-        focusedIndicatorColor = Color.Transparent,
-        unfocusedIndicatorColor = Color.Transparent,
-        disabledIndicatorColor = Color.Transparent,
-        errorIndicatorColor = Color.Transparent,
-      ),
-  )
+    color = MaterialTheme.colorScheme.surfaceContainerHigh,
+  ) {
+    Column {
+      TextField(
+        value = state.text,
+        onValueChange = { state.text = it },
+        modifier = Modifier.fillMaxWidth().heightIn(min = 120.dp).focusRequester(focusRequester),
+        textStyle = MaterialTheme.typography.bodyLarge.copy(fontSize = 17.sp),
+        placeholder = { Text(placeholder, fontSize = 17.sp) },
+        shape = RoundedCornerShape(24.dp),
+        colors =
+          TextFieldDefaults.colors(
+            focusedContainerColor = Color.Transparent,
+            unfocusedContainerColor = Color.Transparent,
+            focusedIndicatorColor = Color.Transparent,
+            unfocusedIndicatorColor = Color.Transparent,
+            disabledIndicatorColor = Color.Transparent,
+            errorIndicatorColor = Color.Transparent,
+          ),
+      )
+      footer()
+    }
+  }
 }
 
 /** Els 5 grups, sempre en l'ordre fix: l'entrada es pot etiquetar amb qualsevol, tingui o no la persona entrades al grup. */

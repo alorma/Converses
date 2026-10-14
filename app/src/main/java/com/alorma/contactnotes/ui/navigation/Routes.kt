@@ -33,6 +33,8 @@ data class EditPersonRoute(
 @Serializable
 data class QuickNoteRoute(
   val personId: Long = 0L,
+  /** Text imported from another app (share or select-text); survives process death. */
+  val sharedText: String? = null,
 ) : AppRoute
 
 @Serializable

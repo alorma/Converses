@@ -1,5 +1,4 @@
-Versió 1.7.6:
-• Converses ja té app per a Wear OS. Les teves persones i les últimes notes al canell, on d'aquí a un moment miraves el mòbil igualment.
-• Dicta una nota al rellotge i arriba al mòbil. T'ha entès malament? Torna-la a dictar.
-• Les persones protegides només s'obren al rellotge quan ho aproves amb l'empremta al mòbil.
-• Falta l'app al rellotge o al mòbil? Converses se n'adona i et proposa instal·lar-la.
+Versió 1.7.7:
+• Converses ja agafa text d'altres apps: comparteix-lo o selecciona'l i toca «Desa a Converses». Fins ara t'ho feia reescriure tot, i no n'estem orgullosos.
+• Missatges que només es poden copiar? Enganxa'ls des de la nota ràpida. Només llegim el porta-retalls quan ho toques.
+• Unes quantes correccions petites que no notaràs, que és justament la gràcia.

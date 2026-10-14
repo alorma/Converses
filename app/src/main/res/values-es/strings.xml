@@ -93,6 +93,9 @@
         <item quantity="other">%d entradas</item>
     </plurals>
     <string name="quick_note">Nota rápida</string>
+    <string name="import_menu_label">Guardar en Converses</string>
+    <string name="import_nothing">No hay nada que importar</string>
+    <string name="paste">Pegar del portapapeles</string>
     <string name="yesterday">Ayer</string>
 
 
@@ -126,6 +129,7 @@
     <string name="entry_hint_person">¿Qué ha dicho %1$s?</string>
     <string name="entry_hint_note">¿Qué quieres apuntar?</string>
     <string name="pick_person">Elige una persona</string>
+    <string name="create_first_person">Crea la primera persona</string>
     <string name="search_by_name">Busca por nombre</string>
     <string name="quick_with_whom">Con quién</string>
     <string name="entry_where_title">Dónde</string>

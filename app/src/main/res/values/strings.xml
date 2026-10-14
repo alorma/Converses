@@ -94,6 +94,9 @@
         <item quantity="other">%d entries</item>
     </plurals>
     <string name="quick_note">Quick note</string>
+    <string name="import_menu_label">Save to Converses</string>
+    <string name="import_nothing">Nothing to import</string>
+    <string name="paste">Paste from clipboard</string>
     <string name="yesterday">Yesterday</string>
 
 
@@ -127,6 +130,7 @@
     <string name="entry_hint_person">What did %1$s say?</string>
     <string name="entry_hint_note">What do you want to note?</string>
     <string name="pick_person">Pick a person</string>
+    <string name="create_first_person">Create the first person</string>
     <string name="search_by_name">Search by name</string>
     <string name="quick_with_whom">With</string>
     <string name="entry_where_title">Where</string>

@@ -21,6 +21,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.unit.IntOffset
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
+import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
@@ -49,8 +50,16 @@ import com.alorma.contactnotes.ui.settings.SettingsScreen
 import org.koin.compose.koinInject
 
 @Composable
-fun AppNavigation(startOnboarding: Boolean = false) {
-  val backStack = rememberNavBackStack(if (startOnboarding) OnboardingRoute else PeopleRoute)
+fun AppNavigation(
+  startOnboarding: Boolean = false,
+  /** Back stack built from a share / select-text intent; wins over [startOnboarding]. */
+  initialBackStack: List<NavKey>? = null,
+) {
+  val backStack =
+    rememberNavBackStack(
+      *(initialBackStack ?: listOf(if (startOnboarding) OnboardingRoute else PeopleRoute)).toTypedArray(),
+    )
+  val imported = initialBackStack != null
   val navigation = remember(backStack) { TopLevelBackStack(backStack) }
   val activity = LocalActivity.current
   val selectionBridge: PersonSelectionBridge = koinInject()
@@ -95,7 +104,9 @@ fun AppNavigation(startOnboarding: Boolean = false) {
           entry<QuickNoteRoute>(metadata = modalTransitions) { route ->
             QuickNoteScreen(
               personId = route.personId,
-              onClose = { navigation.pop() },
+              sharedText = route.sharedText,
+              // Entrat des d'una altra app: tancar torna a l'app d'origen
+              onClose = { if (imported) activity?.finish() else navigation.pop() },
               onNewPerson = { navigation.navigate(EditPersonRoute(returnSelection = true)) },
             )
           }

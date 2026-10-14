@@ -62,6 +62,34 @@ internal fun QuickNoteFilledPreview() {
   )
 }
 
+/** Text importat d'una altra app, encara sense persona triada («Qui» a «Jo»). */
+@Preview
+@Composable
+internal fun QuickNoteSharedPreview() {
+  QuickNotePreview(
+    state = QuickNoteUiState(people = listOf(PreviewData.marta)),
+    form =
+      EntryFormState(
+        text = "She can't come on Saturday.",
+        whenChoice = WhenChoice.Stored(PreviewData.formTime),
+      ),
+  )
+}
+
+/** Text importat en una instal·lació nova: la targeta convida a crear la primera persona. */
+@Preview
+@Composable
+internal fun QuickNoteSharedNoPeoplePreview() {
+  QuickNotePreview(
+    state = QuickNoteUiState(),
+    form =
+      EntryFormState(
+        text = "She can't come on Saturday.",
+        whenChoice = WhenChoice.Stored(PreviewData.formTime),
+      ),
+  )
+}
+
 /** «Qui» a «Jo» (el valor per defecte) amb la data d'una entrada desada (mode edició). */
 @Preview
 @Composable

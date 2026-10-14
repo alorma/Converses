@@ -63,6 +63,7 @@ import com.alorma.contactnotes.designsystem.theme.PersonTheme
 import com.alorma.contactnotes.shared.ChannelType
 import com.alorma.contactnotes.shared.EntryKind
 import com.alorma.contactnotes.shared.initialsOf
+import com.alorma.contactnotes.ui.navigation.isOnlyUrl
 import com.alorma.contactnotes.ui.person.canUnlockWithDevice
 import com.alorma.contactnotes.ui.person.openSecuritySetup
 import com.alorma.contactnotes.ui.person.promptUnlock
@@ -88,6 +89,8 @@ data class QuickNoteUiState(
   /** Persona protegida triada que encara no s'ha autenticat; no es tria fins que es desbloqueja. */
   val pending: PersonEntity? = null,
   val lastChannel: ChannelType? = null,
+  /** `false` only before the first emission of [people]; an empty list is not «no people» until then. */
+  val loaded: Boolean = true,
 )
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -128,7 +131,7 @@ class QuickNoteViewModel(
           QuickNoteUiState(people = people, selected = selected, pending = pending, lastChannel = last)
         }
       }
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), QuickNoteUiState())
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), QuickNoteUiState(loaded = false))
 
   /** Una protegida queda pendent d'autenticar; la resta es tria a l'acte. */
   fun select(person: PersonEntity) {
@@ -179,15 +182,34 @@ class QuickNoteViewModel(
   }
 }
 
+/**
+ * Default «Qui» of an imported text: a lone link is a note (`HAPPENED`); otherwise it is what the person
+ * said (`HEARD`) once one is picked, and `SAID` before that (`HEARD` is disabled without a person).
+ */
+fun importedKind(
+  text: String,
+  hasPerson: Boolean,
+): EntryKind =
+  when {
+    isOnlyUrl(text) -> EntryKind.HAPPENED
+    hasPerson -> EntryKind.HEARD
+    else -> EntryKind.SAID
+  }
+
 @Composable
 fun QuickNoteScreen(
   personId: Long,
   onClose: () -> Unit,
   onNewPerson: () -> Unit,
+  sharedText: String? = null,
   viewModel: QuickNoteViewModel = koinViewModel(parameters = { parametersOf(personId) }),
 ) {
   val state by viewModel.uiState.collectAsStateWithLifecycle()
-  val form = rememberEntryFormState()
+  val form =
+    rememberEntryFormState(
+      initialKind = sharedText?.let { importedKind(it, hasPerson = false) } ?: EntryKind.SAID,
+      initialText = sharedText.orEmpty(),
+    )
   val activity = LocalActivity.current as FragmentActivity
   var showNoLock by remember { mutableStateOf(false) }
 
@@ -217,6 +239,7 @@ fun QuickNoteScreen(
   QuickNoteContent(
     state = state,
     form = form,
+    importedText = sharedText,
     onClose = onClose,
     onSelectPerson = viewModel::select,
     onNewPerson = onNewPerson,
@@ -256,6 +279,7 @@ fun QuickNoteContent(
   onSelectPerson: (PersonEntity) -> Unit,
   onNewPerson: () -> Unit,
   onSave: (person: PersonEntity, channel: ChannelType) -> Unit,
+  importedText: String? = null,
 ) {
   val selected = state.selected
   val channel = form.channel ?: state.lastChannel ?: ChannelType.entries.first()
@@ -263,14 +287,28 @@ fun QuickNoteContent(
   // El xip «Persona» obre el mateix selector; en triar-ne una, el xip queda seleccionat
   var pickedFromChip by rememberSaveable { mutableStateOf(false) }
 
-  // Sense persones el selector estaria buit: es passa directe a crear-ne una
-  val openPicker = { if (state.people.isEmpty()) onNewPerson() else showSheet = true }
+  // Sense persones el selector estaria buit: es passa directe a crear-ne una (però no mentre encara es carreguen)
+  val noPeople = state.loaded && state.people.isEmpty()
+  val openPicker = {
+    if (noPeople) {
+      onNewPerson()
+    } else if (state.loaded) {
+      showSheet = true
+    }
+  }
 
   // Quan la persona arriba (triada, creada o desbloquejada) després d'haver tocat el xip, el xip es marca
   LaunchedEffect(selected?.id) {
     if (pickedFromChip && selected != null) {
       form.kind = EntryKind.HEARD
       pickedFromChip = false
+    }
+  }
+
+  // Importat d'una altra app: en triar persona, «Qui» passa a la persona si l'usuari no l'havia tocat
+  LaunchedEffect(selected?.id) {
+    if (importedText != null && selected != null && !form.kindTouched) {
+      form.kind = importedKind(importedText, hasPerson = true)
     }
   }
 
@@ -319,9 +357,11 @@ fun QuickNoteContent(
             pickedFromChip = true
             openPicker()
           },
+          textFooter = { PasteButton(onPasted = { form.text = pasteInto(form.text, it) }) },
           header = {
             PersonPicker(
               selected = selected,
+              noPeople = noPeople,
               onClick = {
                 pickedFromChip = false
                 openPicker()
@@ -355,6 +395,7 @@ fun QuickNoteContent(
 @Composable
 private fun PersonPicker(
   selected: PersonEntity?,
+  noPeople: Boolean,
   onClick: () -> Unit,
 ) {
   Surface(
@@ -393,7 +434,7 @@ private fun PersonPicker(
           color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
         Text(
-          text = selected?.name ?: stringResource(R.string.pick_person),
+          text = selected?.name ?: stringResource(if (noPeople) R.string.create_first_person else R.string.pick_person),
           style = MaterialTheme.typography.titleMedium,
           fontWeight = FontWeight.Bold,
           color = if (selected == null) MaterialTheme.colorScheme.onSurfaceVariant else Color.Unspecified,
