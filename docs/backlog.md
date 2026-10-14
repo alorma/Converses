@@ -8,9 +8,8 @@ Actualitzat el 14 d'oct. de 2026. Només hi ha el que encara no està fet.
 | 7 | Feature (Iteració 2) | Nou canal "Empresa" (queda dins el 8, com a sub-canal d'Altres) | — |
 | 8 | Feature (Iteració 2, Pro) | Sub-canals amb nom i valor (dins dels 5 grups de canals) | — |
 | 11 | Feature (Iteració 2) | Importar text a la nota ràpida (compartir, seleccionar text i enganxar) | [#30](https://github.com/alorma/Converses/issues/30) |
-| 16 | Neteja | Treure l'avís dels canals quan la v1 sigui residual | — |
 
-Els punts 6, 7, 8 i 11 són de l'**Iteració 2**; el 6 i el 8 són Pro, i l'11 és gratis (vegeu `docs/pro/`). El #45 s'ha descartat i la cerca (#41) queda per més endavant. **Qualsevol canvi de la base de dades ha d'incloure una migració i el seu test** (la v1 ja és a Google Play); l'11 i el 16 no toquen Room. La v2 (canals en 5 grups) ja està feta; el 6 i el 8 necessitaran la v3. La numeració és la del backlog original, perquè els issues i les referències no canviïn; els punts resolts (1–5, 9, 10, 12, 13, 15, 17) i el 14 (descartat: es queda el split button del detall) són a l'historial de git.
+Els punts 6, 7, 8 i 11 són de l'**Iteració 2**; el 6 i el 8 són Pro, i l'11 és gratis (vegeu `docs/pro/`). El #45 s'ha descartat i la cerca (#41) queda per més endavant. **Qualsevol canvi de la base de dades ha d'incloure una migració i el seu test** (la v1 ja és a Google Play); l'11 no toca Room. La v2 (canals en 5 grups) ja està feta; el 6 i el 8 necessitaran la v3. La numeració és la del backlog original, perquè els issues i les referències no canviïn; els punts resolts (1–5, 9, 10, 12, 13, 15, 16, 17) i el 14 (descartat: es queda el split button del detall) són a l'historial de git.
 
 ---
 
@@ -68,12 +67,6 @@ Portar text d'altres apps a la nota ràpida amb el mínim de passos: el text ja 
 - Sense canvis a Room, **no cal migració**. Textos nous a `values/`, `values-ca/` i `values-es/`; en acabar, afegir-ho a «Gratis per sempre» de `docs/pro/README.md`.
 
 ---
-
-## 16 · Neteja: treure l'avís dels canals
-
-Quan la v1 sigui residual a la Play Console, treure l'avís de la migració dels canals: el banner (`NoticeBanner` i el seu ús a `PeopleListScreen`), `showChannelsNotice` i `onChannelsNoticeDismissed` al `PeopleListViewModel`, el flag `channelsNoticePending` d'`AppSettings`/`SettingsRepository`, el callback de `Migration1To2` i les strings `channels_notice_*`.
-
-**La migració i el seu test no es treuen mai:** qualsevol usuari amb la BBDD a la v1 que obri una versió nova ha de passar per ella.
 
 ## 18 · Wear OS: pendent després de la 1.ª versió
 

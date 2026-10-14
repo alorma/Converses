@@ -7,11 +7,9 @@ import androidx.sqlite.db.SupportSQLiteDatabase
  * v1 → v2: els 11 canals passen als 5 grups fixos i la persona deixa de tenir canals propis (backlog 13).
  * Les entrades guarden el canal pel nom de l'enum, així que es reescriuen al grup que toca (si hi quedés
  * `WHATSAPP`, Room no el sabria llegir); la taula `channel` ja no s'usa i s'esborra.
- * [onMigrated] s'executa en acabar i serveix per marcar l'avís als usuaris que venen de la v1.
+ * No es treu mai: qualsevol BBDD a la v1 ha de passar per aquí.
  */
-class Migration1To2(
-  private val onMigrated: () -> Unit = {},
-) : Migration(1, 2) {
+class Migration1To2 : Migration(1, 2) {
   override fun migrate(db: SupportSQLiteDatabase) {
     db.execSQL(
       """
@@ -24,6 +22,5 @@ class Migration1To2(
       """.trimIndent(),
     )
     db.execSQL("DROP TABLE channel")
-    onMigrated()
   }
 }

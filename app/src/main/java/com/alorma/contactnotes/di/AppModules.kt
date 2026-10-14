@@ -48,7 +48,6 @@ import com.alorma.contactnotes.ui.watchinstall.WatchInstallViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.runBlocking
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.dsl.singleOf
 import org.koin.core.module.dsl.viewModel
@@ -63,8 +62,7 @@ val databaseModule =
       val isDebuggable = context.applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE != 0
       Room
         .databaseBuilder(context, ConversesDatabase::class.java, "converses.db")
-        // S'executa en un fil de fons i només amb una BBDD v1: marca l'avís dels canals (les instal·lacions noves no hi passen).
-        .addMigrations(Migration1To2 { runBlocking { get<SettingsRepository>().setChannelsNoticePending(true) } })
+        .addMigrations(Migration1To2())
         .apply { if (isDebuggable) fallbackToDestructiveMigration(dropAllTables = true) }
         .build()
     }
@@ -93,7 +91,7 @@ val settingsModule =
 
 val viewModelModule =
   module {
-    viewModel { (archived: Boolean) -> PeopleListViewModel(archived, get(), get()) }
+    viewModel { (archived: Boolean) -> PeopleListViewModel(archived, get()) }
     viewModelOf(::SettingsViewModel)
     viewModel { WatchInstallViewModel(get(), get()) }
     viewModel { (personId: Long) -> PersonViewModel(personId, get()) }

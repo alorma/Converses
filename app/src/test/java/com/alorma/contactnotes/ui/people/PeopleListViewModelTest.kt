@@ -2,7 +2,6 @@ package com.alorma.contactnotes.ui.people
 
 import com.alorma.contactnotes.shared.ChannelType
 import com.alorma.contactnotes.testing.FakeDb
-import com.alorma.contactnotes.testing.FakeSettingsRepository
 import com.alorma.contactnotes.testing.MainDispatcherRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
@@ -10,7 +9,6 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
-import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 
@@ -18,7 +16,6 @@ import org.junit.Test
 class PeopleListViewModelTest {
   @get:Rule val main = MainDispatcherRule()
   private val db = FakeDb()
-  private val settings = FakeSettingsRepository()
 
   private fun names(vm: PeopleListViewModel) =
     vm.uiState.value.people
@@ -33,7 +30,7 @@ class PeopleListViewModelTest {
       db.addEntry(chat.id, channel = ChannelType.CHAT)
       db.addEntry(social.id, channel = ChannelType.SOCIAL)
       db.addEntry(inPerson.id, channel = ChannelType.IN_PERSON)
-      val vm = PeopleListViewModel(archived = false, repository = db.repository, settings = settings)
+      val vm = PeopleListViewModel(archived = false, repository = db.repository)
       backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { vm.uiState.collect {} }
 
       assertEquals(listOf("Chat", "Social", "InPerson"), names(vm))
@@ -56,7 +53,7 @@ class PeopleListViewModelTest {
       val onInstagram = db.addPerson("OnOther", createdAt = 1)
       db.addEntry(onX.id, channel = ChannelType.SOCIAL)
       db.addEntry(onInstagram.id, channel = ChannelType.OTHER)
-      val vm = PeopleListViewModel(archived = false, repository = db.repository, settings = settings)
+      val vm = PeopleListViewModel(archived = false, repository = db.repository)
       backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { vm.uiState.collect {} }
 
       vm.onFilterToggled(ChannelType.SOCIAL)
@@ -68,7 +65,7 @@ class PeopleListViewModelTest {
     runTest {
       val secret = db.addPerson("Luna", isProtected = true)
       db.addEntry(secret.id, channel = ChannelType.CHAT)
-      val vm = PeopleListViewModel(archived = false, repository = db.repository, settings = settings)
+      val vm = PeopleListViewModel(archived = false, repository = db.repository)
       backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { vm.uiState.collect {} }
 
       assertEquals(listOf("Luna"), names(vm))
@@ -81,40 +78,12 @@ class PeopleListViewModelTest {
     runTest {
       db.addPerson("Active")
       db.addPerson("Archived", archived = true)
-      val vm = PeopleListViewModel(archived = true, repository = db.repository, settings = settings)
+      val vm = PeopleListViewModel(archived = true, repository = db.repository)
       backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { vm.uiState.collect {} }
 
       vm.onFilterToggled(ChannelType.PHONE)
 
       assertEquals(listOf("Archived"), names(vm))
       assertFalse(vm.uiState.value.isLoading)
-    }
-
-  @Test
-  fun channelsNoticeShowsOnlyWhilePendingAndDismissingClearsIt() =
-    runTest {
-      settings.setChannelsNoticePending(true)
-      val vm = PeopleListViewModel(archived = false, repository = db.repository, settings = settings)
-      backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { vm.uiState.collect {} }
-      assertTrue(vm.uiState.value.showChannelsNotice)
-
-      vm.onChannelsNoticeDismissed()
-
-      assertFalse(vm.uiState.value.showChannelsNotice)
-      assertFalse(settings.state.value.channelsNoticePending)
-    }
-
-  @Test
-  fun channelsNoticeIsNotShownToNewUsersNorInTheArchivedList() =
-    runTest {
-      val fresh = PeopleListViewModel(archived = false, repository = db.repository, settings = settings)
-      settings.setChannelsNoticePending(true)
-      val archived = PeopleListViewModel(archived = true, repository = db.repository, settings = settings)
-      backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { archived.uiState.collect {} }
-      assertFalse(archived.uiState.value.showChannelsNotice)
-
-      settings.setChannelsNoticePending(false)
-      backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { fresh.uiState.collect {} }
-      assertFalse(fresh.uiState.value.showChannelsNotice)
     }
 }

@@ -79,16 +79,6 @@ class MigrationTest {
     assertEquals(listOf("t"), db.strings("SELECT text FROM entry"))
   }
 
-  @Test
-  fun migrate1To2NotifiesWhenItHasRun() {
-    helper.createDatabase(TEST_DB, 1).close()
-    var migrated = false
-
-    helper.runMigrationsAndValidate(TEST_DB, 2, true, Migration1To2 { migrated = true })
-
-    assertTrue(migrated)
-  }
-
   private companion object {
     const val TEST_DB = "migration-test"
   }

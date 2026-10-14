@@ -1,10 +1,5 @@
 package com.alorma.contactnotes.ui.people
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.expandVertically
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
@@ -67,7 +62,6 @@ import com.alorma.contactnotes.designsystem.components.Avatar
 import com.alorma.contactnotes.designsystem.components.BetaBadge
 import com.alorma.contactnotes.designsystem.components.DashedActionRow
 import com.alorma.contactnotes.designsystem.components.GroupedListDefaults
-import com.alorma.contactnotes.designsystem.components.NoticeBanner
 import com.alorma.contactnotes.designsystem.components.WelcomeEmptyState
 import com.alorma.contactnotes.designsystem.components.groupedItems
 import com.alorma.contactnotes.designsystem.components.rememberConversesHaptics
@@ -93,7 +87,6 @@ fun PeopleListRoute(
     state = state,
     archived = archived,
     onFilterToggled = viewModel::onFilterToggled,
-    onChannelsNoticeDismissed = viewModel::onChannelsNoticeDismissed,
     onPersonClick = onPersonClick,
     onNewPerson = onNewPerson,
   )
@@ -104,7 +97,6 @@ fun PeopleListScreen(
   state: PeopleListUiState,
   archived: Boolean,
   onFilterToggled: (ChannelType) -> Unit,
-  onChannelsNoticeDismissed: () -> Unit,
   onPersonClick: (PersonEntity) -> Unit,
   onNewPerson: () -> Unit,
 ) {
@@ -136,19 +128,6 @@ fun PeopleListScreen(
           isLoading = state.isLoading,
           onNewPerson = onNewPerson,
         )
-        AnimatedVisibility(
-          visible = state.showChannelsNotice,
-          enter = fadeIn() + expandVertically(),
-          exit = fadeOut() + shrinkVertically(),
-        ) {
-          NoticeBanner(
-            title = stringResource(R.string.channels_notice_title),
-            body = stringResource(R.string.channels_notice_body),
-            actionLabel = stringResource(R.string.channels_notice_action),
-            onAction = onChannelsNoticeDismissed,
-            modifier = Modifier.padding(bottom = 14.dp),
-          )
-        }
         if (!archived) {
           FilterRow(selected = state.filter, onToggle = onFilterToggled)
         }
