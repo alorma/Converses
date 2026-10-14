@@ -113,6 +113,8 @@ internal fun NameAvatar(
   badgeBorder: Color,
 ) {
   val description = stringResource(R.string.avatar_edit_cd)
+  // El clic es retalla amb la forma de l'avatar, no amb un cercle: si no, es mengen les puntes de la forma
+  val avatarShape = shape.asShape()
   Box(modifier = Modifier.size(56.dp)) {
     Box(
       modifier =
@@ -120,10 +122,10 @@ internal fun NameAvatar(
           .fillMaxSize()
           .then(
             if (editable) {
-              Modifier.clip(CircleShape).selectable(selected = false, role = Role.Button, onClick = onClick).semantics {
-                contentDescription =
-                  description
-              }
+              Modifier
+                .clip(avatarShape)
+                .selectable(selected = false, role = Role.Button, onClick = onClick)
+                .semantics { contentDescription = description }
             } else {
               Modifier
             },

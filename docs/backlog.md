@@ -1,6 +1,6 @@
 # Backlog: bugs i features pendents
 
-Actualitzat el 12 d'oct. de 2026. Només hi ha el que encara no està fet.
+Actualitzat el 14 d'oct. de 2026. Només hi ha el que encara no està fet.
 
 | # | Tipus | Tema | Issue |
 | --- | --- | --- | --- |
@@ -9,9 +9,8 @@ Actualitzat el 12 d'oct. de 2026. Només hi ha el que encara no està fet.
 | 8 | Feature (Iteració 2, Pro) | Sub-canals amb nom i valor (dins dels 5 grups de canals) | — |
 | 11 | Feature (Iteració 2) | Importar text a la nota ràpida (compartir, seleccionar text i enganxar) | [#30](https://github.com/alorma/Converses/issues/30) |
 | 16 | Neteja | Treure l'avís dels canals quan la v1 sigui residual | — |
-| 17 | Bug | La insígnia del llapis tapa l'avatar «fantasmeta» a Editar persona | — |
 
-Els punts 6, 7, 8 i 11 són de l'**Iteració 2**; el 6 i el 8 són Pro, i l'11 és gratis (vegeu `docs/pro/`). El #45 s'ha descartat i la cerca (#41) queda per més endavant. **Qualsevol canvi de la base de dades ha d'incloure una migració i el seu test** (la v1 ja és a Google Play); l'11, el 16 i el 17 no toquen Room. La v2 (canals en 5 grups) ja està feta; el 6 i el 8 necessitaran la v3. La numeració és la del backlog original, perquè els issues i les referències no canviïn; els punts resolts (1–5, 9, 10, 12, 13, 15) i el 14 (descartat: es queda el split button del detall) són a l'historial de git.
+Els punts 6, 7, 8 i 11 són de l'**Iteració 2**; el 6 i el 8 són Pro, i l'11 és gratis (vegeu `docs/pro/`). El #45 s'ha descartat i la cerca (#41) queda per més endavant. **Qualsevol canvi de la base de dades ha d'incloure una migració i el seu test** (la v1 ja és a Google Play); l'11 i el 16 no toquen Room. La v2 (canals en 5 grups) ja està feta; el 6 i el 8 necessitaran la v3. La numeració és la del backlog original, perquè els issues i les referències no canviïn; els punts resolts (1–5, 9, 10, 12, 13, 15, 17) i el 14 (descartat: es queda el split button del detall) són a l'historial de git.
 
 ---
 
@@ -75,12 +74,6 @@ Portar text d'altres apps a la nota ràpida amb el mínim de passos: el text ja 
 Quan la v1 sigui residual a la Play Console, treure l'avís de la migració dels canals: el banner (`NoticeBanner` i el seu ús a `PeopleListScreen`), `showChannelsNotice` i `onChannelsNoticeDismissed` al `PeopleListViewModel`, el flag `channelsNoticePending` d'`AppSettings`/`SettingsRepository`, el callback de `Migration1To2` i les strings `channels_notice_*`.
 
 **La migració i el seu test no es treuen mai:** qualsevol usuari amb la BBDD a la v1 que obri una versió nova ha de passar per ella.
-
-## 17 · Bug: la insígnia del llapis tapa l'avatar «fantasmeta»
-
-A **Editar persona**, la insígnia del llapis de `NameAvatar` se superposa a la part baixa de la forma `Ghostish`, que té un tall ondulat just allà, i l'avatar sembla tallat. A les altres formes el llapis queda a la vora i no tapa res.
-
-**Què cal fer:** mantenir la insígnia fora de la silueta (moure-la una mica cap a fora o posicionar-la segons la forma) i comprovar-ho a l'emulador amb les 6 formes. Només UI, sense Room. Detectat el 12 d'oct. de 2026 mirant els avatars del rellotge.
 
 ## 18 · Wear OS: pendent després de la 1.ª versió
 
