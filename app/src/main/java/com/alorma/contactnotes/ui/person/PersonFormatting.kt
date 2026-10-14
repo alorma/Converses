@@ -12,11 +12,11 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import com.alorma.contactnotes.R
 import com.alorma.contactnotes.shared.ChannelType
+import com.alorma.contactnotes.ui.dateFormatter
 import com.alorma.contactnotes.ui.people.label
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
-import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 import java.util.Locale
 
@@ -38,13 +38,13 @@ fun formatTime(
   epochMillis: Long,
   zone: ZoneId = ZoneId.systemDefault(),
   locale: Locale = Locale.getDefault(),
-): String = Instant.ofEpochMilli(epochMillis).atZone(zone).format(DateTimeFormatter.ofPattern("HH:mm", locale))
+): String = Instant.ofEpochMilli(epochMillis).atZone(zone).format(dateFormatter("HH:mm", locale))
 
 fun formatMonthYear(
   epochMillis: Long,
   zone: ZoneId = ZoneId.systemDefault(),
   locale: Locale = Locale.getDefault(),
-): String = Instant.ofEpochMilli(epochMillis).atZone(zone).format(DateTimeFormatter.ofPattern("LLLL yyyy", locale))
+): String = Instant.ofEpochMilli(epochMillis).atZone(zone).format(dateFormatter("LLLL yyyy", locale))
 
 /** "Avui", "Ahir" o la data amb l'any només si no és l'actual. */
 @Composable
@@ -57,8 +57,8 @@ fun dayLabel(
   return when {
     days == 0L -> stringResource(R.string.today)
     days == 1L -> stringResource(R.string.yesterday)
-    date.year == today.year -> date.format(DateTimeFormatter.ofPattern("d MMMM", locale))
-    else -> date.format(DateTimeFormatter.ofPattern("d MMMM yyyy", locale))
+    date.year == today.year -> date.format(dateFormatter("d MMMM", locale))
+    else -> date.format(dateFormatter("d MMMM yyyy", locale))
   }
 }
 

@@ -3,10 +3,10 @@ package com.alorma.contactnotes.ui.people
 import androidx.annotation.StringRes
 import com.alorma.contactnotes.R
 import com.alorma.contactnotes.shared.ChannelType
+import com.alorma.contactnotes.ui.dateFormatter
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
-import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 import java.util.Locale
 
@@ -37,10 +37,10 @@ fun formatLastActivity(
   val dateTime = Instant.ofEpochMilli(epochMillis).atZone(zone)
   val days = ChronoUnit.DAYS.between(dateTime.toLocalDate(), today)
   return when {
-    days <= 0 -> dateTime.format(DateTimeFormatter.ofPattern("HH:mm", locale))
-    days < 7 -> dateTime.format(DateTimeFormatter.ofPattern("EEE", locale)).lowercase(locale)
-    dateTime.year == today.year -> dateTime.format(DateTimeFormatter.ofPattern("d MMM", locale))
-    else -> dateTime.format(DateTimeFormatter.ofPattern("dd/MM/yyyy", locale))
+    days <= 0 -> dateTime.format(dateFormatter("HH:mm", locale))
+    days < 7 -> dateTime.format(dateFormatter("EEE", locale)).lowercase(locale)
+    dateTime.year == today.year -> dateTime.format(dateFormatter("d MMM", locale))
+    else -> dateTime.format(dateFormatter("dd/MM/yyyy", locale))
   }
 }
 
