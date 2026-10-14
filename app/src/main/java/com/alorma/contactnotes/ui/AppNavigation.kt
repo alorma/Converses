@@ -85,7 +85,7 @@ fun AppNavigation(startOnboarding: Boolean = false) {
               onNewPerson = { navigation.navigate(EditPersonRoute()) },
             )
           }
-          entry<ArchivedRoute> {
+          entry<ArchivedRoute>(metadata = tabTransitions) {
             PeopleListRoute(
               archived = true,
               onPersonClick = { person -> navigation.navigate(personRoute(person)) },
@@ -149,8 +149,6 @@ private fun personRoute(person: PersonEntity): AppRoute =
 private const val TransitionMs = 300
 private const val FadeMs = 150
 private const val BackScale = 0.9f
-private const val EnterStartAlpha = 0.6f
-private const val ExitEndAlpha = 0.4f
 
 private val transitionEasing = CubicBezierEasing(0.05f, 0.7f, 0.1f, 1f)
 
@@ -169,28 +167,40 @@ private fun <S> AnimatedContentTransitionScope<S>.nativeTransition(
   val enter: EnterTransition
   val exit: ExitTransition
   if (forward) {
-    enter = (
-      if (vertical) slideInVertically(offset, ::distance) else slideInHorizontally(offset, ::distance)
-    ) + fadeIn(tween(TransitionMs, easing = LinearEasing), initialAlpha = EnterStartAlpha)
+    // Opaque while it slides in: a fading entry lets the screen below show through it.
+    enter = if (vertical) slideInVertically(offset, ::distance) else slideInHorizontally(offset, ::distance)
     exit = ExitTransition.None
   } else {
     enter = EnterTransition.None
+    // Fully opaque until the very end, like the system animation: an early fade shows the screen
+    // below through the leaving one.
+    val lateFade = fadeOut(tween(TransitionMs / 3, delayMillis = TransitionMs * 2 / 3, easing = LinearEasing))
     exit =
       if (vertical) {
-        slideOutVertically(offset, ::distance) +
-          fadeOut(tween(FadeMs + 100, easing = LinearEasing), targetAlpha = ExitEndAlpha)
+        slideOutVertically(offset, ::distance) + lateFade
       } else {
-        scaleOut(tween(TransitionMs, easing = transitionEasing), targetScale = BackScale) +
-          fadeOut(tween(FadeMs + 100, easing = LinearEasing), targetAlpha = ExitEndAlpha)
+        scaleOut(tween(TransitionMs, easing = transitionEasing), targetScale = BackScale) + lateFade
       }
   }
   return enter togetherWith exit
 }
 
+/** Fade through: the leaving tab fades out quickly, then the new one fades in. */
+private fun <S> AnimatedContentTransitionScope<S>.tabTransition(): ContentTransform =
+  fadeIn(tween(TransitionMs - FadeMs / 2, delayMillis = FadeMs / 2, easing = LinearEasing)) togetherWith
+    fadeOut(tween(FadeMs / 2, easing = LinearEasing))
+
 private val modalTransitions =
   NavDisplay.transitionSpec { nativeTransition(forward = true, vertical = true) } +
     NavDisplay.popTransitionSpec { nativeTransition(forward = false, vertical = true) } +
     NavDisplay.predictivePopTransitionSpec { edge -> predictiveBack(edge, vertical = true) }
+
+/**
+ * Metadata for every tab but the base: going to it (`[People]` → `[People, Archived]`) fades. Leaving it
+ * (back key, gesture or the toolbar) uses the default pop, where the tab shrinks and reveals People.
+ * Adding a pop spec here makes the back key flicker.
+ */
+private val tabTransitions = NavDisplay.transitionSpec { tabTransition() }
 
 private const val EdgeRight = 1
 private const val GestureScale = 0.85f
