@@ -31,13 +31,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Archive
 import androidx.compose.material.icons.rounded.Check
-import androidx.compose.material.icons.rounded.EditNote
 import androidx.compose.material.icons.rounded.Forum
 import androidx.compose.material.icons.rounded.Groups
 import androidx.compose.material.icons.rounded.Lock
 import androidx.compose.material.icons.rounded.PersonAdd
-import androidx.compose.material.icons.rounded.Settings
-import androidx.compose.material3.FabPosition
 import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
@@ -68,16 +65,15 @@ import com.alorma.contactnotes.data.db.color
 import com.alorma.contactnotes.data.db.shape
 import com.alorma.contactnotes.designsystem.components.Avatar
 import com.alorma.contactnotes.designsystem.components.BetaBadge
-import com.alorma.contactnotes.designsystem.components.ConversesFloatingToolbar
 import com.alorma.contactnotes.designsystem.components.DashedActionRow
 import com.alorma.contactnotes.designsystem.components.GroupedListDefaults
 import com.alorma.contactnotes.designsystem.components.NoticeBanner
-import com.alorma.contactnotes.designsystem.components.ToolbarDestination
 import com.alorma.contactnotes.designsystem.components.WelcomeEmptyState
 import com.alorma.contactnotes.designsystem.components.groupedItems
 import com.alorma.contactnotes.designsystem.components.rememberConversesHaptics
 import com.alorma.contactnotes.designsystem.theme.ListTitleStyle
 import com.alorma.contactnotes.shared.ChannelType
+import com.alorma.contactnotes.ui.navigation.LocalFloatingBarPadding
 import com.alorma.contactnotes.ui.person.channelName
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
@@ -88,22 +84,16 @@ private val ScreenMargin = 16.dp
 fun PeopleListRoute(
   archived: Boolean,
   onPersonClick: (PersonEntity) -> Unit,
-  onQuickNote: () -> Unit,
-  onOpenSettings: () -> Unit,
   onNewPerson: () -> Unit,
-  onToggleArchivedList: () -> Unit,
   viewModel: PeopleListViewModel = koinViewModel(parameters = { parametersOf(archived) }),
 ) {
   val state by viewModel.uiState.collectAsStateWithLifecycle()
   PeopleListScreen(
     state = state,
     archived = archived,
-    onToggleArchivedList = onToggleArchivedList,
     onFilterToggled = viewModel::onFilterToggled,
     onChannelsNoticeDismissed = viewModel::onChannelsNoticeDismissed,
     onPersonClick = onPersonClick,
-    onQuickNote = onQuickNote,
-    onOpenSettings = onOpenSettings,
     onNewPerson = onNewPerson,
   )
 }
@@ -112,12 +102,9 @@ fun PeopleListRoute(
 fun PeopleListScreen(
   state: PeopleListUiState,
   archived: Boolean,
-  onToggleArchivedList: () -> Unit,
   onFilterToggled: (ChannelType) -> Unit,
   onChannelsNoticeDismissed: () -> Unit,
   onPersonClick: (PersonEntity) -> Unit,
-  onQuickNote: () -> Unit,
-  onOpenSettings: () -> Unit,
   onNewPerson: () -> Unit,
 ) {
   val listState = rememberLazyListState()
@@ -166,34 +153,6 @@ fun PeopleListScreen(
         }
       }
     },
-    floatingActionButtonPosition = FabPosition.Center,
-    floatingActionButton = {
-      ConversesFloatingToolbar(
-        fabIcon = Icons.Rounded.EditNote,
-        fabContentDescription = stringResource(R.string.quick_note),
-        onFabClick = onQuickNote,
-        modifier = Modifier.padding(horizontal = ScreenMargin),
-      ) {
-        ToolbarDestination(
-          icon = Icons.Rounded.Groups,
-          contentDescription = stringResource(R.string.people_title),
-          selected = !archived,
-          onClick = { if (archived) onToggleArchivedList() },
-        )
-        ToolbarDestination(
-          icon = Icons.Rounded.Archive,
-          contentDescription = stringResource(R.string.filter_archived),
-          selected = archived,
-          onClick = { if (!archived) onToggleArchivedList() },
-        )
-        ToolbarDestination(
-          icon = Icons.Rounded.Settings,
-          contentDescription = stringResource(R.string.settings_title),
-          selected = false,
-          onClick = onOpenSettings,
-        )
-      }
-    },
   ) { padding ->
     LazyColumn(
       state = listState,
@@ -203,7 +162,7 @@ fun PeopleListScreen(
           start = ScreenMargin,
           end = ScreenMargin,
           top = padding.calculateTopPadding(),
-          bottom = 96.dp + padding.calculateBottomPadding(),
+          bottom = LocalFloatingBarPadding.current.calculateBottomPadding() + padding.calculateBottomPadding(),
         ),
       verticalArrangement = Arrangement.spacedBy(GroupedListDefaults.ItemSpacing),
     ) {

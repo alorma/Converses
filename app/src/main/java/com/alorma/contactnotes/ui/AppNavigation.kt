@@ -30,6 +30,7 @@ import com.alorma.contactnotes.ui.edit.EditPersonScreen
 import com.alorma.contactnotes.ui.entry.PersonSelectionBridge
 import com.alorma.contactnotes.ui.entry.QuickNoteScreen
 import com.alorma.contactnotes.ui.navigation.AppRoute
+import com.alorma.contactnotes.ui.navigation.AppShell
 import com.alorma.contactnotes.ui.navigation.ArchivedRoute
 import com.alorma.contactnotes.ui.navigation.EditPersonRoute
 import com.alorma.contactnotes.ui.navigation.OnboardingRoute
@@ -39,6 +40,7 @@ import com.alorma.contactnotes.ui.navigation.PersonRoute
 import com.alorma.contactnotes.ui.navigation.QuickNoteRoute
 import com.alorma.contactnotes.ui.navigation.SettingsRoute
 import com.alorma.contactnotes.ui.navigation.TopLevelBackStack
+import com.alorma.contactnotes.ui.navigation.TopLevelRoute
 import com.alorma.contactnotes.ui.onboarding.OnboardingScreen
 import com.alorma.contactnotes.ui.people.PeopleListRoute
 import com.alorma.contactnotes.ui.person.PersonDetailRoute
@@ -53,90 +55,92 @@ fun AppNavigation(startOnboarding: Boolean = false) {
   val activity = LocalActivity.current
   val selectionBridge: PersonSelectionBridge = koinInject()
 
-  NavDisplay(
-    backStack = navigation.backStack,
-    onBack = { if (!navigation.pop()) activity?.finish() },
-    transitionSpec = { nativeTransition(forward = true, vertical = false) },
-    popTransitionSpec = { nativeTransition(forward = false, vertical = false) },
-    predictivePopTransitionSpec = { edge -> predictiveBack(edge, vertical = false) },
-    entryDecorators =
-      listOf(
-        rememberSaveableStateHolderNavEntryDecorator(),
-        rememberViewModelStoreNavEntryDecorator(),
-      ),
-    entryProvider =
-      entryProvider {
-        entry<OnboardingRoute> {
-          OnboardingScreen(onFinished = { navigation.resetTo(PeopleRoute) })
-        }
-        entry<PeopleRoute> {
-          PeopleListRoute(
-            archived = false,
-            onToggleArchivedList = { navigation.switchTab(ArchivedRoute) },
-            onPersonClick = { person -> navigation.navigate(personRoute(person)) },
-            onQuickNote = { navigation.navigate(QuickNoteRoute()) },
-            onNewPerson = { navigation.navigate(EditPersonRoute()) },
-            onOpenSettings = { navigation.navigate(SettingsRoute) },
-          )
-        }
-        entry<ArchivedRoute> {
-          PeopleListRoute(
-            archived = true,
-            onToggleArchivedList = { navigation.switchTab(PeopleRoute) },
-            onPersonClick = { person -> navigation.navigate(personRoute(person)) },
-            onQuickNote = { navigation.navigate(QuickNoteRoute()) },
-            onNewPerson = { navigation.navigate(EditPersonRoute()) },
-            onOpenSettings = { navigation.navigate(SettingsRoute) },
-          )
-        }
-        entry<QuickNoteRoute>(metadata = modalTransitions) { route ->
-          QuickNoteScreen(
-            personId = route.personId,
-            onClose = { navigation.pop() },
-            onNewPerson = { navigation.navigate(EditPersonRoute(returnSelection = true)) },
-          )
-        }
-        entry<SettingsRoute> {
-          SettingsScreen(onBack = { navigation.pop() })
-        }
-        entry<PersonLockedRoute> { route ->
-          PersonLockedScreen(
-            personId = route.id,
-            onBack = { navigation.pop() },
-            onUnlocked = {
-              navigation.pop()
-              navigation.navigate(PersonRoute(route.id))
-            },
-          )
-        }
-        entry<PersonRoute> { route ->
-          PersonDetailRoute(
-            personId = route.id,
-            onBack = { navigation.pop() },
-            onEdit = { focus -> navigation.navigate(EditPersonRoute(route.id, focus = focus)) },
-          )
-        }
-        entry<EditPersonRoute>(metadata = modalTransitions) { route ->
-          EditPersonScreen(
-            personId = route.personId,
-            focus = route.focus,
-            onClose = { navigation.pop() },
-            onSaved = { id ->
-              navigation.pop()
-              if (route.returnSelection) {
-                selectionBridge.post(id, authenticated = true)
-              } else if (route.personId == 0L) {
-                navigation.navigate(PersonRoute(id))
-              }
-            },
-            onDeleted = {
-              navigation.pop()
-              navigation.pop()
-            },
-          )
-        }
-      },
-  )
+  AppShell(
+    currentTab = navigation.currentTab,
+    showNavigation = navigation.current is TopLevelRoute,
+    onTabSelected = navigation::switchTab,
+    onQuickNote = { navigation.navigate(QuickNoteRoute()) },
+    onOpenSettings = { navigation.navigate(SettingsRoute) },
+  ) {
+    NavDisplay(
+      backStack = navigation.backStack,
+      onBack = { if (!navigation.pop()) activity?.finish() },
+      transitionSpec = { nativeTransition(forward = true, vertical = false) },
+      popTransitionSpec = { nativeTransition(forward = false, vertical = false) },
+      predictivePopTransitionSpec = { edge -> predictiveBack(edge, vertical = false) },
+      entryDecorators =
+        listOf(
+          rememberSaveableStateHolderNavEntryDecorator(),
+          rememberViewModelStoreNavEntryDecorator(),
+        ),
+      entryProvider =
+        entryProvider {
+          entry<OnboardingRoute> {
+            OnboardingScreen(onFinished = { navigation.resetTo(PeopleRoute) })
+          }
+          entry<PeopleRoute> {
+            PeopleListRoute(
+              archived = false,
+              onPersonClick = { person -> navigation.navigate(personRoute(person)) },
+              onNewPerson = { navigation.navigate(EditPersonRoute()) },
+            )
+          }
+          entry<ArchivedRoute> {
+            PeopleListRoute(
+              archived = true,
+              onPersonClick = { person -> navigation.navigate(personRoute(person)) },
+              onNewPerson = { navigation.navigate(EditPersonRoute()) },
+            )
+          }
+          entry<QuickNoteRoute>(metadata = modalTransitions) { route ->
+            QuickNoteScreen(
+              personId = route.personId,
+              onClose = { navigation.pop() },
+              onNewPerson = { navigation.navigate(EditPersonRoute(returnSelection = true)) },
+            )
+          }
+          entry<SettingsRoute> {
+            SettingsScreen(onBack = { navigation.pop() })
+          }
+          entry<PersonLockedRoute> { route ->
+            PersonLockedScreen(
+              personId = route.id,
+              onBack = { navigation.pop() },
+              onUnlocked = {
+                navigation.pop()
+                navigation.navigate(PersonRoute(route.id))
+              },
+            )
+          }
+          entry<PersonRoute> { route ->
+            PersonDetailRoute(
+              personId = route.id,
+              onBack = { navigation.pop() },
+              onEdit = { focus -> navigation.navigate(EditPersonRoute(route.id, focus = focus)) },
+            )
+          }
+          entry<EditPersonRoute>(metadata = modalTransitions) { route ->
+            EditPersonScreen(
+              personId = route.personId,
+              focus = route.focus,
+              onClose = { navigation.pop() },
+              onSaved = { id ->
+                navigation.pop()
+                if (route.returnSelection) {
+                  selectionBridge.post(id, authenticated = true)
+                } else if (route.personId == 0L) {
+                  navigation.navigate(PersonRoute(id))
+                }
+              },
+              onDeleted = {
+                navigation.pop()
+                navigation.pop()
+              },
+            )
+          }
+        },
+    )
+  }
 }
 
 private fun personRoute(person: PersonEntity): AppRoute =
