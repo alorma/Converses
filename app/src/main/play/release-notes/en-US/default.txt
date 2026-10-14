@@ -1,4 +1,5 @@
-Version 1.7.1:
+Version 1.7.6:
 • Converses now has a Wear OS app. Your people and their latest notes on your wrist, where you were going to look at your phone anyway.
-• Dictate a note on the watch and it lands on your phone. If the phone is out of reach, it waits its turn.
+• Dictate a note on the watch and it lands on your phone. Misheard? Dictate it again.
 • Protected people open on the watch only after you approve it with your fingerprint on the phone.
+• Missing the app on your watch or phone? Converses notices and offers to install it.
