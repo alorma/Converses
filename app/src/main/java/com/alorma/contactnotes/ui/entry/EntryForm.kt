@@ -59,11 +59,15 @@ class EntryFormState(
   channel: ChannelType? = null,
   text: String = "",
   whenChoice: WhenChoice = WhenChoice.Now,
+  kindTouched: Boolean = false,
 ) {
   var kind by mutableStateOf(kind)
   var channel by mutableStateOf(channel)
   var text by mutableStateOf(text)
   var whenChoice by mutableStateOf(whenChoice)
+
+  /** `true` once the user picks «Qui» by hand, so an automatic default never overrides it. */
+  var kindTouched by mutableStateOf(kindTouched)
 
   val occurredAt: Long? get() = whenChoice.at
   val canSave: Boolean get() = text.isNotBlank()
@@ -71,7 +75,7 @@ class EntryFormState(
   companion object {
     val Saver: Saver<EntryFormState, Any> =
       listSaver(
-        save = { listOf(it.kind.name, it.channel?.name, it.text, WhenChoice.encode(it.whenChoice)) },
+        save = { listOf(it.kind.name, it.channel?.name, it.text, WhenChoice.encode(it.whenChoice), it.kindTouched) },
         restore = {
           @Suppress("UNCHECKED_CAST")
           EntryFormState(
@@ -79,6 +83,7 @@ class EntryFormState(
             channel = (it[1] as String?)?.let(ChannelType::valueOf),
             text = it[2] as String,
             whenChoice = WhenChoice.decode(it[3] as List<Any?>),
+            kindTouched = it[4] as Boolean,
           )
         },
       )
@@ -198,7 +203,12 @@ fun WhoSelector(
       },
     selected = state.kind,
     onSelect = { kind ->
-      if (kind == EntryKind.HEARD && person == null) onPickPerson?.invoke() else state.kind = kind
+      if (kind == EntryKind.HEARD && person == null) {
+        onPickPerson?.invoke()
+      } else {
+        state.kind = kind
+        state.kindTouched = true
+      }
     },
     modifier = modifier,
     prominent = true,

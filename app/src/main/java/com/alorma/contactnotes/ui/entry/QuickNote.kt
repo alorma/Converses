@@ -63,6 +63,7 @@ import com.alorma.contactnotes.designsystem.theme.PersonTheme
 import com.alorma.contactnotes.shared.ChannelType
 import com.alorma.contactnotes.shared.EntryKind
 import com.alorma.contactnotes.shared.initialsOf
+import com.alorma.contactnotes.ui.navigation.isOnlyUrl
 import com.alorma.contactnotes.ui.person.canUnlockWithDevice
 import com.alorma.contactnotes.ui.person.openSecuritySetup
 import com.alorma.contactnotes.ui.person.promptUnlock
@@ -179,6 +180,20 @@ class QuickNoteViewModel(
   }
 }
 
+/**
+ * Default «Qui» of an imported text: a lone link is a note (`HAPPENED`); otherwise it is what the person
+ * said (`HEARD`) once one is picked, and `SAID` before that (`HEARD` is disabled without a person).
+ */
+fun importedKind(
+  text: String,
+  hasPerson: Boolean,
+): EntryKind =
+  when {
+    isOnlyUrl(text) -> EntryKind.HAPPENED
+    hasPerson -> EntryKind.HEARD
+    else -> EntryKind.SAID
+  }
+
 @Composable
 fun QuickNoteScreen(
   personId: Long,
@@ -188,7 +203,11 @@ fun QuickNoteScreen(
   viewModel: QuickNoteViewModel = koinViewModel(parameters = { parametersOf(personId) }),
 ) {
   val state by viewModel.uiState.collectAsStateWithLifecycle()
-  val form = rememberEntryFormState(initialText = sharedText.orEmpty())
+  val form =
+    rememberEntryFormState(
+      initialKind = sharedText?.let { importedKind(it, hasPerson = false) } ?: EntryKind.SAID,
+      initialText = sharedText.orEmpty(),
+    )
   val activity = LocalActivity.current as FragmentActivity
   var showNoLock by remember { mutableStateOf(false) }
 
@@ -218,6 +237,7 @@ fun QuickNoteScreen(
   QuickNoteContent(
     state = state,
     form = form,
+    importedText = sharedText,
     onClose = onClose,
     onSelectPerson = viewModel::select,
     onNewPerson = onNewPerson,
@@ -257,6 +277,7 @@ fun QuickNoteContent(
   onSelectPerson: (PersonEntity) -> Unit,
   onNewPerson: () -> Unit,
   onSave: (person: PersonEntity, channel: ChannelType) -> Unit,
+  importedText: String? = null,
 ) {
   val selected = state.selected
   val channel = form.channel ?: state.lastChannel ?: ChannelType.entries.first()
@@ -272,6 +293,13 @@ fun QuickNoteContent(
     if (pickedFromChip && selected != null) {
       form.kind = EntryKind.HEARD
       pickedFromChip = false
+    }
+  }
+
+  // Importat d'una altra app: en triar persona, «Qui» passa a la persona si l'usuari no l'havia tocat
+  LaunchedEffect(selected?.id) {
+    if (importedText != null && selected != null && !form.kindTouched) {
+      form.kind = importedKind(importedText, hasPerson = true)
     }
   }
 
@@ -323,6 +351,7 @@ fun QuickNoteContent(
           header = {
             PersonPicker(
               selected = selected,
+              noPeople = state.people.isEmpty(),
               onClick = {
                 pickedFromChip = false
                 openPicker()
@@ -356,6 +385,7 @@ fun QuickNoteContent(
 @Composable
 private fun PersonPicker(
   selected: PersonEntity?,
+  noPeople: Boolean,
   onClick: () -> Unit,
 ) {
   Surface(
@@ -394,7 +424,7 @@ private fun PersonPicker(
           color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
         Text(
-          text = selected?.name ?: stringResource(R.string.pick_person),
+          text = selected?.name ?: stringResource(if (noPeople) R.string.create_first_person else R.string.pick_person),
           style = MaterialTheme.typography.titleMedium,
           fontWeight = FontWeight.Bold,
           color = if (selected == null) MaterialTheme.colorScheme.onSurfaceVariant else Color.Unspecified,

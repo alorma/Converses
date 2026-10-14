@@ -128,6 +128,7 @@
     <string name="entry_hint_person">Què ha dit %1$s?</string>
     <string name="entry_hint_note">Què vols apuntar?</string>
     <string name="pick_person">Tria una persona</string>
+    <string name="create_first_person">Crea la primera persona</string>
     <string name="search_by_name">Cerca pel nom</string>
     <string name="quick_with_whom">Amb qui</string>
     <string name="entry_where_title">On</string>
