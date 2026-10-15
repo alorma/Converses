@@ -37,6 +37,7 @@ import com.alorma.contactnotes.wear.data.WearNotes
 import com.alorma.contactnotes.wear.data.WearSnapshotStore
 import com.alorma.contactnotes.wear.data.withProtectedSessions
 import java.util.Locale
+import kotlinx.coroutines.flow.map
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -92,13 +93,17 @@ fun WearNavigation() {
   val sessions = remember { ProtectedSessions.shared }
   // Una protegida aprovada es veu com una persona normal mentre la seva sessió és oberta, i només en memòria
   val openSnapshots = remember { store.stored.withProtectedSessions(sessions.all) }
-  val companion = viewModel { CompanionViewModel(GmsPhoneInstall(context)) }
+  val companion = viewModel { CompanionViewModel(GmsPhoneInstall(context), store.stored.map { it != null }) }
   val companionState by companion.state.collectAsStateWithLifecycle()
   val activity = LocalActivity.current
   // Sense l'app al mòbil emparellat no hi ha res a mostrar: ni la llista, ni la còpia local, ni el bloqueig
   when (val state = companionState) {
     CompanionUiState.Loading -> {
       LoadingContent()
+      return
+    }
+    CompanionUiState.NoPhone -> {
+      NoPhoneContent()
       return
     }
     is CompanionUiState.Missing -> {
