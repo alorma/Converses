@@ -9,6 +9,7 @@ plugins {
   alias(libs.plugins.compose.screenshot)
   alias(libs.plugins.version)
   alias(libs.plugins.play.publisher)
+  alias(libs.plugins.androidx.baselineprofile)
 }
 
 room {
@@ -93,9 +94,20 @@ tasks.withType<PreviewScreenshotValidationTask>().configureEach {
   testEngineInput.threshold.set(0.01f)
 }
 
+// The baseline profile plugin clones `release` into `nonMinifiedRelease` but with the `optimization` DSL it stays
+// obfuscated, and the profile would be full of names like `La02;`
+androidComponents {
+  beforeVariants(selector().withBuildType("nonMinifiedRelease")) { variant ->
+    variant.isMinifyEnabled = false
+    variant.shrinkResources = false
+  }
+}
+
 dependencies {
   implementation(project(":designsystem"))
   implementation(project(":shared"))
+  implementation(libs.androidx.profileinstaller)
+  baselineProfile(project(":baselineprofile"))
   implementation(libs.androidx.core.ktx)
   implementation(libs.androidx.activity.compose)
   implementation(libs.androidx.room.runtime)

@@ -1,5 +1,6 @@
 package com.alorma.contactnotes.ui.people
 
+import androidx.activity.compose.ReportDrawnWhen
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
@@ -101,6 +102,8 @@ fun PeopleListScreen(
   onNewPerson: () -> Unit,
 ) {
   val listState = rememberLazyListState()
+  // Drawn once the rows are laid out (or there is nothing to show), not just when the data arrives
+  ReportDrawnWhen { !state.isLoading && (state.people.isEmpty() || listState.layoutInfo.visibleItemsInfo.isNotEmpty()) }
   // En canviar els xips la llista torna a dalt (no a la primera composició, perquè no perdi la posició en tornar del detall)
   var lastFilter by remember { mutableStateOf(state.filter) }
   LaunchedEffect(state.filter) {
