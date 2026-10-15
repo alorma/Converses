@@ -44,6 +44,8 @@
     <string name="approval_expired_title">Expired</string>
     <string name="approval_expired_hint">It wasn\'t confirmed in time.</string>
     <string name="approval_retry">Try again</string>
+    <string name="no_phone_title">Phone needed</string>
+    <string name="no_phone_hint">Pair a phone and install Converses on it.</string>
     <string name="companion_missing_title">App missing</string>
     <string name="companion_missing_hint">Install Converses on your phone.</string>
     <string name="companion_open_on_phone">Open on phone</string>

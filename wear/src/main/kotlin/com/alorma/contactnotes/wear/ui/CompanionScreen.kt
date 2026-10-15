@@ -2,6 +2,7 @@ package com.alorma.contactnotes.wear.ui
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Check
+import androidx.compose.material.icons.rounded.PhonelinkOff
 import androidx.compose.material.icons.rounded.Smartphone
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -9,6 +10,20 @@ import androidx.compose.ui.res.stringResource
 import com.alorma.contactnotes.wear.R
 import com.alorma.contactnotes.wear.theme.PersonNameStyle
 import com.alorma.contactnotes.wear.theme.WearColors
+
+/** Cap mòbil emparellat i cap dada guardada: l'app del rellotge no pot fer res sola. */
+@Composable
+fun NoPhoneContent(modifier: Modifier = Modifier) {
+  StatusContent(
+    icon = Icons.Rounded.PhonelinkOff,
+    iconBackground = WearColors.SurfaceCardHigh,
+    iconTint = WearColors.OnSurface,
+    title = stringResource(R.string.no_phone_title),
+    subtitle = stringResource(R.string.no_phone_hint),
+    modifier = modifier,
+    titleStyle = PersonNameStyle,
+  )
+}
 
 /** Pantalla 17: el rellotge té l'app i el mòbil emparellat no. Substitueix la llista i no mostra cap dada. */
 @Composable
@@ -56,3 +71,7 @@ fun CompanionMissingPreview() = WearPreview { CompanionMissingContent(onOpenOnPh
 @WearScreenPreviews
 @Composable
 fun CompanionOpenedPreview() = WearPreview { CompanionOpenedContent(onClose = {}) }
+
+@WearScreenPreviews
+@Composable
+fun NoPhonePreview() = WearPreview { NoPhoneContent() }

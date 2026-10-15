@@ -7,6 +7,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
@@ -49,10 +50,10 @@ class CompanionViewModelTest {
   fun tearDown() = Dispatchers.resetMain()
 
   @Test
-  fun appOnPhoneOrNoPhoneLetsTheAppRun() =
+  fun appOnPhoneOrStoredDataLetsTheAppRun() =
     runTest(dispatcher) {
       for (state in listOf(CompanionState.Present, CompanionState.NoDevice)) {
-        val vm = CompanionViewModel(FakeInstall(state))
+        val vm = CompanionViewModel(FakeInstall(state), flowOf(true))
         backgroundScope.launch { vm.state.collect {} }
         runCurrent()
         assertEquals(CompanionUiState.Ready, vm.state.value)
@@ -60,9 +61,18 @@ class CompanionViewModelTest {
     }
 
   @Test
+  fun noPhoneAndNoDataShowsNoPhone() =
+    runTest(dispatcher) {
+      val vm = CompanionViewModel(FakeInstall(CompanionState.NoDevice), flowOf(false))
+      backgroundScope.launch { vm.state.collect {} }
+      runCurrent()
+      assertEquals(CompanionUiState.NoPhone, vm.state.value)
+    }
+
+  @Test
   fun pairedPhoneWithoutTheAppShowsMissing() =
     runTest(dispatcher) {
-      val vm = CompanionViewModel(FakeInstall(CompanionState.Missing(phone)))
+      val vm = CompanionViewModel(FakeInstall(CompanionState.Missing(phone)), flowOf(false))
       backgroundScope.launch { vm.state.collect {} }
       runCurrent()
       assertEquals(CompanionUiState.Missing(phone), vm.state.value)
@@ -72,7 +82,7 @@ class CompanionViewModelTest {
   fun openingPlayMovesToOpenedAndTargetsThePhone() =
     runTest(dispatcher) {
       val install = FakeInstall(CompanionState.Missing(phone))
-      val vm = CompanionViewModel(install)
+      val vm = CompanionViewModel(install, flowOf(false))
       backgroundScope.launch { vm.state.collect {} }
       runCurrent()
       vm.openOnPhone(phone)
@@ -84,7 +94,7 @@ class CompanionViewModelTest {
   @Test
   fun failedOpenStaysOnMissing() =
     runTest(dispatcher) {
-      val vm = CompanionViewModel(FakeInstall(CompanionState.Missing(phone), opens = false))
+      val vm = CompanionViewModel(FakeInstall(CompanionState.Missing(phone), opens = false), flowOf(false))
       backgroundScope.launch { vm.state.collect {} }
       runCurrent()
       vm.openOnPhone(phone)
@@ -96,7 +106,7 @@ class CompanionViewModelTest {
   fun installingTheAppOnThePhoneLetsTheAppRun() =
     runTest(dispatcher) {
       val install = FakeInstall(CompanionState.Missing(phone))
-      val vm = CompanionViewModel(install)
+      val vm = CompanionViewModel(install, flowOf(false))
       backgroundScope.launch { vm.state.collect {} }
       runCurrent()
       vm.openOnPhone(phone)

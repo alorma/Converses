@@ -18,6 +18,7 @@ import com.alorma.contactnotes.wear.ui.LoadingPreview
 import com.alorma.contactnotes.wear.ui.LockRequiredPreview
 import com.alorma.contactnotes.wear.ui.NoDataPreview
 import com.alorma.contactnotes.wear.ui.NoPeoplePreview
+import com.alorma.contactnotes.wear.ui.NoPhonePreview
 import com.alorma.contactnotes.wear.ui.PeopleDiscardedNotesPreview
 import com.alorma.contactnotes.wear.ui.PeoplePhoneOfflinePreview
 import com.alorma.contactnotes.wear.ui.PeoplePreview
@@ -154,4 +155,9 @@ class WearScreenshotTests {
   @PreviewTest
   @Composable
   fun companionOpened() = CompanionOpenedPreview()
+
+  @WatchPreviews
+  @PreviewTest
+  @Composable
+  fun noPhone() = NoPhonePreview()
 }

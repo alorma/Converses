@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.alorma.contactnotes.shared.CompanionNode
 import com.alorma.contactnotes.shared.CompanionState
 import com.alorma.contactnotes.wear.data.PhoneInstall
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -16,8 +17,11 @@ sealed interface CompanionUiState {
   /** Encara no se sap si l'app és al mòbil: no es mostra res. */
   data object Loading : CompanionUiState
 
-  /** L'app és al mòbil, o no hi ha mòbil emparellat: l'app funciona com sempre. */
+  /** L'app és al mòbil, o no hi ha mòbil però hi ha dades guardades: l'app funciona com sempre. */
   data object Ready : CompanionUiState
+
+  /** Sense cap mòbil emparellat i sense dades sincronitzades: no hi ha res a mostrar, només cal dir què fa falta. */
+  data object NoPhone : CompanionUiState
 
   /** Pantalla 17: el mòbil emparellat no té l'app. */
   data class Missing(
@@ -30,13 +34,16 @@ sealed interface CompanionUiState {
 
 class CompanionViewModel(
   private val install: PhoneInstall,
+  hasData: Flow<Boolean>,
 ) : ViewModel() {
   private val opened = MutableStateFlow(false)
 
   val state: StateFlow<CompanionUiState> =
-    combine(install.state, opened) { companion, wasOpened ->
+    combine(install.state, opened, hasData) { companion, wasOpened, synced ->
       when (companion) {
-        CompanionState.Present, CompanionState.NoDevice -> CompanionUiState.Ready
+        CompanionState.Present -> CompanionUiState.Ready
+        // Amb dades guardades l'app funciona com sempre; sense dades ni mòbil, no hi ha res a fer sense ell
+        CompanionState.NoDevice -> if (synced) CompanionUiState.Ready else CompanionUiState.NoPhone
         is CompanionState.Missing ->
           if (wasOpened) CompanionUiState.Opened else CompanionUiState.Missing(companion.node)
       }

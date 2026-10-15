@@ -44,6 +44,8 @@
     <string name="approval_expired_title">Ha caducat</string>
     <string name="approval_expired_hint">No s\'ha confirmat a temps.</string>
     <string name="approval_retry">Reintenta</string>
+    <string name="no_phone_title">Cal el mòbil</string>
+    <string name="no_phone_hint">Emparella un mòbil i instal·la-hi Converses.</string>
     <string name="companion_missing_title">Falta l\'app</string>
     <string name="companion_missing_hint">Instal·la Converses al mòbil.</string>
     <string name="companion_open_on_phone">Obre al mòbil</string>
