@@ -2,8 +2,78 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <!-- PROVA DE CONCEPTE de docs/contacts (fase 0): no es fusiona mai a main -->
+    <!-- Via antiga: només fins a l'API 37; a partir de la 37.2 es fa servir el People Directory -->
+    <uses-permission
+        android:name="android.permission.READ_CONTACTS"
+        android:maxSdkVersion="37" />
+    <uses-permission
+        android:name="android.permission.WRITE_CONTACTS"
+        android:maxSdkVersion="37" />
+
     <!-- Nom diferent perquè la versió de debug i la de release es distingeixin al launcher -->
     <application
         android:label="@string/app_name"
-        tools:replace="android:label" />
+        tools:replace="android:label">
+
+        <activity
+            android:name=".debug.contacts.ContactsPocActivity"
+            android:exported="true" />
+
+        <!-- Via antiga: compte, sync adapter i fila «Converses» a Contactes -->
+        <activity
+            android:name=".debug.contacts.ContactsPocViewActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="vnd.android.cursor.item/vnd.com.alorma.converses.person" />
+            </intent-filter>
+        </activity>
+
+        <service
+            android:name=".debug.contacts.PocAuthenticatorService"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.accounts.AccountAuthenticator" />
+            </intent-filter>
+            <meta-data
+                android:name="android.accounts.AccountAuthenticator"
+                android:resource="@xml/poc_authenticator" />
+        </service>
+
+        <service
+            android:name=".debug.contacts.PocSyncAdapterService"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.content.SyncAdapter" />
+            </intent-filter>
+            <meta-data
+                android:name="android.content.SyncAdapter"
+                android:resource="@xml/poc_syncadapter" />
+            <meta-data
+                android:name="android.provider.CONTACTS_STRUCTURE"
+                android:resource="@xml/poc_contacts" />
+        </service>
+
+        <!-- Via nova: People Directory (API 37.2) -->
+        <provider
+            android:name=".debug.contacts.PocPeopleDirectoryProvider"
+            android:authorities="com.alorma.contactnotes.dev.people"
+            android:exported="true"
+            android:readPermission="android.permission.BIND_DIRECTORY_SEARCH">
+            <property
+                android:name="android.content.PeopleDirectory"
+                android:value="true" />
+        </provider>
+
+        <activity
+            android:name=".debug.contacts.ContactsPocInteractionActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.provider.action.START_PEOPLE_INTERACTION" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+    </application>
 </manifest>
