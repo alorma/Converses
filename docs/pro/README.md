@@ -29,7 +29,7 @@ Mai es cobra per **accedir, protegir o treure** les dades pròpies. Al Pro hi va
 | **Sub-canals** (backlog 8) | No existeix: només els 5 grups | Crear sub-canals dins de qualsevol grup, amb nom lliure (únic per persona) i valor opcional |
 | **Follow-ups / pendents** (backlog 6) | No existeix | Marcar entrades com a pendents, secció «Pendents» al detall, comptador al llistat i recordatoris |
 | **Color de la persona** (tema del detall, `PersonColorFeature`) | No hi és: les pantalles de la persona usen el tema de l'app i l'avatar només té el color automàtic pel nom | Activar el tema que pren el color de l'avatar (i l'ajust «Color de la persona» a Ajustos) |
-| **Contact integration** | No existeix | Vincular una persona a un contacte (`LOOKUP_KEY`), enllaç a «Connected apps» de Contactes, avís de trucada entrant (`CallScreeningService`), importació de diversos contactes de cop (`READ_CONTACTS`) |
+| **Contact integration** | No existeix | Vincular una persona a un contacte (`LOOKUP_KEY`), enllaç a «Connected apps» de Contactes, avís de trucada entrant (`CallScreeningService`), importació de diversos contactes de cop (`READ_CONTACTS`). Pla a `docs/contacts/` |
 
 ## Fet a la v1 gratuïta
 
