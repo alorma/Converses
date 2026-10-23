@@ -1,6 +1,6 @@
 # Contactes — handoff de la fase 0 (23 d'oct. de 2026)
 
-Estat de la investigació per continuar en una sessió nova. El pla és a `docs/contacts/README.md` i `fases.md` (a `main`, commit `587db00`); **aquest document el contradiu en diversos punts**: quan es tanqui la fase 0, cal reescriure el `README.md` amb el que hi ha aquí.
+Estat de la investigació per continuar en una sessió nova. El pla és a `docs/contacts/README.md` i `fases.md` (a `main`, commit `587db00`, **només en local, sense push**: el `main` remot ha avançat amb 5 commits de dependabot i el bump a 1.7.9-SNAPSHOT; cal `git pull --rebase` i decidir amb Bernat si es puja); **aquest document el contradiu en diversos punts**: quan es tanqui la fase 0, cal reescriure el `README.md` amb el que hi ha aquí.
 
 ## On és cada cosa
 
