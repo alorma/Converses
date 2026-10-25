@@ -9,7 +9,7 @@ Context, abast, arquitectura, decisions (C1–C11) i riscos són a `docs/contact
 | 2 | Vincular i desvincular a l'editor; vincle al detall | 1, 0 (C8) | Feta i validada (25-10-2026) |
 | 3 | Compte, sync adapter i obrir des de Contactes | 1 | Feta i validada (25-10-2026) |
 | 4 | Reconciliació, permisos, disparadors i Ajustos › Contactes | 2, 3 | Feta i validada (25-10-2026) |
-| 5 | Privacitat i casos límit | 4 | Pendent |
+| 5 | Privacitat i casos límit | 4 | Tasques fetes, pendent de validació |
 | 6 | Qualitat, textos, captures i Play | 5 | Pendent |
 | 7 | Més endavant | 6 | Idees |
 
@@ -97,10 +97,17 @@ Validat a l'emulador 37.2 (25-10-2026): obrir l'app crea la compte i les files i
 
 ## Fase 5 · Privacitat i casos límit
 
-- [ ] Revisar tot el que s'escriu al proveïdor: només text fix i l'id de la persona (C3); cap nom ni contingut.
-- [ ] Files d'una persona que es protegeix mentre Contactes la mostra: tocar-les passa per `PersonLockedRoute`.
-- [ ] Contacte esborrat o fusionat amb un altre, i dues persones vinculades al mateix contacte.
-- [ ] Desinstal·lar i reinstal·lar: no queden files òrfenes.
+Decidit en començar (25-10-2026): C13 (un contacte, una persona) i C14 (contactes fusionats). Afegit durant la fase: treure d'Ajustos › Contactes les files de la compte i del permís.
+
+- [x] Revisar tot el que s'escriu al proveïdor (emulador, `content query`): el raw contact no té nom (només `SYNC1` = id) i les files porten `data1` = id, `data2` = nom de l'app i `data3` = text fix. El nom que s'hi veu és el del contacte agregat. Sense canvis de codi
+- [x] Files d'una persona que es protegeix mentre Contactes la mostra: la fila vella ja no existeix i obre l'app normal; amb un intent que encara porta la persona, `MainActivity` la torna a llegir i passa per `PersonLockedRoute` («Unlock Pau Vidal» → PIN → fitxa amb el full obert). Cobert per `ContactRowTest`. Sense canvis de codi
+- [x] Contacte esborrat: el proveïdor en conserva l'id amb només les nostres files (un contacte sense nom a Contactes) i el lookup key encara resolia. Ara `rows()` marca les files soles, el pla les refà (i s'esborren) i `resolve` el dona per esborrat; el detall mostra «Aquest contacte ja no existeix» — `aebba2a`
+- [x] Contacte fusionat: les files segueixen la persona i Room desa l'id i el lookup key nous (sense canvis). Dues persones al mateix contacte després d'una fusió: només en té files la primera (C14) — `13253bb`
+- [x] Editor: no es pot vincular un contacte que ja és d'una altra persona (C13); text en/ca/es, preview i captura — `3193c5b`
+- [x] Ajustos › Contactes: fora «Compte "Converses"» i «Gestiona el permís»; ara, activat, és una sola fila — `b7e4a28`
+- [x] Desinstal·lar i reinstal·lar: no queden ni la compte, ni raw contacts, ni contactes sense nom. Sense canvis de codi
+
+Validat a l'emulador 37.2 amb contactes locals (creats i esborrats amb `adb shell content`) i un PIN temporal. Pendent de validació humana: el desbloqueig biomètric real en obrir una protegida des de Contactes.
 
 **Validació:** tests de JVM dels casos; emulador; **humana:** desbloqueig biomètric en obrir una protegida des de Contactes.
 **Sortida:** cap camí que filtri una protegida o dades de les notes.

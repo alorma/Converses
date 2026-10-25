@@ -64,6 +64,8 @@ La prova de concepte és a la branca `poc/contacts-row` (no es fusiona mai), amb
 | C10 | **Via antiga per a tothom, sense People Directory.** Es torna a mirar quan surti l'API 38 i calgui pujar el targetSdk (aleshores `WRITE_CONTACTS` deixarà de funcionar). Descartada també la via d'una URL al contacte (Bernat no vol una URL visible). | Decidit |
 | C11 | **Què es desa a Room:** `contactId`, `contactLookupKey` i `contactName`; telèfons i correus no. | Decidit |
 | C12 | **Permisos només al manifest de debug** fins a la fase 6, perquè la versió publicada no els porti mentre la funció no estigui acabada. El compte, el sync adapter i l'activitat d'entrada poden anar al manifest principal: sense permisos no fan res. | Decidit |
+| C13 | **Un contacte, una persona:** l'editor no deixa vincular un contacte que ja és d'una altra persona (també protegida o arxivada). El missatge no diu de qui és, perquè pot ser una protegida. | Decidit (fase 5) |
+| C14 | **Dos contactes vinculats que es fusionen:** totes dues persones conserven el vincle, però només en té files la primera vinculada (id més baix) que no sigui protegida. | Decidit (fase 5) |
 
 ## Arquitectura
 
