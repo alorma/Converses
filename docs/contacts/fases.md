@@ -7,7 +7,7 @@ Context, abast, arquitectura, decisions (C1–C11) i riscos són a `docs/contact
 | 0 | Decisions i investigació (Play, Contactes a l'emulador, disseny) | — | Fet (25-10-2026) |
 | 1 | Flag, migració v3 i repositori | 0 | Feta (25-10-2026) |
 | 2 | Vincular i desvincular a l'editor; vincle al detall | 1, 0 (C8) | Pendent |
-| 3 | Compte, sync adapter i obrir des de Contactes | 1 | En curs |
+| 3 | Compte, sync adapter i obrir des de Contactes | 1 | Feta, pendent de validar |
 | 4 | Reconciliació, permisos, disparadors i Ajustos › Contactes | 2, 3 | Pendent |
 | 5 | Privacitat i casos límit | 4 | Pendent |
 | 6 | Qualitat, textos, captures i Play | 5 | Pendent |
@@ -57,11 +57,13 @@ Segons `docs/contacts/disseny.md`.
 
 ## Fase 3 · Compte, sync adapter i obrir des de Contactes
 
-- [ ] Authenticator, sync adapter (que no sincronitza res), `syncadapter.xml`, `authenticator.xml` i `contacts.xml` amb els dos mimetypes; tipus de compte diferent a debug i a release.
-- [ ] `PersonRoute` amb un paràmetre per obrir el `NewEntrySheet` d'entrada (C9).
-- [ ] Activitat d'entrada `ACTION_VIEW` per als dos mimetypes: llegeix el `personId` de la fila i navega segons C9 (fitxa, o fitxa amb el full obert); `PersonLockedRoute` si és protegida; l'app normal si el flag està apagat o la persona no hi és.
-- [ ] `ContactsGateway` (interfície) i la seva implementació Android; `FakeContactsGateway` a `app/src/test/.../testing`.
-- [ ] Tests de JVM de la resolució de l'entrada (cada mimetype, protegida, inexistent, flag apagat).
+- [x] `PersonRoute` i `PersonLockedRoute` amb `openNewEntry` (C9); el full s'obre una sola vegada (provat girant la pantalla) — `6921882`
+- [x] Resolució pura de la fila (cada mimetype, protegida, arxivada, inexistent, flag apagat); mimetypes amb l'`applicationId` perquè debug i release no comparteixin files — `ad14faa`
+- [x] Authenticator, sync adapter (que no sincronitza res), `contacts_authenticator.xml`, `contacts_syncadapter.xml` i `contacts.xml` (còpia a `src/debug` amb els mimetypes de `.dev`); tipus de compte per build type (`contacts_account_type`); `ContactsGateway`, `AndroidContactsGateway` i `FakeContactsGateway`. Permisos només al manifest de debug (C12, comprovat a l'APK de release) — `a25e1a6`
+- [x] `ContactRowActivity` (transparent, sense historial) passa només dades a `MainActivity`, que torna a resoldre la ruta: un intent falsificat no se salta el bloqueig — `d58b841`
+- [x] Cel·la al menú de debug: enllaçar el contacte triat amb la persona del mateix nom, i treure totes les files i la compte — `fe48539`
+
+Validat a l'emulador 37.2 (Google Contacts): «View notes» obre la fitxa dins la tasca de Contactes (enrere torna a Contactes); «Create note» obre la fitxa amb el full; flag apagat → llista de persones; intent falsificat amb una protegida → «Unlock Luna Roja» i, després del PIN, la fitxa amb el full obert; Room desa el lookup key nou; «Remove contact rows» ho deixa tot net.
 
 **Validació:** tests, `ktlintCheck`; emulador: amb files creades des del menú de debug, «Veure notes» obre la fitxa i «Crear nota» la fitxa amb el full obert.
 **Sortida:** la cadena Contactes → Converses funciona amb files de prova.
@@ -73,7 +75,8 @@ Segons `docs/contacts/disseny.md` (explicació del permís 5b i Ajustos 5h).
 - [ ] Ajustos › Contactes, només amb el flag i sense etiqueta PRO: mai activat («Activa»), activat (comptador amb plurals, compte, gestionar el permís) i denegat.
 
 - [ ] `ContactsReconciler`: pla pur (crear i esborrar) a partir de les persones, el flag, els permisos i les files existents; aplicat amb `ContactsGateway` en un sol lot.
-- [ ] Tornar a llegir i desar el lookup key després d'agregar.
+- [ ] Tornar a llegir i desar el lookup key després d'agregar (`addRows` ja el torna; falta fer-ho des del reconciliador).
+- [ ] El text de les files s'escriu a l'idioma del moment: refer-les quan canviï l'idioma de l'app o del sistema.
 - [ ] Disparadors: arrencada (tornant a crear la compte si l'usuari l'ha esborrada, C6), desar persona, protegir o desprotegir, esborrar, canvi de flag, permisos concedits. Amb el flag apagat: esborrar-ho tot i treure la compte.
 - [ ] Demanar els permisos segons C7, amb l'explicació dissenyada; sense permisos, el vincle es desa igualment i no hi ha files.
 - [ ] Tests de JVM del pla: idempotència, protegides mai, arxivades sí, contacte esborrat, compte esborrada, flag apagat, permisos denegats.
