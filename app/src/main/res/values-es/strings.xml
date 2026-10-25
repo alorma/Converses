@@ -275,4 +275,10 @@
     <string name="contacts_explain_deny_body">Converses funciona igual. Solo no podrás vincular contactos ni ver el acceso a Contactos en el detalle.</string>
     <string name="contacts_explain_continue">Continuar</string>
     <string name="contacts_explain_not_now">Ahora no</string>
+    <!-- Vínculo con Contactos en el detalle de la persona (docs/contacts/disseny.md, 5e y 5f) -->
+    <string name="contact_linked_name">Vinculada a %1$s</string>
+    <string name="contact_open">Abrir en Contactos</string>
+    <string name="contact_deleted_title">El contacto ya no existe</string>
+    <string name="contact_deleted_body">Se ha borrado de Contactos. Las notas se quedan aquí.</string>
+    <string name="contact_unlink_button">Desvincular</string>
 </resources>

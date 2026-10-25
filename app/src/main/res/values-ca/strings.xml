@@ -275,4 +275,10 @@
     <string name="contacts_explain_deny_body">Converses funciona igual. Només no podràs vincular contactes ni veure l\'accés a Contactes al detall.</string>
     <string name="contacts_explain_continue">Continua</string>
     <string name="contacts_explain_not_now">Ara no</string>
+    <!-- Vincle amb Contactes al detall de la persona (docs/contacts/disseny.md, 5e i 5f) -->
+    <string name="contact_linked_name">Vinculada a %1$s</string>
+    <string name="contact_open">Obre a Contactes</string>
+    <string name="contact_deleted_title">El contacte ja no existeix</string>
+    <string name="contact_deleted_body">S\'ha esborrat de Contactes. Les notes es queden aquí.</string>
+    <string name="contact_unlink_button">Desvincula</string>
 </resources>

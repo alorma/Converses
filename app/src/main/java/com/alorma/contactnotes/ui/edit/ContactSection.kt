@@ -171,8 +171,9 @@ private fun ContactRowLayout(
   }
 }
 
+/** Icona en un cercle de 44 dp, com a les files de Contacte de l'editor i del detall. */
 @Composable
-private fun ContactIcon(icon: ImageVector) {
+internal fun ContactIcon(icon: ImageVector) {
   Box(
     modifier =
       Modifier

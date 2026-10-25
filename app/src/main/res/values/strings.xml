@@ -278,4 +278,10 @@
     <string name="contacts_explain_deny_body">Converses works the same. You just can\'t link contacts or see the Contacts shortcut on a person.</string>
     <string name="contacts_explain_continue">Continue</string>
     <string name="contacts_explain_not_now">Not now</string>
+    <!-- Vincle amb Contactes al detall de la persona (docs/contacts/disseny.md, 5e i 5f) -->
+    <string name="contact_linked_name">Linked to %1$s</string>
+    <string name="contact_open">Open in Contacts</string>
+    <string name="contact_deleted_title">This contact no longer exists</string>
+    <string name="contact_deleted_body">It was deleted from Contacts. Your notes stay here.</string>
+    <string name="contact_unlink_button">Unlink</string>
 </resources>

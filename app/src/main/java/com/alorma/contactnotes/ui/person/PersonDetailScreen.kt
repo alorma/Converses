@@ -51,6 +51,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ClipEntry
 import androidx.compose.ui.platform.LocalClipboard
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
@@ -133,6 +134,8 @@ fun PersonDetailRoute(
 ) {
   val state by viewModel.uiState.collectAsStateWithLifecycle()
   val otherPeople by viewModel.otherPeople.collectAsStateWithLifecycle()
+  val contact by viewModel.contact.collectAsStateWithLifecycle()
+  val context = LocalContext.current
 
   val secureWindow: SecureWindow = koinInject()
   val secure = state.person?.isProtected == true
@@ -199,6 +202,12 @@ fun PersonDetailRoute(
         viewModel.setArchived(!person.archived) { if (!person.archived) onBack() }
       },
       snackbarHostState = snackbarHostState,
+      contact = contact,
+      onOpenContact = { (contact as? DetailContact.Linked)?.let(context::openContact) },
+      onUnlinkContact = {
+        haptics.confirm()
+        viewModel.unlinkContact()
+      },
     )
 
     if (showNewEntry) {
@@ -312,6 +321,9 @@ fun PersonDetailScreen(
   onExport: () -> Unit,
   onToggleArchived: () -> Unit,
   snackbarHostState: SnackbarHostState,
+  contact: DetailContact = DetailContact.None,
+  onOpenContact: () -> Unit = {},
+  onUnlinkContact: () -> Unit = {},
 ) {
   val person = state.person
   var factsExpanded by rememberSaveable { mutableStateOf(false) }
@@ -385,6 +397,16 @@ fun PersonDetailScreen(
           item(key = "channels") { ChannelRow(state.channels) }
         } else {
           item(key = "channels-spacer") { Spacer(Modifier.height(20.dp)) }
+        }
+        if (contact != DetailContact.None) {
+          item(key = "contact") {
+            DetailContactRow(
+              contact = contact,
+              onOpen = onOpenContact,
+              onUnlink = onUnlinkContact,
+              modifier = Modifier.padding(bottom = 12.dp),
+            )
+          }
         }
         item(key = "facts") {
           PinnedFacts(
