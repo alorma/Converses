@@ -1,5 +1,9 @@
 package com.alorma.contactnotes.ui.edit
 
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
+import android.provider.Settings
 import androidx.annotation.StringRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -178,6 +182,11 @@ private fun ContactIcon(icon: ImageVector) {
   ) {
     Icon(icon, contentDescription = null, tint = MaterialTheme.colorScheme.onSecondaryContainer)
   }
+}
+
+/** Ajustos de l'app, l'únic lloc on es pot donar un permís que el sistema ja no torna a preguntar. */
+internal fun Context.openAppDetailsSettings() {
+  startActivity(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.fromParts("package", packageName, null)))
 }
 
 /** Explicació abans de demanar el permís de Contactes (5b). «Ara no» només la tanca. */

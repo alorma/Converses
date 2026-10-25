@@ -1,6 +1,8 @@
 package com.alorma.contactnotes.ui.edit
 
 import androidx.activity.compose.LocalActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.BorderStroke
@@ -86,8 +88,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.alorma.contactnotes.R
+import com.alorma.contactnotes.data.contacts.ContactsPermission
 import com.alorma.contactnotes.data.flags.CustomAvatarFeature
 import com.alorma.contactnotes.data.flags.rememberFeatureEnabled
 import com.alorma.contactnotes.data.settings.SecureWindow
@@ -132,6 +137,18 @@ fun EditPersonScreen(
     if (secure) secureWindow.acquire()
     onDispose { if (secure) secureWindow.release() }
   }
+  // El selector dona accés només al contacte triat, sense permís; el permís cal per a les files a Contactes (C7)
+  val pickContact =
+    rememberLauncherForActivityResult(ActivityResultContracts.PickContact()) { uri ->
+      if (uri != null) viewModel.onContactPicked(uri.toString())
+    }
+  val requestContacts =
+    rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { result ->
+      viewModel.onContactsPermissionChanged()
+      if (result.isNotEmpty() && result.values.all { it }) pickContact.launch(null)
+    }
+  // El permís es pot haver donat o retirat des dels ajustos de l'app
+  LifecycleEventEffect(Lifecycle.Event.ON_RESUME) { viewModel.onContactsPermissionChanged() }
 
   EditPersonContent(
     state = state,
@@ -148,6 +165,13 @@ fun EditPersonScreen(
     },
     customAvatar = rememberFeatureEnabled<CustomAvatarFeature>(),
     focus = focus,
+    onRequestContactsPermission = { requestContacts.launch(ContactsPermission.permissions) },
+    onPickContact = { pickContact.launch(null) },
+    onAllowContacts = {
+      // Denegat per sempre: el sistema ja no mostra el diàleg, només es pot donar als ajustos de l'app
+      val canAsk = ContactsPermission.permissions.any { activity.shouldShowRequestPermissionRationale(it) }
+      if (canAsk) requestContacts.launch(ContactsPermission.permissions) else activity.openAppDetailsSettings()
+    },
   )
 }
 
