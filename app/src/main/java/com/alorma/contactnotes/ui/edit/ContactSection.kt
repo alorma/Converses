@@ -46,6 +46,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.alorma.contactnotes.R
@@ -98,7 +100,7 @@ internal fun ContactSectionRow(
         modifier = modifier.fillMaxWidth(),
       ) {
         ContactRowLayout(icon = Icons.Rounded.Contacts) {
-          Column(modifier = Modifier.weight(1f)) {
+          Column(modifier = Modifier.weight(1f).semantics(mergeDescendants = true) {}) {
             Text(
               stringResource(R.string.contact_linked_to),
               style = MaterialTheme.typography.labelMedium,
@@ -128,7 +130,7 @@ internal fun ContactSectionRow(
             horizontalArrangement = Arrangement.spacedBy(16.dp),
           ) {
             ContactIcon(Icons.Rounded.Lock)
-            Column(modifier = Modifier.weight(1f)) {
+            Column(modifier = Modifier.weight(1f).semantics(mergeDescendants = true) {}) {
               Text(
                 stringResource(R.string.contacts_no_permission),
                 style = MaterialTheme.typography.titleMedium,
@@ -221,7 +223,14 @@ internal fun ContactsExplainSheetContent(
         .padding(start = 24.dp, end = 24.dp, bottom = 16.dp),
     verticalArrangement = Arrangement.spacedBy(16.dp),
   ) {
-    Text(stringResource(R.string.contacts_explain_title), style = DialogTitleStyle)
+    Text(
+      stringResource(R.string.contacts_explain_title),
+      style = DialogTitleStyle,
+      modifier =
+        Modifier.semantics {
+          heading()
+        },
+    )
     Text(
       stringResource(R.string.contacts_explain_body),
       style = MaterialTheme.typography.bodyLarge,
@@ -256,7 +265,7 @@ private fun ExplainPoint(
 ) {
   Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
     ContactIcon(icon)
-    Column(modifier = Modifier.weight(1f)) {
+    Column(modifier = Modifier.weight(1f).semantics(mergeDescendants = true) {}) {
       Text(stringResource(title), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
       Text(
         stringResource(body),
