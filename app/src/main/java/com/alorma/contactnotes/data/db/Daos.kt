@@ -51,6 +51,28 @@ abstract class PersonDao {
   @Query("SELECT * FROM person WHERE id = :id")
   abstract suspend fun get(id: Long): PersonEntity?
 
+  /** Persones amb un contacte vinculat, també protegides i arxivades (`docs/contacts`). */
+  @Query("SELECT * FROM person WHERE contactId IS NOT NULL AND contactLookupKey IS NOT NULL ORDER BY id")
+  abstract fun observeLinked(): Flow<List<PersonEntity>>
+
+  /**
+   * Desa l'id, el lookup key i el nom nous del contacte, però només si la persona encara hi és vinculada amb
+   * [oldLookupKey]: si entremig l'han desvinculada o vinculada a un altre, no es toca.
+   */
+  @Query(
+    """
+    UPDATE person SET contactId = :contactId, contactLookupKey = :lookupKey, contactName = :name
+    WHERE id = :personId AND contactLookupKey = :oldLookupKey
+    """,
+  )
+  abstract suspend fun refreshContact(
+    personId: Long,
+    oldLookupKey: String,
+    contactId: Long,
+    lookupKey: String,
+    name: String,
+  )
+
   @Transaction
   @Query(
     """

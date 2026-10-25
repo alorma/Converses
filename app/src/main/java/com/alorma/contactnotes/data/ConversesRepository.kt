@@ -1,5 +1,6 @@
 package com.alorma.contactnotes.data
 
+import com.alorma.contactnotes.data.contacts.ResolvedContact
 import com.alorma.contactnotes.data.db.EntryDao
 import com.alorma.contactnotes.data.db.EntryEntity
 import com.alorma.contactnotes.data.db.KindCount
@@ -94,6 +95,15 @@ class ConversesRepository(
       updatedAt = System.currentTimeMillis(),
     ),
   )
+
+  fun observeLinkedPeople(): Flow<List<PersonEntity>> = personDao.observeLinked()
+
+  /** El contacte del vincle ha canviat d'id, de lookup key o de nom; no toca res si entremig s'ha canviat el vincle. */
+  suspend fun refreshContact(
+    personId: Long,
+    oldLookupKey: String,
+    contact: ResolvedContact,
+  ) = personDao.refreshContact(personId, oldLookupKey, contact.id, contact.lookupKey, contact.name)
 
   suspend fun unlinkContact(person: PersonEntity) =
     personDao.update(

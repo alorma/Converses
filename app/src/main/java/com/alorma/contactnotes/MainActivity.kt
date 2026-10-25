@@ -17,6 +17,7 @@ import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.alorma.contactnotes.data.ConversesRepository
+import com.alorma.contactnotes.data.contacts.ContactsReconciler
 import com.alorma.contactnotes.data.flags.ContactLinkFeature
 import com.alorma.contactnotes.data.flags.PersonColorFeature
 import com.alorma.contactnotes.data.flags.rememberFeatureEnabled
@@ -52,6 +53,13 @@ class MainActivity : FragmentActivity() {
   private val onboardingFlag: OnboardingFlag by inject()
   private val repository: ConversesRepository by inject()
   private val contactLinkFeature: ContactLinkFeature by inject()
+  private val contactsReconciler: ContactsReconciler by inject()
+
+  // En tornar del diàleg de permís o dels ajustos (permís, compte o idioma canviats), les files de Contactes es revisen
+  override fun onResume() {
+    super.onResume()
+    contactsReconciler.refresh()
+  }
 
   /** Pila per a una fila de Contactes (`ContactRowActivity`); la persona es llegeix aquí, no es creu l'intent. */
   private fun contactRowStack() =

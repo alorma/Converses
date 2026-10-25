@@ -4,6 +4,7 @@ import android.app.Application
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
+import com.alorma.contactnotes.data.contacts.ContactsReconciler
 import com.alorma.contactnotes.data.settings.AppLockManager
 import com.alorma.contactnotes.data.wear.WearSnapshotPublisher
 import com.alorma.contactnotes.di.appModules
@@ -20,6 +21,8 @@ class ConversesApp : Application() {
     }
     val wearPublisher: WearSnapshotPublisher by inject()
     wearPublisher.start()
+    val contactsReconciler: ContactsReconciler by inject()
+    contactsReconciler.start()
     val appLock: AppLockManager by inject()
     ProcessLifecycleOwner.get().lifecycle.addObserver(
       object : DefaultLifecycleObserver {

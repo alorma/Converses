@@ -8,6 +8,7 @@ import com.alorma.contactnotes.data.contacts.AndroidContactsGateway
 import com.alorma.contactnotes.data.contacts.AndroidContactsPermission
 import com.alorma.contactnotes.data.contacts.ContactsGateway
 import com.alorma.contactnotes.data.contacts.ContactsPermission
+import com.alorma.contactnotes.data.contacts.ContactsReconciler
 import com.alorma.contactnotes.data.db.ConversesDatabase
 import com.alorma.contactnotes.data.db.Migration1To2
 import com.alorma.contactnotes.data.db.Migration2To3
@@ -143,6 +144,15 @@ val contactsModule =
   module {
     single<ContactsGateway> { AndroidContactsGateway(androidContext()) }
     single<ContactsPermission> { AndroidContactsPermission(androidContext()) }
+    single {
+      ContactsReconciler(
+        repository = get(),
+        contactLink = get(),
+        permission = get(),
+        gateway = get(),
+        scope = CoroutineScope(SupervisorJob() + Dispatchers.Default),
+      )
+    }
   }
 
 val appModules = listOf(databaseModule, settingsModule, wearModule, contactsModule, viewModelModule)
