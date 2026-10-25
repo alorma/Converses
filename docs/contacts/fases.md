@@ -47,7 +47,7 @@ Sense codi de producte. Prova de concepte a la branca `poc/contacts-row` (no es 
 
 Segons `docs/contacts/disseny.md`. Decidit en començar (25-10-2026): el permís i l'explicació 5b es fan en aquesta fase, no a la 4, perquè l'editor no té sentit sense; a una persona existent, vincular i desvincular es desen a l'acte (com «Protegida»); a Nova persona, amb «Desa».
 
-- [ ] Desar la persona a l'editor conserva el vincle (`save()` no copiava les columnes del contacte)
+- [x] Desar la persona a l'editor conserva el vincle (`save()` no copiava les columnes del contacte) — `40ead27`
 - [ ] Estat del permís de Contactes darrere d'una interfície (fake als tests) i «explicació ja vista» a DataStore
 - [ ] `EditPersonViewModel`: estat de la secció Contacte (flag apagat, sense vincle, vinculat, sense permís), vincular amb el contacte triat i desvincular; tests de JVM
 - [ ] Editor (Editar / Nova persona), només amb el flag: secció «Contacte» amb els tres estats, `PickContact`, «Dona permís» (ajustos de l'app si ja no es pot preguntar) i l'explicació 5b; textos en/ca/es, previews i captures

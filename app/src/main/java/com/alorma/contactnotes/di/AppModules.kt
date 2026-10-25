@@ -5,7 +5,9 @@ import android.content.pm.ApplicationInfo
 import androidx.room.Room
 import com.alorma.contactnotes.data.ConversesRepository
 import com.alorma.contactnotes.data.contacts.AndroidContactsGateway
+import com.alorma.contactnotes.data.contacts.AndroidContactsPermission
 import com.alorma.contactnotes.data.contacts.ContactsGateway
+import com.alorma.contactnotes.data.contacts.ContactsPermission
 import com.alorma.contactnotes.data.db.ConversesDatabase
 import com.alorma.contactnotes.data.db.Migration1To2
 import com.alorma.contactnotes.data.db.Migration2To3
@@ -140,6 +142,7 @@ val wearModule =
 val contactsModule =
   module {
     single<ContactsGateway> { AndroidContactsGateway(androidContext()) }
+    single<ContactsPermission> { AndroidContactsPermission(androidContext()) }
   }
 
 val appModules = listOf(databaseModule, settingsModule, wearModule, contactsModule, viewModelModule)

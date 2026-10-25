@@ -27,4 +27,7 @@ class FakeSettingsRepository : SettingsRepository {
 
   override suspend fun setWatchInstallDismissed(dismissed: Boolean) =
     state.update { it.copy(watchInstallDismissed = dismissed) }
+
+  override suspend fun setContactsExplained(explained: Boolean) =
+    state.update { it.copy(contactsExplained = explained) }
 }

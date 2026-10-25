@@ -21,6 +21,8 @@ data class AppSettings(
   val onboardingDone: Boolean = false,
   /** «No m'ho tornis a demanar» de la proposta d'instal·lar l'app al rellotge. Preferència local, no Room. */
   val watchInstallDismissed: Boolean = false,
+  /** Ja s'ha vist l'explicació del permís de Contactes (5b): no es torna a mostrar abans del diàleg del sistema. */
+  val contactsExplained: Boolean = false,
 )
 
 interface SettingsRepository {
@@ -41,6 +43,8 @@ interface SettingsRepository {
   suspend fun setOnboardingDone(done: Boolean)
 
   suspend fun setWatchInstallDismissed(dismissed: Boolean)
+
+  suspend fun setContactsExplained(explained: Boolean)
 }
 
 private val Context.settingsDataStore by preferencesDataStore(name = "settings")
@@ -68,6 +72,8 @@ class DataStoreSettingsRepository(
 
   override suspend fun setWatchInstallDismissed(dismissed: Boolean) = write { it[WatchInstallDismissedKey] = dismissed }
 
+  override suspend fun setContactsExplained(explained: Boolean) = write { it[ContactsExplainedKey] = explained }
+
   private suspend fun write(block: (androidx.datastore.preferences.core.MutablePreferences) -> Unit) {
     dataStore.edit { block(it) }
   }
@@ -83,6 +89,7 @@ class DataStoreSettingsRepository(
       relockAfterSeconds = this[RelockAfterKey] ?: defaults.relockAfterSeconds,
       onboardingDone = this[OnboardingDoneKey] ?: defaults.onboardingDone,
       watchInstallDismissed = this[WatchInstallDismissedKey] ?: defaults.watchInstallDismissed,
+      contactsExplained = this[ContactsExplainedKey] ?: defaults.contactsExplained,
     )
   }
 
@@ -95,6 +102,7 @@ class DataStoreSettingsRepository(
     val RelockAfterKey = intPreferencesKey("relock_after")
     val OnboardingDoneKey = booleanPreferencesKey("onboarding_done")
     val WatchInstallDismissedKey = booleanPreferencesKey("watch_install_dismissed")
+    val ContactsExplainedKey = booleanPreferencesKey("contacts_explained")
   }
 }
 
