@@ -38,7 +38,7 @@ Entre els pills i les «Dades», una fila en un d'aquests estats:
 Secció «Contactes» entre Seguretat i Quant a, **només amb el flag encès** i sense etiqueta PRO. Tres estats:
 
 1. **Mai activat:** «Vincle amb Contactes», «Encara no l'has activat. Et demanarem permís per veure els contactes.» i el botó «Activa», que passa per l'explicació (5b) i després pel diàleg del sistema.
-2. **Activat:** tres files: «Activat · %d persones vinculades» (plurals); «Compte «Converses»», que obre Ajustos › Comptes del sistema; «Gestiona el permís», que obre els ajustos de l'app (el permís només es pot retirar des d'allà).
+2. **Activat:** una sola fila, «Activat · %d persones vinculades» (plurals). Les files «Compte «Converses»» i «Gestiona el permís» del disseny es van treure a la fase 5 (Bernat, 25-10-2026): quan tot va bé no cal explicar com treure la compte ni el permís.
 3. **Denegat:** «Sense permís de Contactes» amb el botó «Dona permís» i «Les persones vinculades no mostren l'accés a Contactes. Les notes no es perden.».
 
 A sota, sempre: «Les notes no es copien a Contactes: només s'hi afegeixen «Veure notes» i «Crear nota».».
@@ -76,10 +76,6 @@ A sota, sempre: «Les notes no es copien a Contactes: només s'hi afegeixen «Ve
 | Encara no l'has activat. Et demanarem permís per veure els contactes. | Not turned on yet. We'll ask for permission to see your contacts. | Aún no lo has activado. Te pediremos permiso para ver tus contactos. |
 | Activa | Turn on | Activar |
 | Activat · %d persones vinculades | On · %d people linked | Activado · %d personas vinculadas |
-| Compte «Converses» | “Converses” account | Cuenta «Converses» |
-| Es veu a Ajustos › Comptes del sistema | Shown in system Settings › Accounts | Se ve en Ajustes › Cuentas del sistema |
-| Gestiona el permís | Manage permission | Gestionar el permiso |
-| Per retirar-lo, obre els ajustos de l'app | To revoke it, open the app settings | Para retirarlo, abre los ajustes de la app |
 | Les persones vinculades no mostren l'accés a Contactes. Les notes no es perden. | Linked people won't show the Contacts shortcut. No notes are lost. | Las personas vinculadas no muestran el acceso a Contactos. No se pierden notas. |
 | Les notes no es copien a Contactes: només s'hi afegeixen «Veure notes» i «Crear nota». | Notes aren't copied to Contacts: only “View notes” and “Create note” are added. | Las notas no se copian a Contactos: solo se añaden «Ver notas» y «Crear nota». |
 

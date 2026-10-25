@@ -291,10 +291,6 @@
         <item quantity="other">Activat · %d persones vinculades</item>
     </plurals>
     <string name="settings_contacts_on_summary">Mostra les teves notes dins de la fitxa de cada contacte</string>
-    <string name="settings_contacts_account">Compte «Converses»</string>
-    <string name="settings_contacts_account_summary">Es veu a Ajustos › Comptes del sistema</string>
-    <string name="settings_contacts_manage">Gestiona el permís</string>
-    <string name="settings_contacts_manage_summary">Per retirar-lo, obre els ajustos de l\'app</string>
     <string name="settings_contacts_denied_summary">Les persones vinculades no mostren l\'accés a Contactes. Les notes no es perden.</string>
     <string name="settings_contacts_note">Les notes no es copien a Contactes: només s\'hi afegeixen «Veure notes» i «Crear nota».</string>
 </resources>

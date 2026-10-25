@@ -33,7 +33,6 @@ import androidx.compose.material.icons.rounded.Fingerprint
 import androidx.compose.material.icons.rounded.Language
 import androidx.compose.material.icons.rounded.LightMode
 import androidx.compose.material.icons.rounded.Lock
-import androidx.compose.material.icons.rounded.ManageAccounts
 import androidx.compose.material.icons.rounded.Notifications
 import androidx.compose.material.icons.rounded.Palette
 import androidx.compose.material.icons.rounded.Timer
@@ -157,8 +156,6 @@ fun SettingsScreen(
       val canAsk = ContactsPermission.permissions.any { activity.shouldShowRequestPermissionRationale(it) }
       if (canAsk) requestContacts.launch(ContactsPermission.permissions) else context.openAppDetailsSettings()
     },
-    onContactsOpenAccounts = { context.openAccountSettings() },
-    onContactsManagePermission = { context.openAppDetailsSettings() },
     showWatchNotifications = watchPresent,
     watchNotifications = watchNotifications,
     onWatchNotifications = { enabled ->
@@ -217,8 +214,6 @@ fun SettingsContent(
   contacts: ContactsSettingsState? = null,
   onContactsExplainContinue: () -> Unit = {},
   onContactsAllow: () -> Unit = {},
-  onContactsOpenAccounts: () -> Unit = {},
-  onContactsManagePermission: () -> Unit = {},
 ) {
   var showContactsExplain by rememberSaveable { mutableStateOf(false) }
   val scrollBehavior = rememberTopBarScrollBehavior()
@@ -361,8 +356,6 @@ fun SettingsContent(
           state = contacts,
           onTurnOn = { showContactsExplain = true },
           onAllow = onContactsAllow,
-          onOpenAccounts = onContactsOpenAccounts,
-          onManagePermission = onContactsManagePermission,
         )
       }
 
@@ -590,21 +583,11 @@ private fun TileTitle(text: String) {
 
 private fun Context.notificationsEnabled() = NotificationManagerCompat.from(this).areNotificationsEnabled()
 
-private fun Context.openAccountSettings() {
-  try {
-    startActivity(Intent(Settings.ACTION_SYNC_SETTINGS).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
-  } catch (_: ActivityNotFoundException) {
-    // Sense pantalla de comptes: no hi ha res més a fer
-  }
-}
-
 @Composable
 private fun ContactsSection(
   state: ContactsSettingsState,
   onTurnOn: () -> Unit,
   onAllow: () -> Unit,
-  onOpenAccounts: () -> Unit,
-  onManagePermission: () -> Unit,
 ) {
   SettingsGroup(
     title = { SectionTitle(stringResource(R.string.settings_contacts)) },
@@ -623,30 +606,13 @@ private fun ContactsSection(
           },
           shape = groupedItemShape(0, 1),
         )
-      is ContactsSettingsState.On -> {
+      is ContactsSettingsState.On ->
         SettingRow(
           title = pluralStringResource(R.plurals.settings_contacts_on, state.linkedCount, state.linkedCount),
           subtitle = stringResource(R.string.settings_contacts_on_summary),
           icon = Icons.Rounded.Contacts,
-          shape = groupedItemShape(0, 3),
+          shape = groupedItemShape(0, 1),
         )
-        SettingRow(
-          title = stringResource(R.string.settings_contacts_account),
-          subtitle = stringResource(R.string.settings_contacts_account_summary),
-          icon = Icons.Rounded.ManageAccounts,
-          trailing = { Icon(Icons.AutoMirrored.Rounded.OpenInNew, contentDescription = null) },
-          shape = groupedItemShape(1, 3),
-          onClick = onOpenAccounts,
-        )
-        SettingRow(
-          title = stringResource(R.string.settings_contacts_manage),
-          subtitle = stringResource(R.string.settings_contacts_manage_summary),
-          icon = Icons.Rounded.Lock,
-          trailing = { Icon(Icons.AutoMirrored.Rounded.OpenInNew, contentDescription = null) },
-          shape = groupedItemShape(2, 3),
-          onClick = onManagePermission,
-        )
-      }
       ContactsSettingsState.Denied ->
         SettingRow(
           title = stringResource(R.string.contacts_no_permission),

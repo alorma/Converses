@@ -291,10 +291,6 @@
         <item quantity="other">Activado · %d personas vinculadas</item>
     </plurals>
     <string name="settings_contacts_on_summary">Muestra tus notas dentro de la ficha de cada contacto</string>
-    <string name="settings_contacts_account">Cuenta «Converses»</string>
-    <string name="settings_contacts_account_summary">Se ve en Ajustes › Cuentas del sistema</string>
-    <string name="settings_contacts_manage">Gestionar el permiso</string>
-    <string name="settings_contacts_manage_summary">Para retirarlo, abre los ajustes de la app</string>
     <string name="settings_contacts_denied_summary">Las personas vinculadas no muestran el acceso a Contactos. No se pierden notas.</string>
     <string name="settings_contacts_note">Las notas no se copian a Contactos: solo se añaden «Ver notas» y «Crear nota».</string>
 </resources>

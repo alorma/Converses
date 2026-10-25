@@ -294,10 +294,6 @@
         <item quantity="other">On · %d people linked</item>
     </plurals>
     <string name="settings_contacts_on_summary">Show your notes inside each contact\'s card</string>
-    <string name="settings_contacts_account">“Converses” account</string>
-    <string name="settings_contacts_account_summary">Shown in system Settings › Accounts</string>
-    <string name="settings_contacts_manage">Manage permission</string>
-    <string name="settings_contacts_manage_summary">To revoke it, open the app settings</string>
     <string name="settings_contacts_denied_summary">Linked people won\'t show the Contacts shortcut. No notes are lost.</string>
     <string name="settings_contacts_note">Notes aren\'t copied to Contacts: only “View notes” and “Create note” are added.</string>
 </resources>
