@@ -29,7 +29,7 @@ Sense codi de producte. Prova de concepte a la branca `poc/contacts-row` (no es 
 - [x] People Directory (37.2) provat i descartat (C10)
 - [x] Decidir C6, C7, C9, C10 i, en part, C11
 - [x] Disseny de Claude Design (C8): lliurat el 25 d'oct., a `docs/contacts/disseny.md`
-- [ ] Neteja: treure telèfons, correus i l'empresa «Converses» dels contactes de prova (compte de Google de Bernat); `clear` de la prova de concepte als dos emuladors; esborrar el worktree `../Converses-poc-contacts` quan ja no calgui
+- [x] Neteja (25-10-2026): esborrats sencers els quatre contactes de prova (Laia Ferrer, Pau Vidal, Marta Soler, Jordi Puig) del compte de Google, sincronitzat; als emuladors 37.1 i 37.2 no queda cap compte ni raw contact de la prova de concepte, així que no ha calgut cap `clear`; worktree `../Converses-poc-contacts` esborrat (la branca `poc/contacts-row` es conserva amb el handoff)
 
 ## Fase 1 · Flag, migració v3 i repositori
 
