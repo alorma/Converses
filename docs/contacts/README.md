@@ -1,6 +1,6 @@
 # Converses i els contactes del dispositiu — Pla
 
-Actualitzat el 25 d'oct. de 2026 (fases 0 i 1 fetes) · @Bernat · disseny a `docs/contacts/disseny.md`. Aquest document recull l'abast, l'arquitectura, les decisions i els riscos; les fases són a `docs/contacts/fases.md`. És una funció **Pro**: viu darrere de `ContactLinkFeature` (apagat), com la resta de `docs/pro/README.md`.
+Actualitzat el 25 d'oct. de 2026 (fases 0, 1 i 3 fetes) · @Bernat · disseny a `docs/contacts/disseny.md`. Aquest document recull l'abast, l'arquitectura, les decisions i els riscos; les fases són a `docs/contacts/fases.md`. És una funció **Pro**: viu darrere de `ContactLinkFeature` (apagat), com la resta de `docs/pro/README.md`.
 
 ## Objectiu
 

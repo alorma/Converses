@@ -5,9 +5,9 @@ Context, abast, arquitectura, decisions (C1–C11) i riscos són a `docs/contact
 | Fase | Títol | Depèn de | Estat |
 | --- | --- | --- | --- |
 | 0 | Decisions i investigació (Play, Contactes a l'emulador, disseny) | — | Fet (25-10-2026) |
-| 1 | Flag, migració v3 i repositori | 0 | Feta (25-10-2026) |
+| 1 | Flag, migració v3 i repositori | 0 | Feta i validada (25-10-2026) |
 | 2 | Vincular i desvincular a l'editor; vincle al detall | 1, 0 (C8) | Pendent |
-| 3 | Compte, sync adapter i obrir des de Contactes | 1 | Feta, pendent de validar |
+| 3 | Compte, sync adapter i obrir des de Contactes | 1 | Feta i validada (25-10-2026) |
 | 4 | Reconciliació, permisos, disparadors i Ajustos › Contactes | 2, 3 | Pendent |
 | 5 | Privacitat i casos límit | 4 | Pendent |
 | 6 | Qualitat, textos, captures i Play | 5 | Pendent |
@@ -45,14 +45,17 @@ Sense codi de producte. Prova de concepte a la branca `poc/contacts-row` (no es 
 
 ## Fase 2 · Vincular a l'editor; vincle al detall
 
-Segons `docs/contacts/disseny.md`.
+Segons `docs/contacts/disseny.md`. Decidit en començar (25-10-2026): el permís i l'explicació 5b es fan en aquesta fase, no a la 4, perquè l'editor no té sentit sense; a una persona existent, vincular i desvincular es desen a l'acte (com «Protegida»); a Nova persona, amb «Desa».
 
-- [ ] Editor (Editar / Nova persona), només amb el flag: secció «Contacte» amb els tres estats (sense vincle, vinculat, sense permís); `PickContact` i treure el vincle sense confirmació.
-- [ ] Detall: «Vinculada a {nom}» i «Obre a Contactes» (`ACTION_VIEW` amb el lookup URI); estat «contacte esborrat» amb «Desvincula»; cap fila sense permís ni amb la persona bloquejada.
-- [ ] ViewModels amb tests de JVM (flag apagat: res; vincular; desvincular; contacte esborrat).
-- [ ] Textos en en/ca/es; previews i captures (`...Content`).
+- [ ] Desar la persona a l'editor conserva el vincle (`save()` no copiava les columnes del contacte)
+- [ ] Estat del permís de Contactes darrere d'una interfície (fake als tests) i «explicació ja vista» a DataStore
+- [ ] `EditPersonViewModel`: estat de la secció Contacte (flag apagat, sense vincle, vinculat, sense permís), vincular amb el contacte triat i desvincular; tests de JVM
+- [ ] Editor (Editar / Nova persona), només amb el flag: secció «Contacte» amb els tres estats, `PickContact`, «Dona permís» (ajustos de l'app si ja no es pot preguntar) i l'explicació 5b; textos en/ca/es, previews i captures
+- [ ] `PersonDetailViewModel`: vincle resolt en obrir (vinculada, contacte esborrat; res sense permís ni amb el flag apagat), refresc del lookup key i el nom, «Desvincula»; tests de JVM amb `FakeContactsGateway`
+- [ ] Detall: «Vinculada a {nom}» i «Obre a Contactes» (`ACTION_VIEW` amb el lookup URI); targeta «contacte esborrat» amb «Desvincula»; textos, previews i captures
+- [ ] Validació a l'emulador 37.2
 
-**Validació:** tests, `ktlintCheck`, captures revisades; emulador: vincular, obrir a Contactes, desvincular, i amb el flag apagat no es veu res.
+**Validació:** tests, `ktlintCheck`, captures revisades; emulador: vincular (Editar i Nova persona), obrir a Contactes, contacte esborrat i desvincular, sense permís, i amb el flag apagat o la persona bloquejada no es veu res.
 **Sortida:** es pot vincular una persona i obrir el contacte; encara no hi ha files a Contactes.
 
 ## Fase 3 · Compte, sync adapter i obrir des de Contactes
@@ -70,7 +73,7 @@ Validat a l'emulador 37.2 (Google Contacts): «View notes» obre la fitxa dins l
 
 ## Fase 4 · Reconciliació, permisos, disparadors i Ajustos › Contactes
 
-Segons `docs/contacts/disseny.md` (explicació del permís 5b i Ajustos 5h).
+Segons `docs/contacts/disseny.md` (Ajustos 5h; l'explicació del permís 5b ja es fa a la fase 2 i aquí només es reutilitza per a «Activa»).
 
 - [ ] Ajustos › Contactes, només amb el flag i sense etiqueta PRO: mai activat («Activa»), activat (comptador amb plurals, compte, gestionar el permís) i denegat.
 
@@ -78,7 +81,7 @@ Segons `docs/contacts/disseny.md` (explicació del permís 5b i Ajustos 5h).
 - [ ] Tornar a llegir i desar el lookup key després d'agregar (`addRows` ja el torna; falta fer-ho des del reconciliador).
 - [ ] El text de les files s'escriu a l'idioma del moment: refer-les quan canviï l'idioma de l'app o del sistema.
 - [ ] Disparadors: arrencada (tornant a crear la compte si l'usuari l'ha esborrada, C6), desar persona, protegir o desprotegir, esborrar, canvi de flag, permisos concedits. Amb el flag apagat: esborrar-ho tot i treure la compte.
-- [ ] Demanar els permisos segons C7, amb l'explicació dissenyada; sense permisos, el vincle es desa igualment i no hi ha files.
+- [ ] Permisos concedits o retirats fora de l'editor (Ajustos de l'app, «Activa»): les files segueixen l'estat; sense permisos, els vincles es conserven sense files.
 - [ ] Tests de JVM del pla: idempotència, protegides mai, arxivades sí, contacte esborrat, compte esborrada, flag apagat, permisos denegats.
 
 **Validació:** tests, `ktlintCheck`; emulador: el cicle complet (vincular → files; protegir → desapareixen; desprotegir → tornen; esborrar persona → desapareixen; esborrar la compte a Ajustos → tornen en obrir l'app; apagar flag → no queda res ni la compte).
