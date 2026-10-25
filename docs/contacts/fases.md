@@ -6,7 +6,7 @@ Context, abast, arquitectura, decisions (C1–C11) i riscos són a `docs/contact
 | --- | --- | --- | --- |
 | 0 | Decisions i investigació (Play, Contactes a l'emulador, disseny) | — | Fet (25-10-2026) |
 | 1 | Flag, migració v3 i repositori | 0 | Feta i validada (25-10-2026) |
-| 2 | Vincular i desvincular a l'editor; vincle al detall | 1, 0 (C8) | Pendent |
+| 2 | Vincular i desvincular a l'editor; vincle al detall | 1, 0 (C8) | Feta i validada (25-10-2026) |
 | 3 | Compte, sync adapter i obrir des de Contactes | 1 | Feta i validada (25-10-2026) |
 | 4 | Reconciliació, permisos, disparadors i Ajustos › Contactes | 2, 3 | Pendent |
 | 5 | Privacitat i casos límit | 4 | Pendent |
@@ -55,7 +55,7 @@ Segons `docs/contacts/disseny.md`. Decidit en començar (25-10-2026): el permís
 - [x] Detall: «Vinculada a {nom}» i «Obre a Contactes» (`ACTION_VIEW` amb el lookup URI); targeta «contacte esborrat» amb «Desvincula»; textos, previews i captures — `91b4290`
 - [x] Validació a l'emulador 37.2: el vincle fet a l'editor surt al detall en tornar; la fila obre la fitxa a Google Contacts; amb un contacte local esborrat (creat i esborrat amb `adb shell content`, no al compte de Google) surt la targeta i «Desvincula» treu el vincle; amb el flag apagat no surt res i el vincle es conserva. La persona protegida bloquejada no s'ha provat: `PersonLockedScreen` no carrega res del vincle
 
-**On s'ha quedat (25-10-2026):** totes les tasques fetes; falta la validació de Bernat per tancar la fase. La UI de l'editor és a `ui/edit/ContactSection.kt` (fila, full 5b i `openAppDetailsSettings()`, reutilitzable per a Ajustos › Contactes) i la del detall a `ui/person/DetailContactRow.kt`. El que ja hi ha:
+**On s'ha quedat (25-10-2026):** fase validada per Bernat; la següent és la 4 (les files a Contactes arriben amb el reconciliador, no en vincular). La UI de l'editor és a `ui/edit/ContactSection.kt` (fila, full 5b i `openAppDetailsSettings()`, reutilitzable per a Ajustos › Contactes) i la del detall a `ui/person/DetailContactRow.kt`. El que ja hi ha:
 
 - `ContactsPermission` (`isGranted()`, `permissions` = READ i WRITE) i `AppSettings.contactsExplained` amb `setContactsExplained`.
 - `ContactsGateway.readPicked(uri)` llegeix el contacte de `PickContact` sense permís.
