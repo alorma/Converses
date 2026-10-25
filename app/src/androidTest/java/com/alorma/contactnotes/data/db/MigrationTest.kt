@@ -79,6 +79,53 @@ class MigrationTest {
     assertEquals(listOf("t"), db.strings("SELECT text FROM entry"))
   }
 
+  @Test
+  fun migrate2To3KeepsEverythingAndLeavesPeopleUnlinked() {
+    helper.createDatabase(TEST_DB, 2).use { db ->
+      db.insertPerson(1)
+      db.execSQL(
+        "INSERT INTO person (id, name, alias, isProtected, archived, notes, createdAt, updatedAt) " +
+          "VALUES (2, 'P2', 'Alias', 1, 1, 'n', 10, 20)",
+      )
+      db.insertEntry(1, "CHAT")
+      db.execSQL("INSERT INTO pinned_fact (personId, label, value, position) VALUES (2, 'L', 'V', 0)")
+    }
+
+    val db = helper.runMigrationsAndValidate(TEST_DB, 3, true, Migration2To3())
+
+    assertEquals(listOf("P1", "P2"), db.strings("SELECT name FROM person ORDER BY id"))
+    assertEquals(
+      listOf("Alias|1|1|n|10|20"),
+      db.strings(
+        "SELECT alias || '|' || isProtected || '|' || archived || '|' || notes || '|' || " +
+          "createdAt || '|' || updatedAt FROM person WHERE id = 2",
+      ),
+    )
+    assertEquals(listOf("CHAT"), db.strings("SELECT channelType FROM entry"))
+    assertEquals(listOf("V"), db.strings("SELECT value FROM pinned_fact"))
+    assertEquals(
+      listOf("0"),
+      db.strings(
+        "SELECT COUNT(*) FROM person " +
+          "WHERE contactId IS NOT NULL OR contactLookupKey IS NOT NULL OR contactName IS NOT NULL",
+      ),
+    )
+  }
+
+  @Test
+  fun migrate1To3RunsEveryMigration() {
+    helper.createDatabase(TEST_DB, 1).use { db ->
+      db.insertPerson(1)
+      db.insertChannel(1, "WHATSAPP")
+      db.insertEntry(1, "TELEGRAM")
+    }
+
+    val db = helper.runMigrationsAndValidate(TEST_DB, 3, true, Migration1To2(), Migration2To3())
+
+    assertEquals(listOf("P1"), db.strings("SELECT name FROM person"))
+    assertEquals(listOf("CHAT"), db.strings("SELECT channelType FROM entry"))
+  }
+
   private companion object {
     const val TEST_DB = "migration-test"
   }

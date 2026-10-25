@@ -10,7 +10,7 @@ import androidx.room.TypeConverters
     EntryEntity::class,
     PinnedFactEntity::class,
   ],
-  version = 2,
+  version = 3,
 )
 @TypeConverters(AvatarShapeConverter::class)
 abstract class ConversesDatabase : RoomDatabase() {

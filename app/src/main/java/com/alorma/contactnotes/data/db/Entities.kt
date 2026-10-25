@@ -24,6 +24,14 @@ data class PersonEntity(
   val notes: String? = null,
   val createdAt: Long,
   val updatedAt: Long,
+  /**
+   * Contacte del dispositiu vinculat (`docs/contacts`); tots tres `null` vol dir sense vincle. Es resol amb
+   * `Contacts.getLookupUri(contactId, contactLookupKey)`; [contactName] és la còpia del nom triat, per mostrar el
+   * vincle sense `READ_CONTACTS`. No surt mai de Room (ni Wear, ni Auto, ni exportació).
+   */
+  val contactId: Long? = null,
+  val contactLookupKey: String? = null,
+  val contactName: String? = null,
 )
 
 val PersonEntity.shape: AvatarShape get() = avatarShape ?: AvatarShape.Standard

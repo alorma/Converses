@@ -24,3 +24,15 @@ class Migration1To2 : Migration(1, 2) {
     db.execSQL("DROP TABLE channel")
   }
 }
+
+/**
+ * v2 → v3: la persona es pot vincular a un contacte del dispositiu (`docs/contacts`). Tres columnes nul·lables;
+ * les persones existents queden sense vincle.
+ */
+class Migration2To3 : Migration(2, 3) {
+  override fun migrate(db: SupportSQLiteDatabase) {
+    db.execSQL("ALTER TABLE person ADD COLUMN contactId INTEGER")
+    db.execSQL("ALTER TABLE person ADD COLUMN contactLookupKey TEXT")
+    db.execSQL("ALTER TABLE person ADD COLUMN contactName TEXT")
+  }
+}
