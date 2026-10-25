@@ -224,6 +224,9 @@ class EditPersonViewModel(
           notes = base?.notes,
           createdAt = base?.createdAt ?: now,
           updatedAt = now,
+          contactId = base?.contactId,
+          contactLookupKey = base?.contactLookupKey,
+          contactName = base?.contactName,
         )
       val facts =
         current.facts

@@ -177,6 +177,22 @@ class EditPersonViewModelTest {
   }
 
   @Test
+  fun savingAnExistingPersonKeepsTheContactLink() =
+    runTest {
+      val marta = db.addPerson("Marta")
+      db.repository.linkContact(marta, contactId = 7, lookupKey = "lookup", name = "Marta Soler")
+      val vm = viewModel(marta.id)
+      vm.onName("Marta S")
+
+      vm.save { }
+
+      val saved = db.person(marta.id)!!
+      assertEquals(7L, saved.contactId)
+      assertEquals("lookup", saved.contactLookupKey)
+      assertEquals("Marta Soler", saved.contactName)
+    }
+
+  @Test
   fun saveIsIgnoredWhileTheFormIsNotValid() {
     val vm = viewModel()
     var called = false
