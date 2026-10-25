@@ -29,18 +29,19 @@ Mai es cobra per **accedir, protegir o treure** les dades pròpies. Al Pro hi va
 | **Sub-canals** (backlog 8) | No existeix: només els 5 grups | Crear sub-canals dins de qualsevol grup, amb nom lliure (únic per persona) i valor opcional |
 | **Follow-ups / pendents** (backlog 6) | No existeix | Marcar entrades com a pendents, secció «Pendents» al detall, comptador al llistat i recordatoris |
 | **Color de la persona** (tema del detall, `PersonColorFeature`) | No hi és: les pantalles de la persona usen el tema de l'app i l'avatar només té el color automàtic pel nom | Activar el tema que pren el color de l'avatar (i l'ajust «Color de la persona» a Ajustos) |
-| **Contact integration** | No existeix | Vincular una persona a un contacte (`LOOKUP_KEY`), enllaç a «Connected apps» de Contactes, avís de trucada entrant (`CallScreeningService`), importació de diversos contactes de cop (`READ_CONTACTS`). Pla a `docs/contacts/` |
+| **Contact integration** (`ContactLinkFeature`) | No es veu: el flag és apagat i la release no porta els permisos de Contactes (C12) | Vincular una persona a un contacte des de l'editor, «Vinculada a…» i «Obre a Contactes» al detall, «Veure notes» i «Crear nota» a «Connected apps» de Contactes (mai per a protegides) i Ajustos › Contactes. Fet (fases 1–6 de `docs/contacts/`); més endavant (fase 7): avís de trucada entrant (`CallScreeningService`) i importació de diversos contactes de cop |
 
 ## Fet a la v1 gratuïta
 
-- **Feature flags** (`data/flags/`): `CustomAvatarFeature` i `PersonColorFeature`, tots dos apagats; es provan amb el «Pro mode» del menú de debug. Els flags de sub-canals, follow-ups i contactes s'afegiran quan existeixin aquestes funcions. Encara no es comprova cap pagament.
+- **Feature flags** (`data/flags/`): `CustomAvatarFeature` i `PersonColorFeature`, tots dos apagats; es provan amb el «Pro mode» del menú de debug. `ContactLinkFeature` (contactes) també hi és, apagat. Els flags de sub-canals i follow-ups s'afegiran quan existeixin aquestes funcions. Encara no es comprova cap pagament.
 - **Avatar estàndard:** Galeta i color automàtic pel nom (`AvatarColor.forName`); `avatarShape` i `avatarColor` nul·lables (`null` = estàndard).
 - **Editor:** sense targeta d'avatar; l'avatar és a la fila del nom i, amb `CustomAvatarFeature`, obre el full «Avatar».
 
 ## Pendent per al Pro
 
 - Play Billing i la comprovació de pagament al runner de flags.
-- Sub-canals (backlog 8), follow-ups (backlog 6) i integració amb contactes, cadascun darrere del seu flag. Tots tres toquen la base de dades: **cal migració i test** (la v1 ja és publicada).
+- Sub-canals (backlog 8) i follow-ups (backlog 6), cadascun darrere del seu flag. Tots dos toquen la base de dades: **cal migració i test** (la v1 ja és publicada).
+- Contactes, per obrir-ho al Pro: passar `READ_CONTACTS` i `WRITE_CONTACTS` al manifest principal (C12), enviar la declaració de `READ_CONTACTS` a Play Console (esborrany a `docs/contacts/README.md`, «Política») i regenerar la Baseline Profile.
 
 ## Decidit
 
@@ -52,3 +53,6 @@ Mai es cobra per **accedir, protegir o treure** les dades pròpies. Al Pro hi va
 - [ ] Amb totes les funcions apagades: no hi ha selector d'avatar, tots els avatars són Galeta, i el mateix nom dona sempre el mateix color.
 - [x] Els 7 colors surten repartits amb noms diferents (`AvatarColorTest`, 20 noms).
 - [x] Amb `CustomAvatarFeature` activada (debug): el selector torna a sortir i desa els valors.
+- [x] Amb `ContactLinkFeature` apagat no surt res de Contactes (editor, detall, Ajustos) i no queda ni la compte ni les files; el vincle es conserva (emulador, fases 2 i 4).
+- [x] Amb `ContactLinkFeature` activada (debug): vincular, obrir a Contactes, files a «Connected apps», protegides sense files, contacte esborrat i fusionat (emulador, fases 2–5).
+- [x] La release no porta els permisos de Contactes (APK de release, fase 3).

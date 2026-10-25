@@ -45,8 +45,17 @@ La prova de concepte és a la branca `poc/contacts-row` (no es fusiona mai), amb
 
 - `WRITE_CONTACTS` deixa de funcionar per a apps que apuntin a la «upcoming Android release» (2027, probablement API 38): [blog](https://developer.android.com/blog/posts/reliable-way-to-add-and-edit-contacts-android). **Depèn del targetSdk, no del mòbil:** «Apps targeting older versions keep their current behavior». Amb targetSdk 37 funciona també als mòbils amb l'API 38; quan es pugi el targetSdk, les escriptures fallen amb `SecurityException` (el blog no diu què passa amb les files ja escrites). El límit real el posa Play en obligar a pujar el targetSdk (data a verificar a la fase 6). El mateix blog recomana el People Directory per a les files «Call with…/Message with…» d'altres apps. `MANAGE_CONTACTS` no ens toca.
 - `maxSdkVersion="37"` cobreix la 37.2 (`ro.build.version.sdk` hi continua sent 37).
-- `READ_CONTACTS` amb targetSdk 37: declaració obligatòria a Play Console a partir del 27 de gener de 2027: [Play Help](https://support.google.com/googleplay/android-developer/answer/16935362). Cal verificar si `maxSdkVersion` n'eximeix abans de publicar (fase 6).
+- `READ_CONTACTS` amb targetSdk 37: declaració obligatòria a Play Console a partir del 27 de gener de 2027: [Play Help](https://support.google.com/googleplay/android-developer/answer/16935362). Play ho demana des del setembre de 2026 a les apps que ja porten el permís; hi ha una pròrroga automàtica de 30 dies. Només es pot quedar el permís si el selector de contactes no n'hi ha prou per a la funció principal. `WRITE_CONTACTS` no és en aquesta política.
+- **`maxSdkVersion` no n'eximeix (comprovat a la fase 6):** la pàgina no en diu res, però `maxSdkVersion="37"` vol dir que el permís es demana a l'API 37, que és precisament on s'aplica la política. Per esquivar-la caldria `maxSdkVersion="36"`, i aleshores la funció no aniria a cap mòbil amb Android 17. Mentre els permisos siguin només a debug (C12), la release no ha de declarar res.
+- **targetSdk 38:** Play no ha publicat cap data. Fins ara, la data de cada any la marca la versió d'Android de l'any anterior (l'agost de 2026 va ser l'API 36). Si es manté el patró, l'API 38 seria obligatòria cap a l'agost de 2028, però és una deducció, no una data oficial: cal mirar-ho a Play Console. És la data que limita C10.
 - Data safety: tot queda al mòbil, no compta com a «recollit».
+
+### Play: declaració i Data safety (esborrany, fase 6)
+
+Per quan els permisos passin al manifest principal. **No es toca Play sense permís.**
+
+- **Declaració de `READ_CONTACTS`.** Funció: integració amb l'app Contactes (enllaç a «Connected apps» d'un contacte). Per què el selector no n'hi ha prou: el selector dona el contacte una sola vegada, però Converses ha de trobar-lo de nou quan canvia d'id (fusions, sincronització), detectar si s'ha esborrat i saber a quin contacte té enganxades les seves files per esborrar-les o refer-les quan la persona es protegeix, s'arxiva o es desvincula. Només llegeix el contacte vinculat i les files pròpies; no llegeix ni desa telèfons, correus ni l'agenda sencera. Risc: la categoria no encaixa bé amb cap de la llista («Contact management» o «Other»), i Play pot rebutjar-la.
+- **Data safety:** sense canvis. Converses no envia res fora del mòbil: el nom del contacte (`contactName`), l'id i el lookup key es desen a Room, que no surt al backup d'Android ni a l'exportació (`PersonExporter`). Per a Play, una dada que no surt del dispositiu no està «recollida», i per tant «Contacts» no es marca ni com a recollida ni com a compartida.
 
 ## Decisions
 
@@ -109,7 +118,7 @@ Després de crear les files es torna a llegir el lookup key (canvia en agregar) 
 | --- | --- |
 | **Fuga de protegides** (C1) | Test de JVM del pla: una protegida mai no genera files; protegir-ne una amb files genera un esborrat. Comprovació a l'emulador. |
 | **Fuga de contingut** a apps amb `READ_CONTACTS` | Només text fix i l'id de la persona; revisió del codi de `ContactsGateway` a la fase 5. |
-| **Política de Play** per a permisos de contactes i Data safety | Verificar a la fase 6 si `maxSdkVersion` eximeix de la declaració; cap canvi a Play sense permís. |
+| **Política de Play** per a permisos de contactes i Data safety | `maxSdkVersion` no eximeix de la declaració (fase 6); esborrany de la declaració i de Data safety a «Política». Mentre els permisos siguin només a debug, res a declarar; cap canvi a Play sense permís. |
 | **`WRITE_CONTACTS` deixa de funcionar** amb el targetSdk de 2027 | C10: es revisa quan surti l'API 38, abans de pujar el targetSdk. |
 | **Migració v2 → v3** trenca dades publicades | Test amb `MigrationTestHelper`; mai `fallbackToDestructiveMigration` a release. |
 | **Lookup key caducat** o contacte esborrat | `lookupContact` i estat «contacte esborrat» al detall; test del pla amb contactes que ja no hi són. |
