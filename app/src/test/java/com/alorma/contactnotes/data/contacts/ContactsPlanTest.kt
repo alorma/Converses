@@ -83,6 +83,23 @@ class ContactsPlanTest {
   }
 
   @Test
+  fun twoPeopleOnTheSameContactOnlyTheFirstLinkedHasRows() {
+    val bob = LinkedPerson(id = 3, contactId = ada.contactId, lookupKey = "bob", isProtected = false)
+    assertEquals(ContactsPlan(create = listOf(ada)), plan(people = listOf(bob, ada)))
+    // Dos contactes amb files que es fusionen: les de la segona persona se'n van
+    assertEquals(
+      ContactsPlan(remove = listOf(bob.id)),
+      plan(people = listOf(ada, bob), rows = listOf(rowsOf(ada), rowsOf(bob))),
+    )
+  }
+
+  @Test
+  fun aProtectedPersonDoesNotTakeTheContactFromAnother() {
+    val bob = LinkedPerson(id = 3, contactId = luna.contactId, lookupKey = "bob", isProtected = false)
+    assertEquals(ContactsPlan(create = listOf(bob)), plan(people = listOf(luna, bob)))
+  }
+
+  @Test
   fun rowsLeftAloneByADeletedContactAreRedone() {
     assertEquals(ContactsPlan(create = listOf(ada)), plan(rows = listOf(rowsOf(ada).copy(alone = true))))
   }

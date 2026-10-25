@@ -169,6 +169,23 @@ class ContactsReconcilerTest {
     }
 
   @Test
+  fun mergingTwoLinkedContactsKeepsBothLinksAndOnlyTheFirstPersonsRows() =
+    runTest {
+      val ada = linkedPerson("Ada", contactId = 10)
+      val bob = linkedPerson("Bob", contactId = 20)
+      start()
+
+      gateway.mergeContacts(from = 20, into = 10)
+      reconciler.refresh()
+      settle()
+      settle()
+
+      assertEquals(listOf(ada.id), rowPeople())
+      assertEquals(10L, db.person(bob.id)!!.contactId)
+      assertEquals(10L, db.person(ada.id)!!.contactId)
+    }
+
+  @Test
   fun aContactDeletedWithTheSameIdLeavesNoNamelessContact() =
     runTest {
       val ada = linkedPerson("Ada", contactId = 10)

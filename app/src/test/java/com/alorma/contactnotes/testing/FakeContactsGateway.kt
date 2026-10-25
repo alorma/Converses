@@ -20,6 +20,15 @@ class FakeContactsGateway : ContactsGateway {
     contacts[contact.lookupKey] = contact
   }
 
+  /** Fusiona el contacte [from] dins [into]: els lookup keys vells continuen resolent, ara amb l'id de [into]. */
+  fun mergeContacts(
+    from: Long,
+    into: Long,
+  ) {
+    contacts.replaceAll { _, contact -> if (contact.id == from) contact.copy(id = into) else contact }
+    rowsByPerson.replaceAll { _, rows -> if (rows.contactId == from) rows.copy(contactId = into) else rows }
+  }
+
   /** Esborra el contacte del dispositiu: les nostres files hi queden soles, com fa el proveïdor real. */
   fun deleteContact(contactId: Long) {
     contacts.values.removeAll { it.id == contactId }

@@ -26,7 +26,8 @@ data class ContactsPlan(
     /**
      * [people] són totes les persones vinculades, també protegides i arxivades. Sense permís no es poden llegir ni
      * esborrar files ([rows] arriba buit): només es treu la compte, i el sistema n'esborra les files; els vincles es
-     * conserven. Les protegides mai tenen files (C1); les arxivades sí (C4). Amb el flag apagat no queda res.
+     * conserven. Les protegides mai tenen files (C1); les arxivades sí (C4). Amb el flag apagat no queda res. Un
+     * contacte té les files d'una sola persona (C14).
      */
     fun of(
       people: List<LinkedPerson>,
@@ -38,7 +39,17 @@ data class ContactsPlan(
     ): ContactsPlan {
       if (!granted) return ContactsPlan(removeAccount = hasAccount)
 
-      val wanted = if (enabled) people.filterNot { it.isProtected } else emptyList()
+      // Dues persones al mateix contacte (s'han fusionat dos contactes): només en té files la primera vinculada, perquè
+      // les files no diuen de qui són
+      val wanted =
+        if (enabled) {
+          people
+            .filterNot { it.isProtected }
+            .groupBy { it.contactId }
+            .map { (_, sameContact) -> sameContact.minBy { it.id } }
+        } else {
+          emptyList()
+        }
       val wantedIds = wanted.map { it.id }.toSet()
       val rowsByPerson = rows.groupBy { it.personId }
       val accountWanted = enabled && people.isNotEmpty()
