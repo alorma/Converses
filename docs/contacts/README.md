@@ -1,6 +1,6 @@
 # Converses i els contactes del dispositiu — Pla
 
-Actualitzat el 25 d'oct. de 2026 (fase 0 tancada) · @Bernat · **disseny pendent (C8).** Aquest document recull l'abast, l'arquitectura, les decisions i els riscos; les fases són a `docs/contacts/fases.md`. És una funció **Pro**: viu darrere de `ContactLinkFeature` (apagat), com la resta de `docs/pro/README.md`.
+Actualitzat el 25 d'oct. de 2026 (fases 0 i 1 fetes) · @Bernat · disseny a `docs/contacts/disseny.md`. Aquest document recull l'abast, l'arquitectura, les decisions i els riscos; les fases són a `docs/contacts/fases.md`. És una funció **Pro**: viu darrere de `ContactLinkFeature` (apagat), com la resta de `docs/pro/README.md`.
 
 ## Objectiu
 
@@ -58,20 +58,12 @@ La prova de concepte és a la branca `poc/contacts-row` (no es fusiona mai), amb
 | C4 | **Arxivades mantenen les files;** en tocar-les s'obre la persona arxivada. | Decidit |
 | C5 | **Sense biblioteca de tercers.** S'ha descartat [contacts-android](https://github.com/vestrel00/contacts-android): només es publica a JitPack, té un sol mantenidor i no aporta el sync adapter ni `contacts.xml`, que són la part difícil. El poc de `ContactsContract` que cal queda tancat darrere de `ContactsGateway`. | Decidit |
 | C6 | **Si l'usuari esborra la compte «Converses»:** en obrir l'app, si hi ha persones vinculades i la compte no hi és, es torna a crear i es refan les files. | Decidit |
-| C7 | **Permisos** `READ_CONTACTS` i `WRITE_CONTACTS` (tots dos amb `maxSdkVersion="37"`): es demanen en vincular el primer contacte, després de l'explicació (C8). Si es deneguen, el vincle es desa igualment i no hi ha files. | Decidit |
-| C8 | **Disseny** de la fila de l'editor, de la indicació al detall, de l'estat «contacte esborrat» i de l'explicació del permís (Claude Design). Encàrrec a la secció següent. | Obert |
+| C7 | **Permisos** `READ_CONTACTS` i `WRITE_CONTACTS` (tots dos amb `maxSdkVersion="37"`): es demanen en vincular el primer contacte (o amb «Activa» a Ajustos), després de l'explicació. Sense permís no es pot vincular (l'editor mostra «Sense permís de Contactes»); els vincles que ja hi ha es conserven, sense files. | Decidit |
+| C8 | **Disseny:** lliurat el 25 d'oct. i recollit a `docs/contacts/disseny.md` (editor, explicació del permís, detall, Ajustos › Contactes i textos). Sense estat «Gratuït» ni etiqueta «PRO»: tot darrere del flag. | Decidit |
 | C9 | **Destí de les files:** «Veure notes» obre la fitxa de la persona; «Crear nota» obre la fitxa amb el full de nova entrada (`NewEntrySheet`) ja obert. Si la persona és protegida, primer el desbloqueig i després el mateix destí. | Decidit |
 | C10 | **Via antiga per a tothom, sense People Directory.** Es torna a mirar quan surti l'API 38 i calgui pujar el targetSdk (aleshores `WRITE_CONTACTS` deixarà de funcionar). Descartada també la via d'una URL al contacte (Bernat no vol una URL visible). | Decidit |
-| C11 | **Què es desa a Room:** `contactLookupKey` i l'id del contacte (per a `Contacts.getLookupUri(id, lookupKey)`); telèfons i correus no. Si es desa també `contactName` (per mostrar el vincle sense `READ_CONTACTS`) es decideix a l'inici de la fase 1. | Parcial |
-
-## Encàrrec de disseny (C8)
-
-Per a Claude Design. Context: Converses (Material 3 Expressive, color de la persona via `PersonTheme`). Una persona es pot vincular a un contacte del mòbil (funció Pro); el contacte mostra «Converses › Veure notes / Crear nota» a l'app Contactes.
-
-1. **Editor de persona** (Editar / Nova persona): fila «Contacte» en tres estats: sense vincle (acció per triar-ne un amb el selector del sistema), vinculada (nom del contacte i acció per treure el vincle) i contacte esborrat.
-2. **Detall de la persona:** indicació discreta «Vinculada a {nom}» amb l'acció «Obre a Contactes».
-3. **Estat «contacte esborrat»** al detall: el contacte ja no existeix; opció de desvincular.
-4. **Explicació del permís**, abans del diàleg del sistema, en vincular el primer contacte: per què es demana, que apareixerà la compte «Converses» a Ajustos › Comptes i que mai s'hi escriu el nom ni les notes. I què es veu si l'usuari diu que no (el vincle es desa, sense files a Contactes).
+| C11 | **Què es desa a Room:** `contactId`, `contactLookupKey` i `contactName`; telèfons i correus no. | Decidit |
+| C12 | **Permisos només al manifest de debug** fins a la fase 6, perquè la versió publicada no els porti mentre la funció no estigui acabada. El compte, el sync adapter i l'activitat d'entrada poden anar al manifest principal: sense permisos no fan res. | Decidit |
 
 ## Arquitectura
 
@@ -105,7 +97,7 @@ Després de crear les files es torna a llegir el lookup key (canvia en agregar) 
 
 ### Manifest i permisos
 
-- `READ_CONTACTS` i `WRITE_CONTACTS` amb `maxSdkVersion="37"` (C7, C10). `GET_ACCOUNTS` no cal per a la compte pròpia.
+- `READ_CONTACTS` i `WRITE_CONTACTS` amb `maxSdkVersion="37"` (C7, C10), **de moment només al manifest de debug** (C12). `GET_ACCOUNTS` no cal per a la compte pròpia.
 - Serveis de l'authenticator i del sync adapter, exportats amb els intent filters del sistema.
 - Activitat de visualització amb `ACTION_VIEW` i els dos mimetypes.
 

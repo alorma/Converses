@@ -4,11 +4,11 @@ Context, abast, arquitectura, decisions (C1–C11) i riscos són a `docs/contact
 
 | Fase | Títol | Depèn de | Estat |
 | --- | --- | --- | --- |
-| 0 | Decisions i investigació (Play, Contactes a l'emulador, disseny) | — | Fet (25-10-2026), disseny pendent |
-| 1 | Flag, migració v3 i repositori | 0 | Feta, pendent de validar |
-| 2 | Vincular i desvincular a l'editor; vincle al detall | 1, 0 (C8) | Pendent (espera disseny) |
-| 3 | Compte, sync adapter i obrir des de Contactes | 1 | Pendent |
-| 4 | Reconciliació, permisos i disparadors | 2, 3 | Pendent (espera disseny) |
+| 0 | Decisions i investigació (Play, Contactes a l'emulador, disseny) | — | Fet (25-10-2026) |
+| 1 | Flag, migració v3 i repositori | 0 | Feta (25-10-2026) |
+| 2 | Vincular i desvincular a l'editor; vincle al detall | 1, 0 (C8) | Pendent |
+| 3 | Compte, sync adapter i obrir des de Contactes | 1 | En curs |
+| 4 | Reconciliació, permisos, disparadors i Ajustos › Contactes | 2, 3 | Pendent |
 | 5 | Privacitat i casos límit | 4 | Pendent |
 | 6 | Qualitat, textos, captures i Play | 5 | Pendent |
 | 7 | Més endavant | 6 | Idees |
@@ -28,7 +28,7 @@ Sense codi de producte. Prova de concepte a la branca `poc/contacts-row` (no es 
 - [x] Lookup key després de l'agregació: canvia, però l'antic continua resolent; el nom del contacte no canvia
 - [x] People Directory (37.2) provat i descartat (C10)
 - [x] Decidir C6, C7, C9, C10 i, en part, C11
-- [ ] Demanar el disseny a Claude Design (C8): encàrrec escrit al `README.md`, el passa Bernat
+- [x] Disseny de Claude Design (C8): lliurat el 25 d'oct., a `docs/contacts/disseny.md`
 - [ ] Neteja: treure telèfons, correus i l'empresa «Converses» dels contactes de prova (compte de Google de Bernat); `clear` de la prova de concepte als dos emuladors; esborrar el worktree `../Converses-poc-contacts` quan ja no calgui
 
 ## Fase 1 · Flag, migració v3 i repositori
@@ -45,10 +45,10 @@ Sense codi de producte. Prova de concepte a la branca `poc/contacts-row` (no es 
 
 ## Fase 2 · Vincular a l'editor; vincle al detall
 
-Necessita el disseny (C8).
+Segons `docs/contacts/disseny.md`.
 
-- [ ] Editor (Editar / Nova persona), només amb el flag: fila «Contacte» que obre `PickContact`, mostra el nom triat i permet treure'l.
-- [ ] Detall: «Vinculada a {nom}» i «Obre a Contactes» (`ACTION_VIEW` amb el lookup URI); estat «contacte esborrat» amb opció de desvincular.
+- [ ] Editor (Editar / Nova persona), només amb el flag: secció «Contacte» amb els tres estats (sense vincle, vinculat, sense permís); `PickContact` i treure el vincle sense confirmació.
+- [ ] Detall: «Vinculada a {nom}» i «Obre a Contactes» (`ACTION_VIEW` amb el lookup URI); estat «contacte esborrat» amb «Desvincula»; cap fila sense permís ni amb la persona bloquejada.
 - [ ] ViewModels amb tests de JVM (flag apagat: res; vincular; desvincular; contacte esborrat).
 - [ ] Textos en en/ca/es; previews i captures (`...Content`).
 
@@ -66,9 +66,11 @@ Necessita el disseny (C8).
 **Validació:** tests, `ktlintCheck`; emulador: amb files creades des del menú de debug, «Veure notes» obre la fitxa i «Crear nota» la fitxa amb el full obert.
 **Sortida:** la cadena Contactes → Converses funciona amb files de prova.
 
-## Fase 4 · Reconciliació, permisos i disparadors
+## Fase 4 · Reconciliació, permisos, disparadors i Ajustos › Contactes
 
-Necessita el disseny de l'explicació del permís (C8).
+Segons `docs/contacts/disseny.md` (explicació del permís 5b i Ajustos 5h).
+
+- [ ] Ajustos › Contactes, només amb el flag i sense etiqueta PRO: mai activat («Activa»), activat (comptador amb plurals, compte, gestionar el permís) i denegat.
 
 - [ ] `ContactsReconciler`: pla pur (crear i esborrar) a partir de les persones, el flag, els permisos i les files existents; aplicat amb `ContactsGateway` en un sol lot.
 - [ ] Tornar a llegir i desar el lookup key després d'agregar.
