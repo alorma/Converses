@@ -260,6 +260,7 @@
     <string name="contact_section">Contacte</string>
     <string name="contact_link">Vincula un contacte</string>
     <string name="contact_link_summary">Opcional · surt a la fitxa de Contactes</string>
+    <string name="contact_taken">Aquest contacte ja està vinculat a una altra persona</string>
     <string name="contact_linked_to">VINCULAT A</string>
     <string name="contact_unlink">Treu el vincle</string>
     <string name="contacts_no_permission">Sense permís de Contactes</string>

@@ -202,6 +202,14 @@ internal fun EditPersonContactLinkedPreview() {
 
 @Preview
 @Composable
+internal fun EditPersonContactTakenPreview() {
+  EditPersonContactPreview(
+    ContactLinkState(enabled = true, permissionGranted = true, explained = true, pickedTaken = true),
+  )
+}
+
+@Preview
+@Composable
 internal fun EditPersonContactNoPermissionPreview() {
   EditPersonContactPreview(ContactLinkState(enabled = true, explained = true))
 }

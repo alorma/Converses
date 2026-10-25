@@ -145,6 +145,57 @@ class EditPersonViewModelTest {
   }
 
   @Test
+  fun aContactLinkedToSomeoneElseIsNotLinked() =
+    runTest {
+      enableContactLink()
+      val luna = db.addPerson("Luna", isProtected = true)
+      db.repository.linkContact(luna, contactId = picked.id, lookupKey = picked.lookupKey, name = picked.name)
+      val marta = db.addPerson("Marta")
+      contacts.pickable["content://picked"] = picked
+      val vm = viewModel(marta.id)
+
+      vm.onContactPicked("content://picked")
+
+      assertEquals(ContactSection.Taken, vm.state.value.contact.section)
+      assertNull(db.person(marta.id)!!.contactId)
+
+      // Un altre contacte sí que es vincula, i el missatge se'n va
+      contacts.pickable["content://other"] = ResolvedContact(id = 8, lookupKey = "other", name = "Marta")
+      vm.onContactPicked("content://other")
+
+      assertEquals(ContactSection.Linked("Marta"), vm.state.value.contact.section)
+    }
+
+  @Test
+  fun aNewPersonCannotTakeALinkedContact() =
+    runTest {
+      enableContactLink()
+      val luna = db.addPerson("Luna")
+      db.repository.linkContact(luna, contactId = 99, lookupKey = picked.lookupKey, name = picked.name)
+      contacts.pickable["content://picked"] = picked
+      val vm = viewModel()
+
+      vm.onContactPicked("content://picked")
+
+      assertEquals(ContactSection.Taken, vm.state.value.contact.section)
+    }
+
+  @Test
+  fun relinkingTheSameContactIsAllowed() =
+    runTest {
+      enableContactLink()
+      val marta = db.addPerson("Marta")
+      db.repository.linkContact(marta, contactId = picked.id, lookupKey = picked.lookupKey, name = picked.name)
+      contacts.pickable["content://picked"] = picked
+      val vm = viewModel(marta.id)
+      vm.onUnlinkContact()
+
+      vm.onContactPicked("content://picked")
+
+      assertEquals(ContactSection.Linked("Marta Soler"), vm.state.value.contact.section)
+    }
+
+  @Test
   fun aContactThatCannotBeReadIsNotLinked() {
     enableContactLink()
     val marta = db.addPerson("Marta")

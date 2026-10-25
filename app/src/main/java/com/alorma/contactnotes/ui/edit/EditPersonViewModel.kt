@@ -47,6 +47,12 @@ sealed interface ContactSection {
 
   data object NotLinked : ContactSection
 
+  /**
+   * El contacte triat ja és d'una altra persona i no s'ha vinculat (C13). El missatge no diu de qui, perquè pot ser una
+   * persona protegida.
+   */
+  data object Taken : ContactSection
+
   /** Sense permís també es mostra, perquè treure el vincle no en necessita. */
   data class Linked(
     val name: String,
@@ -64,6 +70,7 @@ data class ContactLinkState(
   val permissionGranted: Boolean = false,
   val explained: Boolean = false,
   val linked: LinkedContact? = null,
+  val pickedTaken: Boolean = false,
 ) {
   val section: ContactSection
     get() =
@@ -71,6 +78,7 @@ data class ContactLinkState(
         !enabled -> ContactSection.Hidden
         linked != null -> ContactSection.Linked(linked.name)
         explained && !permissionGranted -> ContactSection.NoPermission
+        pickedTaken -> ContactSection.Taken
         else -> ContactSection.NotLinked
       }
 
@@ -282,8 +290,17 @@ class EditPersonViewModel(
   override fun onContactPicked(contactUri: String) {
     viewModelScope.launch {
       val contact = runCatching { contacts.readPicked(contactUri) }.getOrNull() ?: return@launch
+      // Un contacte, una persona (C13): les files a Contactes no diuen de qui són
+      val taken =
+        repository.observeLinkedPeople().first().any {
+          it.id != personId && (it.contactId == contact.id || it.contactLookupKey == contact.lookupKey)
+        }
+      if (taken) {
+        _state.update { it.copy(contact = it.contact.copy(pickedTaken = true)) }
+        return@launch
+      }
       val linked = LinkedContact(contact.id, contact.lookupKey, contact.name)
-      _state.update { it.copy(contact = it.contact.copy(linked = linked)) }
+      _state.update { it.copy(contact = it.contact.copy(linked = linked, pickedTaken = false)) }
       val person = original ?: return@launch
       repository.linkContact(person, linked.id, linked.lookupKey, linked.name)
       original = person.copy(contactId = linked.id, contactLookupKey = linked.lookupKey, contactName = linked.name)

@@ -63,7 +63,7 @@ internal fun ContactSectionRow(
 ) {
   when (section) {
     ContactSection.Hidden -> Unit
-    ContactSection.NotLinked ->
+    ContactSection.NotLinked, ContactSection.Taken ->
       Surface(
         onClick = onLink,
         shape = MaterialTheme.shapes.large,
@@ -77,10 +77,11 @@ internal fun ContactSectionRow(
               style = MaterialTheme.typography.titleMedium,
               fontWeight = FontWeight.Bold,
             )
+            val taken = section == ContactSection.Taken
             Text(
-              stringResource(R.string.contact_link_summary),
+              stringResource(if (taken) R.string.contact_taken else R.string.contact_link_summary),
               style = MaterialTheme.typography.bodyMedium,
-              color = MaterialTheme.colorScheme.onSurfaceVariant,
+              color = if (taken) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant,
             )
           }
           Icon(

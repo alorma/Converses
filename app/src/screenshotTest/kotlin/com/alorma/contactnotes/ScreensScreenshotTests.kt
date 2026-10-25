@@ -13,6 +13,7 @@ import com.alorma.contactnotes.ui.edit.DeletePersonDialogPreview
 import com.alorma.contactnotes.ui.edit.EditPersonContactLinkedPreview
 import com.alorma.contactnotes.ui.edit.EditPersonContactNoPermissionPreview
 import com.alorma.contactnotes.ui.edit.EditPersonContactNotLinkedPreview
+import com.alorma.contactnotes.ui.edit.EditPersonContactTakenPreview
 import com.alorma.contactnotes.ui.edit.EditPersonCustomAvatarPreview
 import com.alorma.contactnotes.ui.edit.EditPersonExistingPreview
 import com.alorma.contactnotes.ui.edit.EditPersonNewPreview
@@ -277,6 +278,13 @@ class ScreensScreenshotTests {
   @Composable
   fun editPersonContactLinked() {
     EditPersonContactLinkedPreview()
+  }
+
+  @ScreenPreviews
+  @PreviewTest
+  @Composable
+  fun editPersonContactTaken() {
+    EditPersonContactTakenPreview()
   }
 
   @ScreenPreviews
