@@ -9,7 +9,7 @@ Context, abast, arquitectura, decisions (C1–C11) i riscos són a `docs/contact
 | 2 | Vincular i desvincular a l'editor; vincle al detall | 1, 0 (C8) | Feta i validada (25-10-2026) |
 | 3 | Compte, sync adapter i obrir des de Contactes | 1 | Feta i validada (25-10-2026) |
 | 4 | Reconciliació, permisos, disparadors i Ajustos › Contactes | 2, 3 | Feta i validada (25-10-2026) |
-| 5 | Privacitat i casos límit | 4 | Tasques fetes, pendent de validació |
+| 5 | Privacitat i casos límit | 4 | Feta i validada (25-10-2026) |
 | 6 | Qualitat, textos, captures i Play | 5 | Pendent |
 | 7 | Més endavant | 6 | Idees |
 
@@ -107,7 +107,7 @@ Decidit en començar (25-10-2026): C13 (un contacte, una persona) i C14 (contact
 - [x] Ajustos › Contactes: fora «Compte "Converses"» i «Gestiona el permís»; ara, activat, és una sola fila — `b7e4a28`
 - [x] Desinstal·lar i reinstal·lar: no queden ni la compte, ni raw contacts, ni contactes sense nom. Sense canvis de codi
 
-Validat a l'emulador 37.2 amb contactes locals (creats i esborrats amb `adb shell content`) i un PIN temporal. Pendent de validació humana: el desbloqueig biomètric real en obrir una protegida des de Contactes.
+Validat a l'emulador 37.2 amb contactes locals (creats i esborrats amb `adb shell content`) i un PIN temporal. Validat per Bernat (25-10-2026): el desbloqueig en obrir una protegida des d'una fila (Luna Roja → «Crear nota») obre la fitxa amb el full; una protegida vinculada no té files a Contactes (C1).
 
 **Validació:** tests de JVM dels casos; emulador; **humana:** desbloqueig biomètric en obrir una protegida des de Contactes.
 **Sortida:** cap camí que filtri una protegida o dades de les notes.
@@ -119,6 +119,7 @@ Validat a l'emulador 37.2 amb contactes locals (creats i esborrats amb `adb shel
 - [ ] `docs/pro/README.md`: fila «Contact integration» actualitzada i proves marcades.
 - [ ] Verificar si `maxSdkVersion` eximeix de la declaració de `READ_CONTACTS`; preparar el text de Data safety i la declaració de permisos. **No es toca Play sense permís.**
 - [ ] Baseline Profile: no cal mentre sigui darrere de flag (es revisa a la release, com sempre).
+- [ ] Google Contacts i la memòria cau dels tipus de compte: a la fase 5, després de reinstal·lar, les files eren al proveïdor però Google Contacts no les mostrava fins a fer-li `force-stop`. Comprovar si en una instal·lació neta, amb Contactes obert en segon pla, surten soles (al cap d'una estona, girant la pantalla…); si no, buscar un senyal des de Converses que el faci rellegir (crear la compte abans, `requestSync`…) o documentar-ho com a limitació.
 
 **Sortida:** funció llesta per quan existeixi el Pro, apagada a la release.
 
