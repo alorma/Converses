@@ -128,6 +128,7 @@ fun PersonDetailRoute(
   personId: Long,
   onBack: () -> Unit,
   onEdit: (EditFocus?) -> Unit,
+  openNewEntry: Boolean = false,
   viewModel: PersonDetailViewModel = koinViewModel(parameters = { parametersOf(personId) }),
 ) {
   val state by viewModel.uiState.collectAsStateWithLifecycle()
@@ -141,7 +142,8 @@ fun PersonDetailRoute(
   }
 
   val person = state.person ?: return
-  var showNewEntry by rememberSaveable { mutableStateOf(false) }
+  // Desat: s'obre una sola vegada encara que es giri la pantalla o es torni d'una altra
+  var showNewEntry by rememberSaveable { mutableStateOf(openNewEntry) }
   // Quan s'obre des de l'entrada fantasma, ve amb el «Qui» triat i el focus al text
   var newEntryKind by rememberSaveable { mutableStateOf(EntryKind.SAID) }
   var newEntryFocus by rememberSaveable { mutableStateOf(false) }

@@ -119,13 +119,14 @@ fun AppNavigation(
               onBack = { navigation.pop() },
               onUnlocked = {
                 navigation.pop()
-                navigation.navigate(PersonRoute(route.id))
+                navigation.navigate(PersonRoute(route.id, openNewEntry = route.openNewEntry))
               },
             )
           }
           entry<PersonRoute> { route ->
             PersonDetailRoute(
               personId = route.id,
+              openNewEntry = route.openNewEntry,
               onBack = { navigation.pop() },
               onEdit = { focus -> navigation.navigate(EditPersonRoute(route.id, focus = focus)) },
             )

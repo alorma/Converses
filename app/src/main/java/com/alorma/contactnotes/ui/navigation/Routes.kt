@@ -40,9 +40,13 @@ data class QuickNoteRoute(
 @Serializable
 data class PersonRoute(
   val id: Long,
+  /** Obre el full de nova entrada en arribar (fila «Crear nota» de Contactes); només la primera vegada. */
+  val openNewEntry: Boolean = false,
 ) : AppRoute
 
 @Serializable
 data class PersonLockedRoute(
   val id: Long,
+  /** Es passa a [PersonRoute] després de desbloquejar. */
+  val openNewEntry: Boolean = false,
 ) : AppRoute
