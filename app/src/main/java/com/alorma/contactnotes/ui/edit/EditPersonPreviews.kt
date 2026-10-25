@@ -28,6 +28,14 @@ private object NoOpEditPersonActions : EditPersonActions {
 
   override fun onRemoveFact(key: Long) = Unit
 
+  override fun onContactPicked(contactUri: String) = Unit
+
+  override fun onUnlinkContact() = Unit
+
+  override fun onContactsExplained() = Unit
+
+  override fun onContactsPermissionChanged() = Unit
+
   override fun onMoveFact(
     from: Int,
     to: Int,

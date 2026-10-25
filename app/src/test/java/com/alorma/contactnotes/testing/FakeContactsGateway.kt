@@ -44,6 +44,11 @@ class FakeContactsGateway : ContactsGateway {
     lookupKey: String,
   ): ResolvedContact? = contacts[lookupKey] ?: contacts.values.firstOrNull { it.id == contactId }
 
+  /** Contactes que torna el selector, per URI. */
+  val pickable = mutableMapOf<String, ResolvedContact>()
+
+  override suspend fun readPicked(contactUri: String): ResolvedContact? = pickable[contactUri]
+
   override suspend fun personIdForRow(dataUri: String): Long? = rowUris[dataUri]
 
   override fun hasAccount(): Boolean = accountExists

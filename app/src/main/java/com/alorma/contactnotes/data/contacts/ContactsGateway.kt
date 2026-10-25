@@ -40,6 +40,9 @@ interface ContactsGateway {
     lookupKey: String,
   ): ResolvedContact?
 
+  /** El contacte que torna `PickContact` (el sistema en dona accés temporal sense cap permís), o `null` si no es llegeix. */
+  suspend fun readPicked(contactUri: String): ResolvedContact?
+
   /** `personId` de la fila tocada a Contactes (el `content://com.android.contacts/data/N` de l'intent). */
   suspend fun personIdForRow(dataUri: String): Long?
 

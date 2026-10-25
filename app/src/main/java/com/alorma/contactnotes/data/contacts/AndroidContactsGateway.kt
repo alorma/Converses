@@ -126,12 +126,19 @@ class AndroidContactsGateway(
     )
   }
 
+  override suspend fun readPicked(contactUri: String): ResolvedContact? =
+    withContext(Dispatchers.IO) { readContact(contactUri.toUri()) }
+
   private fun resolveNow(
     contactId: Long,
     lookupKey: String,
   ): ResolvedContact? {
     val uri = Contacts.lookupContact(resolver, Contacts.getLookupUri(contactId, lookupKey)) ?: return null
-    return resolver
+    return readContact(uri)
+  }
+
+  private fun readContact(uri: Uri): ResolvedContact? =
+    resolver
       .query(uri, arrayOf(Contacts._ID, Contacts.LOOKUP_KEY, Contacts.DISPLAY_NAME), null, null, null)
       ?.use { cursor ->
         if (cursor.moveToFirst()) {
@@ -140,7 +147,6 @@ class AndroidContactsGateway(
           null
         }
       }
-  }
 
   /** Un raw contact del contacte que no sigui nostre, per enganxar-hi el de la persona. */
   private fun foreignRawContactOf(contactId: Long): Long? =

@@ -106,7 +106,7 @@ val viewModelModule =
     viewModel { (requestId: String) -> ApprovalViewModel(requestId, get()) }
     viewModel { (personId: Long) -> PersonDetailViewModel(personId, get(), get()) }
     viewModel { (personId: Long) -> QuickNoteViewModel(personId, get(), get()) }
-    viewModel { (personId: Long) -> EditPersonViewModel(personId, get(), get()) }
+    viewModel { (personId: Long) -> EditPersonViewModel(personId, get(), get(), get(), get(), get(), get()) }
   }
 
 val wearModule =
