@@ -3,9 +3,12 @@ package com.alorma.contactnotes.ui.person
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.alorma.contactnotes.data.ConversesRepository
+import com.alorma.contactnotes.data.contacts.ContactsGateway
+import com.alorma.contactnotes.data.contacts.ContactsPermission
 import com.alorma.contactnotes.data.db.EntryEntity
 import com.alorma.contactnotes.data.db.PersonEntity
 import com.alorma.contactnotes.data.db.PinnedFactEntity
+import com.alorma.contactnotes.data.flags.ContactLinkFeature
 import com.alorma.contactnotes.shared.ChannelType
 import com.alorma.contactnotes.shared.EntryKind
 import java.time.Instant
@@ -14,7 +17,10 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
@@ -39,13 +45,68 @@ data class PersonDetailUiState(
     }
 }
 
+/** Vincle amb Contactes al detall (`docs/contacts/disseny.md`, 5e i 5f). */
+sealed interface DetailContact {
+  /** Sense vincle, flag apagat, sense permís o el proveïdor no s'ha pogut llegir: cap fila. */
+  data object None : DetailContact
+
+  /** [id] i [lookupKey] són els resolts ara, per obrir el contacte a Contactes. */
+  data class Linked(
+    val id: Long,
+    val lookupKey: String,
+    val name: String,
+  ) : DetailContact
+
+  /** El contacte s'ha esborrat de Contactes: es pot desvincular. */
+  data object Deleted : DetailContact
+}
+
 @OptIn(ExperimentalCoroutinesApi::class)
 class PersonDetailViewModel(
   private val personId: Long,
   private val repository: ConversesRepository,
   private val exporter: PersonExporter,
+  private val contactLink: ContactLinkFeature,
+  private val contactsPermission: ContactsPermission,
+  private val contacts: ContactsGateway,
 ) : ViewModel() {
   private val selectedKinds = MutableStateFlow(EntryKind.entries.toSet())
+
+  private val _contact = MutableStateFlow<DetailContact>(DetailContact.None)
+  val contact: StateFlow<DetailContact> = _contact
+
+  init {
+    // Es resol en obrir el detall i cada vegada que el vincle canvia (per exemple, en tornar de l'editor)
+    viewModelScope.launch {
+      repository
+        .observePerson(personId)
+        .map { person -> person?.takeIf { it.contactId != null && it.contactLookupKey != null } }
+        .distinctUntilChanged { old, new -> old?.linkKey() == new?.linkKey() }
+        .collectLatest { person -> _contact.value = resolveContact(person) }
+    }
+  }
+
+  private suspend fun resolveContact(person: PersonEntity?): DetailContact {
+    if (person == null || !contactLink.isEnabled() || !contactsPermission.isGranted()) return DetailContact.None
+    val contactId = person.contactId ?: return DetailContact.None
+    val lookupKey = person.contactLookupKey ?: return DetailContact.None
+    val resolved =
+      runCatching { contacts.resolve(contactId, lookupKey) }
+        .getOrElse { return DetailContact.None }
+        ?: return DetailContact.Deleted
+    // L'id, el lookup key (canvia en agregar) i el nom poden haver canviat: es desa el que hi ha ara
+    if (resolved.id != contactId || resolved.lookupKey != lookupKey || resolved.name != person.contactName) {
+      repository.linkContact(person, resolved.id, resolved.lookupKey, resolved.name)
+    }
+    return DetailContact.Linked(resolved.id, resolved.lookupKey, resolved.name)
+  }
+
+  fun unlinkContact() {
+    viewModelScope.launch {
+      val person = repository.observePerson(personId).first() ?: return@launch
+      repository.unlinkContact(person)
+    }
+  }
 
   private val timeline =
     selectedKinds.flatMapLatest { kinds ->
@@ -162,6 +223,8 @@ class PersonDetailViewModel(
       exporter.buildText(personId)?.let { exporter.share(name, it) }
     }
   }
+
+  private fun PersonEntity.linkKey() = contactId to contactLookupKey
 
   private fun dayRange(entry: EntryEntity): Pair<Long, Long> {
     val zone = ZoneId.systemDefault()
