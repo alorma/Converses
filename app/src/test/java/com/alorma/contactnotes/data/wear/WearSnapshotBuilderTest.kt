@@ -4,6 +4,7 @@ import com.alorma.contactnotes.data.db.PersonListItem
 import com.alorma.contactnotes.shared.WEAR_MAX_ENTRY_TEXT_LENGTH
 import com.alorma.contactnotes.shared.WearPerson
 import com.alorma.contactnotes.shared.WearSnapshot
+import com.alorma.contactnotes.shared.WearSnapshotCodec
 import com.alorma.contactnotes.testing.FakeDb
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
@@ -152,5 +153,20 @@ class WearSnapshotBuilderTest {
       assertEquals(5_000L, result.generatedAt)
       assertEquals(kael.avatarColor, result.person("Kael").avatarColor)
       assertEquals(kael.avatarShape, result.person("Kael").avatarShape)
+    }
+
+  @Test
+  fun theContactLinkNeverReachesTheWatch() =
+    runTest {
+      val marta = db.addPerson("Marta")
+      val luna = db.addPerson("Luna", isProtected = true)
+      db.repository.linkContact(marta, contactId = 72, lookupKey = "lookup-marta", name = "Contacte Marta")
+      db.repository.linkContact(luna, contactId = 73, lookupKey = "lookup-luna", name = "Contacte Luna")
+
+      val encoded = WearSnapshotCodec.encode(snapshot())
+
+      listOf("lookup-marta", "Contacte Marta", "lookup-luna", "Contacte Luna", "contact").forEach {
+        assertFalse(it, encoded.contains(it))
+      }
     }
 }
