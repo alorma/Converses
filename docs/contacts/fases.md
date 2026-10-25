@@ -8,7 +8,7 @@ Context, abast, arquitectura, decisions (C1–C11) i riscos són a `docs/contact
 | 1 | Flag, migració v3 i repositori | 0 | Feta i validada (25-10-2026) |
 | 2 | Vincular i desvincular a l'editor; vincle al detall | 1, 0 (C8) | Feta i validada (25-10-2026) |
 | 3 | Compte, sync adapter i obrir des de Contactes | 1 | Feta i validada (25-10-2026) |
-| 4 | Reconciliació, permisos, disparadors i Ajustos › Contactes | 2, 3 | Pendent |
+| 4 | Reconciliació, permisos, disparadors i Ajustos › Contactes | 2, 3 | Feta, pendent de validar |
 | 5 | Privacitat i casos límit | 4 | Pendent |
 | 6 | Qualitat, textos, captures i Play | 5 | Pendent |
 | 7 | Més endavant | 6 | Idees |
@@ -83,14 +83,14 @@ Validat a l'emulador 37.2 (Google Contacts): «View notes» obre la fitxa dins l
 
 Segons `docs/contacts/disseny.md` (Ajustos 5h; l'explicació del permís 5b ja es fa a la fase 2 i aquí només es reutilitza per a «Activa»).
 
-- [ ] Ajustos › Contactes, només amb el flag i sense etiqueta PRO: mai activat («Activa»), activat (comptador amb plurals, compte, gestionar el permís) i denegat.
+Decidit en començar (25-10-2026): el comptador d'Ajustos inclou protegides i arxivades; el contacte esborrat es tracta a la fase 5 (el reconciliador ja n'esborra les files òrfenes).
 
-- [ ] `ContactsReconciler`: pla pur (crear i esborrar) a partir de les persones, el flag, els permisos i les files existents; aplicat amb `ContactsGateway` en un sol lot.
-- [ ] Tornar a llegir i desar el lookup key després d'agregar (`addRows` ja el torna; falta fer-ho des del reconciliador).
-- [ ] El text de les files s'escriu a l'idioma del moment: refer-les quan canviï l'idioma de l'app o del sistema.
-- [ ] Disparadors: arrencada (tornant a crear la compte si l'usuari l'ha esborrada, C6), desar persona, protegir o desprotegir, esborrar, canvi de flag, permisos concedits. Amb el flag apagat: esborrar-ho tot i treure la compte.
-- [ ] Permisos concedits o retirats fora de l'editor (Ajustos de l'app, «Activa»): les files segueixen l'estat; sense permisos, els vincles es conserven sense files.
-- [ ] Tests de JVM del pla: idempotència, protegides mai, arxivades sí, contacte esborrat, compte esborrada, flag apagat, permisos denegats.
+- [x] `ContactsGateway.rows()` torna també el contacte on està enganxada cada fila (`RawContacts.CONTACT_ID`) i el text de les files; `rowLabels()` dona el text de l'idioma del moment — `314a23c`
+- [x] `ContactsPlan`: pla pur (compte, crear i esborrar) a partir de les persones vinculades, el flag, el permís, la compte i les files; 14 tests de JVM (protegides mai, arxivades sí, compte esborrada, idioma o contacte canviats, flag apagat, sense permís) — `7e33cfc`
+- [x] `ContactsReconciler` (com `WearSnapshotPublisher`): escolta les persones vinculades (desar, protegir, esborrar, vincular), el flag i `refresh()` a `MainActivity.onResume` (permís, compte esborrada, idioma); desa el lookup key nou amb un `UPDATE` que no trepitja un vincle canviat entremig; sense permís treu la compte (el sistema n'esborra les files) i conserva els vincles; si el contacte ja no hi és, esborra les files. Cada persona va en el seu lot (`addRows`), no tot en un. 10 tests de JVM amb `FakeContactsGateway`, inclosa la idempotència — `974c6d9`
+- [x] Ajustos › Contactes, només amb el flag i sense etiqueta PRO: mai activat («Activa» → 5b → permís), activat (comptador amb plurals, «Compte "Converses"» obre Ajustos › Comptes, «Gestiona el permís») i denegat («Dona permís»); textos, previews i captures — `9b215c5`
+
+Validat a l'emulador 37.2 (25-10-2026): obrir l'app crea la compte i les files i tornar-hi no les refà; idioma de l'app a català → «Veure notes» / «Crear nota»; protegir → desapareixen, desprotegir → tornen; esborrar la compte a Ajustos › Comptes → tornen en obrir l'app; retirar el permís → ni compte ni files, el vincle es conserva i Ajustos diu «Sense permís»; «Dona permís» obre els ajustos de l'app i en tornar amb el permís les files tornen i Ajustos diu «Activat · 1 persona vinculada»; flag apagat → no queda ni la compte, encès → tornen; desvincular l'última persona → fora files i compte; vincular amb el selector → files a l'acte. No provat a l'emulador: l'estat «mai activat» i «Activa» (cal esborrar `contactsExplained`; la captura i el flux 5b de l'editor ho cobreixen).
 
 **Validació:** tests, `ktlintCheck`; emulador: el cicle complet (vincular → files; protegir → desapareixen; desprotegir → tornen; esborrar persona → desapareixen; esborrar la compte a Ajustos → tornen en obrir l'app; apagar flag → no queda res ni la compte).
 **Sortida:** la funció completa a l'emulador amb el flag encès.
