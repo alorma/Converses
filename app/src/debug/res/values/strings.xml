@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
   <string name="app_name">(D) Converses</string>
+  <string name="contacts_account_type" translatable="false">com.alorma.contactnotes.dev.contacts</string>
   <string name="debug_menu_open">Debug menu</string>
   <string name="debug_menu_title">Debug menu</string>
   <string name="debug_data_title">Data</string>

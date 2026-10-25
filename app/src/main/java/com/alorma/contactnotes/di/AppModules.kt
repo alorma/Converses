@@ -4,6 +4,8 @@ import android.content.Context
 import android.content.pm.ApplicationInfo
 import androidx.room.Room
 import com.alorma.contactnotes.data.ConversesRepository
+import com.alorma.contactnotes.data.contacts.AndroidContactsGateway
+import com.alorma.contactnotes.data.contacts.ContactsGateway
 import com.alorma.contactnotes.data.db.ConversesDatabase
 import com.alorma.contactnotes.data.db.Migration1To2
 import com.alorma.contactnotes.data.db.Migration2To3
@@ -134,4 +136,10 @@ val wearModule =
     }
   }
 
-val appModules = listOf(databaseModule, settingsModule, wearModule, viewModelModule)
+/** Vincle amb Contactes (`docs/contacts`), darrere de `ContactLinkFeature`. */
+val contactsModule =
+  module {
+    single<ContactsGateway> { AndroidContactsGateway(androidContext()) }
+  }
+
+val appModules = listOf(databaseModule, settingsModule, wearModule, contactsModule, viewModelModule)

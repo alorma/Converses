@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Les dues files de Converses a la fitxa del contacte (docs/contacts, C9). El mimetype porta l'applicationId
+    (contactRowMimeType): la versió de debug en té una còpia a src/debug/res/xml/contacts.xml.
+    data2 és el resum i data3 el text de la fila, escrit per AndroidContactsGateway.
+-->
+<ContactsAccountType xmlns:android="http://schemas.android.com/apk/res/android">
+    <ContactsDataKind
+        android:detailColumn="data3"
+        android:icon="@mipmap/ic_launcher"
+        android:mimeType="vnd.android.cursor.item/vnd.com.alorma.contactnotes.person"
+        android:summaryColumn="data2" />
+    <ContactsDataKind
+        android:detailColumn="data3"
+        android:icon="@mipmap/ic_launcher"
+        android:mimeType="vnd.android.cursor.item/vnd.com.alorma.contactnotes.note"
+        android:summaryColumn="data2" />
+</ContactsAccountType>

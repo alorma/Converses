@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- No sincronitza res, però Contactes només llegeix el contacts.xml d'una compte amb sync adapter -->
+<sync-adapter xmlns:android="http://schemas.android.com/apk/res/android"
+    android:accountType="@string/contacts_account_type"
+    android:contentAuthority="com.android.contacts"
+    android:supportsUploading="false"
+    android:userVisible="false" />

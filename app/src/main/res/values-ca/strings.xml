@@ -251,4 +251,8 @@
     <string name="install_watch_finish_body">Hem obert Google Play al teu %1$s. Toca Instal·la al rellotge per acabar.</string>
     <string name="install_watch_done">Entesos</string>
     <string name="install_watch_fallback_name">rellotge</string>
+
+    <!-- Files de Converses a la fitxa d'un contacte vinculat (app Contactes) -->
+    <string name="contacts_row_view_notes">Veure notes</string>
+    <string name="contacts_row_create_note">Crear nota</string>
 </resources>

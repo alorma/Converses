@@ -251,4 +251,8 @@
     <string name="install_watch_finish_body">Hemos abierto Google Play en tu %1$s. Toca Instalar en el reloj para terminar.</string>
     <string name="install_watch_done">Entendido</string>
     <string name="install_watch_fallback_name">reloj</string>
+
+    <!-- Filas de Converses en la ficha de un contacto vinculado (app Contactos) -->
+    <string name="contacts_row_view_notes">Ver notas</string>
+    <string name="contacts_row_create_note">Crear nota</string>
 </resources>

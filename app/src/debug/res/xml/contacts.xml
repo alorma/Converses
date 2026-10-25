@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Còpia de src/main/res/xml/contacts.xml amb el mimetype de l'applicationId de debug (.dev) -->
+<ContactsAccountType xmlns:android="http://schemas.android.com/apk/res/android">
+    <ContactsDataKind
+        android:detailColumn="data3"
+        android:icon="@mipmap/ic_launcher"
+        android:mimeType="vnd.android.cursor.item/vnd.com.alorma.contactnotes.dev.person"
+        android:summaryColumn="data2" />
+    <ContactsDataKind
+        android:detailColumn="data3"
+        android:icon="@mipmap/ic_launcher"
+        android:mimeType="vnd.android.cursor.item/vnd.com.alorma.contactnotes.dev.note"
+        android:summaryColumn="data2" />
+</ContactsAccountType>

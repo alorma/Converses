@@ -51,6 +51,36 @@
             android:taskAffinity=""
             android:theme="@style/Theme.ContactNotes.Transparent" />
 
+        <!--
+            Compte local «Converses» i sync adapter buit: l'Android els necessita per mostrar «Veure notes» i
+            «Crear nota» a la fitxa d'un contacte vinculat (docs/contacts). Els permisos de contactes encara només
+            són al manifest de debug (C12): sense permisos, aquests serveis no fan res.
+        -->
+        <service
+            android:name=".data.contacts.ContactsAuthenticatorService"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.accounts.AccountAuthenticator" />
+            </intent-filter>
+            <meta-data
+                android:name="android.accounts.AccountAuthenticator"
+                android:resource="@xml/contacts_authenticator" />
+        </service>
+
+        <service
+            android:name=".data.contacts.ContactsSyncAdapterService"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.content.SyncAdapter" />
+            </intent-filter>
+            <meta-data
+                android:name="android.content.SyncAdapter"
+                android:resource="@xml/contacts_syncadapter" />
+            <meta-data
+                android:name="android.provider.CONTACTS_STRUCTURE"
+                android:resource="@xml/contacts" />
+        </service>
+
         <!-- Respon les peticions de «més entrades» del rellotge (només persones no protegides) -->
         <service
             android:name=".data.wear.WearEntriesService"

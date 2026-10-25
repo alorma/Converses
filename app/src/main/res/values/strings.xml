@@ -252,4 +252,10 @@
     <string name="install_watch_finish_body">We opened Google Play on your %1$s. Tap Install on watch to finish.</string>
     <string name="install_watch_done">Got it</string>
     <string name="install_watch_fallback_name">watch</string>
+
+    <!-- Tipus de la compte local «Converses» (docs/contacts); la versió de debug el sobreescriu amb .dev -->
+    <string name="contacts_account_type" translatable="false">com.alorma.contactnotes.contacts</string>
+    <!-- Files de Converses a la fitxa d'un contacte vinculat (app Contactes) -->
+    <string name="contacts_row_view_notes">View notes</string>
+    <string name="contacts_row_create_note">Create note</string>
 </resources>
