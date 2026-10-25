@@ -119,7 +119,7 @@ Validat a l'emulador 37.2 amb contactes locals (creats i esborrats amb `adb shel
 - [ ] `docs/pro/README.md`: fila «Contact integration» actualitzada i proves marcades.
 - [ ] Verificar si `maxSdkVersion` eximeix de la declaració de `READ_CONTACTS`; preparar el text de Data safety i la declaració de permisos. **No es toca Play sense permís.**
 - [ ] Baseline Profile: no cal mentre sigui darrere de flag (es revisa a la release, com sempre).
-- [ ] Google Contacts i la memòria cau dels tipus de compte: a la fase 5, després de reinstal·lar, les files eren al proveïdor però Google Contacts no les mostrava fins a fer-li `force-stop`. Comprovar si en una instal·lació neta, amb Contactes obert en segon pla, surten soles (al cap d'una estona, girant la pantalla…); si no, buscar un senyal des de Converses que el faci rellegir (crear la compte abans, `requestSync`…) o documentar-ho com a limitació.
+- [x] Google Contacts i la memòria cau dels tipus de compte: documentat com a limitació a «Riscos» del `README.md`. Provat a la 37.2: si Contactes s'obre mentre Converses no hi és i el procés continua viu, després d'instal·lar les files són al proveïdor però no surten. No ho arregla ni esperar, ni girar la pantalla, ni tornar a entrar, ni refer la compte (retirar i tornar a donar el permís), ni `install -r`; només que el procés es mori. Si Contactes ja coneixia el tipus de compte, surten de seguida. Sense canvis de codi
 
 **Sortida:** funció llesta per quan existeixi el Pro, apagada a la release.
 

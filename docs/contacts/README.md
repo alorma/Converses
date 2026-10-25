@@ -114,6 +114,7 @@ Després de crear les files es torna a llegir el lookup key (canvia en agregar) 
 | **Migració v2 → v3** trenca dades publicades | Test amb `MigrationTestHelper`; mai `fallbackToDestructiveMigration` a release. |
 | **Lookup key caducat** o contacte esborrat | `lookupContact` i estat «contacte esborrat» al detall; test del pla amb contactes que ja no hi són. |
 | La compte «Converses» a Ajustos sorprèn l'usuari | Explicació del permís (C8); si l'esborra, es torna a crear (C6). |
+| **Google Contacts no mostra les files** en instal·lar l'app | Limitació acceptada (fase 6): Google Contacts desa els tipus de compte mentre el seu procés és viu. Si ja corria abans d'instal·lar Converses, les files són al proveïdor però no surten a «Connected apps» fins que el procés es mor (el sistema el tanca, reinici, `force-stop`). Provat a la 37.2: no ho arregla ni esperar, ni girar, ni tornar a entrar, ni refer la compte, ni `install -r`. Si Contactes ja coneixia el tipus (reinstal·lació sense obrir-lo entremig), surten de seguida. |
 
 ## Release notes
 
