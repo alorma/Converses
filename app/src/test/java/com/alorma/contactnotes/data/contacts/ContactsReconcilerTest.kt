@@ -169,6 +169,21 @@ class ContactsReconcilerTest {
     }
 
   @Test
+  fun aContactDeletedWithTheSameIdLeavesNoNamelessContact() =
+    runTest {
+      val ada = linkedPerson("Ada", contactId = 10)
+      start()
+
+      // El proveïdor conserva l'id: només les files soles diuen que el contacte ja no hi és
+      gateway.deleteContact(10)
+      reconciler.refresh()
+      settle()
+
+      assertEquals(emptyList<Long>(), rowPeople())
+      assertEquals(10L, db.person(ada.id)!!.contactId)
+    }
+
+  @Test
   fun turningTheFlagOffLeavesNothingAndKeepsTheLinks() =
     runTest {
       val ada = linkedPerson("Ada", contactId = 10)

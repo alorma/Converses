@@ -20,6 +20,12 @@ class FakeContactsGateway : ContactsGateway {
     contacts[contact.lookupKey] = contact
   }
 
+  /** Esborra el contacte del dispositiu: les nostres files hi queden soles, com fa el proveïdor real. */
+  fun deleteContact(contactId: Long) {
+    contacts.values.removeAll { it.id == contactId }
+    rowsByPerson.replaceAll { _, rows -> if (rows.contactId == contactId) rows.copy(alone = true) else rows }
+  }
+
   /** El text de les files en l'idioma del moment; canviar-lo simula un canvi d'idioma. */
   var labels = listOf("View notes", "Create note")
 

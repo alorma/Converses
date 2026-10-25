@@ -56,8 +56,25 @@ class AndroidContactsGateway(
           }.orEmpty()
       if (rows.isEmpty()) return@withContext rows
       val labels = labelsOf(rows.map { it.rawContactId })
-      rows.map { it.copy(labels = labels[it.rawContactId].orEmpty()) }
+      val withOthers = contactsWithForeignRawContacts(rows.map { it.contactId }.distinct())
+      rows.map { it.copy(labels = labels[it.rawContactId].orEmpty(), alone = it.contactId !in withOthers) }
     }
+
+  /** Dels [contactIds], els que tenen algun raw contact que no és nostre (els altres s'han esborrat). */
+  private fun contactsWithForeignRawContacts(contactIds: List<Long>): Set<Long> =
+    resolver
+      .query(
+        RawContacts.CONTENT_URI,
+        arrayOf(RawContacts.CONTACT_ID),
+        "${RawContacts.CONTACT_ID} IN (${contactIds.joinToString()}) AND ${RawContacts.ACCOUNT_TYPE} IS NOT ? AND " +
+          "${RawContacts.DELETED} = 0",
+        arrayOf(accountType),
+        null,
+      )?.use { cursor ->
+        buildSet {
+          while (cursor.moveToNext()) add(cursor.getLong(0))
+        }
+      }.orEmpty()
 
   override fun rowLabels(): List<String> = ContactRowAction.entries.map { context.getString(it.label) }
 
@@ -169,7 +186,8 @@ class AndroidContactsGateway(
     lookupKey: String,
   ): ResolvedContact? {
     val uri = Contacts.lookupContact(resolver, Contacts.getLookupUri(contactId, lookupKey)) ?: return null
-    return readContact(uri)
+    // El lookup key també porta el nostre raw contact: si el contacte s'ha esborrat, resol el que en queda, sense nom
+    return readContact(uri)?.takeIf { foreignRawContactOf(it.id) != null }
   }
 
   private fun readContact(uri: Uri): ResolvedContact? =

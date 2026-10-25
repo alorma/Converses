@@ -46,11 +46,13 @@ data class ContactsPlan(
       val create =
         wanted.filter { person ->
           val existing = rowsByPerson[person.id].orEmpty()
-          // Sense compte, les files que hi quedin són de la compte esborrada i el sistema les traurà
+          // Sense compte, les files que hi quedin són de la compte esborrada i el sistema les traurà. Si han quedat
+          // soles, refer-les no troba el contacte i el reconciliador les esborra
           !hasAccount ||
             existing.size != 1 ||
             existing.single().contactId != person.contactId ||
-            existing.single().labels != labels
+            existing.single().labels != labels ||
+            existing.single().alone
         }
       val remove = rowsByPerson.keys.filterNot { it in wantedIds }.sorted()
 

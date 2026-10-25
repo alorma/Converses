@@ -2,13 +2,15 @@ package com.alorma.contactnotes.data.contacts
 
 /**
  * Persona que ara té files a Contactes: el raw contact de la nostra compte que les porta, el contacte on està enganxat
- * ([contactId]) i el text de cada fila ([labels], en l'ordre de `ContactRowAction`).
+ * ([contactId]) i el text de cada fila ([labels], en l'ordre de `ContactRowAction`). [alone] vol dir que el contacte
+ * ja no té res més que les nostres files: s'ha esborrat i a Contactes en queda un contacte sense nom.
  */
 data class ContactRows(
   val rawContactId: Long,
   val personId: Long,
   val contactId: Long,
   val labels: List<String>,
+  val alone: Boolean = false,
 )
 
 /** Contacte del dispositiu resolt pel vincle; l'id i el lookup key poden haver canviat des que es va desar. */
@@ -42,7 +44,7 @@ interface ContactsGateway {
 
   suspend fun removeRows(personId: Long)
 
-  /** El contacte del vincle, o `null` si s'ha esborrat. */
+  /** El contacte del vincle, o `null` si s'ha esborrat (encara que en quedin les nostres files). */
   suspend fun resolve(
     contactId: Long,
     lookupKey: String,

@@ -83,6 +83,11 @@ class ContactsPlanTest {
   }
 
   @Test
+  fun rowsLeftAloneByADeletedContactAreRedone() {
+    assertEquals(ContactsPlan(create = listOf(ada)), plan(rows = listOf(rowsOf(ada).copy(alone = true))))
+  }
+
+  @Test
   fun missingOrDuplicatedRowsAreRedone() {
     assertEquals(ContactsPlan(create = listOf(ada)), plan(rows = listOf(rowsOf(ada, labels = labels.take(1)))))
     assertEquals(ContactsPlan(create = listOf(ada)), plan(rows = listOf(rowsOf(ada), rowsOf(ada))))
