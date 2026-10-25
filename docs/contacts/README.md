@@ -43,7 +43,7 @@ La prova de concepte és a la branca `poc/contacts-row` (no es fusiona mai), amb
 
 ### Política (verificada)
 
-- `WRITE_CONTACTS` deixa de funcionar per a apps que apuntin a la «upcoming Android release» (2027, probablement API 38): [blog](https://developer.android.com/blog/posts/reliable-way-to-add-and-edit-contacts-android). Fins aleshores, amb targetSdk 37, funciona. `MANAGE_CONTACTS` no ens toca.
+- `WRITE_CONTACTS` deixa de funcionar per a apps que apuntin a la «upcoming Android release» (2027, probablement API 38): [blog](https://developer.android.com/blog/posts/reliable-way-to-add-and-edit-contacts-android). **Depèn del targetSdk, no del mòbil:** «Apps targeting older versions keep their current behavior». Amb targetSdk 37 funciona també als mòbils amb l'API 38; quan es pugi el targetSdk, les escriptures fallen amb `SecurityException` (el blog no diu què passa amb les files ja escrites). El límit real el posa Play en obligar a pujar el targetSdk (data a verificar a la fase 6). El mateix blog recomana el People Directory per a les files «Call with…/Message with…» d'altres apps. `MANAGE_CONTACTS` no ens toca.
 - `maxSdkVersion="37"` cobreix la 37.2 (`ro.build.version.sdk` hi continua sent 37).
 - `READ_CONTACTS` amb targetSdk 37: declaració obligatòria a Play Console a partir del 27 de gener de 2027: [Play Help](https://support.google.com/googleplay/android-developer/answer/16935362). Cal verificar si `maxSdkVersion` n'eximeix abans de publicar (fase 6).
 - Data safety: tot queda al mòbil, no compta com a «recollit».

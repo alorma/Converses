@@ -5,7 +5,7 @@ Context, abast, arquitectura, decisions (C1–C11) i riscos són a `docs/contact
 | Fase | Títol | Depèn de | Estat |
 | --- | --- | --- | --- |
 | 0 | Decisions i investigació (Play, Contactes a l'emulador, disseny) | — | Fet (25-10-2026), disseny pendent |
-| 1 | Flag, migració v3 i repositori | 0 | Pendent |
+| 1 | Flag, migració v3 i repositori | 0 | Feta, pendent de validar |
 | 2 | Vincular i desvincular a l'editor; vincle al detall | 1, 0 (C8) | Pendent (espera disseny) |
 | 3 | Compte, sync adapter i obrir des de Contactes | 1 | Pendent |
 | 4 | Reconciliació, permisos i disparadors | 2, 3 | Pendent (espera disseny) |
@@ -33,12 +33,12 @@ Sense codi de producte. Prova de concepte a la branca `poc/contacts-row` (no es 
 
 ## Fase 1 · Flag, migració v3 i repositori
 
-- [ ] Decidir si es desa `contactName` (C11).
-- [ ] `ContactLinkFeature` (`key = "contact_link_enabled"`, `pro = true`) a `data/flags`, registrat a Koin i al menú de debug.
-- [ ] `PersonEntity`: `contactLookupKey`, l'id del contacte (i `contactName`, segons C11) nul·lables. `ConversesDatabase` a versió 3, `3.json` exportat, `Migration2To3` registrada a `di/AppModules.kt`.
-- [ ] Test de migració 2 → 3 amb `MigrationTestHelper` (les persones i les entrades queden intactes; les columnes noves són `null`).
-- [ ] `ConversesRepository`: vincular i desvincular; tests de JVM amb `FakeDb`.
-- [ ] Comprovar que l'snapshot de Wear, Auto i l'exportació no inclouen el vincle (test).
+- [x] Decidir si es desa `contactName` (C11): sí
+- [x] `ContactLinkFeature` (`key = "contact_link_enabled"`, `pro = true`) a `data/flags`, registrat a Koin (el menú de debug el llista sol) — `30d4f14`
+- [x] `PersonEntity`: `contactId`, `contactLookupKey` i `contactName` nul·lables. `ConversesDatabase` a versió 3, `3.json` exportat, `Migration2To3` registrada a `di/AppModules.kt` — `c30b2dc`
+- [x] Test de migració 2 → 3 i 1 → 3 amb `MigrationTestHelper` (persones, entrades i fets intactes; columnes noves `null`), passat a l'emulador 37.2 — `c30b2dc`
+- [x] `ConversesRepository`: `linkContact` (també per refrescar el lookup key) i `unlinkContact`; tests de JVM amb `FakeDb` — `4bc819d`
+- [x] El vincle no arriba a l'snapshot de Wear (test amb l'snapshot codificat, també per a protegides) — `197c5c7`. Auto encara no existeix. L'exportació (`PersonExporter`) escriu camp a camp i no inclou el vincle (revisat al codi; no té test de JVM perquè necessita `Context`).
 
 **Validació:** `testDebugUnitTest`, test de migració (instrumentat, a l'emulador), `ktlintCheck`.
 **Sortida:** la BBDD d'una v2 real s'actualitza sense perdre res; encara no es veu res a la UI.
