@@ -258,4 +258,24 @@
     <!-- Files de Converses a la fitxa d'un contacte vinculat (app Contactes) -->
     <string name="contacts_row_view_notes">View notes</string>
     <string name="contacts_row_create_note">Create note</string>
+
+    <!-- Secció «Contacte» de l'editor i explicació del permís (docs/contacts/disseny.md, 5a–5d) -->
+    <string name="contact_section">Contact</string>
+    <string name="contact_link">Link a contact</string>
+    <string name="contact_link_summary">Optional · shows up in the Contacts card</string>
+    <string name="contact_linked_to">LINKED TO</string>
+    <string name="contact_unlink">Remove link</string>
+    <string name="contacts_no_permission">No Contacts permission</string>
+    <string name="contacts_no_permission_summary">Needed to link a contact</string>
+    <string name="contacts_allow">Allow</string>
+    <string name="contacts_explain_title">Link people to Contacts</string>
+    <string name="contacts_explain_body">To link, Converses needs to see your contacts. That way your notes show up on the contact\'s card.</string>
+    <string name="contacts_explain_account_title">A “Converses” account will appear</string>
+    <string name="contacts_explain_account_body">You\'ll see it in Settings › Accounts. That\'s normal: Android needs it to show “View notes” and “Create note” inside the contact.</string>
+    <string name="contacts_explain_copy_title">Nothing is copied to Contacts</string>
+    <string name="contacts_explain_copy_body">Only those two shortcuts are added. Your notes stay in Converses.</string>
+    <string name="contacts_explain_deny_title">If you don\'t allow it</string>
+    <string name="contacts_explain_deny_body">Converses works the same. You just can\'t link contacts or see the Contacts shortcut on a person.</string>
+    <string name="contacts_explain_continue">Continue</string>
+    <string name="contacts_explain_not_now">Not now</string>
 </resources>

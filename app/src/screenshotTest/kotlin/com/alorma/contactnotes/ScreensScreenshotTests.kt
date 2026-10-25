@@ -8,7 +8,11 @@ import com.alorma.contactnotes.shared.AvatarColor
 import com.alorma.contactnotes.ui.approval.ApprovalConfirmPreview
 import com.alorma.contactnotes.ui.edit.AvatarSheetAutoPreview
 import com.alorma.contactnotes.ui.edit.AvatarSheetCustomPreview
+import com.alorma.contactnotes.ui.edit.ContactsExplainSheetPreview
 import com.alorma.contactnotes.ui.edit.DeletePersonDialogPreview
+import com.alorma.contactnotes.ui.edit.EditPersonContactLinkedPreview
+import com.alorma.contactnotes.ui.edit.EditPersonContactNoPermissionPreview
+import com.alorma.contactnotes.ui.edit.EditPersonContactNotLinkedPreview
 import com.alorma.contactnotes.ui.edit.EditPersonCustomAvatarPreview
 import com.alorma.contactnotes.ui.edit.EditPersonExistingPreview
 import com.alorma.contactnotes.ui.edit.EditPersonNewPreview
@@ -229,6 +233,34 @@ class ScreensScreenshotTests {
   @Composable
   fun editPersonCustomAvatar() {
     EditPersonCustomAvatarPreview()
+  }
+
+  @ScreenPreviews
+  @PreviewTest
+  @Composable
+  fun editPersonContactNotLinked() {
+    EditPersonContactNotLinkedPreview()
+  }
+
+  @ScreenPreviews
+  @PreviewTest
+  @Composable
+  fun editPersonContactLinked() {
+    EditPersonContactLinkedPreview()
+  }
+
+  @ScreenPreviews
+  @PreviewTest
+  @Composable
+  fun editPersonContactNoPermission() {
+    EditPersonContactNoPermissionPreview()
+  }
+
+  @ScreenPreviews
+  @PreviewTest
+  @Composable
+  fun contactsExplainSheet() {
+    ContactsExplainSheetPreview()
   }
 
   @ScreenPreviews

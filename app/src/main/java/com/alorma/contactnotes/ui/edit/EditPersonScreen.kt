@@ -162,9 +162,13 @@ fun EditPersonContent(
   onProtectedChange: (Boolean) -> Unit,
   customAvatar: Boolean = true,
   focus: EditFocus? = null,
+  onRequestContactsPermission: () -> Unit = {},
+  onPickContact: () -> Unit = {},
+  onAllowContacts: () -> Unit = {},
 ) {
   var showDelete by remember { mutableStateOf(false) }
   var showAvatarSheet by remember { mutableStateOf(false) }
+  var showContactsExplain by rememberSaveable { mutableStateOf(false) }
 
   PersonTheme(state.color ?: AvatarColor.forName(state.name)) {
     val scrollBehavior = rememberTopBarScrollBehavior()
@@ -260,6 +264,23 @@ fun EditPersonContent(
           }
         }
 
+        val contactSection = state.contact.section
+        if (contactSection != ContactSection.Hidden) {
+          SectionHeader(title = stringResource(R.string.contact_section))
+          ContactSectionRow(
+            section = contactSection,
+            onLink = {
+              when (state.contact.linkStep) {
+                ContactLinkStep.Explain -> showContactsExplain = true
+                ContactLinkStep.RequestPermission -> onRequestContactsPermission()
+                ContactLinkStep.Pick -> onPickContact()
+              }
+            },
+            onUnlink = actions::onUnlinkContact,
+            onAllow = onAllowContacts,
+          )
+        }
+
         SectionHeader(title = stringResource(R.string.facts_title))
         FactsEditor(state.facts, actions, focusIndex = focusFactIndex.takeIf { focus == EditFocus.NEW_FACT })
 
@@ -318,6 +339,17 @@ fun EditPersonContent(
           showDelete = false
           actions.delete(exportFirst, onDeleted)
         },
+      )
+    }
+
+    if (showContactsExplain) {
+      ContactsExplainSheet(
+        onContinue = {
+          showContactsExplain = false
+          actions.onContactsExplained()
+          onRequestContactsPermission()
+        },
+        onDismiss = { showContactsExplain = false },
       )
     }
 

@@ -255,4 +255,24 @@
     <!-- Filas de Converses en la ficha de un contacto vinculado (app Contactos) -->
     <string name="contacts_row_view_notes">Ver notas</string>
     <string name="contacts_row_create_note">Crear nota</string>
+
+    <!-- Sección «Contacto» del editor y explicación del permiso (docs/contacts/disseny.md, 5a–5d) -->
+    <string name="contact_section">Contacto</string>
+    <string name="contact_link">Vincula un contacto</string>
+    <string name="contact_link_summary">Opcional · aparece en la ficha de Contactos</string>
+    <string name="contact_linked_to">VINCULADO A</string>
+    <string name="contact_unlink">Quitar vínculo</string>
+    <string name="contacts_no_permission">Sin permiso de Contactos</string>
+    <string name="contacts_no_permission_summary">Necesario para vincular un contacto</string>
+    <string name="contacts_allow">Dar permiso</string>
+    <string name="contacts_explain_title">Vincula personas con Contactos</string>
+    <string name="contacts_explain_body">Para vincular, Converses necesita ver tus contactos. Así tus notas aparecen en la ficha del contacto.</string>
+    <string name="contacts_explain_account_title">Aparecerá una cuenta «Converses»</string>
+    <string name="contacts_explain_account_body">Se verá en Ajustes › Cuentas. Es normal: Android lo necesita para mostrar «Ver notas» y «Crear nota» dentro del contacto.</string>
+    <string name="contacts_explain_copy_title">No se copia nada a Contactos</string>
+    <string name="contacts_explain_copy_body">Solo se añaden esos dos accesos. Las notas se quedan en Converses.</string>
+    <string name="contacts_explain_deny_title">Si no lo permites</string>
+    <string name="contacts_explain_deny_body">Converses funciona igual. Solo no podrás vincular contactos ni ver el acceso a Contactos en el detalle.</string>
+    <string name="contacts_explain_continue">Continuar</string>
+    <string name="contacts_explain_not_now">Ahora no</string>
 </resources>

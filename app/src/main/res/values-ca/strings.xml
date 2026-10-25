@@ -255,4 +255,24 @@
     <!-- Files de Converses a la fitxa d'un contacte vinculat (app Contactes) -->
     <string name="contacts_row_view_notes">Veure notes</string>
     <string name="contacts_row_create_note">Crear nota</string>
+
+    <!-- Secció «Contacte» de l'editor i explicació del permís (docs/contacts/disseny.md, 5a–5d) -->
+    <string name="contact_section">Contacte</string>
+    <string name="contact_link">Vincula un contacte</string>
+    <string name="contact_link_summary">Opcional · surt a la fitxa de Contactes</string>
+    <string name="contact_linked_to">VINCULAT A</string>
+    <string name="contact_unlink">Treu el vincle</string>
+    <string name="contacts_no_permission">Sense permís de Contactes</string>
+    <string name="contacts_no_permission_summary">Cal per vincular un contacte</string>
+    <string name="contacts_allow">Dona permís</string>
+    <string name="contacts_explain_title">Vincula persones amb Contactes</string>
+    <string name="contacts_explain_body">Per vincular, Converses necessita veure els teus contactes. Així les teves notes surten a la fitxa del contacte.</string>
+    <string name="contacts_explain_account_title">Apareixerà un compte «Converses»</string>
+    <string name="contacts_explain_account_body">Es veurà a Ajustos › Comptes. És normal: l\'Android el necessita per mostrar «Veure notes» i «Crear nota» dins del contacte.</string>
+    <string name="contacts_explain_copy_title">No es copia res a Contactes</string>
+    <string name="contacts_explain_copy_body">Només s\'hi afegeixen aquests dos accessos. Les notes es queden a Converses.</string>
+    <string name="contacts_explain_deny_title">Si no ho permets</string>
+    <string name="contacts_explain_deny_body">Converses funciona igual. Només no podràs vincular contactes ni veure l\'accés a Contactes al detall.</string>
+    <string name="contacts_explain_continue">Continua</string>
+    <string name="contacts_explain_not_now">Ara no</string>
 </resources>
