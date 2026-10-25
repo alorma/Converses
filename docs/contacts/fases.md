@@ -48,12 +48,20 @@ Sense codi de producte. Prova de concepte a la branca `poc/contacts-row` (no es 
 Segons `docs/contacts/disseny.md`. Decidit en començar (25-10-2026): el permís i l'explicació 5b es fan en aquesta fase, no a la 4, perquè l'editor no té sentit sense; a una persona existent, vincular i desvincular es desen a l'acte (com «Protegida»); a Nova persona, amb «Desa».
 
 - [x] Desar la persona a l'editor conserva el vincle (`save()` no copiava les columnes del contacte) — `40ead27`
-- [ ] Estat del permís de Contactes darrere d'una interfície (fake als tests) i «explicació ja vista» a DataStore
-- [ ] `EditPersonViewModel`: estat de la secció Contacte (flag apagat, sense vincle, vinculat, sense permís), vincular amb el contacte triat i desvincular; tests de JVM
+- [x] Estat del permís de Contactes darrere d'una interfície (fake als tests) i «explicació ja vista» a DataStore — `194d4b0`
+- [x] `EditPersonViewModel`: estat de la secció Contacte (flag apagat, sense vincle, vinculat, sense permís), vincular amb el contacte triat i desvincular; tests de JVM — `1cc56a3`
 - [ ] Editor (Editar / Nova persona), només amb el flag: secció «Contacte» amb els tres estats, `PickContact`, «Dona permís» (ajustos de l'app si ja no es pot preguntar) i l'explicació 5b; textos en/ca/es, previews i captures
 - [ ] `PersonDetailViewModel`: vincle resolt en obrir (vinculada, contacte esborrat; res sense permís ni amb el flag apagat), refresc del lookup key i el nom, «Desvincula»; tests de JVM amb `FakeContactsGateway`
 - [ ] Detall: «Vinculada a {nom}» i «Obre a Contactes» (`ACTION_VIEW` amb el lookup URI); targeta «contacte esborrat» amb «Desvincula»; textos, previews i captures
 - [ ] Validació a l'emulador 37.2
+
+**On s'ha quedat (25-10-2026, per a la sessió següent):** fetes les tasques 1–3, continuar per la UI de l'editor. El que ja hi ha:
+
+- `ContactsPermission` (`isGranted()`, `permissions` = READ i WRITE) i `AppSettings.contactsExplained` amb `setContactsExplained`.
+- `ContactsGateway.readPicked(uri)` llegeix el contacte de `PickContact` sense permís.
+- `EditPersonUiState.contact` (`ContactLinkState`): `section` (`Hidden`, `NotLinked`, `Linked(name)`, `NoPermission`) i `linkStep` (`Explain` → 5b, `RequestPermission` → diàleg del sistema, `Pick` → selector). `NoPermission` = explicació vista i permís no donat. Amb vincle es mostra `Linked` encara que no hi hagi permís, perquè desvincular no en necessita.
+- Accions a `EditPersonActions` (la UI encara no les crida): `onContactPicked(uri)`, `onUnlinkContact()`, `onContactsExplained()` («Continua» a la 5b) i `onContactsPermissionChanged()` (cridar-la després del diàleg i a `ON_RESUME`).
+- Per a la UI: «Dona permís» obre els ajustos de l'app si l'explicació ja s'ha vist i `shouldShowRequestPermissionRationale` és fals; si no, torna a demanar el permís. «Ara no» a la 5b no marca l'explicació com a vista.
 
 **Validació:** tests, `ktlintCheck`, captures revisades; emulador: vincular (Editar i Nova persona), obrir a Contactes, contacte esborrat i desvincular, sense permís, i amb el flag apagat o la persona bloquejada no es veu res.
 **Sortida:** es pot vincular una persona i obrir el contacte; encara no hi ha files a Contactes.
