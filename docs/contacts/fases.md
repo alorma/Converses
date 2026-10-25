@@ -50,12 +50,12 @@ Segons `docs/contacts/disseny.md`. Decidit en començar (25-10-2026): el permís
 - [x] Desar la persona a l'editor conserva el vincle (`save()` no copiava les columnes del contacte) — `40ead27`
 - [x] Estat del permís de Contactes darrere d'una interfície (fake als tests) i «explicació ja vista» a DataStore — `194d4b0`
 - [x] `EditPersonViewModel`: estat de la secció Contacte (flag apagat, sense vincle, vinculat, sense permís), vincular amb el contacte triat i desvincular; tests de JVM — `1cc56a3`
-- [ ] Editor (Editar / Nova persona), només amb el flag: secció «Contacte» amb els tres estats, `PickContact`, «Dona permís» (ajustos de l'app si ja no es pot preguntar) i l'explicació 5b; textos en/ca/es, previews i captures
+- [x] Editor (Editar / Nova persona), només amb el flag: secció «Contacte» amb els tres estats, `PickContact`, «Dona permís» (ajustos de l'app si ja no es pot preguntar) i l'explicació 5b; textos en/ca/es, previews i captures — `b32009b`, `8c330f2`. Provat a l'emulador 37.2: 5b la primera vegada («Ara no» la torna a mostrar), rebutjar → «Sense permís», «Dona permís» torna a preguntar i després obre els ajustos de l'app, el permís donat des dels ajustos es nota en tornar, vincular i desvincular es desen a l'acte (també girant la pantalla), Nova persona desa el vincle amb «Desa», i amb el flag apagat no es veu res
 - [ ] `PersonDetailViewModel`: vincle resolt en obrir (vinculada, contacte esborrat; res sense permís ni amb el flag apagat), refresc del lookup key i el nom, «Desvincula»; tests de JVM amb `FakeContactsGateway`
 - [ ] Detall: «Vinculada a {nom}» i «Obre a Contactes» (`ACTION_VIEW` amb el lookup URI); targeta «contacte esborrat» amb «Desvincula»; textos, previews i captures
 - [ ] Validació a l'emulador 37.2
 
-**On s'ha quedat (25-10-2026, per a la sessió següent):** fetes les tasques 1–3, continuar per la UI de l'editor. El que ja hi ha:
+**On s'ha quedat (25-10-2026, per a la sessió següent):** fetes les tasques 1–4 (editor), continuar pel `PersonDetailViewModel`. La UI de l'editor és a `ui/edit/ContactSection.kt` (fila, full 5b i `openAppDetailsSettings()`, reutilitzable per a Ajustos › Contactes). El que ja hi ha:
 
 - `ContactsPermission` (`isGranted()`, `permissions` = READ i WRITE) i `AppSettings.contactsExplained` amb `setContactsExplained`.
 - `ContactsGateway.readPicked(uri)` llegeix el contacte de `PickContact` sense permís.
