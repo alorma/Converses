@@ -95,6 +95,48 @@ class ConversesRepositoryTest {
     }
 
   @Test
+  fun linkContactStoresTheContactAndKeepsTheRest() =
+    runTest {
+      val person = db.addPerson("Marta")
+      repository.setProtected(person, true)
+
+      repository.linkContact(db.person(person.id)!!, contactId = 72, lookupKey = "942i7e", name = "Marta Soler")
+
+      val stored = db.person(person.id)!!
+      assertEquals(72L, stored.contactId)
+      assertEquals("942i7e", stored.contactLookupKey)
+      assertEquals("Marta Soler", stored.contactName)
+      assertEquals("Marta", stored.name)
+      assertTrue(stored.isProtected)
+    }
+
+  @Test
+  fun linkingAgainRefreshesTheLookupKey() =
+    runTest {
+      val person = db.addPerson("Marta")
+      repository.linkContact(person, contactId = 72, lookupKey = "942i7e", name = "Marta Soler")
+
+      repository.linkContact(db.person(person.id)!!, contactId = 72, lookupKey = "942i7e.381r75-", name = "Marta Soler")
+
+      assertEquals("942i7e.381r75-", db.person(person.id)!!.contactLookupKey)
+    }
+
+  @Test
+  fun unlinkContactClearsTheLink() =
+    runTest {
+      val person = db.addPerson("Marta")
+      repository.linkContact(person, contactId = 72, lookupKey = "942i7e", name = "Marta Soler")
+
+      repository.unlinkContact(db.person(person.id)!!)
+
+      val stored = db.person(person.id)!!
+      assertNull(stored.contactId)
+      assertNull(stored.contactLookupKey)
+      assertNull(stored.contactName)
+      assertEquals("Marta", stored.name)
+    }
+
+  @Test
   fun deletingAPersonRemovesItsEntries() =
     runTest {
       val person = db.addPerson("Marta")

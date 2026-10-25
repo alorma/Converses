@@ -80,6 +80,31 @@ class ConversesRepository(
     isProtected: Boolean,
   ) = personDao.update(person.copy(isProtected = isProtected, updatedAt = System.currentTimeMillis()))
 
+  /** Vincula la persona a un contacte del dispositiu, o en refresca el lookup key (`docs/contacts`). */
+  suspend fun linkContact(
+    person: PersonEntity,
+    contactId: Long,
+    lookupKey: String,
+    name: String,
+  ) = personDao.update(
+    person.copy(
+      contactId = contactId,
+      contactLookupKey = lookupKey,
+      contactName = name,
+      updatedAt = System.currentTimeMillis(),
+    ),
+  )
+
+  suspend fun unlinkContact(person: PersonEntity) =
+    personDao.update(
+      person.copy(
+        contactId = null,
+        contactLookupKey = null,
+        contactName = null,
+        updatedAt = System.currentTimeMillis(),
+      ),
+    )
+
   suspend fun countEntriesInRange(
     personId: Long,
     channel: ChannelType,
