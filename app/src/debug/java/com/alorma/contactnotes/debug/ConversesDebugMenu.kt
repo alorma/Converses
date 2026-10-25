@@ -1,7 +1,11 @@
 package com.alorma.contactnotes.debug
 
+import android.Manifest
 import android.app.Activity
+import android.provider.ContactsContract.Contacts
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.material3.Switch
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -9,12 +13,15 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import com.alorma.contactnotes.R
+import com.alorma.contactnotes.data.ConversesRepository
+import com.alorma.contactnotes.data.contacts.ContactsGateway
 import com.alorma.contactnotes.data.db.ConversesDatabase
 import com.alorma.contactnotes.data.flags.FeatureFlag
 import com.alorma.contactnotes.data.flags.LocalFeatureFlagRunner
 import com.alorma.contactnotes.data.insertSampleData
 import com.alorma.contactnotes.data.settings.OnboardingFlag
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.compose.getKoin
@@ -25,7 +32,84 @@ import org.koin.compose.koinInject
 fun ConversesDebugMenu() {
   FeatureFlagsModule()
   DataModule()
+  ContactsModule()
   OnboardingModule()
+}
+
+/**
+ * Crea les files de Contactes sense la UI de la fase 2: el contacte triat s'enllaça amb la persona que es diu igual
+ * (les dades de mostra coincideixen amb els contactes de prova). Els missatges no diuen cap nom.
+ */
+@Composable
+private fun ContactsModule() {
+  val repository: ConversesRepository = koinInject()
+  val gateway: ContactsGateway = koinInject()
+  val context = LocalContext.current
+  val scope = rememberCoroutineScope()
+  val linked = stringResource(R.string.debug_contacts_linked)
+  val noPerson = stringResource(R.string.debug_contacts_no_person)
+  val failed = stringResource(R.string.debug_contacts_failed)
+  val cleared = stringResource(R.string.debug_contacts_cleared)
+  val toast = { message: String -> Toast.makeText(context, message, Toast.LENGTH_SHORT).show() }
+
+  val pick =
+    rememberLauncherForActivityResult(ActivityResultContracts.PickContact()) { uri ->
+      uri ?: return@rememberLauncherForActivityResult
+      scope.launch {
+        val message =
+          runCatching {
+            val (contactId, lookupKey, name) =
+              withContext(Dispatchers.IO) {
+                context.contentResolver
+                  .query(
+                    uri,
+                    arrayOf(Contacts._ID, Contacts.LOOKUP_KEY, Contacts.DISPLAY_NAME),
+                    null,
+                    null,
+                    null,
+                  )!!
+                  .use {
+                    it.moveToFirst()
+                    Triple(it.getLong(0), it.getString(1), it.getString(2))
+                  }
+              }
+            val people = repository.observePeople().first() + repository.observePeople(archived = true).first()
+            val person = people.map { it.person }.firstOrNull { it.name == name } ?: return@runCatching noPerson
+            gateway.ensureAccount()
+            val contact = gateway.addRows(person.id, contactId, lookupKey) ?: return@runCatching failed
+            repository.linkContact(person, contact.id, contact.lookupKey, contact.name)
+            linked
+          }.getOrElse { failed }
+        toast(message)
+      }
+    }
+  val permissions =
+    rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { result ->
+      if (result.values.all { it }) pick.launch(null) else toast(failed)
+    }
+
+  DebugModule(stringResource(R.string.debug_contacts_title)) {
+    DebugCell(
+      title = stringResource(R.string.debug_contacts_link),
+      subtitle = stringResource(R.string.debug_contacts_link_summary),
+      onClick = {
+        permissions.launch(arrayOf(Manifest.permission.READ_CONTACTS, Manifest.permission.WRITE_CONTACTS))
+      },
+    )
+    DebugCell(
+      title = stringResource(R.string.debug_contacts_clear),
+      subtitle = stringResource(R.string.debug_contacts_clear_summary),
+      onClick = {
+        scope.launch {
+          runCatching {
+            gateway.rows().forEach { gateway.removeRows(it.personId) }
+            gateway.removeAccount()
+          }
+          toast(cleared)
+        }
+      },
+    )
+  }
 }
 
 @Composable

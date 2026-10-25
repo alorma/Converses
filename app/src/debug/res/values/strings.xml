@@ -8,6 +8,15 @@
   <string name="debug_data_reseed">Reseed sample data</string>
   <string name="debug_data_reseed_summary">Deletes every person and entry, then inserts the sample data again</string>
   <string name="debug_data_reseeded">Sample data restored</string>
+  <string name="debug_contacts_title">Contacts</string>
+  <string name="debug_contacts_link">Link a contact</string>
+  <string name="debug_contacts_link_summary">Pick a contact; it is linked to the person with the same name and gets the rows in Contacts</string>
+  <string name="debug_contacts_linked">Linked: rows added to the contact</string>
+  <string name="debug_contacts_no_person">No person has that name</string>
+  <string name="debug_contacts_failed">Could not link the contact</string>
+  <string name="debug_contacts_clear">Remove contact rows</string>
+  <string name="debug_contacts_clear_summary">Deletes every Converses row and the account (the links in the app stay)</string>
+  <string name="debug_contacts_cleared">Contact rows removed</string>
   <string name="debug_onboarding_title">Onboarding</string>
   <string name="debug_onboarding_show">Show onboarding again</string>
   <string name="debug_onboarding_show_summary">Clears the flag and restarts the screen</string>
