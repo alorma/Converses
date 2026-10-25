@@ -10,7 +10,7 @@ Context, abast, arquitectura, decisions (C1–C11) i riscos són a `docs/contact
 | 3 | Compte, sync adapter i obrir des de Contactes | 1 | Feta i validada (25-10-2026) |
 | 4 | Reconciliació, permisos, disparadors i Ajustos › Contactes | 2, 3 | Feta i validada (25-10-2026) |
 | 5 | Privacitat i casos límit | 4 | Feta i validada (25-10-2026) |
-| 6 | Qualitat, textos, captures i Play | 5 | Pendent |
+| 6 | Qualitat, textos, captures i Play | 5 | Feta i validada (25-10-2026); TalkBack quan s'obri al Pro |
 | 7 | Més endavant | 6 | Idees |
 
 ---
@@ -116,12 +116,14 @@ Validat a l'emulador 37.2 amb contactes locals (creats i esborrats amb `adb shel
 
 - [x] Google Contacts i la memòria cau dels tipus de compte: documentat com a limitació a «Riscos» del `README.md`. Provat a la 37.2: si Contactes s'obre mentre Converses no hi és i el procés continua viu, després d'instal·lar les files són al proveïdor però no surten. No ho arregla ni esperar, ni girar la pantalla, ni tornar a entrar, ni refer la compte (retirar i tornar a donar el permís), ni `install -r`; només que el procés es mori. Si Contactes ja coneixia el tipus de compte, surten de seguida. Sense canvis de codi — `fa17c9d`
 - [x] Captures de referència: `validateDebugScreenshotTest` passa i cada estat (editor, 5b, detall, Ajustos, «ja vinculat») té referència clara i fosca. No ha calgut regenerar-ne cap
-- [ ] TalkBack a la fila de l'editor i al detall. Al codi: els textos de les files no clicables (editor vinculat, «Sense permís», contacte esborrat i els punts de la 5b) es llegeixen com un sol element, i el títol de la 5b és un encapçalament. Les files clicables ja s'agrupaven — `c71f6de`. Falta la validació **humana** amb TalkBack
+- [x] TalkBack a la fila de l'editor i al detall. Al codi: els textos de les files no clicables (editor vinculat, «Sense permís», contacte esborrat i els punts de la 5b) es llegeixen com un sol element, i el títol de la 5b és un encapçalament. Les files clicables ja s'agrupaven — `c71f6de`. La prova **humana** amb TalkBack es fa quan s'obri al Pro (apuntat a `docs/pro/README.md`)
 - [x] `maxSdkVersion` no eximeix de la declaració de `READ_CONTACTS` (la política és per a targetSdk 37 i el permís es demana a la 37). Esborrany de la declaració i de Data safety (sense canvis) a «Política» del `README.md`. No s'ha tocat Play
 - [x] `docs/pro/README.md`: fila «Contact integration» actualitzada, què falta per obrir-ho al Pro i proves marcades
 - [x] Baseline Profile: no cal mentre sigui darrere de flag; regenerar-la quan s'obri al Pro (apuntat a `docs/pro/README.md`)
 
 **Sortida:** funció llesta per quan existeixi el Pro, apagada a la release.
+
+Tancada per Bernat (25-10-2026), amb la prova de TalkBack ajornada fins al Pro. La funció queda aparcada: el que falta per obrir-la és a «Pendent per al Pro» de `docs/pro/README.md`.
 
 ## Fase 7 · Més endavant
 
