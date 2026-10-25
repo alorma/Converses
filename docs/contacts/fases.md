@@ -1,14 +1,14 @@
 # Converses i els contactes del dispositiu — Fases
 
-Context, abast, arquitectura, decisions (C1–C8) i riscos són a `docs/contacts/README.md`. Cada fase acaba amb alguna cosa que es pot provar; no es comença la següent sense validar l'anterior.
+Context, abast, arquitectura, decisions (C1–C11) i riscos són a `docs/contacts/README.md`. Cada fase acaba amb alguna cosa que es pot provar; no es comença la següent sense validar l'anterior.
 
 | Fase | Títol | Depèn de | Estat |
 | --- | --- | --- | --- |
-| 0 | Decisions i investigació (Play, Contactes a l'emulador, disseny) | — | Pendent |
+| 0 | Decisions i investigació (Play, Contactes a l'emulador, disseny) | — | Fet (25-10-2026), disseny pendent |
 | 1 | Flag, migració v3 i repositori | 0 | Pendent |
-| 2 | Vincular i desvincular a l'editor; vincle al detall | 1, 0 (C8) | Pendent |
+| 2 | Vincular i desvincular a l'editor; vincle al detall | 1, 0 (C8) | Pendent (espera disseny) |
 | 3 | Compte, sync adapter i obrir des de Contactes | 1 | Pendent |
-| 4 | Reconciliació, permisos i disparadors | 2, 3 | Pendent |
+| 4 | Reconciliació, permisos i disparadors | 2, 3 | Pendent (espera disseny) |
 | 5 | Privacitat i casos límit | 4 | Pendent |
 | 6 | Qualitat, textos, captures i Play | 5 | Pendent |
 | 7 | Més endavant | 6 | Idees |
@@ -21,29 +21,31 @@ Com es treballa cada fase (tasques, commits, validació, proposta d'inici): `.cl
 
 ## Fase 0 · Decisions i investigació
 
-Sense codi de producte. **Bloquejant:** si Play o les apps de Contactes no ho permeten com esperem, el pla s'atura aquí.
+Sense codi de producte. Prova de concepte a la branca `poc/contacts-row` (no es fusiona mai); resultats a `docs/contacts/handoff.md` d'aquella branca i resumits al `README.md`.
 
-- [ ] Política de Play vigent per a `READ_CONTACTS` i `WRITE_CONTACTS` (permisos sensibles, declaració, Data safety). Dir què caldrà declarar i si afecta la versió gratuïta.
-- [ ] Prova de concepte **fora de `main`** (branca d'usar i llençar): compte, sync adapter, `contacts.xml` i una fila enganxada a un contacte. Comprovar a l'emulador que es veu i s'obre a **l'app Contactes de l'AOSP i a Google Contacts**, i on surt (secció «Connected apps» o similar).
-- [ ] Comprovar què passa amb el lookup key després de l'agregació, i si el nom mostrat del contacte canvia (no hauria: el nostre raw contact no té nom).
-- [ ] Decidir C6 (compte esborrada per l'usuari) i C7 (quan i com es demanen els permisos).
-- [ ] Decidir si es desa `contactName` a Room (mostrar el vincle sense `READ_CONTACTS`) o només `contactLookupKey`.
-- [ ] Demanar el disseny a Claude Design (C8): fila «Contacte» a l'editor, indicació al detall, explicació del permís i estat «contacte esborrat».
-
-**Sortida:** decisions escrites al `README.md`, la prova de concepte vista a les dues apps de Contactes i el disseny.
+- [x] Política de Play vigent per a `READ_CONTACTS` i `WRITE_CONTACTS` — vegeu «Política» al `README.md`
+- [x] Prova de concepte: compte, sync adapter, `contacts.xml` i files enganxades a un contacte; vistes i obertes a Google Contacts a la 37.1 i a la 37.2 — `21af28b`, `de6318b` (a `poc/contacts-row`)
+- [x] Lookup key després de l'agregació: canvia, però l'antic continua resolent; el nom del contacte no canvia
+- [x] People Directory (37.2) provat i descartat (C10)
+- [x] Decidir C6, C7, C9, C10 i, en part, C11
+- [ ] Demanar el disseny a Claude Design (C8): encàrrec escrit al `README.md`, el passa Bernat
+- [ ] Neteja: treure telèfons, correus i l'empresa «Converses» dels contactes de prova (compte de Google de Bernat); `clear` de la prova de concepte als dos emuladors; esborrar el worktree `../Converses-poc-contacts` quan ja no calgui
 
 ## Fase 1 · Flag, migració v3 i repositori
 
+- [ ] Decidir si es desa `contactName` (C11).
 - [ ] `ContactLinkFeature` (`key = "contact_link_enabled"`, `pro = true`) a `data/flags`, registrat a Koin i al menú de debug.
-- [ ] `PersonEntity`: `contactLookupKey` (i `contactName`, si la fase 0 ho decideix) nul·lables. `ConversesDatabase` a versió 3, `3.json` exportat, `Migration2To3` registrada a `di/AppModules.kt`.
+- [ ] `PersonEntity`: `contactLookupKey`, l'id del contacte (i `contactName`, segons C11) nul·lables. `ConversesDatabase` a versió 3, `3.json` exportat, `Migration2To3` registrada a `di/AppModules.kt`.
 - [ ] Test de migració 2 → 3 amb `MigrationTestHelper` (les persones i les entrades queden intactes; les columnes noves són `null`).
 - [ ] `ConversesRepository`: vincular i desvincular; tests de JVM amb `FakeDb`.
-- [ ] Comprovar que l'snapshot de Wear i l'exportació no inclouen el vincle (test).
+- [ ] Comprovar que l'snapshot de Wear, Auto i l'exportació no inclouen el vincle (test).
 
 **Validació:** `testDebugUnitTest`, test de migració (instrumentat, a l'emulador), `ktlintCheck`.
 **Sortida:** la BBDD d'una v2 real s'actualitza sense perdre res; encara no es veu res a la UI.
 
 ## Fase 2 · Vincular a l'editor; vincle al detall
+
+Necessita el disseny (C8).
 
 - [ ] Editor (Editar / Nova persona), només amb el flag: fila «Contacte» que obre `PickContact`, mostra el nom triat i permet treure'l.
 - [ ] Detall: «Vinculada a {nom}» i «Obre a Contactes» (`ACTION_VIEW` amb el lookup URI); estat «contacte esborrat» amb opció de desvincular.
@@ -51,34 +53,37 @@ Sense codi de producte. **Bloquejant:** si Play o les apps de Contactes no ho pe
 - [ ] Textos en en/ca/es; previews i captures (`...Content`).
 
 **Validació:** tests, `ktlintCheck`, captures revisades; emulador: vincular, obrir a Contactes, desvincular, i amb el flag apagat no es veu res.
-**Sortida:** es pot vincular una persona i obrir el contacte; encara no hi ha fila a Contactes.
+**Sortida:** es pot vincular una persona i obrir el contacte; encara no hi ha files a Contactes.
 
 ## Fase 3 · Compte, sync adapter i obrir des de Contactes
 
-- [ ] Authenticator, sync adapter (que no sincronitza res), `syncadapter.xml`, `authenticator.xml`, `contacts.xml` i icona.
-- [ ] Activitat d'entrada `ACTION_VIEW` amb el mimetype propi: llegeix `SYNC1` i navega a `PersonRoute` o `PersonLockedRoute`; si el flag està apagat o la persona no hi és, obre l'app normal.
+- [ ] Authenticator, sync adapter (que no sincronitza res), `syncadapter.xml`, `authenticator.xml` i `contacts.xml` amb els dos mimetypes; tipus de compte diferent a debug i a release.
+- [ ] `PersonRoute` amb un paràmetre per obrir el `NewEntrySheet` d'entrada (C9).
+- [ ] Activitat d'entrada `ACTION_VIEW` per als dos mimetypes: llegeix el `personId` de la fila i navega segons C9 (fitxa, o fitxa amb el full obert); `PersonLockedRoute` si és protegida; l'app normal si el flag està apagat o la persona no hi és.
 - [ ] `ContactsGateway` (interfície) i la seva implementació Android; `FakeContactsGateway` a `app/src/test/.../testing`.
-- [ ] Tests de JVM de la resolució de l'entrada (id vàlid, protegida, inexistent, flag apagat).
+- [ ] Tests de JVM de la resolució de l'entrada (cada mimetype, protegida, inexistent, flag apagat).
 
-**Validació:** tests, `ktlintCheck`; emulador: amb una fila creada des del menú de debug, tocar-la a Contactes obre la persona.
-**Sortida:** la cadena Contactes → Converses funciona amb una fila de prova.
+**Validació:** tests, `ktlintCheck`; emulador: amb files creades des del menú de debug, «Veure notes» obre la fitxa i «Crear nota» la fitxa amb el full obert.
+**Sortida:** la cadena Contactes → Converses funciona amb files de prova.
 
 ## Fase 4 · Reconciliació, permisos i disparadors
 
+Necessita el disseny de l'explicació del permís (C8).
+
 - [ ] `ContactsReconciler`: pla pur (crear i esborrar) a partir de les persones, el flag, els permisos i les files existents; aplicat amb `ContactsGateway` en un sol lot.
 - [ ] Tornar a llegir i desar el lookup key després d'agregar.
-- [ ] Disparadors: arrencada, desar persona, protegir o desprotegir, esborrar, canvi de flag, permisos concedits. Amb el flag apagat: esborrar-ho tot i treure la compte.
-- [ ] Demanar els permisos segons C7, amb l'explicació dissenyada; sense permisos, el vincle es desa igualment i no hi ha fila.
-- [ ] Tests de JVM del pla: idempotència, protegides mai, arxivades sí, contacte esborrat, flag apagat, permisos denegats.
+- [ ] Disparadors: arrencada (tornant a crear la compte si l'usuari l'ha esborrada, C6), desar persona, protegir o desprotegir, esborrar, canvi de flag, permisos concedits. Amb el flag apagat: esborrar-ho tot i treure la compte.
+- [ ] Demanar els permisos segons C7, amb l'explicació dissenyada; sense permisos, el vincle es desa igualment i no hi ha files.
+- [ ] Tests de JVM del pla: idempotència, protegides mai, arxivades sí, contacte esborrat, compte esborrada, flag apagat, permisos denegats.
 
-**Validació:** tests, `ktlintCheck`; emulador: el cicle complet (vincular → fila; protegir → desapareix; desprotegir → torna; esborrar persona → desapareix; apagar flag → no queda res ni la compte).
+**Validació:** tests, `ktlintCheck`; emulador: el cicle complet (vincular → files; protegir → desapareixen; desprotegir → tornen; esborrar persona → desapareixen; esborrar la compte a Ajustos → tornen en obrir l'app; apagar flag → no queda res ni la compte).
 **Sortida:** la funció completa a l'emulador amb el flag encès.
 
 ## Fase 5 · Privacitat i casos límit
 
-- [ ] Revisar tot el que s'escriu al proveïdor: només text fix i `SYNC1` (C3); cap nom ni contingut.
-- [ ] Fila d'una persona que es protegeix mentre Contactes la mostra: tocar-la passa per `PersonLockedRoute`.
-- [ ] Compte esborrada per l'usuari (C6), contacte esborrat o fusionat amb un altre, i dues persones vinculades al mateix contacte.
+- [ ] Revisar tot el que s'escriu al proveïdor: només text fix i l'id de la persona (C3); cap nom ni contingut.
+- [ ] Files d'una persona que es protegeix mentre Contactes la mostra: tocar-les passa per `PersonLockedRoute`.
+- [ ] Contacte esborrat o fusionat amb un altre, i dues persones vinculades al mateix contacte.
 - [ ] Desinstal·lar i reinstal·lar: no queden files òrfenes.
 
 **Validació:** tests de JVM dels casos; emulador; **humana:** desbloqueig biomètric en obrir una protegida des de Contactes.
@@ -89,12 +94,13 @@ Sense codi de producte. **Bloquejant:** si Play o les apps de Contactes no ho pe
 - [ ] TalkBack a la fila de l'editor i al detall (**humana**).
 - [ ] Captures de referència actualitzades (etiqueta `update-screenshots` al PR).
 - [ ] `docs/pro/README.md`: fila «Contact integration» actualitzada i proves marcades.
-- [ ] Preparar el text de Data safety i la declaració de permisos; **no es toca Play sense permís.**
+- [ ] Verificar si `maxSdkVersion` eximeix de la declaració de `READ_CONTACTS`; preparar el text de Data safety i la declaració de permisos. **No es toca Play sense permís.**
 - [ ] Baseline Profile: no cal mentre sigui darrere de flag (es revisa a la release, com sempre).
 
 **Sortida:** funció llesta per quan existeixi el Pro, apagada a la release.
 
 ## Fase 7 · Més endavant
 
+- **Revisar C10 amb l'API 38:** si `WRITE_CONTACTS` deixa de funcionar, mirar si Google Contacts o Telèfon ja fan servir el People Directory, o quina alternativa hi ha.
 - **Avís de trucada entrant** (`CallScreeningService`) per a persones vinculades: demana el rol de filtre de trucades i llegir telèfons del contacte; cal decidir-ne la privacitat (protegides).
 - **Importar diversos contactes alhora** per crear persones: aquí es pot tornar a valorar contacts-android (C5).
