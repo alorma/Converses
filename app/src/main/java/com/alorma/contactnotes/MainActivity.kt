@@ -16,6 +16,8 @@ import androidx.compose.runtime.getValue
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import com.alorma.contactnotes.data.ConversesRepository
+import com.alorma.contactnotes.data.flags.ContactLinkFeature
 import com.alorma.contactnotes.data.flags.PersonColorFeature
 import com.alorma.contactnotes.data.flags.rememberFeatureEnabled
 import com.alorma.contactnotes.data.settings.AppLockManager
@@ -28,6 +30,9 @@ import com.alorma.contactnotes.designsystem.theme.ConversesTheme
 import com.alorma.contactnotes.designsystem.theme.ThemeMode
 import com.alorma.contactnotes.ui.AppNavigation
 import com.alorma.contactnotes.ui.lock.AppLockScreen
+import com.alorma.contactnotes.ui.navigation.EXTRA_CONTACT_ROW_ACTION
+import com.alorma.contactnotes.ui.navigation.EXTRA_CONTACT_ROW_PERSON_ID
+import com.alorma.contactnotes.ui.navigation.contactRowBackStack
 import com.alorma.contactnotes.ui.navigation.isTextImport
 import com.alorma.contactnotes.ui.navigation.toBackStack
 import com.alorma.contactnotes.ui.watchinstall.WatchInstallSheet
@@ -45,13 +50,25 @@ class MainActivity : FragmentActivity() {
   private val appLock: AppLockManager by inject()
   private val secureWindow: SecureWindow by inject()
   private val onboardingFlag: OnboardingFlag by inject()
+  private val repository: ConversesRepository by inject()
+  private val contactLinkFeature: ContactLinkFeature by inject()
+
+  /** Pila per a una fila de Contactes (`ContactRowActivity`); la persona es llegeix aquí, no es creu l'intent. */
+  private fun contactRowStack() =
+    contactRowBackStack(
+      actionName = intent.getStringExtra(EXTRA_CONTACT_ROW_ACTION),
+      personId = intent.getLongExtra(EXTRA_CONTACT_ROW_PERSON_ID, -1).takeIf { it > 0 },
+      enabled = contactLinkFeature.isEnabled(),
+      findPerson = { id -> runBlocking { repository.getPerson(id) } },
+    )
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     // Lectura síncrona abans del primer frame per evitar un parpelleig de tema en obrir.
     val initialSettings = runBlocking { settingsRepository.settings.first() }
-    // Share / select-text: directe a la nota ràpida, sense onboarding (no es marca com a vist)
-    val importStack = intent.toBackStack()
+    // Share / select-text: directe a la nota ràpida; fila de Contactes: directe a la persona. Sense onboarding (no es
+    // marca com a vist)
+    val importStack = intent.toBackStack() ?: contactRowStack()
     if (importStack == null && intent.isTextImport) {
       Toast.makeText(this, R.string.import_nothing, Toast.LENGTH_SHORT).show()
       finish()

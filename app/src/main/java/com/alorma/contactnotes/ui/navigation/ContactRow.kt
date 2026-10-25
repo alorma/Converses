@@ -29,6 +29,26 @@ fun contactRowAction(
   mimeType: String?,
 ): ContactRowAction? = ContactRowAction.entries.firstOrNull { contactRowMimeType(applicationId, it) == mimeType }
 
+/** Extres amb què `ContactRowActivity` obre `MainActivity`: només dades, mai una ruta ja resolta. */
+const val EXTRA_CONTACT_ROW_PERSON_ID = "com.alorma.contactnotes.extra.CONTACT_ROW_PERSON_ID"
+const val EXTRA_CONTACT_ROW_ACTION = "com.alorma.contactnotes.extra.CONTACT_ROW_ACTION"
+
+/**
+ * Pila inicial de `MainActivity` per a una fila de Contactes, o `null` si l'intent no en ve. `MainActivity` és
+ * exportada i qualsevol app li pot passar aquests extres, per això es torna a resoldre aquí (flag, persona, protegida)
+ * en lloc de confiar en el que digui l'intent.
+ */
+fun contactRowBackStack(
+  actionName: String?,
+  personId: Long?,
+  enabled: Boolean,
+  findPerson: (Long) -> PersonEntity?,
+): List<AppRoute>? {
+  val action = ContactRowAction.entries.firstOrNull { it.name == actionName } ?: return null
+  if (personId == null || !enabled) return null
+  return contactRowRoute(action, findPerson(personId), enabled)?.let { listOf(it) }
+}
+
 /**
  * On porta una fila tocada a Contactes: la persona (amb el full obert per a «Crear nota»), el desbloqueig primer si és
  * protegida, o `null` (l'app normal) si el flag està apagat, la fila no és nostra o la persona ja no hi és.

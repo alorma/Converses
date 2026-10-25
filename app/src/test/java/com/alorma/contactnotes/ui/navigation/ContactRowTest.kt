@@ -58,6 +58,32 @@ class ContactRowTest {
     assertNull(contactRowAction(RELEASE, null))
   }
 
+  @Test
+  fun theBackStackIsResolvedAgainFromTheExtras() {
+    val people = mapOf(marta.id to marta, luna.id to luna)
+
+    assertEquals(
+      listOf(PersonRoute(2, openNewEntry = true)),
+      contactRowBackStack(ContactRowAction.CreateNote.name, 2, enabled = true, findPerson = people::get),
+    )
+    // Un intent falsificat no pot saltar-se el bloqueig: la protecció surt de la base de dades
+    assertEquals(
+      listOf(PersonLockedRoute(1)),
+      contactRowBackStack(ContactRowAction.ViewNotes.name, 1, enabled = true, findPerson = people::get),
+    )
+  }
+
+  @Test
+  fun noBackStackWithoutAValidRowAFlagOrAPerson() {
+    val people = mapOf(marta.id to marta)
+
+    assertNull(contactRowBackStack(null, 2, enabled = true, findPerson = people::get))
+    assertNull(contactRowBackStack("Delete", 2, enabled = true, findPerson = people::get))
+    assertNull(contactRowBackStack(ContactRowAction.ViewNotes.name, null, enabled = true, findPerson = people::get))
+    assertNull(contactRowBackStack(ContactRowAction.ViewNotes.name, 2, enabled = false, findPerson = people::get))
+    assertNull(contactRowBackStack(ContactRowAction.ViewNotes.name, 9, enabled = true, findPerson = people::get))
+  }
+
   private companion object {
     const val RELEASE = "com.alorma.contactnotes"
     const val DEBUG = "com.alorma.contactnotes.dev"

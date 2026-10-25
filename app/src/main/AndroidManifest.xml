@@ -56,6 +56,21 @@
             «Crear nota» a la fitxa d'un contacte vinculat (docs/contacts). Els permisos de contactes encara només
             són al manifest de debug (C12): sense permisos, aquests serveis no fan res.
         -->
+        <!-- «Veure notes» / «Crear nota» a la fitxa d'un contacte: llegeix la fila i obre MainActivity -->
+        <activity
+            android:name=".ui.contacts.ContactRowActivity"
+            android:excludeFromRecents="true"
+            android:exported="true"
+            android:noHistory="true"
+            android:theme="@style/Theme.ContactNotes.Transparent">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="vnd.android.cursor.item/vnd.${applicationId}.person" />
+                <data android:mimeType="vnd.android.cursor.item/vnd.${applicationId}.note" />
+            </intent-filter>
+        </activity>
+
         <service
             android:name=".data.contacts.ContactsAuthenticatorService"
             android:exported="true">
