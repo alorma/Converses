@@ -26,11 +26,14 @@ import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Mail
 import androidx.compose.material.icons.outlined.Policy
 import androidx.compose.material.icons.rounded.BrightnessAuto
+import androidx.compose.material.icons.rounded.Contacts
 import androidx.compose.material.icons.rounded.DarkMode
 import androidx.compose.material.icons.rounded.Face
 import androidx.compose.material.icons.rounded.Fingerprint
 import androidx.compose.material.icons.rounded.Language
 import androidx.compose.material.icons.rounded.LightMode
+import androidx.compose.material.icons.rounded.Lock
+import androidx.compose.material.icons.rounded.ManageAccounts
 import androidx.compose.material.icons.rounded.Notifications
 import androidx.compose.material.icons.rounded.Palette
 import androidx.compose.material.icons.rounded.Timer
@@ -38,6 +41,7 @@ import androidx.compose.material.icons.rounded.UnfoldMore
 import androidx.compose.material.icons.rounded.Vibration
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItemDefaults
@@ -49,10 +53,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.LinkAnnotation
 import androidx.compose.ui.text.SpanStyle
@@ -71,6 +77,8 @@ import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.alorma.compose.settings.ui.expressive.SettingsGroup
 import com.alorma.contactnotes.R
+import com.alorma.contactnotes.data.contacts.ContactsPermission
+import com.alorma.contactnotes.data.flags.ContactLinkFeature
 import com.alorma.contactnotes.data.flags.PersonColorFeature
 import com.alorma.contactnotes.data.flags.rememberFeatureEnabled
 import com.alorma.contactnotes.data.settings.AppLockManager
@@ -86,6 +94,8 @@ import com.alorma.contactnotes.designsystem.components.groupedItemShape
 import com.alorma.contactnotes.designsystem.components.rememberConversesHaptics
 import com.alorma.contactnotes.designsystem.components.rememberTopBarScrollBehavior
 import com.alorma.contactnotes.designsystem.theme.ThemeMode
+import com.alorma.contactnotes.ui.edit.ContactsExplainSheet
+import com.alorma.contactnotes.ui.edit.openAppDetailsSettings
 import com.alorma.contactnotes.ui.person.canUnlockWithDevice
 import com.alorma.contactnotes.ui.person.openSecuritySetup
 import com.alorma.contactnotes.ui.person.promptUnlock
@@ -127,8 +137,28 @@ fun SettingsScreen(
       }
     }
 
+  val contactsState by viewModel.contacts.collectAsStateWithLifecycle()
+  val requestContacts =
+    rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
+      viewModel.onContactsPermissionChanged()
+    }
+  // El permís es pot haver donat o retirat des dels ajustos de l'app
+  LifecycleEventEffect(Lifecycle.Event.ON_RESUME) { viewModel.onContactsPermissionChanged() }
+
   SettingsContent(
     settings = settings,
+    contacts = if (rememberFeatureEnabled<ContactLinkFeature>()) contactsState else null,
+    onContactsExplainContinue = {
+      viewModel.onContactsExplained()
+      requestContacts.launch(ContactsPermission.permissions)
+    },
+    onContactsAllow = {
+      // Denegat per sempre: el sistema ja no mostra el diàleg, només es pot donar als ajustos de l'app
+      val canAsk = ContactsPermission.permissions.any { activity.shouldShowRequestPermissionRationale(it) }
+      if (canAsk) requestContacts.launch(ContactsPermission.permissions) else context.openAppDetailsSettings()
+    },
+    onContactsOpenAccounts = { context.openAccountSettings() },
+    onContactsManagePermission = { context.openAppDetailsSettings() },
     showWatchNotifications = watchPresent,
     watchNotifications = watchNotifications,
     onWatchNotifications = { enabled ->
@@ -184,7 +214,13 @@ fun SettingsContent(
   showWatchNotifications: Boolean = false,
   watchNotifications: Boolean = false,
   onWatchNotifications: (Boolean) -> Unit = {},
+  contacts: ContactsSettingsState? = null,
+  onContactsExplainContinue: () -> Unit = {},
+  onContactsAllow: () -> Unit = {},
+  onContactsOpenAccounts: () -> Unit = {},
+  onContactsManagePermission: () -> Unit = {},
 ) {
+  var showContactsExplain by rememberSaveable { mutableStateOf(false) }
   val scrollBehavior = rememberTopBarScrollBehavior()
   Scaffold(
     modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
@@ -320,6 +356,16 @@ fun SettingsContent(
         modifier = Modifier.padding(horizontal = 4.dp),
       )
 
+      if (contacts != null) {
+        ContactsSection(
+          state = contacts,
+          onTurnOn = { showContactsExplain = true },
+          onAllow = onContactsAllow,
+          onOpenAccounts = onContactsOpenAccounts,
+          onManagePermission = onContactsManagePermission,
+        )
+      }
+
       val aboutCount = 3
       SettingsGroup(
         title = { SectionTitle(stringResource(R.string.settings_about)) },
@@ -348,6 +394,16 @@ fun SettingsContent(
       }
       MadeBy(modifier = Modifier.padding(start = 4.dp, top = 4.dp, bottom = 32.dp))
     }
+  }
+
+  if (showContactsExplain) {
+    ContactsExplainSheet(
+      onContinue = {
+        showContactsExplain = false
+        onContactsExplainContinue()
+      },
+      onDismiss = { showContactsExplain = false },
+    )
   }
 }
 
@@ -533,6 +589,85 @@ private fun TileTitle(text: String) {
 }
 
 private fun Context.notificationsEnabled() = NotificationManagerCompat.from(this).areNotificationsEnabled()
+
+private fun Context.openAccountSettings() {
+  try {
+    startActivity(Intent(Settings.ACTION_SYNC_SETTINGS).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+  } catch (_: ActivityNotFoundException) {
+    // Sense pantalla de comptes: no hi ha res més a fer
+  }
+}
+
+@Composable
+private fun ContactsSection(
+  state: ContactsSettingsState,
+  onTurnOn: () -> Unit,
+  onAllow: () -> Unit,
+  onOpenAccounts: () -> Unit,
+  onManagePermission: () -> Unit,
+) {
+  SettingsGroup(
+    title = { SectionTitle(stringResource(R.string.settings_contacts)) },
+    verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap),
+  ) {
+    when (state) {
+      ContactsSettingsState.NeverOn ->
+        SettingRow(
+          title = stringResource(R.string.settings_contacts_link),
+          subtitle = stringResource(R.string.settings_contacts_off_summary),
+          icon = Icons.Rounded.Contacts,
+          trailing = {
+            FilledTonalButton(onClick = onTurnOn) {
+              Text(stringResource(R.string.settings_contacts_turn_on), fontWeight = FontWeight.Bold)
+            }
+          },
+          shape = groupedItemShape(0, 1),
+        )
+      is ContactsSettingsState.On -> {
+        SettingRow(
+          title = pluralStringResource(R.plurals.settings_contacts_on, state.linkedCount, state.linkedCount),
+          subtitle = stringResource(R.string.settings_contacts_on_summary),
+          icon = Icons.Rounded.Contacts,
+          shape = groupedItemShape(0, 3),
+        )
+        SettingRow(
+          title = stringResource(R.string.settings_contacts_account),
+          subtitle = stringResource(R.string.settings_contacts_account_summary),
+          icon = Icons.Rounded.ManageAccounts,
+          trailing = { Icon(Icons.AutoMirrored.Rounded.OpenInNew, contentDescription = null) },
+          shape = groupedItemShape(1, 3),
+          onClick = onOpenAccounts,
+        )
+        SettingRow(
+          title = stringResource(R.string.settings_contacts_manage),
+          subtitle = stringResource(R.string.settings_contacts_manage_summary),
+          icon = Icons.Rounded.Lock,
+          trailing = { Icon(Icons.AutoMirrored.Rounded.OpenInNew, contentDescription = null) },
+          shape = groupedItemShape(2, 3),
+          onClick = onManagePermission,
+        )
+      }
+      ContactsSettingsState.Denied ->
+        SettingRow(
+          title = stringResource(R.string.contacts_no_permission),
+          subtitle = stringResource(R.string.settings_contacts_denied_summary),
+          icon = Icons.Rounded.Lock,
+          trailing = {
+            FilledTonalButton(onClick = onAllow) {
+              Text(stringResource(R.string.contacts_allow), fontWeight = FontWeight.Bold)
+            }
+          },
+          shape = groupedItemShape(0, 1),
+        )
+    }
+  }
+  Text(
+    text = stringResource(R.string.settings_contacts_note),
+    style = MaterialTheme.typography.bodySmall,
+    color = MaterialTheme.colorScheme.onSurfaceVariant,
+    modifier = Modifier.padding(horizontal = 4.dp),
+  )
+}
 
 private fun Context.openNotificationSettings() {
   val intent =

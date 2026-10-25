@@ -281,4 +281,19 @@
     <string name="contact_deleted_title">El contacte ja no existeix</string>
     <string name="contact_deleted_body">S\'ha esborrat de Contactes. Les notes es queden aquí.</string>
     <string name="contact_unlink_button">Desvincula</string>
+    <string name="settings_contacts">Contactes</string>
+    <string name="settings_contacts_link">Vincle amb Contactes</string>
+    <string name="settings_contacts_off_summary">Encara no l\'has activat. Et demanarem permís per veure els contactes.</string>
+    <string name="settings_contacts_turn_on">Activa</string>
+    <plurals name="settings_contacts_on">
+        <item quantity="one">Activat · %d persona vinculada</item>
+        <item quantity="other">Activat · %d persones vinculades</item>
+    </plurals>
+    <string name="settings_contacts_on_summary">Mostra les teves notes dins de la fitxa de cada contacte</string>
+    <string name="settings_contacts_account">Compte «Converses»</string>
+    <string name="settings_contacts_account_summary">Es veu a Ajustos › Comptes del sistema</string>
+    <string name="settings_contacts_manage">Gestiona el permís</string>
+    <string name="settings_contacts_manage_summary">Per retirar-lo, obre els ajustos de l\'app</string>
+    <string name="settings_contacts_denied_summary">Les persones vinculades no mostren l\'accés a Contactes. Les notes no es perden.</string>
+    <string name="settings_contacts_note">Les notes no es copien a Contactes: només s\'hi afegeixen «Veure notes» i «Crear nota».</string>
 </resources>

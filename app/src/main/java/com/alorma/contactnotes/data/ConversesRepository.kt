@@ -31,6 +31,8 @@ class ConversesRepository(
 
   fun observePerson(id: Long): Flow<PersonEntity?> = personDao.observe(id)
 
+  fun observeLinkedContactsCount(): Flow<Int> = personDao.observeLinkedCount()
+
   /** Grups de canal usats a les entrades de la persona, sempre en l'ordre fix de [ChannelType]. */
   fun observeChannels(personId: Long): Flow<List<ChannelType>> =
     entryDao.observeChannelTypes(personId).map { it.distinct().sorted() }

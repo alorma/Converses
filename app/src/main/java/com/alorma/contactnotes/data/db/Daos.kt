@@ -89,6 +89,10 @@ abstract class PersonDao {
   )
   abstract fun observeList(archived: Boolean): Flow<List<PersonListItem>>
 
+  /** Persones amb vincle a Contactes, també les protegides i arxivades: només es compta, no es llegeix cap dada. */
+  @Query("SELECT COUNT(*) FROM person WHERE contactLookupKey IS NOT NULL")
+  abstract fun observeLinkedCount(): Flow<Int>
+
   @Query(
     """
     SELECT COUNT(*) FROM person

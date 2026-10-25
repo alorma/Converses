@@ -138,6 +138,8 @@ class FakePersonDao(
         }.sortedByDescending { it.lastEntry?.occurredAt ?: it.person.createdAt }
     }
 
+  override fun observeLinkedCount(): Flow<Int> = db.people.map { list -> list.count { it.contactLookupKey != null } }
+
   override suspend fun countAliasConflicts(
     alias: String,
     excludeId: Long,

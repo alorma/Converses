@@ -74,3 +74,48 @@ internal fun SettingsWatchPreview() {
     )
   }
 }
+
+@Composable
+private fun SettingsContactsPreview(contacts: ContactsSettingsState) {
+  ConversesPreviewTheme {
+    SettingsContent(
+      settings = AppSettings(),
+      canUnlock = true,
+      languageName = "English",
+      versionName = "1.0 (1)",
+      onBack = {},
+      onThemeMode = {},
+      onDynamicColor = {},
+      onPersonColorTheme = {},
+      onHapticFeedback = {},
+      onAppLockChange = {},
+      onRelockAfter = {},
+      onOpenLanguage = {},
+      onOpenSecuritySetup = {},
+      onOpenPrivacyPolicy = {},
+      onOpenFeedback = {},
+      contacts = contacts,
+    )
+  }
+}
+
+/** Contactes: mai activat (1c, 5h). */
+@Preview
+@Composable
+internal fun SettingsContactsNeverOnPreview() {
+  SettingsContactsPreview(ContactsSettingsState.NeverOn)
+}
+
+/** Contactes: activat amb tres files. */
+@Preview
+@Composable
+internal fun SettingsContactsOnPreview() {
+  SettingsContactsPreview(ContactsSettingsState.On(linkedCount = 3))
+}
+
+/** Contactes: permís denegat. */
+@Preview
+@Composable
+internal fun SettingsContactsDeniedPreview() {
+  SettingsContactsPreview(ContactsSettingsState.Denied)
+}

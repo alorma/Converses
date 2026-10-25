@@ -53,6 +53,9 @@ import com.alorma.contactnotes.ui.person.PersonLockedLockedOutPreview
 import com.alorma.contactnotes.ui.person.PersonLockedNoCredentialsPreview
 import com.alorma.contactnotes.ui.person.PersonLockedWaitingPreview
 import com.alorma.contactnotes.ui.settings.SettingsAppLockPreview
+import com.alorma.contactnotes.ui.settings.SettingsContactsDeniedPreview
+import com.alorma.contactnotes.ui.settings.SettingsContactsNeverOnPreview
+import com.alorma.contactnotes.ui.settings.SettingsContactsOnPreview
 import com.alorma.contactnotes.ui.settings.SettingsNoLockPreview
 import com.alorma.contactnotes.ui.watchinstall.WatchInstallFinishPreview
 import com.alorma.contactnotes.ui.watchinstall.WatchInstallProposePreview
@@ -68,6 +71,17 @@ import com.android.tools.screenshot.PreviewTest
   uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_NORMAL,
 )
 annotation class ScreenPreviews
+
+/** Com [ScreenPreviews] però més alta: la secció Contactes d'Ajustos queda sota el plec d'una pantalla normal. */
+@Preview(name = "Light", locale = "en", widthDp = 411, heightDp = 1500)
+@Preview(
+  name = "Dark",
+  locale = "en",
+  widthDp = 411,
+  heightDp = 1500,
+  uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_NORMAL,
+)
+annotation class TallScreenPreviews
 
 /** Idiomes que no són l'anglès i font gran, per veure que els textos no es tallen. Només en clar. */
 @Preview(name = "Catalan", locale = "ca", widthDp = 411, heightDp = 891)
@@ -355,6 +369,27 @@ class ScreensScreenshotTests {
   @Composable
   fun settingsNoLock() {
     SettingsNoLockPreview()
+  }
+
+  @TallScreenPreviews
+  @PreviewTest
+  @Composable
+  fun settingsContactsNeverOn() {
+    SettingsContactsNeverOnPreview()
+  }
+
+  @TallScreenPreviews
+  @PreviewTest
+  @Composable
+  fun settingsContactsOn() {
+    SettingsContactsOnPreview()
+  }
+
+  @TallScreenPreviews
+  @PreviewTest
+  @Composable
+  fun settingsContactsDenied() {
+    SettingsContactsDeniedPreview()
   }
 
   @ScreenPreviews
