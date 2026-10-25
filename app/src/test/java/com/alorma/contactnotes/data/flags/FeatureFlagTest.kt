@@ -9,15 +9,16 @@ class FeatureFlagTest {
   private val runner = LocalFeatureFlagRunner()
   private val avatar = CustomAvatarFeature(runner)
   private val personColor = PersonColorFeature(runner)
+  private val contactLink = ContactLinkFeature(runner)
 
   @Test
   fun everythingIsOffByDefault() {
-    listOf(avatar, personColor).forEach { assertFalse(it.key, it.isEnabled()) }
+    listOf(avatar, personColor, contactLink).forEach { assertFalse(it.key, it.isEnabled()) }
   }
 
   @Test
   fun keysAreUnique() {
-    val keys = listOf(avatar, personColor).map { it.key }
+    val keys = listOf(avatar, personColor, contactLink).map { it.key }
     assertTrue(keys.size == keys.toSet().size)
   }
 
@@ -58,7 +59,7 @@ class FeatureFlagTest {
 
   @Test
   fun proModeSwitchesEveryProFlagAtOnce() {
-    val flags = listOf(avatar, personColor)
+    val flags = listOf(avatar, personColor, contactLink)
     assertTrue(flags.all { it.pro })
 
     flags.filter { it.pro }.forEach { runner.setOverride(it.key, true) }

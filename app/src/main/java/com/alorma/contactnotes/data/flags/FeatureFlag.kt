@@ -22,3 +22,8 @@ class CustomAvatarFeature(
 class PersonColorFeature(
   runner: FeatureFlagRunner,
 ) : FeatureFlag(runner, key = "person_color_enabled", pro = true)
+
+/** Vincular una persona a un contacte del dispositiu (`docs/contacts`). */
+class ContactLinkFeature(
+  runner: FeatureFlagRunner,
+) : FeatureFlag(runner, key = "contact_link_enabled", pro = true)

@@ -6,6 +6,7 @@ import androidx.room.Room
 import com.alorma.contactnotes.data.ConversesRepository
 import com.alorma.contactnotes.data.db.ConversesDatabase
 import com.alorma.contactnotes.data.db.Migration1To2
+import com.alorma.contactnotes.data.flags.ContactLinkFeature
 import com.alorma.contactnotes.data.flags.CustomAvatarFeature
 import com.alorma.contactnotes.data.flags.FeatureFlag
 import com.alorma.contactnotes.data.flags.FeatureFlagRunner
@@ -85,6 +86,7 @@ val settingsModule =
     } bind FeatureFlagRunner::class
     singleOf(::CustomAvatarFeature) bind FeatureFlag::class
     singleOf(::PersonColorFeature) bind FeatureFlag::class
+    singleOf(::ContactLinkFeature) bind FeatureFlag::class
     single { PersonExporter(androidContext(), get()) }
     single { PersonSelectionBridge() }
   }
