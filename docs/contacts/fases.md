@@ -8,7 +8,7 @@ Context, abast, arquitectura, decisions (C1–C11) i riscos són a `docs/contact
 | 1 | Flag, migració v3 i repositori | 0 | Feta i validada (25-10-2026) |
 | 2 | Vincular i desvincular a l'editor; vincle al detall | 1, 0 (C8) | Feta i validada (25-10-2026) |
 | 3 | Compte, sync adapter i obrir des de Contactes | 1 | Feta i validada (25-10-2026) |
-| 4 | Reconciliació, permisos, disparadors i Ajustos › Contactes | 2, 3 | Feta, pendent de validar |
+| 4 | Reconciliació, permisos, disparadors i Ajustos › Contactes | 2, 3 | Feta i validada (25-10-2026) |
 | 5 | Privacitat i casos límit | 4 | Pendent |
 | 6 | Qualitat, textos, captures i Play | 5 | Pendent |
 | 7 | Més endavant | 6 | Idees |
