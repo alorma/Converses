@@ -31,22 +31,56 @@ class AndroidContactsGateway(
 
   override suspend fun rows(): List<ContactRows> =
     withContext(Dispatchers.IO) {
-      resolver
-        .query(
-          RawContacts.CONTENT_URI,
-          arrayOf(RawContacts._ID, RawContacts.SYNC1),
-          "${RawContacts.ACCOUNT_TYPE} = ? AND ${RawContacts.DELETED} = 0",
-          arrayOf(accountType),
-          null,
-        )?.use { cursor ->
-          buildList {
-            while (cursor.moveToNext()) {
-              val personId = cursor.getString(1)?.toLongOrNull() ?: continue
-              add(ContactRows(rawContactId = cursor.getLong(0), personId = personId))
+      val rows =
+        resolver
+          .query(
+            RawContacts.CONTENT_URI,
+            arrayOf(RawContacts._ID, RawContacts.SYNC1, RawContacts.CONTACT_ID),
+            "${RawContacts.ACCOUNT_TYPE} = ? AND ${RawContacts.DELETED} = 0",
+            arrayOf(accountType),
+            null,
+          )?.use { cursor ->
+            buildList {
+              while (cursor.moveToNext()) {
+                val personId = cursor.getString(1)?.toLongOrNull() ?: continue
+                add(
+                  ContactRows(
+                    rawContactId = cursor.getLong(0),
+                    personId = personId,
+                    contactId = cursor.getLong(2),
+                    labels = emptyList(),
+                  ),
+                )
+              }
             }
-          }
-        }.orEmpty()
+          }.orEmpty()
+      if (rows.isEmpty()) return@withContext rows
+      val labels = labelsOf(rows.map { it.rawContactId })
+      rows.map { it.copy(labels = labels[it.rawContactId].orEmpty()) }
     }
+
+  override fun rowLabels(): List<String> = ContactRowAction.entries.map { context.getString(it.label) }
+
+  /** El text de les files de cada raw contact, en l'ordre de [ContactRowAction] (les que falten no hi són). */
+  private fun labelsOf(rawContactIds: List<Long>): Map<Long, List<String>> {
+    val mimeTypes = ContactRowAction.entries.map { contactRowMimeType(context.packageName, it) }
+    val found = mutableMapOf<Long, MutableMap<Int, String>>()
+    resolver
+      .query(
+        Data.CONTENT_URI,
+        arrayOf(Data.RAW_CONTACT_ID, Data.MIMETYPE, Data.DATA3),
+        "${Data.RAW_CONTACT_ID} IN (${rawContactIds.joinToString()})",
+        null,
+        null,
+      )?.use { cursor ->
+        while (cursor.moveToNext()) {
+          val index = mimeTypes.indexOf(cursor.getString(1))
+          if (index < 0) continue
+          found.getOrPut(cursor.getLong(0)) { sortedMapOf() }[index] = cursor.getString(2).orEmpty()
+        }
+      }
+    return found.mapValues { (_, byIndex) -> byIndex.values.toList() }
+  }
 
   override suspend fun addRows(
     personId: Long,
@@ -58,6 +92,7 @@ class AndroidContactsGateway(
       val target = foreignRawContactOf(contact.id) ?: return@withContext null
       removeRowsNow(personId)
 
+      val labels = rowLabels()
       val ops =
         arrayListOf(
           ContentProviderOperation
@@ -75,7 +110,7 @@ class AndroidContactsGateway(
             .withValue(Data.MIMETYPE, contactRowMimeType(context.packageName, action))
             .withValue(Data.DATA1, personId.toString())
             .withValue(Data.DATA2, context.getString(R.string.app_name))
-            .withValue(Data.DATA3, context.getString(action.label))
+            .withValue(Data.DATA3, labels[action.ordinal])
             .build()
       }
       ops +=

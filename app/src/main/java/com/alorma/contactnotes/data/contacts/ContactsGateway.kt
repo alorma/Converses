@@ -1,9 +1,14 @@
 package com.alorma.contactnotes.data.contacts
 
-/** Persona que ara té files a Contactes: el raw contact de la nostra compte que les porta. */
+/**
+ * Persona que ara té files a Contactes: el raw contact de la nostra compte que les porta, el contacte on està enganxat
+ * ([contactId]) i el text de cada fila ([labels], en l'ordre de `ContactRowAction`).
+ */
 data class ContactRows(
   val rawContactId: Long,
   val personId: Long,
+  val contactId: Long,
+  val labels: List<String>,
 )
 
 /** Contacte del dispositiu resolt pel vincle; l'id i el lookup key poden haver canviat des que es va desar. */
@@ -21,6 +26,9 @@ data class ResolvedContact(
 interface ContactsGateway {
   /** Persones que ara tenen files. */
   suspend fun rows(): List<ContactRows>
+
+  /** El text que ha de dur cada fila ara (en l'ordre de `ContactRowAction`): canvia amb l'idioma. */
+  fun rowLabels(): List<String>
 
   /**
    * Crea (o refà) les files de [personId] enganxades al contacte. Torna el contacte amb el lookup key nou (canvia en

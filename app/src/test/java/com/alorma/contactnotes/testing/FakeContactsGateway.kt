@@ -20,15 +20,28 @@ class FakeContactsGateway : ContactsGateway {
     contacts[contact.lookupKey] = contact
   }
 
-  override suspend fun rows(): List<ContactRows> = rowsByPerson.values.toList()
+  /** El text de les files en l'idioma del moment; canviar-lo simula un canvi d'idioma. */
+  var labels = listOf("View notes", "Create note")
+
+  /** Llançat per [rows] i [addRows] quan no hi ha permís. */
+  var denied = false
+
+  override suspend fun rows(): List<ContactRows> {
+    if (denied) throw SecurityException()
+    return rowsByPerson.values.toList()
+  }
+
+  override fun rowLabels(): List<String> = labels
 
   override suspend fun addRows(
     personId: Long,
     contactId: Long,
     lookupKey: String,
   ): ResolvedContact? {
+    if (denied) throw SecurityException()
     val contact = contacts[lookupKey] ?: contacts.values.firstOrNull { it.id == contactId } ?: return null
-    rowsByPerson[personId] = ContactRows(rawContactId = nextRawId++, personId = personId)
+    rowsByPerson[personId] =
+      ContactRows(rawContactId = nextRawId++, personId = personId, contactId = contact.id, labels = labels)
     val aggregated = contact.copy(lookupKey = contact.lookupKey + aggregatedSuffix)
     contacts.remove(contact.lookupKey)
     contacts[aggregated.lookupKey] = aggregated
