@@ -1,39 +1,27 @@
 package com.alorma.contactnotes.wear.components
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Lock
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.clearAndSetSemantics
-import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.semantics.stateDescription
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.wear.compose.material3.ButtonDefaults
+import androidx.wear.compose.material3.FilledTonalButton
 import androidx.wear.compose.material3.Icon
+import androidx.wear.compose.material3.SurfaceTransformation
 import androidx.wear.compose.material3.Text
 import com.alorma.contactnotes.shared.AvatarColor
 import com.alorma.contactnotes.shared.AvatarShape
 import com.alorma.contactnotes.wear.R
-import com.alorma.contactnotes.wear.theme.RowSubtitleStyle
-import com.alorma.contactnotes.wear.theme.RowTitleStyle
-import com.alorma.contactnotes.wear.theme.WearColors
 
 /**
- * Fila de la llista de persones: avatar Galeta, nom i hora de l'última entrada.
- * Una persona protegida només mostra nom i cadenat: cap hora ni entrada.
+ * Fila de la llista de persones: el `Button` natiu de Wear, amb l'avatar Galeta a la icona, el nom i l'hora de l'última
+ * entrada. Una persona protegida només mostra nom i cadenat: cap hora ni entrada.
  */
 @Composable
 fun PersonRow(
@@ -43,45 +31,41 @@ fun PersonRow(
   avatarShape: AvatarShape,
   lastEntry: String?,
   isProtected: Boolean,
-  shape: RoundedCornerShape,
   onClick: () -> Unit,
   modifier: Modifier = Modifier,
+  transformation: SurfaceTransformation? = null,
 ) {
-  val protectedLabel = stringResource(R.string.person_protected)
-  Row(
-    modifier =
-      modifier
-        .semantics(mergeDescendants = true) { if (isProtected) stateDescription = protectedLabel }
-        .fillMaxWidth()
-        .height(52.dp)
-        .clip(shape)
-        .background(WearColors.SurfaceCard)
-        .clickable(role = Role.Button, onClick = onClick)
-        .padding(horizontal = 12.dp),
-    horizontalArrangement = Arrangement.spacedBy(10.dp),
-    verticalAlignment = Alignment.CenterVertically,
-  ) {
+  FilledTonalButton(
+    onClick = onClick,
+    modifier = modifier.fillMaxWidth(),
+    transformation = transformation,
     // Les inicials repetirien el nom a TalkBack
-    PersonAvatar(
-      initials = initials,
-      color = color,
-      shape = avatarShape,
-      size = 36.dp,
-      modifier = Modifier.clearAndSetSemantics {},
-    )
-    Column(modifier = Modifier.weight(1f)) {
-      Text(text = name, style = RowTitleStyle, color = WearColors.OnSurface, maxLines = 1)
-      if (!isProtected && lastEntry != null) {
-        Text(text = lastEntry, style = RowSubtitleStyle, color = WearColors.OnSurfaceVariant, maxLines = 1)
-      }
-    }
-    if (isProtected) {
-      Icon(
-        imageVector = Icons.Rounded.Lock,
-        contentDescription = null,
-        tint = WearColors.OnSurfaceVariant,
-        modifier = Modifier.size(20.dp),
+    icon = {
+      PersonAvatar(
+        initials = initials,
+        color = color,
+        shape = avatarShape,
+        size = ButtonDefaults.LargeIconSize,
+        modifier = Modifier.clearAndSetSemantics {},
       )
-    }
+    },
+    secondaryLabel =
+      when {
+        isProtected -> {
+          {
+            Icon(
+              imageVector = Icons.Rounded.Lock,
+              contentDescription = stringResource(R.string.person_protected),
+              modifier = Modifier.size(16.dp),
+            )
+          }
+        }
+        lastEntry != null -> {
+          { Text(text = lastEntry, maxLines = 1, overflow = TextOverflow.Ellipsis) }
+        }
+        else -> null
+      },
+  ) {
+    Text(text = name, maxLines = 1, overflow = TextOverflow.Ellipsis)
   }
 }

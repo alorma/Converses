@@ -1,46 +1,35 @@
 package com.alorma.contactnotes.wear.ui
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Info
 import androidx.compose.material.icons.rounded.PersonAdd
 import androidx.compose.material.icons.rounded.PhonelinkOff
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.wear.compose.foundation.lazy.TransformingLazyColumn
 import androidx.wear.compose.foundation.lazy.rememberTransformingLazyColumnState
 import androidx.wear.compose.material3.Icon
+import androidx.wear.compose.material3.OutlinedButton
 import androidx.wear.compose.material3.ScreenScaffold
+import androidx.wear.compose.material3.SurfaceTransformation
 import androidx.wear.compose.material3.Text
+import androidx.wear.compose.material3.TitleCard
 import androidx.wear.compose.material3.lazy.rememberTransformationSpec
+import androidx.wear.compose.material3.lazy.transformedHeight
 import com.alorma.contactnotes.shared.AvatarColor
 import com.alorma.contactnotes.shared.AvatarShape
 import com.alorma.contactnotes.wear.R
 import com.alorma.contactnotes.wear.components.PersonRow
-import com.alorma.contactnotes.wear.components.groupedItemShape
 import com.alorma.contactnotes.wear.theme.ListTitleStyle
 import com.alorma.contactnotes.wear.theme.PersonNameStyle
-import com.alorma.contactnotes.wear.theme.RowSubtitleStyle
 import com.alorma.contactnotes.wear.theme.WearColors
 
 /** Una persona a la llista. Si és protegida, `lastEntry` ha de ser sempre `null`: no se'n mostra res més que el nom. */
@@ -69,27 +58,26 @@ fun PeopleContent(
   ScreenScaffold(scrollState = state, modifier = modifier) { padding ->
     TransformingLazyColumn(
       state = state,
-      contentPadding = PaddingValues(start = 22.dp, end = 22.dp, top = 28.dp, bottom = 36.dp),
-      verticalArrangement = Arrangement.spacedBy(2.dp),
+      contentPadding = padding,
+      verticalArrangement = Arrangement.spacedBy(4.dp),
     ) {
-      item {
-        Text(
-          text = stringResource(R.string.app_name),
-          style = ListTitleStyle,
-          color = WearColors.OnSurface,
-          textAlign = TextAlign.Center,
-          modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
-        )
-      }
+      item { WearListTitle(text = stringResource(R.string.app_name), style = ListTitleStyle) }
       if (dataAgeMinutes != null) {
-        item { PhoneOfflineBanner(dataAgeMinutes = dataAgeMinutes, modifier = Modifier.padding(bottom = 4.dp)) }
+        item {
+          PhoneOfflineBanner(
+            dataAgeMinutes = dataAgeMinutes,
+            modifier = Modifier.transformedHeight(this, spec),
+            transformation = SurfaceTransformation(spec),
+          )
+        }
       }
       if (discardedNotes > 0) {
         item {
           DiscardedNotesBanner(
             count = discardedNotes,
             onClick = onDiscardedNotesClick,
-            modifier = Modifier.padding(bottom = 4.dp),
+            modifier = Modifier.transformedHeight(this, spec),
+            transformation = SurfaceTransformation(spec),
           )
         }
       }
@@ -102,9 +90,9 @@ fun PeopleContent(
           avatarShape = person.avatarShape,
           lastEntry = person.lastEntry,
           isProtected = person.isProtected,
-          shape = groupedItemShape(index, people.size),
           onClick = { onPersonClick(person) },
-          modifier = Modifier.scrollTransformed(this, spec),
+          modifier = Modifier.transformedHeight(this, spec),
+          transformation = SurfaceTransformation(spec),
         )
       }
     }
@@ -116,83 +104,46 @@ private fun DiscardedNotesBanner(
   count: Int,
   onClick: () -> Unit,
   modifier: Modifier = Modifier,
+  transformation: SurfaceTransformation? = null,
 ) {
-  Row(
-    modifier =
-      modifier
-        .fillMaxWidth()
-        .heightIn(min = 48.dp)
-        .clip(RoundedCornerShape(24.dp))
-        .background(WearColors.SurfaceCardHigh)
-        .clickable(role = Role.Button, onClick = onClick)
-        .padding(horizontal = 14.dp, vertical = 6.dp),
-    horizontalArrangement = Arrangement.spacedBy(10.dp),
-    verticalAlignment = Alignment.CenterVertically,
+  OutlinedButton(
+    onClick = onClick,
+    modifier = modifier.fillMaxWidth(),
+    transformation = transformation,
+    icon = { Icon(Icons.Rounded.Info, contentDescription = null) },
+    secondaryLabel = { Text(text = stringResource(R.string.discarded_notes_hint)) },
   ) {
-    Icon(
-      Icons.Rounded.Info,
-      contentDescription = null,
-      tint = WearColors.OnSurfaceVariant,
-      modifier = Modifier.size(22.dp),
-    )
-    Column {
-      Text(
-        text = pluralStringResource(R.plurals.discarded_notes_title, count, count),
-        fontSize = 13.sp,
-        lineHeight = 18.sp,
-        fontWeight = FontWeight.SemiBold,
-        color = WearColors.OnSurface,
-      )
-      Text(
-        text = stringResource(R.string.discarded_notes_hint),
-        style = RowSubtitleStyle,
-        color = WearColors.OnSurfaceVariant,
-      )
-    }
+    Text(text = pluralStringResource(R.plurals.discarded_notes_title, count, count))
   }
 }
 
+/** Avís que no es pot tocar: una `TitleCard` nativa amb la icona, el títol i l'antiguitat de les dades. */
 @Composable
 private fun PhoneOfflineBanner(
   dataAgeMinutes: Int,
   modifier: Modifier = Modifier,
+  transformation: SurfaceTransformation? = null,
 ) {
-  Row(
-    modifier =
-      modifier
-        .fillMaxWidth()
-        .heightIn(min = 48.dp)
-        .clip(RoundedCornerShape(24.dp))
-        .background(WearColors.SurfaceCardHigh)
-        .padding(horizontal = 14.dp, vertical = 6.dp),
-    horizontalArrangement = Arrangement.spacedBy(10.dp),
-    verticalAlignment = Alignment.CenterVertically,
+  TitleCard(
+    modifier = modifier.fillMaxWidth(),
+    transformation = transformation,
+    title = {
+      Icon(
+        Icons.Rounded.PhonelinkOff,
+        contentDescription = null,
+        modifier = Modifier.padding(end = 4.dp).size(18.dp),
+      )
+      Text(text = stringResource(R.string.phone_not_connected))
+    },
   ) {
-    Icon(
-      Icons.Rounded.PhonelinkOff,
-      contentDescription = null,
-      tint = WearColors.OnSurfaceVariant,
-      modifier = Modifier.size(22.dp),
+    Text(
+      text =
+        when {
+          dataAgeMinutes < 1 -> stringResource(R.string.data_just_now)
+          dataAgeMinutes < 60 -> stringResource(R.string.data_from_minutes, dataAgeMinutes)
+          else -> stringResource(R.string.data_from_hours, dataAgeMinutes / 60)
+        },
     )
-    Column {
-      Text(
-        text = stringResource(R.string.phone_not_connected),
-        fontSize = 13.sp,
-        lineHeight = 18.sp,
-        fontWeight = FontWeight.SemiBold,
-        color = WearColors.OnSurface,
-      )
-      Text(
-        text =
-          when {
-            dataAgeMinutes < 1 -> stringResource(R.string.data_just_now)
-            dataAgeMinutes < 60 -> stringResource(R.string.data_from_minutes, dataAgeMinutes)
-            else -> stringResource(R.string.data_from_hours, dataAgeMinutes / 60)
-          },
-        style = RowSubtitleStyle,
-        color = WearColors.OnSurfaceVariant,
-      )
-    }
   }
 }
 
@@ -206,6 +157,21 @@ internal val SamplePeople =
 @WearScreenPreviews
 @Composable
 fun PeoplePreview() = WearPreview { PeopleContent(people = SamplePeople, onPersonClick = {}) }
+
+/** Play va rebutjar l'app per un nom llarg tallat a la vora rodona: aquesta captura ho vigila. */
+@WearScreenPreviews
+@Composable
+fun PeopleLongNamePreview() =
+  WearPreview {
+    PeopleContent(
+      people =
+        listOf(
+          PersonItem(1, "Maria Antònia Fontcuberta", "MF", AvatarColor.Sky, AvatarShape.Cookie9Sided, "Fa 2 h", false),
+          PersonItem(2, "Bartomeu Puigdollers", "BP", AvatarColor.Lavender, AvatarShape.Clover4Leaf, null, true),
+        ),
+      onPersonClick = {},
+    )
+  }
 
 @WearScreenPreviews
 @Composable
