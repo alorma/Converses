@@ -26,6 +26,9 @@ sealed interface ContactsSettingsState {
 
   /** Sense permís després d'haver-lo demanat. */
   data object Denied : ContactsSettingsState
+
+  /** Funció oberta però sense Pro (`ContactLinkFeature` a `FeatureState.Locked`); fins al paywall, no fa res. */
+  data object Locked : ContactsSettingsState
 }
 
 class SettingsViewModel(

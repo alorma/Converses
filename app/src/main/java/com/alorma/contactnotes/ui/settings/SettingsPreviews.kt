@@ -113,6 +113,13 @@ internal fun SettingsContactsOnPreview() {
   SettingsContactsPreview(ContactsSettingsState.On(linkedCount = 3))
 }
 
+/** Contactes: funció oberta sense Pro (5h, gratuït). */
+@Preview
+@Composable
+internal fun SettingsContactsLockedPreview() {
+  SettingsContactsPreview(ContactsSettingsState.Locked)
+}
+
 /** Contactes: permís denegat. */
 @Preview
 @Composable

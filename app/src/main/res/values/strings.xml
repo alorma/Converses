@@ -4,6 +4,8 @@
     <string name="people_title">Converses</string>
     <string name="beta_badge" translatable="false">BETA</string>
     <string name="beta_description">Beta version</string>
+    <string name="pro_badge" translatable="false">PRO</string>
+    <string name="pro_description">Pro feature</string>
     <plurals name="people_count">
         <item quantity="one">%d person</item>
         <item quantity="other">%d people</item>

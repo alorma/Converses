@@ -12,6 +12,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -54,6 +55,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
@@ -78,14 +80,17 @@ import com.alorma.compose.settings.ui.expressive.SettingsGroup
 import com.alorma.contactnotes.R
 import com.alorma.contactnotes.data.contacts.ContactsPermission
 import com.alorma.contactnotes.data.flags.ContactLinkFeature
+import com.alorma.contactnotes.data.flags.FeatureState
 import com.alorma.contactnotes.data.flags.PersonColorFeature
 import com.alorma.contactnotes.data.flags.rememberFeatureEnabled
+import com.alorma.contactnotes.data.flags.rememberFeatureState
 import com.alorma.contactnotes.data.settings.AppLockManager
 import com.alorma.contactnotes.data.settings.AppSettings
 import com.alorma.contactnotes.data.wear.WearLink
 import com.alorma.contactnotes.designsystem.components.ConversesToggleGroup
 import com.alorma.contactnotes.designsystem.components.ConversesTopBar
 import com.alorma.contactnotes.designsystem.components.GroupedListDefaults
+import com.alorma.contactnotes.designsystem.components.ProBadge
 import com.alorma.contactnotes.designsystem.components.SettingRow
 import com.alorma.contactnotes.designsystem.components.SettingSwitchRow
 import com.alorma.contactnotes.designsystem.components.ToggleOption
@@ -146,7 +151,12 @@ fun SettingsScreen(
 
   SettingsContent(
     settings = settings,
-    contacts = if (rememberFeatureEnabled<ContactLinkFeature>()) contactsState else null,
+    contacts =
+      when (rememberFeatureState<ContactLinkFeature>()) {
+        FeatureState.Hidden -> null
+        FeatureState.Locked -> ContactsSettingsState.Locked
+        FeatureState.Unlocked -> contactsState
+      },
     onContactsExplainContinue = {
       viewModel.onContactsExplained()
       requestContacts.launch(ContactsPermission.permissions)
@@ -590,10 +600,25 @@ private fun ContactsSection(
   onAllow: () -> Unit,
 ) {
   SettingsGroup(
-    title = { SectionTitle(stringResource(R.string.settings_contacts)) },
+    title = {
+      Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+        SectionTitle(stringResource(R.string.settings_contacts))
+        ProBadge(
+          text = stringResource(R.string.pro_badge),
+          contentDescription = stringResource(R.string.pro_description),
+        )
+      }
+    },
     verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap),
   ) {
     when (state) {
+      ContactsSettingsState.Locked ->
+        SettingRow(
+          title = stringResource(R.string.settings_contacts_link),
+          subtitle = stringResource(R.string.settings_contacts_on_summary),
+          icon = Icons.Rounded.Contacts,
+          shape = groupedItemShape(0, 1),
+        )
       ContactsSettingsState.NeverOn ->
         SettingRow(
           title = stringResource(R.string.settings_contacts_link),
@@ -627,12 +652,15 @@ private fun ContactsSection(
         )
     }
   }
-  Text(
-    text = stringResource(R.string.settings_contacts_note),
-    style = MaterialTheme.typography.bodySmall,
-    color = MaterialTheme.colorScheme.onSurfaceVariant,
-    modifier = Modifier.padding(horizontal = 4.dp),
-  )
+  // Bloquejada (5h, gratuït) no porta la nota
+  if (state != ContactsSettingsState.Locked) {
+    Text(
+      text = stringResource(R.string.settings_contacts_note),
+      style = MaterialTheme.typography.bodySmall,
+      color = MaterialTheme.colorScheme.onSurfaceVariant,
+      modifier = Modifier.padding(horizontal = 4.dp),
+    )
+  }
 }
 
 private fun Context.openNotificationSettings() {

@@ -20,6 +20,7 @@ import androidx.compose.material.icons.rounded.SouthWest
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -39,6 +40,17 @@ internal fun AvatarPreview() {
       Avatar(initials = "LF", shape = AvatarShape.Clover8Leaf, color = AvatarColor.Peach)
       Avatar(initials = "PV", shape = AvatarShape.Sunny, color = AvatarColor.Sky)
       Avatar(initials = "LR", shape = AvatarShape.Cookie9Sided, color = AvatarColor.Rose, locked = true)
+    }
+  }
+}
+
+@Preview
+@Composable
+internal fun ProBadgePreview() {
+  ConversesPreviewSurface {
+    Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+      Text("Contacts", style = MaterialTheme.typography.titleSmall)
+      ProBadge(text = "PRO", contentDescription = "Pro feature")
     }
   }
 }

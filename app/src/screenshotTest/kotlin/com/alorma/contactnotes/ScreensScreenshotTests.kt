@@ -55,6 +55,7 @@ import com.alorma.contactnotes.ui.person.PersonLockedNoCredentialsPreview
 import com.alorma.contactnotes.ui.person.PersonLockedWaitingPreview
 import com.alorma.contactnotes.ui.settings.SettingsAppLockPreview
 import com.alorma.contactnotes.ui.settings.SettingsContactsDeniedPreview
+import com.alorma.contactnotes.ui.settings.SettingsContactsLockedPreview
 import com.alorma.contactnotes.ui.settings.SettingsContactsNeverOnPreview
 import com.alorma.contactnotes.ui.settings.SettingsContactsOnPreview
 import com.alorma.contactnotes.ui.settings.SettingsNoLockPreview
@@ -391,6 +392,13 @@ class ScreensScreenshotTests {
   @Composable
   fun settingsContactsOn() {
     SettingsContactsOnPreview()
+  }
+
+  @TallScreenPreviews
+  @PreviewTest
+  @Composable
+  fun settingsContactsLocked() {
+    SettingsContactsLockedPreview()
   }
 
   @TallScreenPreviews
