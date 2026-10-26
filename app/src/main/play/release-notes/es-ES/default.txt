@@ -1,4 +1,2 @@
-Versión 1.7.7:
-• Converses ya coge texto de otras apps: compártelo, o selecciónalo y toca «Guardar en Converses». Hasta ahora te hacía reescribirlo todo, y no estamos orgullosos.
-• ¿Mensajes que solo se pueden copiar? Pégalos desde la nota rápida. Solo leemos el portapapeles cuando tocas.
-• Unas cuantas correcciones pequeñas que no notarás, que es justo la gracia.
+Versión 1.7.9:
+• Unas cuantas correcciones pequeñas y mucho trabajo interno que no notarás, que es justo la gracia.

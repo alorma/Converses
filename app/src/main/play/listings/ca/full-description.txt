@@ -12,7 +12,7 @@ RÀPID DE FER
 • Edita o esborra qualsevol entrada, amb opció de desfer si te'n penedeixes.
 
 PRIVADA PER DISSENY
-• Tot es queda al teu dispositiu i al rellotge emparellat. L'app no té accés a internet, ni comptes, ni anuncis, ni seguiment.
+• Les notes i les persones es queden al teu dispositiu i al rellotge emparellat: no surten mai a internet. Sense comptes, ni anuncis, ni seguiment.
 • Protegeix les persones sensibles amb l'empremta, la cara o el bloqueig de pantalla. Les seves notes queden amagades fins que les desbloquegis i es bloquegen les captures de pantalla.
 • Les teves notes queden excloses de les còpies de seguretat al núvol.
 • Exporta les notes d'una persona com a text pla quan vulguis i comparteix-les amb l'app que triïs.

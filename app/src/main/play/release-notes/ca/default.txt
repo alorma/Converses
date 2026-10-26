@@ -1,4 +1,2 @@
-Versió 1.7.7:
-• Converses ja agafa text d'altres apps: comparteix-lo o selecciona'l i toca «Desa a Converses». Fins ara t'ho feia reescriure tot, i no n'estem orgullosos.
-• Missatges que només es poden copiar? Enganxa'ls des de la nota ràpida. Només llegim el porta-retalls quan ho toques.
-• Unes quantes correccions petites que no notaràs, que és justament la gràcia.
+Versió 1.7.9:
+• Unes quantes correccions petites i molta feina interna que no notaràs, que és justament la gràcia.

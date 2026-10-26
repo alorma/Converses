@@ -46,7 +46,7 @@ Dues dimensions independents per a cada funció Pro:
 
 RevenueCat (26-10-2026): entitlement `converses_pro`, producte `lifetime` (Test Store fet; Play Store pendent de pujar una build amb `BILLING` per poder-lo crear a Play Console), offering `default`. Claus a `local.properties` i secrets de GitHub: `REVENUECAT_TEST_API_KEY` (debug, Test Store) i `REVENUECAT_GOOGLE_API_KEY` (release). L'SDK va també a la release: la fitxa de Play deixa de poder dir «sense internet».
 
-- [ ] SDK 10.29.0 i claus a `BuildConfig`; configurat anònim quan el fil principal queda lliure (al `onCreate` afegia ~400 ms a l'arrencada), i sense clau no es configura; manifest, builds i emulador
+- [x] SDK 10.29.0 i claus a `BuildConfig`; configurat anònim quan el fil principal queda lliure (al `onCreate` afegia ~400 ms a l'arrencada), i sense clau no es configura; manifest, builds i emulador — `c8a59ce`
 - [ ] `RevenueCatProDataSource`: listener de `CustomerInfo`, entitlement `converses_pro`, memòria cau sense connexió; ha de suportar que l'SDK encara no estigui configurat; tests de JVM
 - [ ] Preu de l'offering, compra i restauració a `ProRepository`, amb els estats (pendent, error, cancel·lació, sense connexió, restaurar amb i sense compra); tests de JVM
 - [ ] Reemborsament o revocació: es perd Pro i no s'esborren dades; test de JVM

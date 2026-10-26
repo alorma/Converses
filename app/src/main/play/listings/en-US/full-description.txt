@@ -12,7 +12,7 @@ QUICK TO CAPTURE
 • Edit or delete any entry, with undo if you change your mind.
 
 PRIVATE BY DESIGN
-• Everything stays on your device and your paired watch. The app has no internet access, no accounts, no ads and no tracking.
+• Your notes and the people in them stay on your device and your paired watch: they never go online. No accounts, no ads and no tracking.
 • Protect sensitive people with your fingerprint, face or screen lock. Their notes stay hidden until you unlock them, and screenshots are blocked.
 • Your notes are excluded from cloud backups.
 • Export a person's notes as plain text whenever you want, and share them with the app you choose.

@@ -1,4 +1,2 @@
-Version 1.7.7:
-• Converses now takes text from other apps: share it, or select it and tap "Save to Converses". Until now it made you retype everything, and we're not proud of that.
-• Messages you can only copy? Paste them from the quick note. We only read the clipboard when you tap.
-• A few small fixes you won't notice, which is exactly the point.
+Version 1.7.9:
+• A few small fixes and a lot of internal work you won't notice, which is exactly the point.
