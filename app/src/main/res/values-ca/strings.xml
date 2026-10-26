@@ -315,4 +315,6 @@
     <string name="paywall_pending">La compra està pendent. Pro s\'activarà quan es confirmi.</string>
     <string name="paywall_failed">No s\'ha pogut completar la compra.</string>
     <string name="paywall_nothing_to_restore">No hi ha cap compra per restaurar en aquest compte de Google.</string>
+    <string name="settings_pro_summary">Un sol pagament: canals propis, pendents, contactes i més</string>
+    <string name="settings_pro_owned_summary">Activat · gràcies pel suport</string>
 </resources>

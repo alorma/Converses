@@ -116,7 +116,7 @@ fun AppNavigation(
             PaywallScreen(highlight = route.highlight, onClose = { navigation.pop() })
           }
           entry<SettingsRoute> {
-            SettingsScreen(onBack = { navigation.pop() })
+            SettingsScreen(onBack = { navigation.pop() }, onOpenPro = { navigation.navigate(PaywallRoute()) })
           }
           entry<PersonLockedRoute> { route ->
             PersonLockedScreen(

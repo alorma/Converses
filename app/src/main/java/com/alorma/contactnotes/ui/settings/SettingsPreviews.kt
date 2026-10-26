@@ -10,6 +10,7 @@ import com.alorma.contactnotes.designsystem.preview.ConversesPreviewTheme
 private fun SettingsPreview(
   settings: AppSettings,
   canUnlock: Boolean,
+  isPro: Boolean = false,
 ) {
   ConversesPreviewTheme {
     SettingsContent(
@@ -28,8 +29,16 @@ private fun SettingsPreview(
       onOpenSecuritySetup = {},
       onOpenPrivacyPolicy = {},
       onOpenFeedback = {},
+      isPro = isPro,
     )
   }
+}
+
+/** Amb Pro: la targeta de dalt és normal i diu «Activat» (1c). */
+@Preview
+@Composable
+internal fun SettingsProPreview() {
+  SettingsPreview(settings = AppSettings(), canUnlock = true, isPro = true)
 }
 
 /** Color dinàmic apagat (tema Grafit), bloqueig de l'app activat i «Torna a bloquejar». */
@@ -100,6 +109,8 @@ private fun SettingsContactsPreview(
       onOpenFeedback = {},
       contacts = contacts,
       personColor = personColor,
+      // Contactes fora de `Locked` vol dir que ja és Pro
+      isPro = contacts != ContactsSettingsState.Locked,
     )
   }
 }

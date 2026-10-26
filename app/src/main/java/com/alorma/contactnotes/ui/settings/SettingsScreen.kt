@@ -9,6 +9,7 @@ import android.os.Build
 import android.provider.Settings
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,12 +17,17 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
+import androidx.compose.material.icons.automirrored.rounded.KeyboardArrowRight
 import androidx.compose.material.icons.automirrored.rounded.OpenInNew
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Mail
@@ -39,6 +45,7 @@ import androidx.compose.material.icons.rounded.Palette
 import androidx.compose.material.icons.rounded.Timer
 import androidx.compose.material.icons.rounded.UnfoldMore
 import androidx.compose.material.icons.rounded.Vibration
+import androidx.compose.material.icons.rounded.WorkspacePremium
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.FilledTonalButton
@@ -83,6 +90,7 @@ import com.alorma.contactnotes.data.flags.ContactLinkFeature
 import com.alorma.contactnotes.data.flags.FeatureState
 import com.alorma.contactnotes.data.flags.PersonColorFeature
 import com.alorma.contactnotes.data.flags.rememberFeatureState
+import com.alorma.contactnotes.data.pro.ProRepository
 import com.alorma.contactnotes.data.settings.AppLockManager
 import com.alorma.contactnotes.data.settings.AppSettings
 import com.alorma.contactnotes.data.wear.WearLink
@@ -112,10 +120,13 @@ private val RelockOptions = listOf(0, 60, 300)
 @Composable
 fun SettingsScreen(
   onBack: () -> Unit,
+  onOpenPro: () -> Unit,
   viewModel: SettingsViewModel = koinViewModel(),
   appLock: AppLockManager = koinInject(),
+  pro: ProRepository = koinInject(),
 ) {
   val settings by viewModel.settings.collectAsStateWithLifecycle()
+  val isPro by pro.isPro.collectAsStateWithLifecycle()
   val context = LocalContext.current
   val activity = context as FragmentActivity
   var canUnlock by remember { mutableStateOf(activity.canUnlockWithDevice()) }
@@ -151,6 +162,8 @@ fun SettingsScreen(
 
   SettingsContent(
     settings = settings,
+    isPro = isPro,
+    onOpenPro = onOpenPro,
     contacts =
       when (rememberFeatureState<ContactLinkFeature>()) {
         FeatureState.Hidden -> null
@@ -224,6 +237,9 @@ fun SettingsContent(
   contacts: ContactsSettingsState? = null,
   onContactsExplainContinue: () -> Unit = {},
   onContactsAllow: () -> Unit = {},
+  /** `null`: sense la targeta de Pro (previews antigues). */
+  isPro: Boolean? = null,
+  onOpenPro: () -> Unit = {},
 ) {
   var showContactsExplain by rememberSaveable { mutableStateOf(false) }
   val scrollBehavior = rememberTopBarScrollBehavior()
@@ -253,6 +269,7 @@ fun SettingsContent(
           .padding(horizontal = 16.dp),
       verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
+      isPro?.let { ProCard(isPro = it, onClick = onOpenPro) }
       SettingsGroup(
         title = { SectionTitle(stringResource(R.string.settings_appearance)) },
         verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap),
@@ -694,5 +711,42 @@ private fun Context.openNotificationSettings() {
     startActivity(intent)
   } catch (_: ActivityNotFoundException) {
     // Sense pantalla d'ajustos de notificacions: no hi ha res més a fer
+  }
+}
+
+/** Targeta de Pro a dalt d'Ajustos (1c): destacada sense Pro, normal amb Pro; totes dues porten a la pantalla de Pro. */
+@Composable
+private fun ProCard(
+  isPro: Boolean,
+  onClick: () -> Unit,
+) {
+  val scheme = MaterialTheme.colorScheme
+  Surface(
+    onClick = onClick,
+    shape = RoundedCornerShape(GroupedListDefaults.OuterCorner),
+    color = if (isPro) GroupedListDefaults.containerColor else scheme.primaryContainer,
+    contentColor = if (isPro) scheme.onSurface else scheme.onPrimaryContainer,
+    modifier = Modifier.fillMaxWidth(),
+  ) {
+    Row(
+      modifier = Modifier.heightIn(min = 80.dp).padding(start = 14.dp, end = 16.dp, top = 14.dp, bottom = 14.dp),
+      verticalAlignment = Alignment.CenterVertically,
+      horizontalArrangement = Arrangement.spacedBy(14.dp),
+    ) {
+      Box(
+        modifier = Modifier.size(44.dp).background(scheme.primary, CircleShape),
+        contentAlignment = Alignment.Center,
+      ) {
+        Icon(Icons.Rounded.WorkspacePremium, contentDescription = null, tint = scheme.onPrimary)
+      }
+      Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(3.dp)) {
+        Text(stringResource(R.string.paywall_title), fontSize = 17.sp, fontWeight = FontWeight.ExtraBold)
+        Text(
+          text = stringResource(if (isPro) R.string.settings_pro_owned_summary else R.string.settings_pro_summary),
+          style = MaterialTheme.typography.bodySmall,
+        )
+      }
+      Icon(Icons.AutoMirrored.Rounded.KeyboardArrowRight, contentDescription = null)
+    }
   }
 }

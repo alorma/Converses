@@ -65,6 +65,7 @@ import com.alorma.contactnotes.ui.settings.SettingsContactsLockedPreview
 import com.alorma.contactnotes.ui.settings.SettingsContactsNeverOnPreview
 import com.alorma.contactnotes.ui.settings.SettingsContactsOnPreview
 import com.alorma.contactnotes.ui.settings.SettingsNoLockPreview
+import com.alorma.contactnotes.ui.settings.SettingsProPreview
 import com.alorma.contactnotes.ui.watchinstall.WatchInstallFinishPreview
 import com.alorma.contactnotes.ui.watchinstall.WatchInstallProposePreview
 import com.android.tools.screenshot.PreviewTest
@@ -413,6 +414,13 @@ class ScreensScreenshotTests {
   @Composable
   fun paywallOwned() {
     PaywallOwnedPreview()
+  }
+
+  @ScreenPreviews
+  @PreviewTest
+  @Composable
+  fun settingsPro() {
+    SettingsProPreview()
   }
 
   @ScreenPreviews

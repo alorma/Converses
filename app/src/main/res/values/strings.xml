@@ -319,4 +319,6 @@
     <string name="paywall_pending">Your purchase is pending. Pro will turn on once it\'s confirmed.</string>
     <string name="paywall_failed">The purchase couldn\'t be completed.</string>
     <string name="paywall_nothing_to_restore">There\'s no purchase to restore on this Google account.</string>
+    <string name="settings_pro_summary">One payment: custom channels, follow-ups, contacts and more</string>
+    <string name="settings_pro_owned_summary">Active · thanks for your support</string>
 </resources>
