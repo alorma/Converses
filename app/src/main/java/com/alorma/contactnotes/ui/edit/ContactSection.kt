@@ -65,6 +65,28 @@ internal fun ContactSectionRow(
 ) {
   when (section) {
     ContactSection.Hidden -> Unit
+    // Sense acció fins que hi hagi paywall (`docs/pro/fases.md`, fase 3)
+    ContactSection.Locked ->
+      Surface(
+        shape = MaterialTheme.shapes.large,
+        color = GroupedListDefaults.containerColor,
+        modifier = modifier.fillMaxWidth(),
+      ) {
+        ContactRowLayout(icon = Icons.Rounded.PersonAdd) {
+          Column(modifier = Modifier.weight(1f).semantics(mergeDescendants = true) {}) {
+            Text(
+              stringResource(R.string.contact_link),
+              style = MaterialTheme.typography.titleMedium,
+              fontWeight = FontWeight.Bold,
+            )
+            Text(
+              stringResource(R.string.contact_link_summary),
+              style = MaterialTheme.typography.bodyMedium,
+              color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+          }
+        }
+      }
     ContactSection.NotLinked, ContactSection.Taken ->
       Surface(
         onClick = onLink,

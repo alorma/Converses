@@ -46,6 +46,9 @@ sealed interface ContactSection {
   /** Flag apagat: no es veu res. */
   data object Hidden : ContactSection
 
+  /** Flag obert sense Pro: fila amb l'etiqueta PRO i sense acció fins al paywall. */
+  data object Locked : ContactSection
+
   data object NotLinked : ContactSection
 
   /**
@@ -68,6 +71,8 @@ enum class ContactLinkStep { Explain, RequestPermission, Pick }
 
 data class ContactLinkState(
   val enabled: Boolean = false,
+  /** Flag obert sense Pro: la fila surt amb l'etiqueta PRO i el vincle que hi hagi es conserva però no es mostra. */
+  val locked: Boolean = false,
   val permissionGranted: Boolean = false,
   val explained: Boolean = false,
   val linked: LinkedContact? = null,
@@ -76,6 +81,7 @@ data class ContactLinkState(
   val section: ContactSection
     get() =
       when {
+        locked -> ContactSection.Locked
         !enabled -> ContactSection.Hidden
         linked != null -> ContactSection.Linked(linked.name)
         explained && !permissionGranted -> ContactSection.NoPermission
@@ -179,6 +185,7 @@ class EditPersonViewModel(
         contact =
           ContactLinkState(
             enabled = contactLink.isEnabled(),
+            locked = contactLink.state() == FeatureState.Locked,
             permissionGranted = contactsPermission.isGranted(),
           ),
       ),
@@ -192,7 +199,10 @@ class EditPersonViewModel(
       contactLink.observeState().collect { feature ->
         val enabled = feature == FeatureState.Unlocked
         val explained = enabled && settings.settings.first().contactsExplained
-        _state.update { it.copy(contact = it.contact.copy(enabled = enabled, explained = explained)) }
+        val locked = feature == FeatureState.Locked
+        _state.update {
+          it.copy(contact = it.contact.copy(enabled = enabled, locked = locked, explained = explained))
+        }
       }
     }
   }

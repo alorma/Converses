@@ -100,6 +100,7 @@ import com.alorma.contactnotes.designsystem.components.ConversesSaveButton
 import com.alorma.contactnotes.designsystem.components.ConversesSwitch
 import com.alorma.contactnotes.designsystem.components.ConversesTopBar
 import com.alorma.contactnotes.designsystem.components.GroupedListDefaults
+import com.alorma.contactnotes.designsystem.components.ProBadge
 import com.alorma.contactnotes.designsystem.components.asShape
 import com.alorma.contactnotes.designsystem.components.groupedItemShape
 import com.alorma.contactnotes.designsystem.components.rememberConversesHaptics
@@ -290,7 +291,7 @@ fun EditPersonContent(
 
         val contactSection = state.contact.section
         if (contactSection != ContactSection.Hidden) {
-          SectionHeader(title = stringResource(R.string.contact_section))
+          SectionHeader(title = stringResource(R.string.contact_section), pro = true)
           ContactSectionRow(
             section = contactSection,
             onLink = {
@@ -391,14 +392,25 @@ fun EditPersonContent(
 }
 
 @Composable
-private fun SectionHeader(title: String) {
-  Text(
-    text = title,
-    style = MaterialTheme.typography.titleMedium,
-    fontWeight = FontWeight.Bold,
-    color = MaterialTheme.colorScheme.onSurfaceVariant,
+private fun SectionHeader(
+  title: String,
+  pro: Boolean = false,
+) {
+  Row(
     modifier = Modifier.fillMaxWidth().padding(start = 4.dp, top = 8.dp),
-  )
+    horizontalArrangement = Arrangement.spacedBy(8.dp),
+    verticalAlignment = Alignment.CenterVertically,
+  ) {
+    Text(
+      text = title,
+      style = MaterialTheme.typography.titleMedium,
+      fontWeight = FontWeight.Bold,
+      color = MaterialTheme.colorScheme.onSurfaceVariant,
+    )
+    if (pro) {
+      ProBadge(text = stringResource(R.string.pro_badge), contentDescription = stringResource(R.string.pro_description))
+    }
+  }
 }
 
 @Composable

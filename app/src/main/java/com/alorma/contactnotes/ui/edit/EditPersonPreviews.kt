@@ -208,6 +208,13 @@ internal fun EditPersonContactTakenPreview() {
   )
 }
 
+/** Flag obert sense Pro: fila amb PRO i sense acció. */
+@Preview
+@Composable
+internal fun EditPersonContactLockedPreview() {
+  EditPersonContactPreview(ContactLinkState(locked = true))
+}
+
 @Preview
 @Composable
 internal fun EditPersonContactNoPermissionPreview() {

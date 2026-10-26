@@ -65,14 +65,36 @@ class EditPersonViewModelTest {
     enableContactLink()
     pro.setPro(false)
     val vm = viewModel()
-    assertEquals(ContactSection.Hidden, vm.state.value.contact.section)
+    assertEquals(ContactSection.Locked, vm.state.value.contact.section)
 
     pro.setPro(true)
     assertEquals(ContactSection.NotLinked, vm.state.value.contact.section)
 
     pro.setPro(false)
+    assertEquals(ContactSection.Locked, vm.state.value.contact.section)
+
+    flags.setOverride("contact_link_enabled", false)
     assertEquals(ContactSection.Hidden, vm.state.value.contact.section)
   }
+
+  @Test
+  fun withoutProALinkedPersonIsLockedAndSavingKeepsTheLink() =
+    runTest {
+      enableContactLink()
+      pro.setPro(false)
+      val person = db.addPerson("Marta Soler")
+      db.repository.linkContact(person, picked.id, picked.lookupKey, picked.name)
+      val vm = viewModel(person.id)
+      assertEquals(ContactSection.Locked, vm.state.value.contact.section)
+
+      vm.onAlias("Marta")
+      var saved = false
+      vm.save { saved = true }
+
+      assertTrue(saved)
+      assertEquals("Marta", db.repository.getPerson(person.id)?.alias)
+      assertEquals(picked.id, db.repository.getPerson(person.id)?.contactId)
+    }
 
   @Test
   fun theFirstLinkExplainsThenAsksForPermissionThenPicks() {
