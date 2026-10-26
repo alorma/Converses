@@ -40,6 +40,7 @@ uiautomator = "2.4.0"
 benchmark = "1.5.0"
 baselineprofile = "1.5.0"
 profileinstaller = "1.4.1"
+revenuecat = "10.29.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -92,6 +93,7 @@ wear-navigation3-runtime = { group = "androidx.navigation3", name = "navigation3
 wear-navigation3-ui = { group = "androidx.navigation3", name = "navigation3-ui", version.ref = "wearNavigation3" }
 wear-tooling-preview = { group = "androidx.wear", name = "wear-tooling-preview", version.ref = "wearToolingPreview" }
 play-services-wearable = { group = "com.google.android.gms", name = "play-services-wearable", version.ref = "playServicesWearable" }
+revenuecat-purchases = { group = "com.revenuecat.purchases", name = "purchases", version.ref = "revenuecat" }
 wear-remote-interactions = { group = "androidx.wear", name = "wear-remote-interactions", version.ref = "wearRemoteInteractions" }
 compose-screenshot-validation = { group = "com.android.tools.screenshot", name = "screenshot-validation-api", version.ref = "composeScreenshot" }
 

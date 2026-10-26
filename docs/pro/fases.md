@@ -44,10 +44,15 @@ Dues dimensions independents per a cada funció Pro:
 
 ## Fase 2 · RevenueCat
 
-- [ ] Instruccions de RevenueCat (clau d'API, producte, entitlement `pro`)
-- [ ] `RevenueCatProDataSource`: SDK configurat amb l'identificador anònim, listener de `CustomerInfo`, memòria cau sense connexió
-- [ ] Preu localitzat, compra i restauració, amb els estats (pendent, error, cancel·lació, sense connexió)
-- [ ] Reemborsament o revocació: es perd Pro i no s'esborren dades
+RevenueCat (26-10-2026): entitlement `converses_pro`, producte `lifetime` (Test Store fet; Play Store pendent de pujar una build amb `BILLING` per poder-lo crear a Play Console), offering `default`. Claus a `local.properties` i secrets de GitHub: `REVENUECAT_TEST_API_KEY` (debug, Test Store) i `REVENUECAT_GOOGLE_API_KEY` (release). L'SDK va també a la release: la fitxa de Play deixa de poder dir «sense internet».
+
+- [ ] SDK 10.29.0 i claus a `BuildConfig`; configurat anònim quan el fil principal queda lliure (al `onCreate` afegia ~400 ms a l'arrencada), i sense clau no es configura; manifest, builds i emulador
+- [ ] `RevenueCatProDataSource`: listener de `CustomerInfo`, entitlement `converses_pro`, memòria cau sense connexió; ha de suportar que l'SDK encara no estigui configurat; tests de JVM
+- [ ] Preu de l'offering, compra i restauració a `ProRepository`, amb els estats (pendent, error, cancel·lació, sense connexió, restaurar amb i sense compra); tests de JVM
+- [ ] Reemborsament o revocació: es perd Pro i no s'esborren dades; test de JVM
+- [ ] Debug: «Override Pro» (encès, mana «Pro user»; apagat, RevenueCat), estat de RevenueCat i compra i restauració de prova; emulador amb el Test Store
+- [ ] Fitxa de Play (en, ca, es): treure «sense accés a internet» (text revisat per Bernat)
+- [ ] `docs/pro/` al dia (entitlement `converses_pro`, override, secrets)
 
 ## Fase 3 · Paywall
 

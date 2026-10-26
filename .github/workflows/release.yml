@@ -70,6 +70,7 @@ jobs:
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+          REVENUECAT_GOOGLE_API_KEY: ${{ secrets.REVENUECAT_GOOGLE_API_KEY }}
 
       - name: Upload AAB and mapping
         # Una quota d'emmagatzematge plena no ha de bloquejar la publicació a Play (el mapping de R8 va dins l'AAB)

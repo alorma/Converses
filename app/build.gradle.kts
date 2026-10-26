@@ -1,4 +1,5 @@
 import com.android.compose.screenshot.tasks.PreviewScreenshotValidationTask
+import java.util.Properties
 
 plugins {
   alias(libs.plugins.android.application)
@@ -15,6 +16,16 @@ plugins {
 room {
   schemaDirectory("$projectDir/schemas")
 }
+
+// Claus de RevenueCat: de `local.properties` en local i de la variable d'entorn (secret del mateix nom) a la CI.
+// Si no n'hi ha cap, la clau queda buida i l'app no configura RevenueCat: ningú no és Pro
+val localProperties =
+  Properties().apply {
+    val file = rootProject.file("local.properties")
+    if (file.exists()) file.inputStream().use { load(it) }
+  }
+
+fun secret(name: String): String = System.getenv(name) ?: localProperties.getProperty(name).orEmpty()
 
 android {
   namespace = "com.alorma.contactnotes"
@@ -64,6 +75,8 @@ android {
       signingConfig = signingConfigs.getByName("debug")
       // Permet tenir instal·lades a la vegada la versió de debug i la de release
       applicationIdSuffix = ".dev"
+      // Test Store de RevenueCat: el `.dev` no és a Play, i aquesta clau no cobra mai res
+      buildConfigField("String", "REVENUECAT_API_KEY", "\"${secret("REVENUECAT_TEST_API_KEY")}\"")
     }
     release {
       optimization {
@@ -74,7 +87,11 @@ android {
         debugSymbolLevel = "SYMBOL_TABLE"
       }
       signingConfigs.findByName("release")?.let { signingConfig = it }
+      buildConfigField("String", "REVENUECAT_API_KEY", "\"${secret("REVENUECAT_GOOGLE_API_KEY")}\"")
     }
+  }
+  buildFeatures {
+    buildConfig = true
   }
   testOptions {
     // Els tests de ViewModel construeixen classes que reben un `Context` que no arriben a fer servir
@@ -129,6 +146,7 @@ dependencies {
   implementation(libs.kotlinx.coroutines.android)
   implementation(libs.kotlinx.coroutines.play.services)
   implementation(libs.play.services.wearable)
+  implementation(libs.revenuecat.purchases)
   implementation(libs.wear.remote.interactions)
   implementation(libs.kotlinx.coroutines.guava)
   implementation(libs.androidx.lifecycle.runtime.compose)
