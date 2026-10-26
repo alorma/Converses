@@ -298,4 +298,25 @@
     <string name="settings_contacts_on_summary">Show your notes inside each contact\'s card</string>
     <string name="settings_contacts_denied_summary">Linked people won\'t show the Contacts shortcut. No notes are lost.</string>
     <string name="settings_contacts_note">Notes aren\'t copied to Contacts: only “View notes” and “Create note” are added.</string>
+    <string name="paywall_title">Converses Pro</string>
+    <string name="paywall_subtitle">One payment. Forever.</string>
+    <string name="paywall_benefit_people">People your way</string>
+    <string name="paywall_benefit_people_summary">Avatar shape and colour, and a colour for each person</string>
+    <string name="paywall_benefit_channels">Custom channels</string>
+    <string name="paywall_benefit_channels_summary">WhatsApp, Discord… inside each group</string>
+    <string name="paywall_benefit_follow_ups">Follow-ups</string>
+    <string name="paywall_benefit_follow_ups_summary">Note what you need to do and mark it done</string>
+    <string name="paywall_benefit_contacts">Contacts link</string>
+    <string name="paywall_benefit_contacts_summary">Your notes on the contact\'s card</string>
+    <string name="paywall_note">No subscription and no account. Your notes stay on your phone.</string>
+    <string name="paywall_buy">Get Pro · %s</string>
+    <string name="paywall_buy_offline">You need a connection to buy.</string>
+    <string name="paywall_restore">Restore purchase</string>
+    <string name="paywall_privacy">Privacy</string>
+    <string name="paywall_owned_title">You have Pro</string>
+    <string name="paywall_owned_subtitle">Thanks for supporting Converses. All of this is yours now.</string>
+    <string name="paywall_owned_done">Let\'s go</string>
+    <string name="paywall_pending">Your purchase is pending. Pro will turn on once it\'s confirmed.</string>
+    <string name="paywall_failed">The purchase couldn\'t be completed.</string>
+    <string name="paywall_nothing_to_restore">There\'s no purchase to restore on this Google account.</string>
 </resources>

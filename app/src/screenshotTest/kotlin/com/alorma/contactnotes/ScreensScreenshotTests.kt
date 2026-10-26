@@ -36,6 +36,10 @@ import com.alorma.contactnotes.ui.navigation.AppShellPeoplePreview
 import com.alorma.contactnotes.ui.onboarding.OnboardingStep1Preview
 import com.alorma.contactnotes.ui.onboarding.OnboardingStep2Preview
 import com.alorma.contactnotes.ui.onboarding.OnboardingStep3Preview
+import com.alorma.contactnotes.ui.paywall.PaywallFromContactsPreview
+import com.alorma.contactnotes.ui.paywall.PaywallOfflinePreview
+import com.alorma.contactnotes.ui.paywall.PaywallOwnedPreview
+import com.alorma.contactnotes.ui.paywall.PaywallPreview
 import com.alorma.contactnotes.ui.people.PeopleListScreenArchivedPreview
 import com.alorma.contactnotes.ui.people.PeopleListScreenEmptyPreview
 import com.alorma.contactnotes.ui.people.PeopleListScreenLoadedPreview
@@ -379,6 +383,36 @@ class ScreensScreenshotTests {
   @Composable
   fun onboardingStep3() {
     OnboardingStep3Preview()
+  }
+
+  @ScreenPreviews
+  @LocalizedScreenPreviews
+  @PreviewTest
+  @Composable
+  fun paywall() {
+    PaywallPreview()
+  }
+
+  @ScreenPreviews
+  @PreviewTest
+  @Composable
+  fun paywallFromContacts() {
+    PaywallFromContactsPreview()
+  }
+
+  @ScreenPreviews
+  @PreviewTest
+  @Composable
+  fun paywallOffline() {
+    PaywallOfflinePreview()
+  }
+
+  @ScreenPreviews
+  @LocalizedScreenPreviews
+  @PreviewTest
+  @Composable
+  fun paywallOwned() {
+    PaywallOwnedPreview()
   }
 
   @ScreenPreviews

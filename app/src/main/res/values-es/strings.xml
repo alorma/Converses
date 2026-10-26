@@ -294,4 +294,25 @@
     <string name="settings_contacts_on_summary">Muestra tus notas dentro de la ficha de cada contacto</string>
     <string name="settings_contacts_denied_summary">Las personas vinculadas no muestran el acceso a Contactos. No se pierden notas.</string>
     <string name="settings_contacts_note">Las notas no se copian a Contactos: solo se añaden «Ver notas» y «Crear nota».</string>
+    <string name="paywall_title">Converses Pro</string>
+    <string name="paywall_subtitle">Un solo pago. Para siempre.</string>
+    <string name="paywall_benefit_people">Personas a tu manera</string>
+    <string name="paywall_benefit_people_summary">Forma y color del avatar, y un color para cada persona</string>
+    <string name="paywall_benefit_channels">Canales propios</string>
+    <string name="paywall_benefit_channels_summary">WhatsApp, Discord… dentro de cada grupo</string>
+    <string name="paywall_benefit_follow_ups">Pendientes</string>
+    <string name="paywall_benefit_follow_ups_summary">Apunta lo que tienes que hacer y márcalo como hecho</string>
+    <string name="paywall_benefit_contacts">Vínculo con Contactos</string>
+    <string name="paywall_benefit_contacts_summary">Tus notas en la ficha del contacto</string>
+    <string name="paywall_note">Sin suscripción y sin cuenta. Tus notas se quedan en el móvil.</string>
+    <string name="paywall_buy">Consigue Pro · %s</string>
+    <string name="paywall_buy_offline">Necesitas conexión para comprar.</string>
+    <string name="paywall_restore">Restaurar la compra</string>
+    <string name="paywall_privacy">Privacidad</string>
+    <string name="paywall_owned_title">Ya tienes Pro</string>
+    <string name="paywall_owned_subtitle">Gracias por apoyar Converses. Todo esto ya es tuyo.</string>
+    <string name="paywall_owned_done">Vamos</string>
+    <string name="paywall_pending">La compra está pendiente. Pro se activará cuando se confirme.</string>
+    <string name="paywall_failed">No se ha podido completar la compra.</string>
+    <string name="paywall_nothing_to_restore">No hay ninguna compra que restaurar en esta cuenta de Google.</string>
 </resources>

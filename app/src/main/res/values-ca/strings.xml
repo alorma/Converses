@@ -294,4 +294,25 @@
     <string name="settings_contacts_on_summary">Mostra les teves notes dins de la fitxa de cada contacte</string>
     <string name="settings_contacts_denied_summary">Les persones vinculades no mostren l\'accés a Contactes. Les notes no es perden.</string>
     <string name="settings_contacts_note">Les notes no es copien a Contactes: només s\'hi afegeixen «Veure notes» i «Crear nota».</string>
+    <string name="paywall_title">Converses Pro</string>
+    <string name="paywall_subtitle">Un sol pagament. Per sempre.</string>
+    <string name="paywall_benefit_people">Persones a la teva manera</string>
+    <string name="paywall_benefit_people_summary">Forma i color de l\'avatar, i un color per a cada persona</string>
+    <string name="paywall_benefit_channels">Canals propis</string>
+    <string name="paywall_benefit_channels_summary">WhatsApp, Discord… dins de cada grup</string>
+    <string name="paywall_benefit_follow_ups">Pendents</string>
+    <string name="paywall_benefit_follow_ups_summary">Apunta què has de fer i marca-ho com a fet</string>
+    <string name="paywall_benefit_contacts">Vincle amb Contactes</string>
+    <string name="paywall_benefit_contacts_summary">Les teves notes a la fitxa del contacte</string>
+    <string name="paywall_note">Sense subscripció i sense compte. Les teves notes es queden al mòbil.</string>
+    <string name="paywall_buy">Aconsegueix Pro · %s</string>
+    <string name="paywall_buy_offline">Cal connexió per comprar.</string>
+    <string name="paywall_restore">Restaura la compra</string>
+    <string name="paywall_privacy">Privacitat</string>
+    <string name="paywall_owned_title">Ja tens Pro</string>
+    <string name="paywall_owned_subtitle">Gràcies per donar suport a Converses. Tot això ja és teu.</string>
+    <string name="paywall_owned_done">Som-hi</string>
+    <string name="paywall_pending">La compra està pendent. Pro s\'activarà quan es confirmi.</string>
+    <string name="paywall_failed">No s\'ha pogut completar la compra.</string>
+    <string name="paywall_nothing_to_restore">No hi ha cap compra per restaurar en aquest compte de Google.</string>
 </resources>

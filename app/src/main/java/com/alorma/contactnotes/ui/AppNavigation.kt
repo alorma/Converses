@@ -35,6 +35,7 @@ import com.alorma.contactnotes.ui.navigation.AppShell
 import com.alorma.contactnotes.ui.navigation.ArchivedRoute
 import com.alorma.contactnotes.ui.navigation.EditPersonRoute
 import com.alorma.contactnotes.ui.navigation.OnboardingRoute
+import com.alorma.contactnotes.ui.navigation.PaywallRoute
 import com.alorma.contactnotes.ui.navigation.PeopleRoute
 import com.alorma.contactnotes.ui.navigation.PersonLockedRoute
 import com.alorma.contactnotes.ui.navigation.PersonRoute
@@ -43,6 +44,7 @@ import com.alorma.contactnotes.ui.navigation.SettingsRoute
 import com.alorma.contactnotes.ui.navigation.TopLevelBackStack
 import com.alorma.contactnotes.ui.navigation.TopLevelRoute
 import com.alorma.contactnotes.ui.onboarding.OnboardingScreen
+import com.alorma.contactnotes.ui.paywall.PaywallScreen
 import com.alorma.contactnotes.ui.people.PeopleListRoute
 import com.alorma.contactnotes.ui.person.PersonDetailRoute
 import com.alorma.contactnotes.ui.person.PersonLockedScreen
@@ -109,6 +111,9 @@ fun AppNavigation(
               onClose = { if (imported) activity?.finish() else navigation.pop() },
               onNewPerson = { navigation.navigate(EditPersonRoute(returnSelection = true)) },
             )
+          }
+          entry<PaywallRoute>(metadata = modalTransitions) { route ->
+            PaywallScreen(highlight = route.highlight, onClose = { navigation.pop() })
           }
           entry<SettingsRoute> {
             SettingsScreen(onBack = { navigation.pop() })
