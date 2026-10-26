@@ -2,6 +2,7 @@ package com.alorma.contactnotes.ui.settings
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
+import com.alorma.contactnotes.data.flags.FeatureState
 import com.alorma.contactnotes.data.settings.AppSettings
 import com.alorma.contactnotes.designsystem.preview.ConversesPreviewTheme
 
@@ -76,7 +77,10 @@ internal fun SettingsWatchPreview() {
 }
 
 @Composable
-private fun SettingsContactsPreview(contacts: ContactsSettingsState) {
+private fun SettingsContactsPreview(
+  contacts: ContactsSettingsState,
+  personColor: FeatureState = FeatureState.Unlocked,
+) {
   ConversesPreviewTheme {
     SettingsContent(
       settings = AppSettings(),
@@ -95,6 +99,7 @@ private fun SettingsContactsPreview(contacts: ContactsSettingsState) {
       onOpenPrivacyPolicy = {},
       onOpenFeedback = {},
       contacts = contacts,
+      personColor = personColor,
     )
   }
 }
@@ -113,11 +118,11 @@ internal fun SettingsContactsOnPreview() {
   SettingsContactsPreview(ContactsSettingsState.On(linkedCount = 3))
 }
 
-/** Contactes: funció oberta sense Pro (5h, gratuït). */
+/** Usuari gratuït amb els flags oberts: Contactes (5h) i «Person color» bloquejats. */
 @Preview
 @Composable
 internal fun SettingsContactsLockedPreview() {
-  SettingsContactsPreview(ContactsSettingsState.Locked)
+  SettingsContactsPreview(ContactsSettingsState.Locked, personColor = FeatureState.Locked)
 }
 
 /** Contactes: permís denegat. */

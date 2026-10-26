@@ -82,11 +82,11 @@ import com.alorma.contactnotes.data.contacts.ContactsPermission
 import com.alorma.contactnotes.data.flags.ContactLinkFeature
 import com.alorma.contactnotes.data.flags.FeatureState
 import com.alorma.contactnotes.data.flags.PersonColorFeature
-import com.alorma.contactnotes.data.flags.rememberFeatureEnabled
 import com.alorma.contactnotes.data.flags.rememberFeatureState
 import com.alorma.contactnotes.data.settings.AppLockManager
 import com.alorma.contactnotes.data.settings.AppSettings
 import com.alorma.contactnotes.data.wear.WearLink
+import com.alorma.contactnotes.designsystem.components.ConversesSwitch
 import com.alorma.contactnotes.designsystem.components.ConversesToggleGroup
 import com.alorma.contactnotes.designsystem.components.ConversesTopBar
 import com.alorma.contactnotes.designsystem.components.GroupedListDefaults
@@ -176,7 +176,7 @@ fun SettingsScreen(
         context.openNotificationSettings()
       }
     },
-    showPersonColor = rememberFeatureEnabled<PersonColorFeature>(),
+    personColor = rememberFeatureState<PersonColorFeature>(),
     canUnlock = canUnlock,
     languageName = remember { currentLanguageName(context) },
     versionName = remember { versionLabel(context) },
@@ -217,7 +217,7 @@ fun SettingsContent(
   onOpenSecuritySetup: () -> Unit,
   onOpenPrivacyPolicy: () -> Unit,
   onOpenFeedback: () -> Unit,
-  showPersonColor: Boolean = true,
+  personColor: FeatureState = FeatureState.Unlocked,
   showWatchNotifications: Boolean = false,
   watchNotifications: Boolean = false,
   onWatchNotifications: (Boolean) -> Unit = {},
@@ -257,7 +257,7 @@ fun SettingsContent(
         title = { SectionTitle(stringResource(R.string.settings_appearance)) },
         verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap),
       ) {
-        val themeCount = if (showPersonColor) 3 else 2
+        val themeCount = if (personColor != FeatureState.Hidden) 3 else 2
         ThemeModeRow(
           selected = settings.themeMode,
           onSelected = onThemeMode,
@@ -271,15 +271,37 @@ fun SettingsContent(
           onCheckedChange = onDynamicColor,
           shape = groupedItemShape(1, themeCount),
         )
-        if (showPersonColor) {
-          SettingSwitchRow(
-            title = stringResource(R.string.settings_person_color),
-            subtitle = stringResource(R.string.settings_person_color_summary),
-            icon = Icons.Rounded.Face,
-            checked = settings.personColorTheme,
-            onCheckedChange = onPersonColorTheme,
-            shape = groupedItemShape(2, themeCount),
-          )
+        when (personColor) {
+          FeatureState.Hidden -> Unit
+          // Sense acció fins que hi hagi paywall (`docs/pro/fases.md`, fase 3)
+          FeatureState.Locked ->
+            SettingRow(
+              title = stringResource(R.string.settings_person_color),
+              subtitle = stringResource(R.string.settings_person_color_summary),
+              icon = Icons.Rounded.Face,
+              trailing = {
+                Row(
+                  horizontalArrangement = Arrangement.spacedBy(8.dp),
+                  verticalAlignment = Alignment.CenterVertically,
+                ) {
+                  ProBadge(
+                    text = stringResource(R.string.pro_badge),
+                    contentDescription = stringResource(R.string.pro_description),
+                  )
+                  ConversesSwitch(checked = false, onCheckedChange = null, enabled = false)
+                }
+              },
+              shape = groupedItemShape(2, themeCount),
+            )
+          FeatureState.Unlocked ->
+            SettingSwitchRow(
+              title = stringResource(R.string.settings_person_color),
+              subtitle = stringResource(R.string.settings_person_color_summary),
+              icon = Icons.Rounded.Face,
+              checked = settings.personColorTheme,
+              onCheckedChange = onPersonColorTheme,
+              shape = groupedItemShape(2, themeCount),
+            )
         }
       }
 
