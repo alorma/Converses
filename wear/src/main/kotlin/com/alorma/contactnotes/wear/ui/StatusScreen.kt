@@ -7,11 +7,8 @@ import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Check
@@ -32,13 +29,16 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.wear.compose.material3.AlertDialogContent
+import androidx.wear.compose.material3.ButtonDefaults
 import androidx.wear.compose.material3.CircularProgressIndicator
+import androidx.wear.compose.material3.EdgeButton
 import androidx.wear.compose.material3.Icon
 import androidx.wear.compose.material3.ScreenScaffold
 import androidx.wear.compose.material3.Text
+import androidx.wear.compose.material3.lazy.rememberTransformationSpec
 import com.alorma.contactnotes.wear.R
 import com.alorma.contactnotes.wear.components.CookieShape
 import com.alorma.contactnotes.wear.theme.ButtonLabelStyle
@@ -81,66 +81,70 @@ fun StatusContent(
   titleStyle: androidx.compose.ui.text.TextStyle = WhoTitleStyle,
   action: String? = null,
   actionTonal: Boolean = false,
-  compact: Boolean = false,
   onAction: () -> Unit = {},
 ) {
   // Les mides del brief són per a una pantalla de 240 dp; a Small Round (192 dp) la Galeta s'encongeix perquè hi càpiga tot
   val scale = (LocalConfiguration.current.screenHeightDp / 240f).coerceIn(0.7f, 1f)
   val cookieRotation = rememberCookieRotation()
-  ScreenScaffold(modifier = modifier) {
-    Column(
-      modifier =
-        Modifier.fillMaxSize().padding(
-          start = 12.dp + 8.dp * scale,
-          end = 12.dp + 8.dp * scale,
-          top = (if (compact) 26.dp else 38.dp) * scale,
-          bottom = if (action != null) PinnedEdgeButtonSpace else 12.dp,
+  val spec = rememberTransformationSpec()
+  val iconSlot: @Composable () -> Unit = {
+    Box(modifier = Modifier.size(cookieSize * scale * scale * 0.85f), contentAlignment = Alignment.Center) {
+      // Només gira la Galeta; la icona es queda quieta
+      Box(
+        modifier =
+          Modifier
+            .fillMaxSize()
+            .graphicsLayer { rotationZ = cookieRotation.value }
+            .clip(CookieShape)
+            .background(iconBackground),
+      )
+      Icon(
+        icon,
+        contentDescription = null,
+        tint = iconTint,
+        modifier = Modifier.size(iconSize * scale * scale * 0.85f),
+      )
+    }
+  }
+  val titleSlot: @Composable () -> Unit = {
+    Text(
+      text = title,
+      style =
+        titleStyle.copy(
+          fontSize = titleStyle.fontSize * (0.5f + 0.5f * scale),
+          lineHeight = titleStyle.lineHeight * (0.5f + 0.5f * scale),
         ),
-      horizontalAlignment = Alignment.CenterHorizontally,
-      verticalArrangement = Arrangement.spacedBy(6.dp, Alignment.CenterVertically),
-    ) {
-      val cookie = cookieSize * scale * scale * 0.85f
-      Box(modifier = Modifier.size(cookie), contentAlignment = Alignment.Center) {
-        // Només gira la Galeta; la icona es queda quieta
-        Box(
-          modifier =
-            Modifier
-              .fillMaxSize()
-              .graphicsLayer { rotationZ = cookieRotation.value }
-              .clip(CookieShape)
-              .background(iconBackground),
-        )
-        Icon(
-          icon,
-          contentDescription = null,
-          tint = iconTint,
-          modifier = Modifier.size(iconSize * scale * scale * 0.85f),
-        )
-      }
-      Text(
-        text = title,
-        style =
-          titleStyle.copy(
-            fontSize = titleStyle.fontSize * (0.5f + 0.5f * scale),
-            lineHeight =
-              titleStyle.lineHeight * (0.5f + 0.5f * scale),
-          ),
-        color = WearColors.OnSurface,
-        textAlign = TextAlign.Center,
-      )
-      Text(
-        text = subtitle,
-        style = RowSubtitleStyle,
-        color = WearColors.OnSurfaceVariant,
-        textAlign = TextAlign.Center,
-        modifier = Modifier.padding(horizontal = 16.dp),
-      )
-    }
-    if (action != null) {
-      PinnedEdgeButton(onClick = onAction, tonal = actionTonal) {
-        Text(text = action, style = ButtonLabelStyle)
-      }
-    }
+      color = WearColors.OnSurface,
+    )
+  }
+  val textSlot: @Composable () -> Unit = {
+    Text(text = subtitle, style = RowSubtitleStyle, color = WearColors.OnSurfaceVariant)
+  }
+  // `AlertDialogContent` natiu: centra el contingut, hi posa els marges de la pantalla rodona i fa scroll si no hi cap
+  if (action != null) {
+    AlertDialogContent(
+      edgeButton = {
+        EdgeButton(
+          onClick = onAction,
+          colors = if (actionTonal) ButtonDefaults.filledTonalButtonColors() else ButtonDefaults.buttonColors(),
+        ) {
+          Text(text = action, style = ButtonLabelStyle)
+        }
+      },
+      title = titleSlot,
+      transformationSpec = spec,
+      modifier = modifier,
+      icon = iconSlot,
+      text = textSlot,
+    )
+  } else {
+    AlertDialogContent(
+      title = titleSlot,
+      transformationSpec = spec,
+      modifier = modifier,
+      icon = iconSlot,
+      text = textSlot,
+    )
   }
 }
 

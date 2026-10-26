@@ -13,9 +13,8 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -42,14 +41,16 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.wear.compose.material3.EdgeButton
 import androidx.wear.compose.material3.FilledTonalIconButton
 import androidx.wear.compose.material3.Icon
-import androidx.wear.compose.material3.ScreenScaffold
+import androidx.wear.compose.material3.ListHeader
 import androidx.wear.compose.material3.Text
 import com.alorma.contactnotes.wear.R
 import com.alorma.contactnotes.wear.data.SpeechError
@@ -157,32 +158,47 @@ fun DictateContent(
   level: Float? = null,
   onRestart: (() -> Unit)? = null,
 ) {
-  ScreenScaffold(modifier = modifier) {
-    Column(
-      modifier = Modifier.fillMaxSize().padding(start = 30.dp, end = 30.dp, top = 38.dp),
-      horizontalAlignment = Alignment.CenterHorizontally,
-      verticalArrangement = Arrangement.spacedBy(8.dp),
-    ) {
-      Text(
-        text = stringResource(R.string.note_for, personName).uppercase(),
-        style = OverlineStyle,
-        color = WearColors.OnSurfaceVariant,
-      )
-      Text(text = text, style = DictationTextStyle, color = WearColors.OnSurface, textAlign = TextAlign.Center)
-    }
-    if (onRestart == null) {
-      VoiceWaves(level = level, modifier = Modifier.align(Alignment.Center).padding(top = 56.dp))
-    } else {
-      FilledTonalIconButton(
-        onClick = onRestart,
-        modifier = Modifier.align(Alignment.Center).padding(top = 72.dp).size(40.dp),
-      ) {
-        Icon(Icons.Rounded.Refresh, contentDescription = stringResource(R.string.dictate_restart))
+  // Una llista nativa: una transcripció llarga fa scroll en lloc de tallar-se per la vora rodona
+  WearListScreen(
+    modifier = modifier,
+    verticalArrangement = Arrangement.spacedBy(8.dp),
+    edgeButton = {
+      EdgeButton(onClick = onFinish) {
+        Icon(Icons.Rounded.Check, contentDescription = null, modifier = Modifier.padding(end = 6.dp))
+        Text(text = stringResource(R.string.dictate_finish), style = ButtonLabelStyle)
+      }
+    },
+  ) {
+    item {
+      ListHeader(modifier = Modifier.fillMaxWidth()) {
+        Text(
+          text = stringResource(R.string.note_for, personName).uppercase(),
+          style = OverlineStyle,
+          color = WearColors.OnSurfaceVariant,
+          maxLines = 2,
+          overflow = TextOverflow.Ellipsis,
+        )
       }
     }
-    PinnedEdgeButton(onClick = onFinish) {
-      Icon(Icons.Rounded.Check, contentDescription = null, modifier = Modifier.padding(end = 6.dp))
-      Text(text = stringResource(R.string.dictate_finish), style = ButtonLabelStyle)
+    item {
+      Text(
+        text = text,
+        style = DictationTextStyle,
+        color = WearColors.OnSurface,
+        textAlign = TextAlign.Center,
+        modifier = Modifier.fillMaxWidth(),
+      )
+    }
+    item {
+      Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+        if (onRestart == null) {
+          VoiceWaves(level = level)
+        } else {
+          FilledTonalIconButton(onClick = onRestart, modifier = Modifier.size(40.dp)) {
+            Icon(Icons.Rounded.Refresh, contentDescription = stringResource(R.string.dictate_restart))
+          }
+        }
+      }
     }
   }
 }

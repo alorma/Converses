@@ -1,37 +1,29 @@
 package com.alorma.contactnotes.wear.ui
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.RowScope
-import androidx.compose.foundation.layout.calculateEndPadding
-import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.wear.compose.foundation.lazy.TransformingLazyColumn
 import androidx.wear.compose.foundation.lazy.TransformingLazyColumnItemScope
+import androidx.wear.compose.foundation.lazy.TransformingLazyColumnScope
+import androidx.wear.compose.foundation.lazy.rememberTransformingLazyColumnState
 import androidx.wear.compose.material3.AppScaffold
-import androidx.wear.compose.material3.ButtonDefaults
-import androidx.wear.compose.material3.EdgeButton
 import androidx.wear.compose.material3.ListHeader
 import androidx.wear.compose.material3.ListHeaderDefaults
+import androidx.wear.compose.material3.ScreenScaffold
 import androidx.wear.compose.material3.Text
 import androidx.wear.compose.material3.TimeSource
 import androidx.wear.compose.material3.TimeText
@@ -84,25 +76,32 @@ internal fun WearPreview(content: @Composable () -> Unit) {
   }
 }
 
-/** Alçada que ocupa l'`EdgeButton` a baix: el contingut que hi ha a sobre ha de deixar-hi aquest marge. */
-val PinnedEdgeButtonSpace = 56.dp
-
 /**
- * Marges d'una llista: els laterals i el de dalt són els que dona `ScreenScaffold` (un percentatge de la pantalla, no
- * `dp` fixos), perquè la vora rodona no talli res a cap mida de rellotge. Play ho exigeix («Watch shapes»).
+ * Pantalla de Wear amb una llista que fa scroll: el `ScreenScaffold` natiu hi posa els marges (un percentatge de la
+ * pantalla, no `dp` fixos) i, si n'hi ha, l'`EdgeButton`. Així res no queda tallat per la vora rodona, ni amb textos
+ * llargs: Play ho exigeix («Watch shapes»).
  */
 @Composable
-fun wearListPadding(
-  scaffoldPadding: PaddingValues,
-  bottom: Dp,
-): PaddingValues {
-  val direction = LocalLayoutDirection.current
-  return PaddingValues(
-    start = scaffoldPadding.calculateStartPadding(direction),
-    end = scaffoldPadding.calculateEndPadding(direction),
-    top = scaffoldPadding.calculateTopPadding(),
-    bottom = bottom,
-  )
+fun WearListScreen(
+  modifier: Modifier = Modifier,
+  edgeButton: (@Composable BoxScope.() -> Unit)? = null,
+  verticalArrangement: Arrangement.Vertical = Arrangement.spacedBy(4.dp),
+  content: TransformingLazyColumnScope.() -> Unit,
+) {
+  val state = rememberTransformingLazyColumnState()
+  val list: @Composable BoxScope.(PaddingValues) -> Unit = { padding ->
+    TransformingLazyColumn(
+      state = state,
+      contentPadding = padding,
+      verticalArrangement = verticalArrangement,
+      content = content,
+    )
+  }
+  if (edgeButton != null) {
+    ScreenScaffold(scrollState = state, edgeButton = edgeButton, modifier = modifier, content = list)
+  } else {
+    ScreenScaffold(scrollState = state, modifier = modifier, content = list)
+  }
 }
 
 /**
@@ -138,30 +137,4 @@ fun TransformingLazyColumnItemScope.WearListTitle(
       )
     }
   }
-}
-
-/**
- * `EdgeButton` sempre visible (P2). El de `ScreenScaffold` s'amaga fins que la llista arriba al final, i el brief el vol fix:
- * és l'acció principal. Porta un degradat a darrere perquè el contingut s'esvaeixi sota el botó.
- */
-@Composable
-fun BoxScope.PinnedEdgeButton(
-  onClick: () -> Unit,
-  tonal: Boolean = false,
-  content: @Composable RowScope.() -> Unit,
-) {
-  Box(
-    modifier =
-      Modifier
-        .align(Alignment.BottomCenter)
-        .fillMaxWidth()
-        .height(64.dp)
-        .background(Brush.verticalGradient(0f to Color.Transparent, 0.75f to WearColors.Background)),
-  )
-  EdgeButton(
-    onClick = onClick,
-    modifier = Modifier.align(Alignment.BottomCenter),
-    colors = if (tonal) ButtonDefaults.filledTonalButtonColors() else ButtonDefaults.buttonColors(),
-    content = content,
-  )
 }
