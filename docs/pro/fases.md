@@ -52,6 +52,7 @@ Dues dimensions independents per a cada funció Pro:
 - **Claus:** a `local.properties` i als secrets de GitHub del mateix nom. `REVENUECAT_TEST_API_KEY` (debug i l'APK de `build-apk.yml`) i `REVENUECAT_GOOGLE_API_KEY` (release a `release.yml`). Sense clau, l'app no configura RevenueCat i ningú no és Pro.
 - **Sandbox Testing Access ha d'estar a «Anybody»** (Project settings › General). Si és restringit (per exemple, al correu de Bernat), les compres de sandbox i del Test Store queden com a «Unattached products» i no donen l'entitlement: l'app no té comptes i RevenueCat no pot identificar ningú per correu. A producció no hi influeix.
 - El producte de Play Console no es podia crear fins que hi hagués una build amb `BILLING`: es va pujar la 1.7.9 al track intern.
+- **Notificacions de Google (RTDN):** topic `projects/converses/topics/Play-Store-Notifications` (Google Cloud, projecte `converses`), posat a Play Console › Monetization setup. Google Play hi ha de poder publicar: `google-play-developer-notifications@system.gserviceaccount.com` amb el rol *Pub/Sub Publisher* al topic (sense, la notificació de prova falla).
 - L'SDK també va a la release: la fitxa de Play ja no diu «sense accés a internet».
 
 ### Debug
@@ -67,8 +68,8 @@ Al menú de debug, l'apartat **Pro** té un sol interruptor, «Pro user», que e
 - [x] Debug: apartat Pro amb l'interruptor «Pro user» (estat de RevenueCat o override) i compra i restauració de prova; títols dels apartats en negreta; emulador amb el Test Store (compra vàlida, fallida i cancel·lada, override, sense connexió) — `5ebad34`, `4c95246`, `445104e`
 - [x] Fitxa de Play (en, ca, es): treure «sense accés a internet» — `a07ad48`
 - [x] `docs/pro/` al dia (entitlement `converses_pro`, configuració de RevenueCat, debug, secrets)
-- [ ] RevenueCat: el `lifetime` de Play Store també al paquet de l'offering `default`
-- [ ] RevenueCat: notificacions de Google (RTDN) connectades i provades
+- [x] RevenueCat: el `lifetime` de Play Store també al paquet de l'offering `default` (`$rc_lifetime`, amb els dos productes)
+- [x] RevenueCat: notificacions de Google (RTDN) connectades i provades (notificació de prova rebuda)
 - [ ] Compra real a Play des del track intern amb un *license tester*
 
 ## Fase 3 · Paywall
