@@ -139,6 +139,23 @@ class RevenueCatProDataSourceTest {
     }
 
   @Test
+  fun refundOrRevocationTurnsProOffAndSurvivesARestart() =
+    runTest {
+      val gateway = FakeGateway()
+      val saved = mutableListOf<Boolean>()
+      val source = RevenueCatProDataSource(gateway, persist = { saved += it })
+      source.start()
+      source.purchase(activity)
+
+      gateway.send(false)
+
+      assertFalse(source.isPro.value)
+      assertEquals(listOf(true, false), saved)
+      val restarted = RevenueCatProDataSource(FakeGateway(), initial = saved.last())
+      assertFalse(restarted.isPro.value)
+    }
+
+  @Test
   fun restoreWithAPurchaseTurnsProOn() =
     runTest {
       val repository = ProRepository(RevenueCatProDataSource(FakeGateway(restoreResult = RestoreResult.Restored)))
