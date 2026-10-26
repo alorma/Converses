@@ -25,26 +25,22 @@ class OverridableProDataSourceTest {
       started = true
     }
 
-    override suspend fun price(): String = "4,99 €"
-
     override suspend fun purchase(activity: Activity): PurchaseResult {
       purchases++
       return PurchaseResult.Cancelled
     }
   }
 
-  private val local = LocalProDataSource()
   private val remote = FakeRemote()
 
   private fun source(
     initialOverride: Boolean = false,
     persist: (Boolean) -> Unit = {},
-  ) = OverridableProDataSource(local, remote, initialOverride, persist, CoroutineScope(UnconfinedTestDispatcher()))
+  ) = OverridableProDataSource(remote, initialOverride, persist, CoroutineScope(UnconfinedTestDispatcher()))
 
   @Test
   fun withoutOverrideRevenueCatDecides() {
     val source = source()
-    local.setPro(true)
     assertFalse(source.isPro.value)
 
     remote.state.value = true
@@ -52,20 +48,15 @@ class OverridableProDataSourceTest {
   }
 
   @Test
-  fun withOverrideTheLocalSwitchDecides() {
+  fun overrideIsProWithoutBuying() {
     val source = source(initialOverride = true)
-    remote.state.value = true
-    assertFalse(source.isPro.value)
-
-    local.setPro(true)
     assertTrue(source.isPro.value)
   }
 
   @Test
-  fun switchingTheOverrideSwitchesTheSourceAndIsPersisted() {
+  fun turningTheOverrideOffGoesBackToRevenueCatAndIsPersisted() {
     val saved = mutableListOf<Boolean>()
     val source = source(persist = { saved += it })
-    local.setPro(true)
 
     source.setOverride(true)
     assertTrue(source.isPro.value)
@@ -76,22 +67,27 @@ class OverridableProDataSourceTest {
   }
 
   @Test
+  fun aPurchaseStaysProWhateverTheOverride() {
+    val source = source()
+    remote.state.value = true
+
+    source.setOverride(true)
+    source.setOverride(false)
+
+    assertTrue(source.isPro.value)
+  }
+
+  @Test
   fun revenueCatStartsEvenWithTheOverrideOn() {
     source(initialOverride = true).start()
     assertTrue(remote.started)
   }
 
   @Test
-  fun purchaseGoesToTheSourceThatDecides() =
+  fun purchaseAlwaysGoesToRevenueCat() =
     runTest {
-      val source = source()
+      val source = source(initialOverride = true)
       assertEquals(PurchaseResult.Cancelled, source.purchase(Activity()))
       assertEquals(1, remote.purchases)
-
-      source.setOverride(true)
-      assertEquals(PurchaseResult.Purchased, source.purchase(Activity()))
-      assertEquals(1, remote.purchases)
-      assertTrue(source.isPro.value)
-      assertEquals("Debug", source.price())
     }
 }

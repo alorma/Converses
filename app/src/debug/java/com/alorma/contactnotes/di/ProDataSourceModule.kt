@@ -1,7 +1,6 @@
 package com.alorma.contactnotes.di
 
 import com.alorma.contactnotes.BuildConfig
-import com.alorma.contactnotes.data.pro.LocalProDataSource
 import com.alorma.contactnotes.data.pro.NoProDataSource
 import com.alorma.contactnotes.data.pro.OverridableProDataSource
 import com.alorma.contactnotes.data.pro.ProDataSource
@@ -16,17 +15,10 @@ import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.bind
 import org.koin.dsl.module
 
-/**
- * Debug: Pro comes from RevenueCat's Test Store (`REVENUECAT_TEST_API_KEY`), unless "Override Pro" is on in the debug
- * menu, and then the "Pro user" switch decides.
- */
+/** Debug: Pro comes from RevenueCat's Test Store (`REVENUECAT_TEST_API_KEY`), or from the debug menu's override. */
 val proDataSourceModule =
   module {
     single { DebugProStore(androidContext()) }
-    single {
-      val store: DebugProStore = get()
-      LocalProDataSource(initial = store.load(), persist = store::save)
-    }
     single {
       val store: DebugProStore = get()
       val remote =
@@ -41,7 +33,6 @@ val proDataSourceModule =
           )
         }
       OverridableProDataSource(
-        local = get(),
         remote = remote,
         initialOverride = store.loadOverride(),
         persistOverride = store::saveOverride,

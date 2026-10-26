@@ -14,11 +14,9 @@ import kotlinx.coroutines.runBlocking
 
 private val Context.debugProDataStore by preferencesDataStore(name = "debug_pro")
 
-private val IsProKey = booleanPreferencesKey("is_pro")
-
 private val OverrideKey = booleanPreferencesKey("override")
 
-/** Saves the debug menu's fake Pro and its override. Lives in `files/datastore`, already excluded from backup. */
+/** Saves the debug menu's Pro override. Lives in `files/datastore`, already excluded from backup. */
 @OptIn(ExperimentalCoroutinesApi::class)
 class DebugProStore(
   context: Context,
@@ -28,14 +26,7 @@ class DebugProStore(
   // A single thread so writes keep their order
   private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO.limitedParallelism(1))
 
-  /** Synchronous read at startup, before any flag is checked. */
-  fun load(): Boolean = runBlocking { dataStore.data.first()[IsProKey] ?: false }
-
-  fun save(isPro: Boolean) {
-    scope.launch { dataStore.edit { it[IsProKey] = isPro } }
-  }
-
-  /** Off by default: Pro comes from RevenueCat (Test Store). */
+  /** Synchronous read at startup, before any flag is checked. Off by default: Pro comes from RevenueCat. */
   fun loadOverride(): Boolean = runBlocking { dataStore.data.first()[OverrideKey] ?: false }
 
   fun saveOverride(overridden: Boolean) {

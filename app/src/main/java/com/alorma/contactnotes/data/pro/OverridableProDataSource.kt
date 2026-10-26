@@ -10,11 +10,10 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 
 /**
- * El Pro del debug: amb l'override encès mana [local] (l'interruptor «Pro user» del menú de debug); apagat, [remote]
- * (RevenueCat amb el Test Store). [remote] arrenca sempre, perquè el menú en pugui ensenyar l'estat real.
+ * El Pro del debug: el de [remote] (RevenueCat amb el Test Store), o Pro sense comprar si l'override del menú de debug
+ * està encès. La compra i la restauració sempre van a [remote].
  */
 class OverridableProDataSource(
-  val local: LocalProDataSource,
   val remote: ProDataSource,
   initialOverride: Boolean = false,
   private val persistOverride: (Boolean) -> Unit = {},
@@ -25,11 +24,8 @@ class OverridableProDataSource(
   val isOverridden: StateFlow<Boolean> = overrideState.asStateFlow()
 
   override val isPro: StateFlow<Boolean> =
-    combine(overrideState, local.isPro, remote.isPro) { overridden, localPro, remotePro ->
-      if (overridden) localPro else remotePro
-    }.stateIn(scope, SharingStarted.Eagerly, if (initialOverride) local.isPro.value else remote.isPro.value)
-
-  private val active: ProDataSource get() = if (overrideState.value) local else remote
+    combine(overrideState, remote.isPro) { overridden, bought -> overridden || bought }
+      .stateIn(scope, SharingStarted.Eagerly, initialOverride || remote.isPro.value)
 
   fun setOverride(value: Boolean) {
     overrideState.value = value
@@ -38,9 +34,9 @@ class OverridableProDataSource(
 
   override fun start() = remote.start()
 
-  override suspend fun price(): String? = active.price()
+  override suspend fun price(): String? = remote.price()
 
-  override suspend fun purchase(activity: Activity): PurchaseResult = active.purchase(activity)
+  override suspend fun purchase(activity: Activity): PurchaseResult = remote.purchase(activity)
 
-  override suspend fun restore(): RestoreResult = active.restore()
+  override suspend fun restore(): RestoreResult = remote.restore()
 }

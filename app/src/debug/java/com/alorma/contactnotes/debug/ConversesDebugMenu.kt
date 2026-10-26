@@ -154,16 +154,16 @@ private fun OnboardingModule() {
   }
 }
 
-/** Being Pro, apart from the flags: the override, the fake switch and RevenueCat (Test Store). */
+/**
+ * Being Pro, apart from the flags. The switch shows the real state: on when RevenueCat (Test Store) says it was bought,
+ * and then it cannot be turned off; otherwise turning it on overrides Pro without buying.
+ */
 @Composable
 private fun ProModule() {
   val pro: OverridableProDataSource = koinInject()
+  val isPro = pro.isPro.collectAsState().value
   val overridden = pro.isOverridden.collectAsState().value
-  val localPro =
-    pro.local.isPro
-      .collectAsState()
-      .value
-  val remotePro =
+  val bought =
     pro.remote.isPro
       .collectAsState()
       .value
@@ -172,18 +172,16 @@ private fun ProModule() {
   val scope = rememberCoroutineScope()
   DebugModule(stringResource(R.string.debug_pro_title)) {
     DebugCell(
-      title = stringResource(R.string.debug_flags_pro_override),
-      subtitle = stringResource(R.string.debug_flags_pro_override_summary),
-      trailing = { Switch(checked = overridden, onCheckedChange = pro::setOverride) },
-    )
-    DebugCell(
-      title = stringResource(R.string.debug_flags_pro_user),
-      subtitle = stringResource(R.string.debug_flags_pro_user_summary),
-      trailing = { Switch(checked = localPro, onCheckedChange = pro.local::setPro, enabled = overridden) },
-    )
-    DebugCell(
-      title = stringResource(R.string.debug_pro_revenuecat),
-      subtitle = stringResource(R.string.debug_pro_revenuecat_state, remotePro.toString()),
+      title = stringResource(R.string.debug_pro_user),
+      subtitle =
+        stringResource(
+          when {
+            bought -> R.string.debug_pro_user_bought
+            overridden -> R.string.debug_pro_user_overridden
+            else -> R.string.debug_pro_user_not_bought
+          },
+        ),
+      trailing = { Switch(checked = isPro, onCheckedChange = pro::setOverride, enabled = !bought) },
     )
     // Always against RevenueCat, whatever the override says; the result name is enough for debugging
     DebugCell(

@@ -24,29 +24,3 @@ interface ProDataSource {
 object NoProDataSource : ProDataSource {
   override val isPro: StateFlow<Boolean> = MutableStateFlow(false).asStateFlow()
 }
-
-/** Pro de mentida, el commuta el menú de debug; cada canvi es passa a [persist] perquè es conservi. */
-class LocalProDataSource(
-  initial: Boolean = false,
-  private val persist: (Boolean) -> Unit = {},
-) : ProDataSource {
-  private val state = MutableStateFlow(initial)
-
-  override val isPro: StateFlow<Boolean> = state.asStateFlow()
-
-  fun setPro(value: Boolean) {
-    state.value = value
-    persist(value)
-  }
-
-  /** Perquè el paywall es pugui provar sense xarxa: «comprar» encén el Pro de mentida. */
-  override suspend fun price(): String = "Debug"
-
-  override suspend fun purchase(activity: Activity): PurchaseResult {
-    setPro(true)
-    return PurchaseResult.Purchased
-  }
-
-  override suspend fun restore(): RestoreResult =
-    if (state.value) RestoreResult.Restored else RestoreResult.NothingToRestore
-}

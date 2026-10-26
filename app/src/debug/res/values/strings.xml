@@ -22,12 +22,10 @@
   <string name="debug_onboarding_show_summary">Clears the flag and restarts the screen</string>
   <string name="debug_flags_title">Feature flags</string>
   <string name="debug_pro_title">Pro</string>
-  <string name="debug_flags_pro_override">Override Pro</string>
-  <string name="debug_flags_pro_override_summary">On: the Pro user switch decides. Off: RevenueCat (Test Store) decides</string>
-  <string name="debug_flags_pro_user">Pro user</string>
-  <string name="debug_flags_pro_user_summary">Fake pro entitlement, used while Override Pro is on. Pro flags that are on stay locked without Pro</string>
-  <string name="debug_pro_revenuecat">RevenueCat</string>
-  <string name="debug_pro_revenuecat_state">Entitlement converses_pro: %1$s</string>
+  <string name="debug_pro_user">Pro user</string>
+  <string name="debug_pro_user_bought">Bought (RevenueCat, Test Store)</string>
+  <string name="debug_pro_user_overridden">Overridden: Pro without buying</string>
+  <string name="debug_pro_user_not_bought">Not bought. Turn it on to override</string>
   <string name="debug_pro_buy">Buy Pro (Test Store)</string>
   <string name="debug_pro_restore">Restore purchases</string>
   <string name="debug_flags_pro_mode">Turn on every Pro flag</string>
