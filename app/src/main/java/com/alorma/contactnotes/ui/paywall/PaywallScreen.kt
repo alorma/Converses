@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
@@ -134,30 +135,27 @@ fun PaywallContent(
         colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent),
       )
     },
+    // Peu fix al `bottomBar`: així el snackbar surt per sobre dels botons i no els tapa
+    bottomBar = {
+      PaywallFooter(state = state, onBuy = onBuy, onRestore = onRestore, onPrivacy = onPrivacy, onDone = onClose)
+    },
   ) { padding ->
     Column(
       modifier =
         Modifier
           .fillMaxSize()
-          .padding(padding),
+          .verticalScroll(rememberScrollState())
+          .padding(padding)
+          .padding(start = 16.dp, end = 16.dp, bottom = 16.dp),
+      verticalArrangement = Arrangement.spacedBy(18.dp),
     ) {
-      Column(
-        modifier =
-          Modifier
-            .weight(1f)
-            .verticalScroll(rememberScrollState())
-            .padding(start = 16.dp, end = 16.dp, bottom = 16.dp),
-        verticalArrangement = Arrangement.spacedBy(18.dp),
-      ) {
-        PaywallHeader(owned = state.isPro)
-        BenefitList(
-          benefits = proBenefits(if (state.isPro) null else highlight),
-          highlight = if (state.isPro) null else highlight,
-          owned = state.isPro,
-        )
-        if (!state.isPro) PrivacyNote()
-      }
-      PaywallFooter(state = state, onBuy = onBuy, onRestore = onRestore, onPrivacy = onPrivacy, onDone = onClose)
+      PaywallHeader(owned = state.isPro)
+      BenefitList(
+        benefits = proBenefits(if (state.isPro) null else highlight),
+        highlight = if (state.isPro) null else highlight,
+        owned = state.isPro,
+      )
+      if (!state.isPro) PrivacyNote()
     }
   }
 }
@@ -289,7 +287,8 @@ private fun PaywallFooter(
   onDone: () -> Unit,
 ) {
   Column(
-    modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 20.dp),
+    // Com els `bottomBar` de Material (BottomAppBar), el peu s'aparta de la barra de navegació del sistema
+    modifier = Modifier.navigationBarsPadding().padding(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 20.dp),
     verticalArrangement = Arrangement.spacedBy(6.dp),
   ) {
     if (state.isPro) {
