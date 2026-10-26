@@ -110,6 +110,7 @@ import com.alorma.contactnotes.designsystem.theme.DialogTitleStyle
 import com.alorma.contactnotes.designsystem.theme.PersonTheme
 import com.alorma.contactnotes.shared.AvatarColor
 import com.alorma.contactnotes.shared.AvatarShape
+import com.alorma.contactnotes.ui.paywall.ProBenefit
 import com.alorma.contactnotes.ui.people.label
 import com.alorma.contactnotes.ui.person.canUnlockWithDevice
 import com.alorma.contactnotes.ui.person.icon
@@ -125,6 +126,7 @@ fun EditPersonScreen(
   onSaved: (Long) -> Unit,
   onDeleted: () -> Unit,
   focus: EditFocus? = null,
+  onOpenPro: (ProBenefit) -> Unit = {},
   viewModel: EditPersonViewModel = koinViewModel(parameters = { parametersOf(personId) }),
 ) {
   val state by viewModel.state.collectAsStateWithLifecycle()
@@ -169,6 +171,7 @@ fun EditPersonScreen(
     focus = focus,
     onRequestContactsPermission = { requestContacts.launch(ContactsPermission.permissions) },
     onPickContact = { pickContact.launch(null) },
+    onOpenPro = onOpenPro,
     onAllowContacts = {
       // Denegat per sempre: el sistema ja no mostra el diàleg, només es pot donar als ajustos de l'app
       val canAsk = ContactsPermission.permissions.any { activity.shouldShowRequestPermissionRationale(it) }
@@ -191,6 +194,8 @@ fun EditPersonContent(
   onRequestContactsPermission: () -> Unit = {},
   onPickContact: () -> Unit = {},
   onAllowContacts: () -> Unit = {},
+  /** Des d'una funció `Locked` (fila de Contactes o full «Avatar»): obre la pantalla de Pro. */
+  onOpenPro: (ProBenefit) -> Unit = {},
 ) {
   var showDelete by remember { mutableStateOf(false) }
   var showAvatarSheet by remember { mutableStateOf(false) }
@@ -304,6 +309,7 @@ fun EditPersonContent(
             },
             onUnlink = actions::onUnlinkContact,
             onAllow = onAllowContacts,
+            onOpenPro = { onOpenPro(ProBenefit.Contacts) },
           )
         }
 
@@ -388,6 +394,10 @@ fun EditPersonContent(
         onColor = actions::onColor,
         onDismiss = { showAvatarSheet = false },
         locked = customAvatar == FeatureState.Locked,
+        onOpenPro = {
+          showAvatarSheet = false
+          onOpenPro(ProBenefit.People)
+        },
       )
     }
   }

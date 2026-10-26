@@ -116,7 +116,7 @@ fun AppNavigation(
             PaywallScreen(highlight = route.highlight, onClose = { navigation.pop() })
           }
           entry<SettingsRoute> {
-            SettingsScreen(onBack = { navigation.pop() }, onOpenPro = { navigation.navigate(PaywallRoute()) })
+            SettingsScreen(onBack = { navigation.pop() }, onOpenPro = { navigation.navigate(PaywallRoute(it)) })
           }
           entry<PersonLockedRoute> { route ->
             PersonLockedScreen(
@@ -140,6 +140,7 @@ fun AppNavigation(
             EditPersonScreen(
               personId = route.personId,
               focus = route.focus,
+              onOpenPro = { navigation.navigate(PaywallRoute(it)) },
               onClose = { navigation.pop() },
               onSaved = { id ->
                 navigation.pop()

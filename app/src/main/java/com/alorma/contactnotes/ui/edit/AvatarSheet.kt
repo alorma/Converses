@@ -5,6 +5,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -169,12 +170,13 @@ fun AvatarSheet(
   onColor: (AvatarColor?) -> Unit,
   onDismiss: () -> Unit,
   locked: Boolean = false,
+  onOpenPro: () -> Unit = {},
 ) {
   ModalBottomSheet(
     onDismissRequest = onDismiss,
     sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
   ) {
-    AvatarSheetContent(name, shape, color, onShape, onColor, onDone = onDismiss, locked = locked)
+    AvatarSheetContent(name, shape, color, onShape, onColor, onDone = onDismiss, locked = locked, onOpenPro = onOpenPro)
   }
 }
 
@@ -188,6 +190,8 @@ fun AvatarSheetContent(
   onColor: (AvatarColor?) -> Unit,
   onDone: () -> Unit,
   locked: Boolean = false,
+  /** Amb [locked], tocar «Forma» o «Color» porta a la pantalla de Pro (origen `avatar`). */
+  onOpenPro: () -> Unit = {},
 ) {
   // Sense Pro es veu el que hi ha desat, com a la resta de l'app, però no es pot canviar
   val resolvedShape = shape ?: AvatarShape.Standard
@@ -239,7 +243,7 @@ fun AvatarSheetContent(
       }
     }
 
-    SheetSection(stringResource(R.string.avatar_shape), locked) {
+    SheetSection(stringResource(R.string.avatar_shape), locked, onOpenPro) {
       // Dues files de 3: amb 6 formes en una fila les etiquetes no hi caben
       Column(modifier = Modifier.fillMaxWidth().selectableGroup(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
         AvatarShape.entries.chunked(ShapesPerRow).forEach { row ->
@@ -260,7 +264,7 @@ fun AvatarSheetContent(
       }
     }
 
-    SheetSection(stringResource(R.string.avatar_color), locked) {
+    SheetSection(stringResource(R.string.avatar_color), locked, onOpenPro) {
       Row(
         modifier = Modifier.fillMaxWidth().selectableGroup(),
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -283,6 +287,7 @@ fun AvatarSheetContent(
 private fun SheetSection(
   title: String,
   locked: Boolean,
+  onLockedClick: () -> Unit,
   content: @Composable () -> Unit,
 ) {
   Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -297,8 +302,20 @@ private fun SheetSection(
         )
       }
     }
-    // Opacitat de contingut desactivat de Material
-    Box(modifier = if (locked) Modifier.alpha(0.38f) else Modifier) { content() }
+    Box {
+      // Opacitat de contingut desactivat de Material
+      Box(modifier = if (locked) Modifier.alpha(0.38f) else Modifier) { content() }
+      if (locked) {
+        // Les opcions són desactivades: el toc de tota la secció porta a la pantalla de Pro
+        Box(
+          modifier =
+            Modifier.matchParentSize().clickable(
+              onClickLabel = stringResource(R.string.pro_description),
+              onClick = onLockedClick,
+            ),
+        )
+      }
+    }
   }
 }
 

@@ -108,6 +108,7 @@ import com.alorma.contactnotes.designsystem.components.rememberTopBarScrollBehav
 import com.alorma.contactnotes.designsystem.theme.ThemeMode
 import com.alorma.contactnotes.ui.edit.ContactsExplainSheet
 import com.alorma.contactnotes.ui.edit.openAppDetailsSettings
+import com.alorma.contactnotes.ui.paywall.ProBenefit
 import com.alorma.contactnotes.ui.person.canUnlockWithDevice
 import com.alorma.contactnotes.ui.person.openSecuritySetup
 import com.alorma.contactnotes.ui.person.promptUnlock
@@ -120,7 +121,7 @@ private val RelockOptions = listOf(0, 60, 300)
 @Composable
 fun SettingsScreen(
   onBack: () -> Unit,
-  onOpenPro: () -> Unit,
+  onOpenPro: (ProBenefit?) -> Unit,
   viewModel: SettingsViewModel = koinViewModel(),
   appLock: AppLockManager = koinInject(),
   pro: ProRepository = koinInject(),
@@ -239,7 +240,8 @@ fun SettingsContent(
   onContactsAllow: () -> Unit = {},
   /** `null`: sense la targeta de Pro (previews antigues). */
   isPro: Boolean? = null,
-  onOpenPro: () -> Unit = {},
+  /** Obre la pantalla de Pro; el benefici és l'origen (8b), `null` des de la targeta. */
+  onOpenPro: (ProBenefit?) -> Unit = {},
 ) {
   var showContactsExplain by rememberSaveable { mutableStateOf(false) }
   val scrollBehavior = rememberTopBarScrollBehavior()
@@ -269,7 +271,7 @@ fun SettingsContent(
           .padding(horizontal = 16.dp),
       verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-      isPro?.let { ProCard(isPro = it, onClick = onOpenPro) }
+      isPro?.let { ProCard(isPro = it, onClick = { onOpenPro(null) }) }
       SettingsGroup(
         title = { SectionTitle(stringResource(R.string.settings_appearance)) },
         verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap),
@@ -296,6 +298,7 @@ fun SettingsContent(
               title = stringResource(R.string.settings_person_color),
               subtitle = stringResource(R.string.settings_person_color_summary),
               icon = Icons.Rounded.Face,
+              onClick = { onOpenPro(ProBenefit.People) },
               trailing = {
                 Row(
                   horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -405,6 +408,7 @@ fun SettingsContent(
           state = contacts,
           onTurnOn = { showContactsExplain = true },
           onAllow = onContactsAllow,
+          onOpenPro = { onOpenPro(ProBenefit.Contacts) },
         )
       }
 
@@ -637,6 +641,7 @@ private fun ContactsSection(
   state: ContactsSettingsState,
   onTurnOn: () -> Unit,
   onAllow: () -> Unit,
+  onOpenPro: () -> Unit,
 ) {
   SettingsGroup(
     title = {
@@ -656,6 +661,8 @@ private fun ContactsSection(
           title = stringResource(R.string.settings_contacts_link),
           subtitle = stringResource(R.string.settings_contacts_on_summary),
           icon = Icons.Rounded.Contacts,
+          onClick = onOpenPro,
+          trailing = { Icon(Icons.AutoMirrored.Rounded.KeyboardArrowRight, contentDescription = null) },
           shape = groupedItemShape(0, 1),
         )
       ContactsSettingsState.NeverOn ->

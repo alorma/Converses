@@ -62,12 +62,14 @@ internal fun ContactSectionRow(
   onUnlink: () -> Unit,
   onAllow: () -> Unit,
   modifier: Modifier = Modifier,
+  onOpenPro: () -> Unit = {},
 ) {
   when (section) {
     ContactSection.Hidden -> Unit
-    // Sense acció fins que hi hagi paywall (`docs/pro/fases.md`, fase 3)
+    // Sense Pro porta a la pantalla de Pro (origen `contactes`)
     ContactSection.Locked ->
       Surface(
+        onClick = onOpenPro,
         shape = MaterialTheme.shapes.large,
         color = GroupedListDefaults.containerColor,
         modifier = modifier.fillMaxWidth(),
@@ -85,6 +87,11 @@ internal fun ContactSectionRow(
               color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
           }
+          Icon(
+            Icons.Rounded.ChevronRight,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+          )
         }
       }
     ContactSection.NotLinked, ContactSection.Taken ->
