@@ -3,7 +3,6 @@ package com.alorma.contactnotes.wear.ui
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -21,16 +20,21 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.wear.compose.foundation.lazy.TransformingLazyColumn
 import androidx.wear.compose.foundation.lazy.rememberTransformingLazyColumnState
 import androidx.wear.compose.material3.Button
 import androidx.wear.compose.material3.CircularProgressIndicator
+import androidx.wear.compose.material3.EdgeButton
 import androidx.wear.compose.material3.Icon
 import androidx.wear.compose.material3.ScreenScaffold
+import androidx.wear.compose.material3.SurfaceTransformation
 import androidx.wear.compose.material3.Text
 import androidx.wear.compose.material3.lazy.rememberTransformationSpec
+import androidx.wear.compose.material3.lazy.transformedHeight
 import com.alorma.contactnotes.shared.AvatarColor
 import com.alorma.contactnotes.shared.AvatarShape
 import com.alorma.contactnotes.wear.R
@@ -92,21 +96,24 @@ fun TimelineContent(
   ScreenScaffold(
     scrollState = state,
     modifier = modifier,
-  ) {
+    edgeButton = {
+      EdgeButton(onClick = onNote) {
+        Icon(Icons.Rounded.Mic, contentDescription = null, modifier = Modifier.padding(end = 6.dp))
+        Text(text = stringResource(R.string.note_button), style = ButtonLabelStyle)
+      }
+    },
+  ) { padding ->
     TransformingLazyColumn(
       state = state,
-      contentPadding = PaddingValues(start = 20.dp, end = 20.dp, top = 28.dp, bottom = PinnedEdgeButtonSpace),
+      contentPadding = padding,
       verticalArrangement = Arrangement.spacedBy(4.dp),
     ) {
       item {
-        Row(
-          modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
-          horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
-          verticalAlignment = Alignment.CenterVertically,
-        ) {
-          PersonAvatar(initials = initials, color = color, shape = avatarShape, size = 30.dp)
-          Text(text = name, style = PersonNameStyle, color = WearColors.OnSurface, maxLines = 1)
-        }
+        WearListTitle(
+          text = name,
+          style = PersonNameStyle,
+          leading = { PersonAvatar(initials = initials, color = color, shape = avatarShape, size = 30.dp) },
+        )
       }
       items(entries.size, key = { entries[it].id }) { index ->
         val entry = entries[index]
@@ -114,7 +121,8 @@ fun TimelineContent(
           author = entry.author,
           meta = entry.meta,
           text = entry.text,
-          modifier = Modifier.scrollTransformed(this, spec),
+          modifier = Modifier.transformedHeight(this, spec),
+          transformation = SurfaceTransformation(spec),
         )
       }
       if (loadingMore) {
@@ -127,10 +135,6 @@ fun TimelineContent(
           }
         }
       }
-    }
-    PinnedEdgeButton(onClick = onNote) {
-      Icon(Icons.Rounded.Mic, contentDescription = null, modifier = Modifier.padding(end = 6.dp))
-      Text(text = stringResource(R.string.note_button), style = ButtonLabelStyle)
     }
   }
 }
@@ -156,6 +160,35 @@ fun TimelinePreview() =
       color = AvatarColor.Sky,
       avatarShape = AvatarShape.Clover4Leaf,
       entries = sampleEntries(),
+      onNote = {},
+    )
+  }
+
+/** Play va rebutjar l'app per un nom llarg tallat a la vora rodona: aquesta captura ho vigila. */
+@WearScreenPreviews
+@Composable
+fun TimelineLongNamePreview() =
+  WearPreview {
+    TimelineContent(
+      name = "Maria Antònia Fontcuberta i Puigdollers",
+      initials = "MF",
+      color = AvatarColor.Peach,
+      avatarShape = AvatarShape.Sunny,
+      entries = sampleEntries(),
+      onNote = {},
+    )
+  }
+
+@WearScreenPreviews
+@Composable
+fun TimelineEmptyLongNamePreview() =
+  WearPreview {
+    TimelineContent(
+      name = "Maria Antònia Fontcuberta i Puigdollers",
+      initials = "MF",
+      color = AvatarColor.Peach,
+      avatarShape = AvatarShape.Sunny,
+      entries = emptyList(),
       onNote = {},
     )
   }
@@ -232,7 +265,15 @@ private fun EmptyTimelineContent(
     ) {
       Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
         PersonAvatar(initials = initials, color = color, shape = avatarShape, size = 30.dp)
-        Text(text = name, style = PersonNameStyle, color = WearColors.OnSurface, maxLines = 1)
+        Text(
+          text = name,
+          style = PersonNameStyle,
+          color = WearColors.OnSurface,
+          textAlign = TextAlign.Center,
+          maxLines = 2,
+          overflow = TextOverflow.Ellipsis,
+          modifier = Modifier.weight(1f, fill = false),
+        )
       }
       Button(onClick = onNote) {
         Icon(Icons.Rounded.Mic, contentDescription = null, modifier = Modifier.padding(end = 6.dp))

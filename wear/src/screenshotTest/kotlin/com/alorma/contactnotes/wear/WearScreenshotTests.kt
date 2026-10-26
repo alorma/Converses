@@ -25,8 +25,10 @@ import com.alorma.contactnotes.wear.ui.PeoplePhoneOfflinePreview
 import com.alorma.contactnotes.wear.ui.PeoplePreview
 import com.alorma.contactnotes.wear.ui.SavedPendingPreview
 import com.alorma.contactnotes.wear.ui.SavedPreview
+import com.alorma.contactnotes.wear.ui.TimelineEmptyLongNamePreview
 import com.alorma.contactnotes.wear.ui.TimelineEmptyPreview
 import com.alorma.contactnotes.wear.ui.TimelineLoadingMorePreview
+import com.alorma.contactnotes.wear.ui.TimelineLongNamePreview
 import com.alorma.contactnotes.wear.ui.TimelinePreview
 import com.alorma.contactnotes.wear.ui.WhoPreview
 import com.android.tools.screenshot.PreviewTest
@@ -51,6 +53,16 @@ class WearScreenshotTests {
   @PreviewTest
   @Composable
   fun timeline() = TimelinePreview()
+
+  @WatchPreviews
+  @PreviewTest
+  @Composable
+  fun timelineLongName() = TimelineLongNamePreview()
+
+  @WatchPreviews
+  @PreviewTest
+  @Composable
+  fun timelineEmptyLongName() = TimelineEmptyLongNamePreview()
 
   @WatchPreviews
   @PreviewTest

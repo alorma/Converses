@@ -2,15 +2,12 @@ package com.alorma.contactnotes.wear.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.EditNote
 import androidx.compose.material.icons.rounded.Person
@@ -22,7 +19,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.wear.compose.material3.Icon
+import androidx.wear.compose.material3.SurfaceTransformation
 import androidx.wear.compose.material3.Text
+import androidx.wear.compose.material3.TitleCard
 import com.alorma.contactnotes.shared.AvatarColor
 import com.alorma.contactnotes.shared.AvatarShape
 import com.alorma.contactnotes.wear.theme.EntryTextStyle
@@ -81,25 +80,21 @@ private fun EntryMarker(author: EntryAuthor) {
   }
 }
 
-/** Entrada de la cronologia (només lectura): marcador, «qui · hora · canal» en majúscules i el text. */
+/** Entrada de la cronologia (només lectura): una `TitleCard` nativa amb el marcador i «qui · hora · canal» al títol. */
 @Composable
 fun TimelineEntry(
   author: EntryAuthor,
   meta: String,
   text: String,
   modifier: Modifier = Modifier,
+  transformation: SurfaceTransformation? = null,
 ) {
-  Column(
-    modifier =
-      modifier
-        .fillMaxWidth()
-        .clip(RoundedCornerShape(18.dp))
-        .background(WearColors.SurfaceCard)
-        .padding(horizontal = 12.dp, vertical = 10.dp),
-    verticalArrangement = Arrangement.spacedBy(4.dp),
-  ) {
-    Row(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalAlignment = Alignment.CenterVertically) {
+  TitleCard(
+    modifier = modifier.fillMaxWidth(),
+    transformation = transformation,
+    title = {
       EntryMarker(author)
+      Spacer(modifier = Modifier.width(6.dp))
       Text(
         text = meta.uppercase(),
         style = OverlineStyle,
@@ -108,7 +103,8 @@ fun TimelineEntry(
         maxLines = 1,
         overflow = TextOverflow.Ellipsis,
       )
-    }
-    Text(text = text, style = EntryTextStyle, color = WearColors.OnSurface)
+    },
+  ) {
+    Text(text = text, style = EntryTextStyle)
   }
 }
