@@ -2,7 +2,7 @@
 
 Què queda fora de la versió gratuïta, perquè passarà a ser Pro, i què es queda gratis per sempre. **La v1 (publicada) no té Pro:** les funcions Pro existeixen al codi però són darrere de feature flags apagats. Document de treball per al Pro.
 
-Model previst per al Pro: **pagament únic**, sense subscripció i sense anuncis. La compra (Play Billing) encara no està feta.
+Model previst per al Pro: **pagament únic**, sense subscripció i sense anuncis. La compra es farà amb **RevenueCat**: un producte no consumible i un entitlement `pro`; el codi consulta l'entitlement, mai el producte. Sense compte: RevenueCat fa servir el seu identificador anònim i no rep mai notes ni persones. Fases a `docs/pro/fases.md`.
 
 ## Regla
 
@@ -33,17 +33,19 @@ Mai es cobra per **accedir, protegir o treure** les dades pròpies. Al Pro hi va
 
 ## Fet a la v1 gratuïta
 
-- **Feature flags** (`data/flags/`): `CustomAvatarFeature` i `PersonColorFeature`, tots dos apagats; es provan amb el «Pro mode» del menú de debug. `ContactLinkFeature` (contactes) també hi és, apagat. Els flags de sub-canals i follow-ups s'afegiran quan existeixin aquestes funcions. Encara no es comprova cap pagament.
+- **Feature flags** (`data/flags/`): `CustomAvatarFeature` i `PersonColorFeature`, tots dos apagats. `ContactLinkFeature` (contactes) també hi és, apagat. Els flags de sub-canals i follow-ups s'afegiran quan existeixin aquestes funcions. Cada flag Pro és `Hidden`, `Locked` o `Unlocked` segons el flag i el `ProRepository` (`docs/pro/fases.md`, «Model»); al menú de debug, «Pro user» fa de compra i «Turn on every Pro flag» obre tots els flags. A release encara ningú no és Pro.
 - **Avatar estàndard:** Galeta i color automàtic pel nom (`AvatarColor.forName`); `avatarShape` i `avatarColor` nul·lables (`null` = estàndard).
 - **Editor:** sense targeta d'avatar; l'avatar és a la fila del nom i, amb `CustomAvatarFeature`, obre el full «Avatar».
 
 ## Pendent per al Pro
 
-- Play Billing i la comprovació de pagament al runner de flags.
+- Infraestructura (`ProRepository` i runner de flags Pro), RevenueCat, paywall i publicació: `docs/pro/fases.md`.
 - Sub-canals (backlog 8) i follow-ups (backlog 6), cadascun darrere del seu flag. Tots dos toquen la base de dades: **cal migració i test** (la v1 ja és publicada).
 - Contactes, per obrir-ho al Pro: passar `READ_CONTACTS` i `WRITE_CONTACTS` al manifest principal (C12), enviar la declaració de `READ_CONTACTS` a Play Console (esborrany a `docs/contacts/README.md`, «Política») i regenerar la Baseline Profile. Fitxa de Play (`app/src/main/play/listings`, en/ca/es): afegir la funció a la descripció (vincular un contacte, «Veure notes» i «Crear nota» des de Contactes) i repassar «ni comptes» de «Privada per disseny», perquè amb la funció apareix la compte local «Converses» a Ajustos › Comptes (per exemple «ni registre», o explicar que és local i només serveix perquè Contactes mostri les files); captures noves si es vol ensenyar. Abans d'obrir-ho, provar amb TalkBack la fila «Vinculada a…» de l'editor, la fila del detall i el full 5b (codi a `c71f6de`).
 
 ## Decidit
+
+- **Baixada de Pro** (reemborsament, revocació, o flag obert sense Pro): el que es va fer amb Pro es conserva i es continua veient (per exemple, la forma i el color de l'avatar). Només no es pot canviar ni fer-ne de nou. Mai s'esborren dades.
 
 - **Canal «Empresa»** (backlog 7): ja no és un canal del sistema; és un sub-canal d'«Altres» (Pro).
 - Els canals de les entrades de la beta (WhatsApp, Telegram…) passen al seu grup i les persones deixen de tenir canals propis; no es mantenen gratis.
@@ -56,3 +58,15 @@ Mai es cobra per **accedir, protegir o treure** les dades pròpies. Al Pro hi va
 - [x] Amb `ContactLinkFeature` apagat no surt res de Contactes (editor, detall, Ajustos) i no queda ni la compte ni les files; el vincle es conserva (emulador, fases 2 i 4).
 - [x] Amb `ContactLinkFeature` activada (debug): vincular, obrir a Contactes, files a «Connected apps», protegides sense files, contacte esborrat i fusionat (emulador, fases 2–5).
 - [x] La release no porta els permisos de Contactes (APK de release, fase 3).
+
+## Disseny
+
+Lliurament de Claude Design del 26-10-2026 (pantalla de Pro i punts d'entrada). Resum:
+
+- **Pantalla «Converses Pro» (8a):** pantalla completa amb tancar; capçalera (galeta de 64 dp en `primary` amb `workspace_premium`, «Converses Pro», «Un sol pagament. Per sempre.»), quatre beneficis en llista agrupada (`palette` Persones a la teva manera, `forum` Canals propis, `flag` Pendents, `contacts` Vincle amb Contactes), nota amb `lock` i peu fix amb «Aconsegueix Pro · {preu}», «Restaura la compra» i «Termes · Privacitat».
+- **Des d'una funció (8b):** paràmetre d'origen (`ajustos`, `contactes`, `canals`, `pendents`, `avatar`); el benefici d'origen va primer amb una vora de 2 dp.
+- **Ja tens Pro (8c):** `check`, «Ja tens Pro», beneficis amb `check_circle` i «Som-hi», que torna on era l'usuari.
+- **Punts d'entrada:** mai s'obre sola. Targeta a dalt d'Ajustos, Ajustos › Canals, Ajustos › Contactes, xip «Canal propi» al camp «On», fila «Pendent» de la nota ràpida i, quan es llanci, l'editor d'avatar.
+- **Etiqueta PRO:** 20 dp d'alçada, radi 7, fons `primaryContainer`, text de 10,5 sp en pes 800.
+- **Estats de la compra:** pendent, error, cancel·lació (sense missatge), restaurar amb i sense compra, sense connexió (botó desactivat), reemborsament (es perd Pro, no s'esborren dades). Textos ca, en i es al tauler 8d.
+- **Sincronització:** per definir; no surt a la pantalla de Pro.
