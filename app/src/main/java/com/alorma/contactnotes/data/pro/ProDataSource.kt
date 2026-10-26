@@ -7,9 +7,12 @@ import kotlinx.coroutines.flow.asStateFlow
 /** D'on surt si l'usuari té l'entitlement `pro`. Cada variant en registra un a Koin (`proDataSourceModule`). */
 interface ProDataSource {
   val isPro: StateFlow<Boolean>
+
+  /** Es crida un cop en arrencar l'app (`ConversesApp`). */
+  fun start() {}
 }
 
-/** Mai Pro: el que porta la release fins que hi hagi RevenueCat (`docs/pro/fases.md`, fase 2). */
+/** Mai Pro: la release quan no té clau de RevenueCat. */
 object NoProDataSource : ProDataSource {
   override val isPro: StateFlow<Boolean> = MutableStateFlow(false).asStateFlow()
 }
