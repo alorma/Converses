@@ -1,2 +1,2 @@
-Versió 1.7.9:
+Versió 1.7.10:
 • Unes quantes correccions petites i molta feina interna que no notaràs, que és justament la gràcia.

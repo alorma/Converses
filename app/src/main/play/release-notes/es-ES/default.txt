@@ -1,2 +1,2 @@
-Versión 1.7.9:
+Versión 1.7.10:
 • Unas cuantas correcciones pequeñas y mucho trabajo interno que no notarás, que es justo la gracia.

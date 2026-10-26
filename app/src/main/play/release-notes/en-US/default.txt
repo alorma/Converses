@@ -1,2 +1,2 @@
-Version 1.7.9:
+Version 1.7.10:
 • A few small fixes and a lot of internal work you won't notice, which is exactly the point.
