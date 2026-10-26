@@ -94,7 +94,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.alorma.contactnotes.R
 import com.alorma.contactnotes.data.contacts.ContactsPermission
 import com.alorma.contactnotes.data.flags.CustomAvatarFeature
-import com.alorma.contactnotes.data.flags.rememberFeatureEnabled
+import com.alorma.contactnotes.data.flags.FeatureState
+import com.alorma.contactnotes.data.flags.rememberFeatureState
 import com.alorma.contactnotes.data.settings.SecureWindow
 import com.alorma.contactnotes.designsystem.components.ConversesSaveButton
 import com.alorma.contactnotes.designsystem.components.ConversesSwitch
@@ -164,7 +165,7 @@ fun EditPersonScreen(
         haptics.toggle(value)
       }
     },
-    customAvatar = rememberFeatureEnabled<CustomAvatarFeature>(),
+    customAvatar = rememberFeatureState<CustomAvatarFeature>(),
     focus = focus,
     onRequestContactsPermission = { requestContacts.launch(ContactsPermission.permissions) },
     onPickContact = { pickContact.launch(null) },
@@ -185,7 +186,7 @@ fun EditPersonContent(
   onSaved: (Long) -> Unit,
   onDeleted: () -> Unit,
   onProtectedChange: (Boolean) -> Unit,
-  customAvatar: Boolean = true,
+  customAvatar: FeatureState = FeatureState.Unlocked,
   focus: EditFocus? = null,
   onRequestContactsPermission: () -> Unit = {},
   onPickContact: () -> Unit = {},
@@ -255,7 +256,7 @@ fun EditPersonContent(
                 name = state.name,
                 shape = state.shape ?: AvatarShape.Standard,
                 color = state.color ?: AvatarColor.forName(state.name),
-                editable = customAvatar,
+                editable = customAvatar != FeatureState.Hidden,
                 onClick = { showAvatarSheet = true },
                 badgeBorder = GroupedListDefaults.containerColor,
               )
@@ -378,7 +379,7 @@ fun EditPersonContent(
       )
     }
 
-    if (showAvatarSheet && customAvatar) {
+    if (showAvatarSheet && customAvatar != FeatureState.Hidden) {
       AvatarSheet(
         name = state.name,
         shape = state.shape,
@@ -386,6 +387,7 @@ fun EditPersonContent(
         onShape = actions::onShape,
         onColor = actions::onColor,
         onDismiss = { showAvatarSheet = false },
+        locked = customAvatar == FeatureState.Locked,
       )
     }
   }

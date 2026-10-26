@@ -2,6 +2,7 @@ package com.alorma.contactnotes.ui.edit
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
+import com.alorma.contactnotes.data.flags.FeatureState
 import com.alorma.contactnotes.designsystem.preview.ConversesPreviewTheme
 import com.alorma.contactnotes.designsystem.theme.PersonTheme
 import com.alorma.contactnotes.shared.AvatarColor
@@ -53,7 +54,7 @@ private object NoOpEditPersonActions : EditPersonActions {
 private fun EditPersonPreview(
   state: EditPersonUiState,
   canAuthenticate: Boolean = true,
-  customAvatar: Boolean = false,
+  customAvatar: FeatureState = FeatureState.Hidden,
 ) {
   ConversesPreviewTheme {
     EditPersonContent(
@@ -156,7 +157,7 @@ internal fun EditPersonCustomAvatarPreview() {
       facts = Facts.take(1),
       entryCount = 3,
     ),
-    customAvatar = true,
+    customAvatar = FeatureState.Unlocked,
   )
 }
 
@@ -239,15 +240,30 @@ internal fun ContactsExplainSheetPreview() {
 private fun AvatarSheetPreview(
   shape: AvatarShape?,
   color: AvatarColor?,
+  locked: Boolean = false,
 ) {
   ConversesPreviewTheme {
     androidx.compose.material3.Surface(
       color = androidx.compose.material3.MaterialTheme.colorScheme.surfaceContainerLow,
     ) {
-      AvatarSheetContent(name = "Marta Soler", shape = shape, color = color, onShape = {}, onColor = {}, onDone = {})
+      AvatarSheetContent(
+        name = "Marta Soler",
+        shape = shape,
+        color = color,
+        onShape = {},
+        onColor = {},
+        onDone = {},
+        locked = locked,
+      )
     }
   }
 }
+
+/** Sense Pro: PRO i opcions desactivades; l'avatar desat es veu però no es pot canviar. */
+@Preview
+@Composable
+internal fun AvatarSheetLockedPreview() =
+  AvatarSheetPreview(shape = AvatarShape.Clover8Leaf, color = AvatarColor.Rose, locked = true)
 
 /** Forma i color per defecte: el resum diu «color automàtic». */
 @Preview

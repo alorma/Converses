@@ -24,6 +24,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Autorenew
 import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material.icons.rounded.Edit
+import androidx.compose.material.icons.rounded.Lock
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -35,6 +36,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
@@ -47,6 +49,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.alorma.contactnotes.R
+import com.alorma.contactnotes.designsystem.components.ProBadge
 import com.alorma.contactnotes.designsystem.components.asShape
 import com.alorma.contactnotes.designsystem.components.color
 import com.alorma.contactnotes.designsystem.theme.SheetTitleStyle
@@ -165,12 +168,13 @@ fun AvatarSheet(
   onShape: (AvatarShape) -> Unit,
   onColor: (AvatarColor?) -> Unit,
   onDismiss: () -> Unit,
+  locked: Boolean = false,
 ) {
   ModalBottomSheet(
     onDismissRequest = onDismiss,
     sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
   ) {
-    AvatarSheetContent(name, shape, color, onShape, onColor, onDone = onDismiss)
+    AvatarSheetContent(name, shape, color, onShape, onColor, onDone = onDismiss, locked = locked)
   }
 }
 
@@ -183,7 +187,9 @@ fun AvatarSheetContent(
   onShape: (AvatarShape) -> Unit,
   onColor: (AvatarColor?) -> Unit,
   onDone: () -> Unit,
+  locked: Boolean = false,
 ) {
+  // Sense Pro es veu el que hi ha desat, com a la resta de l'app, però no es pot canviar
   val resolvedShape = shape ?: AvatarShape.Standard
   val resolvedColor = color ?: AvatarColor.forName(name)
   val shapeName = stringResource(shapeNameRes(resolvedShape))
@@ -211,11 +217,19 @@ fun AvatarSheetContent(
         blankPlaceholder = false,
       )
       Column {
-        Text(
-          stringResource(R.string.avatar_sheet_title),
-          style = SheetTitleStyle,
-          color = MaterialTheme.colorScheme.onSurface,
-        )
+        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+          Text(
+            stringResource(R.string.avatar_sheet_title),
+            style = SheetTitleStyle,
+            color = MaterialTheme.colorScheme.onSurface,
+          )
+          if (locked) {
+            ProBadge(
+              text = stringResource(R.string.pro_badge),
+              contentDescription = stringResource(R.string.pro_description),
+            )
+          }
+        }
         Text(
           summary,
           style = MaterialTheme.typography.bodySmall,
@@ -225,7 +239,7 @@ fun AvatarSheetContent(
       }
     }
 
-    SheetSection(stringResource(R.string.avatar_shape)) {
+    SheetSection(stringResource(R.string.avatar_shape), locked) {
       // Dues files de 3: amb 6 formes en una fila les etiquetes no hi caben
       Column(modifier = Modifier.fillMaxWidth().selectableGroup(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
         AvatarShape.entries.chunked(ShapesPerRow).forEach { row ->
@@ -236,6 +250,7 @@ fun AvatarSheetContent(
                 selected = option == resolvedShape,
                 first = index == 0,
                 last = index == row.lastIndex,
+                enabled = !locked,
                 onClick = { onShape(option) },
                 modifier = Modifier.weight(1f),
               )
@@ -245,15 +260,15 @@ fun AvatarSheetContent(
       }
     }
 
-    SheetSection(stringResource(R.string.avatar_color)) {
+    SheetSection(stringResource(R.string.avatar_color), locked) {
       Row(
         modifier = Modifier.fillMaxWidth().selectableGroup(),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
       ) {
-        Swatch(color = null, selected = color == null, onClick = { onColor(null) })
+        Swatch(color = null, selected = color == null, enabled = !locked, onClick = { onColor(null) })
         AvatarColor.entries.forEach { option ->
-          Swatch(color = option, selected = color == option, onClick = { onColor(option) })
+          Swatch(color = option, selected = color == option, enabled = !locked, onClick = { onColor(option) })
         }
       }
     }
@@ -267,11 +282,23 @@ fun AvatarSheetContent(
 @Composable
 private fun SheetSection(
   title: String,
+  locked: Boolean,
   content: @Composable () -> Unit,
 ) {
   Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-    Text(title, fontSize = 14.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
-    content()
+    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+      Text(title, fontSize = 14.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
+      if (locked) {
+        Icon(
+          Icons.Rounded.Lock,
+          contentDescription = null,
+          tint = MaterialTheme.colorScheme.onSurfaceVariant,
+          modifier = Modifier.size(16.dp),
+        )
+      }
+    }
+    // Opacitat de contingut desactivat de Material
+    Box(modifier = if (locked) Modifier.alpha(0.38f) else Modifier) { content() }
   }
 }
 
@@ -281,6 +308,7 @@ private fun ShapeButton(
   selected: Boolean,
   first: Boolean,
   last: Boolean,
+  enabled: Boolean,
   onClick: () -> Unit,
   modifier: Modifier = Modifier,
 ) {
@@ -304,7 +332,7 @@ private fun ShapeButton(
         .height(84.dp)
         .clip(buttonShape)
         .background(if (selected) scheme.primaryContainer else scheme.surfaceContainerLowest)
-        .selectable(selected = selected, role = Role.RadioButton, onClick = onClick),
+        .selectable(selected = selected, enabled = enabled, role = Role.RadioButton, onClick = onClick),
     horizontalAlignment = Alignment.CenterHorizontally,
     verticalArrangement = Arrangement.Center,
   ) {
@@ -330,6 +358,7 @@ private fun ShapeButton(
 private fun Swatch(
   color: AvatarColor?,
   selected: Boolean,
+  enabled: Boolean,
   onClick: () -> Unit,
 ) {
   val scheme = MaterialTheme.colorScheme
@@ -340,7 +369,7 @@ private fun Swatch(
         .size(40.dp)
         .clip(CircleShape)
         .then(if (selected) Modifier.border(BorderStroke(2.dp, scheme.primary), CircleShape) else Modifier)
-        .selectable(selected = selected, role = Role.RadioButton, onClick = onClick)
+        .selectable(selected = selected, enabled = enabled, role = Role.RadioButton, onClick = onClick)
         .semantics { contentDescription = description },
     contentAlignment = Alignment.Center,
   ) {

@@ -8,6 +8,7 @@ import com.alorma.contactnotes.shared.AvatarColor
 import com.alorma.contactnotes.ui.approval.ApprovalConfirmPreview
 import com.alorma.contactnotes.ui.edit.AvatarSheetAutoPreview
 import com.alorma.contactnotes.ui.edit.AvatarSheetCustomPreview
+import com.alorma.contactnotes.ui.edit.AvatarSheetLockedPreview
 import com.alorma.contactnotes.ui.edit.ContactsExplainSheetPreview
 import com.alorma.contactnotes.ui.edit.DeletePersonDialogPreview
 import com.alorma.contactnotes.ui.edit.EditPersonContactLinkedPreview
@@ -322,6 +323,13 @@ class ScreensScreenshotTests {
   @Composable
   fun avatarSheetCustom() {
     AvatarSheetCustomPreview()
+  }
+
+  @ScreenPreviews
+  @PreviewTest
+  @Composable
+  fun avatarSheetLocked() {
+    AvatarSheetLockedPreview()
   }
 
   @ScreenPreviews
