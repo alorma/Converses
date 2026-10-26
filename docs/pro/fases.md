@@ -83,14 +83,15 @@ Al menú de debug, l'apartat **Pro** té un sol interruptor, «Pro user», que e
 
 ### Tasques
 
-- [x] `PaywallRoute(origin)`, `PaywallViewModel` (preu, compra, restauració, sense connexió amb `NetworkMonitor`, snackbars) i tests de JVM — `050e127`
-- [x] Pantalla «Converses Pro» (8a), des d'una funció (8b) i «Ja tens Pro» (8c), amb els textos ca, en i es del tauler 8d; captures — `3587042`
-- [x] Targeta d'Ajustos (destacada sense Pro, «Activat» amb Pro); captures i emulador amb el Test Store (restaurar sense compra, cancel·lació, error, sense connexió, compra vàlida i «Som-hi») — `6c376f2`
-- [x] Punts d'entrada `Locked`: Ajustos › Contactes i la fila de Contactes de l'editor (`Contacts`), Ajustos › «Color de la persona» i el full «Avatar» (`People`); captures i emulador — `07e6cda`
+- [x] `PaywallRoute(origin)`, `PaywallViewModel` (preu, compra, restauració, sense connexió amb `NetworkMonitor`, snackbars) i tests de JVM — `ce7df4e`
+- [x] Pantalla «Converses Pro» (8a), des d'una funció (8b) i «Ja tens Pro» (8c), amb els textos ca, en i es del tauler 8d; captures — `5406eaa`
+- [x] Targeta d'Ajustos (destacada sense Pro, «Activat» amb Pro); captures i emulador amb el Test Store (restaurar sense compra, cancel·lació, error, sense connexió, compra vàlida i «Som-hi») — `f1e2686`
+- [x] Punts d'entrada `Locked`: Ajustos › Contactes i la fila de Contactes de l'editor (`Contacts`), Ajustos › «Color de la persona» i el full «Avatar» (`People`); captures i emulador — `c5bd808`
 - [ ] Compra real a Play des del track intern amb un *license tester* (Play Console › Settings › License testing; el compte de Bernat ja hi és des del 26-10-2026): a la fase 2 la release no tenia cap botó per comprar; el Test Store sí que es va validar
 
 ## Fase 4 · Publicació
 
-- [ ] Política de privacitat (converses.app i alorma.github.io): RevenueCat rep un identificador anònim i les dades de compra, mai notes ni persones
+- [x] Política de privacitat a converses.app (ConversesLanding `da12eb6`, 26-10-2026): RevenueCat rep un identificador anònim i les dades de compra, mai notes ni persones
+- [ ] La mateixa política a alorma.github.io
 - [ ] Formulari de seguretat de dades de Play
 - [ ] Termes
