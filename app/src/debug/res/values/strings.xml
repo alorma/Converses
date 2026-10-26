@@ -21,10 +21,12 @@
   <string name="debug_onboarding_show">Show onboarding again</string>
   <string name="debug_onboarding_show_summary">Clears the flag and restarts the screen</string>
   <string name="debug_flags_title">Feature flags</string>
-  <string name="debug_flags_pro_mode">Pro mode</string>
-  <string name="debug_flags_pro_mode_summary">On turns every Pro flag on, off turns them all off</string>
-  <string name="debug_flags_overridden">Overridden</string>
-  <string name="debug_flags_default">Default value</string>
+  <string name="debug_flags_pro_user">Pro user</string>
+  <string name="debug_flags_pro_user_summary">Fake pro entitlement. Pro flags that are on stay locked without it</string>
+  <string name="debug_flags_pro_mode">Turn on every Pro flag</string>
+  <string name="debug_flags_pro_mode_summary">Only says whether each Pro feature exists; being Pro is the switch above</string>
+  <string name="debug_flags_overridden">Overridden · %1$s</string>
+  <string name="debug_flags_default">Default value · %1$s</string>
   <string name="debug_flags_reset">Reset flags</string>
   <string name="debug_flags_reset_summary">Removes every override and goes back to the default values</string>
 </resources>

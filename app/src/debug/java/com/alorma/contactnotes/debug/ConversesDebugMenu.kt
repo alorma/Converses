@@ -19,6 +19,7 @@ import com.alorma.contactnotes.data.db.ConversesDatabase
 import com.alorma.contactnotes.data.flags.FeatureFlag
 import com.alorma.contactnotes.data.flags.LocalFeatureFlagRunner
 import com.alorma.contactnotes.data.insertSampleData
+import com.alorma.contactnotes.data.pro.LocalProDataSource
 import com.alorma.contactnotes.data.settings.OnboardingFlag
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
@@ -154,11 +155,19 @@ private fun OnboardingModule() {
 @Composable
 private fun FeatureFlagsModule() {
   val runner: LocalFeatureFlagRunner = koinInject()
+  val pro: LocalProDataSource = koinInject()
   val flags = getKoin().getAll<FeatureFlag>()
-  // Reads below depend on this, so the switches follow every override
+  // Reads below depend on these, so the switches follow every override and the Pro switch
   runner.changes.collectAsState().value
+  val isPro = pro.isPro.collectAsState().value
+  val states = flags.associateWith { it.state() }
   val proFlags = flags.filter { it.pro }
   DebugModule(stringResource(R.string.debug_flags_title)) {
+    DebugCell(
+      title = stringResource(R.string.debug_flags_pro_user),
+      subtitle = stringResource(R.string.debug_flags_pro_user_summary),
+      trailing = { Switch(checked = isPro, onCheckedChange = pro::setPro) },
+    )
     DebugCell(
       title = stringResource(R.string.debug_flags_pro_mode),
       subtitle = stringResource(R.string.debug_flags_pro_mode_summary),
@@ -175,6 +184,7 @@ private fun FeatureFlagsModule() {
         subtitle =
           stringResource(
             if (runner.hasOverride(flag.key)) R.string.debug_flags_overridden else R.string.debug_flags_default,
+            states.getValue(flag).name,
           ),
         trailing = { Switch(checked = runner.isEnabled(flag), onCheckedChange = { runner.setOverride(flag.key, it) }) },
       )
