@@ -164,7 +164,7 @@ private fun FeatureFlagsModule() {
       subtitle = stringResource(R.string.debug_flags_pro_mode_summary),
       trailing = {
         Switch(
-          checked = proFlags.isNotEmpty() && proFlags.all { it.isEnabled() },
+          checked = proFlags.isNotEmpty() && proFlags.all { runner.isEnabled(it) },
           onCheckedChange = { on -> proFlags.forEach { runner.setOverride(it.key, on) } },
         )
       },
@@ -176,7 +176,7 @@ private fun FeatureFlagsModule() {
           stringResource(
             if (runner.hasOverride(flag.key)) R.string.debug_flags_overridden else R.string.debug_flags_default,
           ),
-        trailing = { Switch(checked = flag.isEnabled(), onCheckedChange = { runner.setOverride(flag.key, it) }) },
+        trailing = { Switch(checked = runner.isEnabled(flag), onCheckedChange = { runner.setOverride(flag.key, it) }) },
       )
     }
     DebugCell(
