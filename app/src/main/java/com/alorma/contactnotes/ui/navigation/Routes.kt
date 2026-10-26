@@ -2,6 +2,7 @@ package com.alorma.contactnotes.ui.navigation
 
 import androidx.navigation3.runtime.NavKey
 import com.alorma.contactnotes.ui.edit.EditFocus
+import com.alorma.contactnotes.ui.paywall.ProBenefit
 import kotlinx.serialization.Serializable
 
 /** Every destination of the app's single back stack. */
@@ -49,4 +50,10 @@ data class PersonLockedRoute(
   val id: Long,
   /** Es passa a [PersonRoute] després de desbloquejar. */
   val openNewEntry: Boolean = false,
+) : AppRoute
+
+/** Pantalla «Converses Pro»: [highlight] és el benefici d'on ve l'usuari (8b); des d'Ajustos, `null` (8a). */
+@Serializable
+data class PaywallRoute(
+  val highlight: ProBenefit? = null,
 ) : AppRoute

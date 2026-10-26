@@ -20,6 +20,8 @@ import com.alorma.contactnotes.data.flags.FeatureFlagStore
 import com.alorma.contactnotes.data.flags.LocalFeatureFlagRunner
 import com.alorma.contactnotes.data.flags.PersonColorFeature
 import com.alorma.contactnotes.data.flags.ProFeatureFlagRunner
+import com.alorma.contactnotes.data.pro.AndroidNetworkMonitor
+import com.alorma.contactnotes.data.pro.NetworkMonitor
 import com.alorma.contactnotes.data.pro.ProRepository
 import com.alorma.contactnotes.data.settings.AppLockManager
 import com.alorma.contactnotes.data.settings.DataStoreFireAndForgetRunner
@@ -47,6 +49,7 @@ import com.alorma.contactnotes.ui.approval.ApprovalViewModel
 import com.alorma.contactnotes.ui.edit.EditPersonViewModel
 import com.alorma.contactnotes.ui.entry.PersonSelectionBridge
 import com.alorma.contactnotes.ui.entry.QuickNoteViewModel
+import com.alorma.contactnotes.ui.paywall.PaywallViewModel
 import com.alorma.contactnotes.ui.people.PeopleListViewModel
 import com.alorma.contactnotes.ui.person.PersonDetailViewModel
 import com.alorma.contactnotes.ui.person.PersonExporter
@@ -93,6 +96,7 @@ val settingsModule =
       LocalFeatureFlagRunner(initial = store.load(), persist = store::save)
     }
     singleOf(::ProRepository)
+    single<NetworkMonitor> { AndroidNetworkMonitor(androidContext()) }
     single<FeatureFlagRunner> {
       ProFeatureFlagRunner(
         flags = get<LocalFeatureFlagRunner>(),
@@ -111,6 +115,7 @@ val viewModelModule =
   module {
     viewModel { (archived: Boolean) -> PeopleListViewModel(archived, get()) }
     viewModelOf(::SettingsViewModel)
+    viewModelOf(::PaywallViewModel)
     viewModel { WatchInstallViewModel(get(), get()) }
     viewModel { (personId: Long) -> PersonViewModel(personId, get()) }
     viewModel { PersonLockViewModel() }
