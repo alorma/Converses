@@ -4,6 +4,7 @@ import android.Manifest
 import android.app.Activity
 import android.provider.ContactsContract.Contacts
 import android.widget.Toast
+import androidx.activity.compose.LocalActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.material3.Switch
@@ -19,7 +20,7 @@ import com.alorma.contactnotes.data.db.ConversesDatabase
 import com.alorma.contactnotes.data.flags.FeatureFlag
 import com.alorma.contactnotes.data.flags.LocalFeatureFlagRunner
 import com.alorma.contactnotes.data.insertSampleData
-import com.alorma.contactnotes.data.pro.LocalProDataSource
+import com.alorma.contactnotes.data.pro.OverridableProDataSource
 import com.alorma.contactnotes.data.settings.OnboardingFlag
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
@@ -31,6 +32,7 @@ import org.koin.compose.koinInject
 // No module may show names or entry text: protected people must not leak through the menu
 @Composable
 fun ConversesDebugMenu() {
+  ProModule()
   FeatureFlagsModule()
   DataModule()
   ContactsModule()
@@ -152,22 +154,71 @@ private fun OnboardingModule() {
   }
 }
 
+/** Being Pro, apart from the flags: the override, the fake switch and RevenueCat (Test Store). */
 @Composable
-private fun FeatureFlagsModule() {
-  val runner: LocalFeatureFlagRunner = koinInject()
-  val pro: LocalProDataSource = koinInject()
-  val flags = getKoin().getAll<FeatureFlag>()
-  // Reads below depend on these, so the switches follow every override and the Pro switch
-  runner.changes.collectAsState().value
-  val isPro = pro.isPro.collectAsState().value
-  val states = flags.associateWith { it.state() }
-  val proFlags = flags.filter { it.pro }
-  DebugModule(stringResource(R.string.debug_flags_title)) {
+private fun ProModule() {
+  val pro: OverridableProDataSource = koinInject()
+  val overridden = pro.isOverridden.collectAsState().value
+  val localPro =
+    pro.local.isPro
+      .collectAsState()
+      .value
+  val remotePro =
+    pro.remote.isPro
+      .collectAsState()
+      .value
+  val activity = LocalActivity.current
+  val context = LocalContext.current
+  val scope = rememberCoroutineScope()
+  DebugModule(stringResource(R.string.debug_pro_title)) {
+    DebugCell(
+      title = stringResource(R.string.debug_flags_pro_override),
+      subtitle = stringResource(R.string.debug_flags_pro_override_summary),
+      trailing = { Switch(checked = overridden, onCheckedChange = pro::setOverride) },
+    )
     DebugCell(
       title = stringResource(R.string.debug_flags_pro_user),
       subtitle = stringResource(R.string.debug_flags_pro_user_summary),
-      trailing = { Switch(checked = isPro, onCheckedChange = pro::setPro) },
+      trailing = { Switch(checked = localPro, onCheckedChange = pro.local::setPro, enabled = overridden) },
     )
+    DebugCell(
+      title = stringResource(R.string.debug_pro_revenuecat),
+      subtitle = stringResource(R.string.debug_pro_revenuecat_state, remotePro.toString()),
+    )
+    // Always against RevenueCat, whatever the override says; the result name is enough for debugging
+    DebugCell(
+      title = stringResource(R.string.debug_pro_buy),
+      onClick = {
+        activity ?: return@DebugCell
+        scope.launch {
+          val result = pro.remote.purchase(activity)
+          Toast.makeText(context, result.toString(), Toast.LENGTH_SHORT).show()
+        }
+      },
+    )
+    DebugCell(
+      title = stringResource(R.string.debug_pro_restore),
+      onClick = {
+        scope.launch {
+          val result = pro.remote.restore()
+          Toast.makeText(context, result.toString(), Toast.LENGTH_SHORT).show()
+        }
+      },
+    )
+  }
+}
+
+@Composable
+private fun FeatureFlagsModule() {
+  val runner: LocalFeatureFlagRunner = koinInject()
+  val pro: OverridableProDataSource = koinInject()
+  val flags = getKoin().getAll<FeatureFlag>()
+  // Reads below depend on these, so the switches follow every override and every Pro change
+  runner.changes.collectAsState().value
+  pro.isPro.collectAsState().value
+  val states = flags.associateWith { it.state() }
+  val proFlags = flags.filter { it.pro }
+  DebugModule(stringResource(R.string.debug_flags_title)) {
     DebugCell(
       title = stringResource(R.string.debug_flags_pro_mode),
       subtitle = stringResource(R.string.debug_flags_pro_mode_summary),

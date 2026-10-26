@@ -49,7 +49,7 @@ RevenueCat (26-10-2026): entitlement `converses_pro`, producte `lifetime` (Test 
 - [x] SDK 10.29.0 i claus a `BuildConfig`; configurat anònim quan el fil principal queda lliure (al `onCreate` afegia ~400 ms a l'arrencada), i sense clau no es configura; manifest, builds i emulador — `c8a59ce`
 - [x] `RevenueCatProDataSource`: listener de `CustomerInfo`, entitlement `converses_pro`, memòria cau sense connexió; ha de suportar que l'SDK encara no estigui configurat; tests de JVM — `e9cdda4`
 - [x] Preu de l'offering, compra i restauració a `ProRepository`, amb els estats (pendent, error, cancel·lació, sense connexió, restaurar amb i sense compra); tests de JVM — `79a8000`
-- [ ] Reemborsament o revocació: es perd Pro i no s'esborren dades; test de JVM
+- [x] Reemborsament o revocació: es perd Pro i no s'esborren dades; test de JVM — `e2e16af`
 - [ ] Debug: «Override Pro» (encès, mana «Pro user»; apagat, RevenueCat), estat de RevenueCat i compra i restauració de prova; emulador amb el Test Store
 - [ ] Fitxa de Play (en, ca, es): treure «sense accés a internet» (text revisat per Bernat)
 - [ ] `docs/pro/` al dia (entitlement `converses_pro`, override, secrets)

@@ -16,7 +16,9 @@ private val Context.debugProDataStore by preferencesDataStore(name = "debug_pro"
 
 private val IsProKey = booleanPreferencesKey("is_pro")
 
-/** Saves the debug menu's fake Pro. Lives in `files/datastore`, already excluded from backup. */
+private val OverrideKey = booleanPreferencesKey("override")
+
+/** Saves the debug menu's fake Pro and its override. Lives in `files/datastore`, already excluded from backup. */
 @OptIn(ExperimentalCoroutinesApi::class)
 class DebugProStore(
   context: Context,
@@ -31,5 +33,12 @@ class DebugProStore(
 
   fun save(isPro: Boolean) {
     scope.launch { dataStore.edit { it[IsProKey] = isPro } }
+  }
+
+  /** Off by default: Pro comes from RevenueCat (Test Store). */
+  fun loadOverride(): Boolean = runBlocking { dataStore.data.first()[OverrideKey] ?: false }
+
+  fun saveOverride(overridden: Boolean) {
+    scope.launch { dataStore.edit { it[OverrideKey] = overridden } }
   }
 }
