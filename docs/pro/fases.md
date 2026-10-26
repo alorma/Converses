@@ -76,7 +76,7 @@ Al menú de debug, l'apartat **Pro** té un sol interruptor, «Pro user», que e
 - [ ] Pantalla «Converses Pro» (8a), des d'una funció (8b, paràmetre d'origen) i «Ja tens Pro» (8c)
 - [ ] Targeta d'Ajustos i punts d'entrada `Locked` que porten al paywall, amb el seu origen. Ara no fan res: Ajustos › Contactes i la fila de Contactes de l'editor (`contactes`), el full «Avatar» (`avatar`) i Ajustos › «Color de la persona» (`avatar`, o el que digui el disseny)
 - [ ] Textos ca, en i es (tauler 8d)
-- [ ] Compra real a Play des del track intern amb un *license tester* (afegit a Play Console › Settings › License testing): a la fase 2 la release no tenia cap botó per comprar; el Test Store sí que es va validar
+- [ ] Compra real a Play des del track intern amb un *license tester* (Play Console › Settings › License testing; el compte de Bernat ja hi és des del 26-10-2026): a la fase 2 la release no tenia cap botó per comprar; el Test Store sí que es va validar
 
 ## Fase 4 · Publicació
 
