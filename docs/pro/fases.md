@@ -73,9 +73,20 @@ Al menú de debug, l'apartat **Pro** té un sol interruptor, «Pro user», que e
 
 ## Fase 3 · Paywall
 
-- [ ] Pantalla «Converses Pro» (8a), des d'una funció (8b, paràmetre d'origen) i «Ja tens Pro» (8c)
-- [ ] Targeta d'Ajustos i punts d'entrada `Locked` que porten al paywall, amb el seu origen. Ara no fan res: Ajustos › Contactes i la fila de Contactes de l'editor (`contactes`), el full «Avatar» (`avatar`) i Ajustos › «Color de la persona» (`avatar`, o el que digui el disseny)
-- [ ] Textos ca, en i es (tauler 8d)
+### Decisions (26-10-2026)
+
+- **Visible a la release:** la targeta d'Ajustos i el paywall no van darrere de cap flag. Quan es prepari la release que obri Pro, es trauran els flags Pro i només quedarà la comprovació del Pro; fins aleshores no es publica cap release amb el paywall.
+- **Els quatre beneficis**, com el disseny, encara que Canals propis i Pendents no existeixin.
+- **Peu sense «Termes»:** només «Privacitat» (la política actual). «Termes» s'afegeix a la fase 4, quan hi hagi la pàgina.
+- **Origen:** `PaywallRoute(highlight: ProBenefit?)`; `People` cobreix `avatar` i «Color de la persona», `Contacts` és `contactes`, `null` és la targeta d'Ajustos. `Channels` i `FollowUps` esperen les seves funcions.
+- **Full «Avatar» `Locked`:** no hi havia disseny per a l'accés; tocar «Forma» o «Color» tanca el full i obre el paywall, sense cap canvi visual.
+
+### Tasques
+
+- [x] `PaywallRoute(origin)`, `PaywallViewModel` (preu, compra, restauració, sense connexió amb `NetworkMonitor`, snackbars) i tests de JVM — `050e127`
+- [x] Pantalla «Converses Pro» (8a), des d'una funció (8b) i «Ja tens Pro» (8c), amb els textos ca, en i es del tauler 8d; captures — `3587042`
+- [x] Targeta d'Ajustos (destacada sense Pro, «Activat» amb Pro); captures i emulador amb el Test Store (restaurar sense compra, cancel·lació, error, sense connexió, compra vàlida i «Som-hi») — `6c376f2`
+- [x] Punts d'entrada `Locked`: Ajustos › Contactes i la fila de Contactes de l'editor (`Contacts`), Ajustos › «Color de la persona» i el full «Avatar» (`People`); captures i emulador — `07e6cda`
 - [ ] Compra real a Play des del track intern amb un *license tester* (Play Console › Settings › License testing; el compte de Bernat ja hi és des del 26-10-2026): a la fase 2 la release no tenia cap botó per comprar; el Test Store sí que es va validar
 
 ## Fase 4 · Publicació
