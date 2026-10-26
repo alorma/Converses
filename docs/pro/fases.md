@@ -5,7 +5,7 @@ Què és gratis i què és Pro, i la regla, són a `docs/pro/README.md`. Disseny
 | Fase | Títol | Depèn de | Estat |
 | --- | --- | --- | --- |
 | 1 | Infraestructura: datasource, `ProRepository`, runner de flags Pro, debug drawer i etiqueta PRO | — | Feta i validada (26-10-2026) |
-| 2 | RevenueCat: SDK, entitlement `converses_pro`, preu, compra i restauració | 1 | En curs |
+| 2 | RevenueCat: SDK, entitlement `converses_pro`, preu, compra i restauració | 1 | Feta i validada (26-10-2026) |
 | 3 | Paywall: pantalla «Converses Pro» (8a, 8b, 8c) i punts d'entrada | 2 | Pendent |
 | 4 | Publicació: política de privacitat, seguretat de dades de Play, termes | 3 | Pendent |
 
