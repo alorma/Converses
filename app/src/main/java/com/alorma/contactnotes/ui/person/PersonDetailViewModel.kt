@@ -76,12 +76,16 @@ class PersonDetailViewModel(
   val contact: StateFlow<DetailContact> = _contact
 
   init {
-    // Es resol en obrir el detall i cada vegada que el vincle canvia (per exemple, en tornar de l'editor)
+    // Es resol en obrir el detall i cada vegada que el vincle canvia (per exemple, en tornar de l'editor) o que canvia
+    // el flag o el Pro
     viewModelScope.launch {
-      repository
-        .observePerson(personId)
-        .map { person -> person?.takeIf { it.contactId != null && it.contactLookupKey != null } }
-        .distinctUntilChanged { old, new -> old?.linkKey() == new?.linkKey() }
+      combine(
+        repository
+          .observePerson(personId)
+          .map { person -> person?.takeIf { it.contactId != null && it.contactLookupKey != null } }
+          .distinctUntilChanged { old, new -> old?.linkKey() == new?.linkKey() },
+        contactLink.observeState(),
+      ) { person, _ -> person }
         .collectLatest { person -> _contact.value = resolveContact(person) }
     }
   }

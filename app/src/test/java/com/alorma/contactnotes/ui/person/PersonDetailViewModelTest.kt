@@ -4,6 +4,9 @@ import android.content.ContextWrapper
 import com.alorma.contactnotes.data.contacts.ResolvedContact
 import com.alorma.contactnotes.data.flags.ContactLinkFeature
 import com.alorma.contactnotes.data.flags.LocalFeatureFlagRunner
+import com.alorma.contactnotes.data.flags.ProFeatureFlagRunner
+import com.alorma.contactnotes.data.pro.LocalProDataSource
+import com.alorma.contactnotes.data.pro.ProRepository
 import com.alorma.contactnotes.shared.ChannelType
 import com.alorma.contactnotes.shared.EntryKind
 import com.alorma.contactnotes.testing.FakeContactsGateway
@@ -12,6 +15,7 @@ import com.alorma.contactnotes.testing.FakeDb
 import com.alorma.contactnotes.testing.MainDispatcherRule
 import java.time.LocalDate
 import java.time.ZoneId
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -40,6 +44,9 @@ class PersonDetailViewModelTest {
       .toEpochMilli()
 
   private val flags = LocalFeatureFlagRunner()
+  private val pro = LocalProDataSource(initial = true)
+  private val contactLink =
+    ContactLinkFeature(ProFeatureFlagRunner(flags, ProRepository(pro), CoroutineScope(UnconfinedTestDispatcher())))
   private val permission = FakeContactsPermission(granted = true)
   private val contacts = FakeContactsGateway()
   private val contact = ResolvedContact(id = 7, lookupKey = "lookup", name = "Marta Soler Puig")
@@ -50,7 +57,7 @@ class PersonDetailViewModelTest {
         person.id,
         db.repository,
         PersonExporter(ContextWrapper(null), db.repository),
-        ContactLinkFeature(flags),
+        contactLink,
         permission,
         contacts,
       )
@@ -71,6 +78,24 @@ class PersonDetailViewModelTest {
       val vm = viewModel()
 
       assertEquals(DetailContact.Linked(7, "lookup", "Marta Soler Puig"), vm.contact.value)
+    }
+
+  @Test
+  fun theLinkedContactFollowsProWhileTheDetailIsOpen() =
+    runTest {
+      linkToContact()
+      contacts.addContact(contact)
+      pro.setPro(false)
+      val vm = viewModel()
+      assertEquals(DetailContact.None, vm.contact.value)
+
+      pro.setPro(true)
+      assertEquals(DetailContact.Linked(7, "lookup", "Marta Soler Puig"), vm.contact.value)
+
+      // Sense Pro no es mostra, però el vincle es conserva
+      pro.setPro(false)
+      assertEquals(DetailContact.None, vm.contact.value)
+      assertEquals(7L, db.repository.getPerson(person.id)?.contactId)
     }
 
   @Test

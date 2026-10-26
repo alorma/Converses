@@ -8,6 +8,7 @@ import com.alorma.contactnotes.data.contacts.ContactsPermission
 import com.alorma.contactnotes.data.db.PersonEntity
 import com.alorma.contactnotes.data.db.PinnedFactEntity
 import com.alorma.contactnotes.data.flags.ContactLinkFeature
+import com.alorma.contactnotes.data.flags.FeatureState
 import com.alorma.contactnotes.data.settings.SettingsRepository
 import com.alorma.contactnotes.shared.AvatarColor
 import com.alorma.contactnotes.shared.AvatarShape
@@ -186,10 +187,12 @@ class EditPersonViewModel(
 
   init {
     if (personId != 0L) load()
-    if (contactLink.isEnabled()) {
-      viewModelScope.launch {
-        val explained = settings.settings.first().contactsExplained
-        _state.update { it.copy(contact = it.contact.copy(explained = explained)) }
+    // El flag o el Pro poden canviar amb l'editor obert (debug, o en tornar del paywall)
+    viewModelScope.launch {
+      contactLink.observeState().collect { feature ->
+        val enabled = feature == FeatureState.Unlocked
+        val explained = enabled && settings.settings.first().contactsExplained
+        _state.update { it.copy(contact = it.contact.copy(enabled = enabled, explained = explained)) }
       }
     }
   }

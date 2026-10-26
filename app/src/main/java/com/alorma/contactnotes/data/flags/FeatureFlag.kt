@@ -1,5 +1,9 @@
 package com.alorma.contactnotes.data.flags
 
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
+
 /**
  * Una funció que es pot amagar o mostrar, al estil de FireAndForget: cada flag defineix la seva clau i el valor per
  * defecte, i el [FeatureFlagRunner] diu en quin [FeatureState] és. Una funció apagada simplement no hi és; una de Pro
@@ -13,6 +17,9 @@ abstract class FeatureFlag(
   val pro: Boolean = false,
 ) {
   fun state(): FeatureState = runner.state(this)
+
+  /** [state] cada cop que canvia (el flag o el Pro), per als ViewModels que han de seguir-lo. */
+  fun observeState(): Flow<FeatureState> = runner.changes.map { state() }.distinctUntilChanged()
 
   /** Vol dir [FeatureState.Unlocked]: la funció funciona. */
   open fun isEnabled(): Boolean = runner.isEnabled(this)

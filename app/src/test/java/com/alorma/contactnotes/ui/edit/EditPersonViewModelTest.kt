@@ -4,14 +4,19 @@ import android.content.ContextWrapper
 import com.alorma.contactnotes.data.contacts.ResolvedContact
 import com.alorma.contactnotes.data.flags.ContactLinkFeature
 import com.alorma.contactnotes.data.flags.LocalFeatureFlagRunner
+import com.alorma.contactnotes.data.flags.ProFeatureFlagRunner
+import com.alorma.contactnotes.data.pro.LocalProDataSource
+import com.alorma.contactnotes.data.pro.ProRepository
 import com.alorma.contactnotes.testing.FakeContactsGateway
 import com.alorma.contactnotes.testing.FakeContactsPermission
 import com.alorma.contactnotes.testing.FakeDb
 import com.alorma.contactnotes.testing.FakeSettingsRepository
 import com.alorma.contactnotes.testing.MainDispatcherRule
 import com.alorma.contactnotes.ui.person.PersonExporter
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -26,6 +31,9 @@ class EditPersonViewModelTest {
   @get:Rule val main = MainDispatcherRule()
   private val db = FakeDb()
   private val flags = LocalFeatureFlagRunner()
+  private val pro = LocalProDataSource(initial = true)
+  private val contactLink =
+    ContactLinkFeature(ProFeatureFlagRunner(flags, ProRepository(pro), CoroutineScope(UnconfinedTestDispatcher())))
   private val permission = FakeContactsPermission(granted = false)
   private val contacts = FakeContactsGateway()
   private val settings = FakeSettingsRepository()
@@ -35,7 +43,7 @@ class EditPersonViewModelTest {
       personId,
       db.repository,
       PersonExporter(ContextWrapper(null), db.repository),
-      ContactLinkFeature(flags),
+      contactLink,
       permission,
       contacts,
       settings,
@@ -49,6 +57,20 @@ class EditPersonViewModelTest {
   fun withTheFlagOffTheContactSectionIsHidden() {
     val vm = viewModel()
 
+    assertEquals(ContactSection.Hidden, vm.state.value.contact.section)
+  }
+
+  @Test
+  fun theContactSectionFollowsProWhileTheEditorIsOpen() {
+    enableContactLink()
+    pro.setPro(false)
+    val vm = viewModel()
+    assertEquals(ContactSection.Hidden, vm.state.value.contact.section)
+
+    pro.setPro(true)
+    assertEquals(ContactSection.NotLinked, vm.state.value.contact.section)
+
+    pro.setPro(false)
     assertEquals(ContactSection.Hidden, vm.state.value.contact.section)
   }
 
