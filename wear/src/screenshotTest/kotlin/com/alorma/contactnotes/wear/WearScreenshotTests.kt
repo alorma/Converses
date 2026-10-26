@@ -30,6 +30,7 @@ import com.alorma.contactnotes.wear.ui.TimelineEmptyPreview
 import com.alorma.contactnotes.wear.ui.TimelineLoadingMorePreview
 import com.alorma.contactnotes.wear.ui.TimelineLongNamePreview
 import com.alorma.contactnotes.wear.ui.TimelinePreview
+import com.alorma.contactnotes.wear.ui.WhoLongNamePreview
 import com.alorma.contactnotes.wear.ui.WhoPreview
 import com.android.tools.screenshot.PreviewTest
 
@@ -118,6 +119,11 @@ class WearScreenshotTests {
   @PreviewTest
   @Composable
   fun who() = WhoPreview()
+
+  @WatchPreviews
+  @PreviewTest
+  @Composable
+  fun whoLongName() = WhoLongNamePreview()
 
   @WatchPreviews
   @PreviewTest

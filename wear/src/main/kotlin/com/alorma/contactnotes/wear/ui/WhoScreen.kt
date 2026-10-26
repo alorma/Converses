@@ -1,9 +1,7 @@
 package com.alorma.contactnotes.wear.ui
 
-import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.EditNote
 import androidx.compose.material.icons.rounded.Person
@@ -17,21 +15,24 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.wear.compose.foundation.lazy.TransformingLazyColumn
 import androidx.wear.compose.foundation.lazy.rememberTransformingLazyColumnState
+import androidx.wear.compose.material3.ButtonDefaults
+import androidx.wear.compose.material3.EdgeButton
 import androidx.wear.compose.material3.Icon
+import androidx.wear.compose.material3.RadioButton
 import androidx.wear.compose.material3.ScreenScaffold
+import androidx.wear.compose.material3.SurfaceTransformation
 import androidx.wear.compose.material3.Text
+import androidx.wear.compose.material3.lazy.rememberTransformationSpec
+import androidx.wear.compose.material3.lazy.transformedHeight
 import com.alorma.contactnotes.shared.AvatarColor
 import com.alorma.contactnotes.wear.R
 import com.alorma.contactnotes.wear.components.PersonAvatar
-import com.alorma.contactnotes.wear.components.WhoGroup
-import com.alorma.contactnotes.wear.components.WhoOption
 import com.alorma.contactnotes.wear.theme.ButtonLabelStyle
-import com.alorma.contactnotes.wear.theme.WearColors
 import com.alorma.contactnotes.wear.theme.WhoTitleStyle
 import kotlinx.coroutines.delay
 
@@ -47,42 +48,42 @@ fun WhoContent(
   modifier: Modifier = Modifier,
 ) {
   val state = rememberTransformingLazyColumnState()
-  val options =
+  val spec = rememberTransformationSpec()
+  // Etiqueta i icona de cada opció, en l'ordre de selectedIndex
+  val options: List<Pair<String, @Composable () -> Unit>> =
     listOf(
-      WhoOption(
-        label = stringResource(R.string.entry_who_me),
-        leading = { Icon(Icons.Rounded.Person, contentDescription = null, modifier = Modifier.size(24.dp)) },
-      ),
-      WhoOption(
-        label = personName,
-        leading = { PersonAvatar(initials = personInitials, color = personColor, size = 28.dp) },
-        leadingIsAvatar = true,
-      ),
-      WhoOption(
-        label = stringResource(R.string.entry_who_note),
-        leading = { Icon(Icons.Rounded.EditNote, contentDescription = null, modifier = Modifier.size(24.dp)) },
-      ),
+      stringResource(R.string.entry_who_me) to { Icon(Icons.Rounded.Person, contentDescription = null) },
+      personName to {
+        PersonAvatar(initials = personInitials, color = personColor, size = ButtonDefaults.IconSize)
+      },
+      stringResource(R.string.entry_who_note) to { Icon(Icons.Rounded.EditNote, contentDescription = null) },
     )
   ScreenScaffold(
     scrollState = state,
     modifier = modifier,
-  ) {
+    edgeButton = {
+      EdgeButton(onClick = onSave) { Text(text = stringResource(R.string.save), style = ButtonLabelStyle) }
+    },
+  ) { padding ->
     TransformingLazyColumn(
       state = state,
-      contentPadding = PaddingValues(start = 30.dp, end = 30.dp, top = 30.dp, bottom = PinnedEdgeButtonSpace),
+      contentPadding = padding,
+      verticalArrangement = Arrangement.spacedBy(4.dp),
     ) {
-      item {
-        Text(
-          text = stringResource(R.string.who_title),
-          style = WhoTitleStyle,
-          color = WearColors.OnSurface,
-          textAlign = TextAlign.Center,
-          modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
-        )
+      item { WearListTitle(text = stringResource(R.string.who_title), style = WhoTitleStyle) }
+      items(options.size) { index ->
+        val (label, icon) = options[index]
+        RadioButton(
+          selected = index == selectedIndex,
+          onSelect = { onSelect(index) },
+          modifier = Modifier.fillMaxWidth().transformedHeight(this, spec),
+          transformation = SurfaceTransformation(spec),
+          icon = { icon() },
+        ) {
+          Text(text = label, maxLines = 2, overflow = TextOverflow.Ellipsis)
+        }
       }
-      item { WhoGroup(options = options, selectedIndex = selectedIndex, onSelect = onSelect) }
     }
-    PinnedEdgeButton(onClick = onSave) { Text(text = stringResource(R.string.save), style = ButtonLabelStyle) }
   }
 }
 
@@ -97,6 +98,21 @@ fun WhoPreview() =
       personColor = AvatarColor.Sky,
       selectedIndex = selected,
       onSelect = { selected = it },
+      onSave = {},
+    )
+  }
+
+/** Play va rebutjar l'app per un nom llarg tallat a la vora rodona: aquesta captura ho vigila. */
+@WearScreenPreviews
+@Composable
+fun WhoLongNamePreview() =
+  WearPreview {
+    WhoContent(
+      personName = "Maria Antònia Fontcuberta i Puigdollers",
+      personInitials = "MF",
+      personColor = AvatarColor.Peach,
+      selectedIndex = 1,
+      onSelect = {},
       onSave = {},
     )
   }
