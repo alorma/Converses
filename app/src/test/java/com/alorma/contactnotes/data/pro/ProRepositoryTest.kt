@@ -1,5 +1,7 @@
 package com.alorma.contactnotes.data.pro
 
+import android.app.Activity
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -27,6 +29,27 @@ class ProRepositoryTest {
     local.setPro(false)
     assertFalse(repository.isPro.value)
   }
+
+  @Test
+  fun localPurchaseTurnsTheFakeProOn() =
+    runTest {
+      val repository = ProRepository(LocalProDataSource())
+
+      assertEquals(RestoreResult.NothingToRestore, repository.restore())
+      assertEquals(PurchaseResult.Purchased, repository.purchase(Activity()))
+      assertTrue(repository.isPro.value)
+      assertEquals(RestoreResult.Restored, repository.restore())
+    }
+
+  @Test
+  fun releaseWithoutKeyCannotBuy() =
+    runTest {
+      val repository = ProRepository(NoProDataSource)
+
+      assertEquals(null, repository.price())
+      assertEquals(PurchaseResult.Failed, repository.purchase(Activity()))
+      assertFalse(repository.isPro.value)
+    }
 
   @Test
   fun localIsPersistedAndRestored() {
