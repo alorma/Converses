@@ -5,7 +5,7 @@ Què és gratis i què és Pro, i la regla, són a `docs/pro/README.md`. Disseny
 | Fase | Títol | Depèn de | Estat |
 | --- | --- | --- | --- |
 | 1 | Infraestructura: datasource, `ProRepository`, runner de flags Pro, debug drawer i etiqueta PRO | — | Feta i validada (26-10-2026) |
-| 2 | RevenueCat: SDK, entitlement `pro`, preu, compra i restauració | 1 | Pendent |
+| 2 | RevenueCat: SDK, entitlement `converses_pro`, preu, compra i restauració | 1 | En curs |
 | 3 | Paywall: pantalla «Converses Pro» (8a, 8b, 8c) i punts d'entrada | 2 | Pendent |
 | 4 | Publicació: política de privacitat, seguretat de dades de Play, termes | 3 | Pendent |
 
@@ -27,7 +27,7 @@ Dues dimensions independents per a cada funció Pro:
 | Encès | No | `Locked`: surt amb l'etiqueta PRO (més endavant porta al paywall) |
 | Encès | Sí | `Unlocked`: funciona |
 
-`isEnabled()` d'un flag Pro vol dir `Unlocked`. L'estat Pro surt d'un `ProDataSource`: a debug, un local que es commuta des del debug drawer; a release, fins a la fase 2, un que sempre diu que no.
+`isEnabled()` d'un flag Pro vol dir `Unlocked`. L'estat Pro surt d'un `ProDataSource`: a release, RevenueCat (o «mai Pro» si no hi ha clau); a debug, RevenueCat amb el Test Store i un override des del menú de debug (fase 2).
 
 ## Fase 1 · Infraestructura
 
@@ -44,15 +44,32 @@ Dues dimensions independents per a cada funció Pro:
 
 ## Fase 2 · RevenueCat
 
-RevenueCat (26-10-2026): entitlement `converses_pro`, producte `lifetime` (Test Store fet; Play Store pendent de pujar una build amb `BILLING` per poder-lo crear a Play Console), offering `default`. Claus a `local.properties` i secrets de GitHub: `REVENUECAT_TEST_API_KEY` (debug, Test Store) i `REVENUECAT_GOOGLE_API_KEY` (release). L'SDK va també a la release: la fitxa de Play deixa de poder dir «sense internet».
+### Configuració de RevenueCat (26-10-2026)
+
+- **Projecte Converses**, dues apps: Test Store (debug) i Converses (Play Store, `com.alorma.contactnotes`, amb les credencials del service account).
+- **Entitlement** `converses_pro`, amb els dos productes `lifetime` lligats (no consumibles): Test Store `prode32ea36f83` i Play Store `prod0874b2bb70`. El codi mira sempre l'entitlement (`PRO_ENTITLEMENT`), mai el producte.
+- **Offering** `default` (actual), amb un sol paquet: l'app compra el primer paquet de l'offering actual.
+- **Claus:** a `local.properties` i als secrets de GitHub del mateix nom. `REVENUECAT_TEST_API_KEY` (debug i l'APK de `build-apk.yml`) i `REVENUECAT_GOOGLE_API_KEY` (release a `release.yml`). Sense clau, l'app no configura RevenueCat i ningú no és Pro.
+- **Sandbox Testing Access ha d'estar a «Anybody»** (Project settings › General). Si és restringit (per exemple, al correu de Bernat), les compres de sandbox i del Test Store queden com a «Unattached products» i no donen l'entitlement: l'app no té comptes i RevenueCat no pot identificar ningú per correu. A producció no hi influeix.
+- El producte de Play Console no es podia crear fins que hi hagués una build amb `BILLING`: es va pujar la 1.7.9 al track intern.
+- L'SDK també va a la release: la fitxa de Play ja no diu «sense accés a internet».
+
+### Debug
+
+Al menú de debug, l'apartat **Pro** té un sol interruptor, «Pro user», que ensenya l'estat real: encès i bloquejat si RevenueCat (Test Store) diu que s'ha comprat; si no, encendre'l fa override (Pro sense comprar, desat a DataStore). A sota, «Buy Pro (Test Store)» i «Restore purchases» (al Test Store la restauració no existeix: torna el `CustomerInfo` desat). Per tornar a provar una compra des de zero, cal esborrar les dades de l'app (nou identificador anònim).
+
+### Tasques
 
 - [x] SDK 10.29.0 i claus a `BuildConfig`; configurat anònim quan el fil principal queda lliure (al `onCreate` afegia ~400 ms a l'arrencada), i sense clau no es configura; manifest, builds i emulador — `c8a59ce`
 - [x] `RevenueCatProDataSource`: listener de `CustomerInfo`, entitlement `converses_pro`, memòria cau sense connexió; ha de suportar que l'SDK encara no estigui configurat; tests de JVM — `e9cdda4`
 - [x] Preu de l'offering, compra i restauració a `ProRepository`, amb els estats (pendent, error, cancel·lació, sense connexió, restaurar amb i sense compra); tests de JVM — `79a8000`
 - [x] Reemborsament o revocació: es perd Pro i no s'esborren dades; test de JVM — `e2e16af`
-- [ ] Debug: «Override Pro» (encès, mana «Pro user»; apagat, RevenueCat), estat de RevenueCat i compra i restauració de prova; emulador amb el Test Store
-- [ ] Fitxa de Play (en, ca, es): treure «sense accés a internet» (text revisat per Bernat)
-- [ ] `docs/pro/` al dia (entitlement `converses_pro`, override, secrets)
+- [x] Debug: apartat Pro amb l'interruptor «Pro user» (estat de RevenueCat o override) i compra i restauració de prova; títols dels apartats en negreta; emulador amb el Test Store (compra vàlida, fallida i cancel·lada, override, sense connexió) — `5ebad34`, `4c95246`, `445104e`
+- [x] Fitxa de Play (en, ca, es): treure «sense accés a internet» — `a07ad48`
+- [x] `docs/pro/` al dia (entitlement `converses_pro`, configuració de RevenueCat, debug, secrets)
+- [ ] RevenueCat: el `lifetime` de Play Store també al paquet de l'offering `default`
+- [ ] RevenueCat: notificacions de Google (RTDN) connectades i provades
+- [ ] Compra real a Play des del track intern amb un *license tester*
 
 ## Fase 3 · Paywall
 

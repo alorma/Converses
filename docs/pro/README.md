@@ -2,7 +2,7 @@
 
 Què queda fora de la versió gratuïta, perquè passarà a ser Pro, i què es queda gratis per sempre. **La v1 (publicada) no té Pro:** les funcions Pro existeixen al codi però són darrere de feature flags apagats. Document de treball per al Pro.
 
-Model previst per al Pro: **pagament únic**, sense subscripció i sense anuncis. La compra es farà amb **RevenueCat**: un producte no consumible i un entitlement `pro`; el codi consulta l'entitlement, mai el producte. Sense compte: RevenueCat fa servir el seu identificador anònim i no rep mai notes ni persones. Fases a `docs/pro/fases.md`.
+Model previst per al Pro: **pagament únic**, sense subscripció i sense anuncis. La compra es farà amb **RevenueCat**: un producte no consumible (`lifetime`) i un entitlement `converses_pro`; el codi consulta l'entitlement, mai el producte. Sense compte: RevenueCat fa servir el seu identificador anònim i no rep mai notes ni persones. Fases a `docs/pro/fases.md`.
 
 ## Regla
 
@@ -33,7 +33,7 @@ Mai es cobra per **accedir, protegir o treure** les dades pròpies. Al Pro hi va
 
 ## Fet a la v1 gratuïta
 
-- **Feature flags** (`data/flags/`): `CustomAvatarFeature` i `PersonColorFeature`, tots dos apagats. `ContactLinkFeature` (contactes) també hi és, apagat. Els flags de sub-canals i follow-ups s'afegiran quan existeixin aquestes funcions. Cada flag Pro és `Hidden`, `Locked` o `Unlocked` segons el flag i el `ProRepository` (`docs/pro/fases.md`, «Model»); al menú de debug, «Pro user» fa de compra i «Turn on every Pro flag» obre tots els flags. A release encara ningú no és Pro.
+- **Feature flags** (`data/flags/`): `CustomAvatarFeature` i `PersonColorFeature`, tots dos apagats. `ContactLinkFeature` (contactes) també hi és, apagat. Els flags de sub-canals i follow-ups s'afegiran quan existeixin aquestes funcions. Cada flag Pro és `Hidden`, `Locked` o `Unlocked` segons el flag i el `ProRepository` (`docs/pro/fases.md`, «Model»); al menú de debug, l'apartat Pro ensenya l'estat de RevenueCat (Test Store) i permet fer override, i «Turn on every Pro flag» obre tots els flags. A release, Pro surt de RevenueCat (fase 2).
 - **Avatar estàndard:** Galeta i color automàtic pel nom (`AvatarColor.forName`); `avatarShape` i `avatarColor` nul·lables (`null` = estàndard).
 - **Editor:** sense targeta d'avatar; l'avatar és a la fila del nom i, amb `CustomAvatarFeature`, obre el full «Avatar».
 
