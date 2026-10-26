@@ -19,6 +19,7 @@ import com.alorma.contactnotes.data.flags.FeatureFlagRunner
 import com.alorma.contactnotes.data.flags.FeatureFlagStore
 import com.alorma.contactnotes.data.flags.LocalFeatureFlagRunner
 import com.alorma.contactnotes.data.flags.PersonColorFeature
+import com.alorma.contactnotes.data.pro.ProRepository
 import com.alorma.contactnotes.data.settings.AppLockManager
 import com.alorma.contactnotes.data.settings.DataStoreFireAndForgetRunner
 import com.alorma.contactnotes.data.settings.DataStoreSettingsRepository
@@ -90,6 +91,7 @@ val settingsModule =
       val store: FeatureFlagStore = get()
       LocalFeatureFlagRunner(initial = store.load(), persist = store::save)
     } bind FeatureFlagRunner::class
+    singleOf(::ProRepository)
     singleOf(::CustomAvatarFeature) bind FeatureFlag::class
     singleOf(::PersonColorFeature) bind FeatureFlag::class
     singleOf(::ContactLinkFeature) bind FeatureFlag::class
@@ -155,4 +157,12 @@ val contactsModule =
     }
   }
 
-val appModules = listOf(databaseModule, settingsModule, wearModule, contactsModule, viewModelModule)
+val appModules =
+  listOf(
+    databaseModule,
+    proDataSourceModule,
+    settingsModule,
+    wearModule,
+    contactsModule,
+    viewModelModule,
+  )
