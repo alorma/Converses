@@ -26,5 +26,4 @@ rootProject.name = "converses"
 include(":app")
 include(":designsystem")
 include(":shared")
-include(":wear")
 include(":baselineprofile")
