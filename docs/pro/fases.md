@@ -8,8 +8,11 @@ Què és gratis i què és Pro, i la regla, són a `docs/pro/README.md`. Disseny
 | 2 | RevenueCat: SDK, entitlement `converses_pro`, preu, compra i restauració | 1 | Feta i validada (26-10-2026) |
 | 3 | Paywall: pantalla «Converses Pro» (8a, 8b, 8c) i punts d'entrada | 2 | Pendent |
 | 4 | Publicació: política de privacitat, seguretat de dades de Play, termes | 3 | Pendent |
+| 5 | Room v5 i flags de Canals propis i Pendents | — | En curs |
+| 6 | Canals propis: camp «On» (7a, 7c), full «Nou canal» (7b), cronologia, exportar, Ajustos › Canals propis (7d) | 5 | Pendent |
+| 7 | Pendents: fila «Pendent» (P5, 7e), secció al detall (P6), marcar com a fet (7f), cronologia i comptador al llistat (P7) | 5 | Pendent |
 
-Canals propis, Pendents i la personalització de l'avatar tindran els seus lliuraments de disseny i les seves fases.
+Canals propis i Pendents: lliurament de Claude Design del 02-11-2026 (`converses-canals-pendents.zip`, resumit a «Disseny · Canals propis i Pendents» del `README.md`). La personalització de l'avatar tindrà el seu lliurament i la seva fase.
 
 ---
 
@@ -95,3 +98,37 @@ Al menú de debug, l'apartat **Pro** té un sol interruptor, «Pro user», que e
 - [ ] La mateixa política a alorma.github.io
 - [ ] Formulari de seguretat de dades de Play
 - [ ] Termes
+
+## Fases 5–7 · Canals propis i Pendents
+
+**Totes dues són funcions Pro.** Cadascuna va darrere del seu flag Pro (`CustomChannelsFeature`, `FollowUpsFeature`; `pro = true`, apagats): `Hidden` no mostra res, `Locked` (sense Pro) mostra l'etiqueta PRO i porta al paywall (`ProBenefit.Channels`, `ProBenefit.FollowUps`), `Unlocked` funciona. La base de dades no depèn del Pro: el que es va crear amb Pro es conserva i es continua veient si es perd («Baixada de Pro», `README.md`).
+
+### Decisions (02-11-2026)
+
+- **Room v5, una sola migració per a les dues funcions** (fase 5). Taula `custom_channel(id, channelType, name, createdAt)` i, a `entry`, `customChannelId` (nul·lable, `SET NULL` en esborrar el canal), `isPending` i `doneAt`.
+- **Canviar un canal de grup:** les seves entrades s'hi mouen (el `channelType` de l'entrada passa al grup nou), perquè el filtre per grups quadri.
+- **Nom únic dins del grup, sense distingir majúscules** («WhatsApp» i «whatsapp» són el mateix nom); validat al repositori.
+- **Canals antics (beta):** no es poden recuperar. La migració 1→2 els va convertir al grup i va esborrar la taula `channel`; no en queda cap rastre.
+
+### Per decidir abans de les fases 6 i 7
+
+- Disseny de «Reanomena» i «Canvia de grup» (no n'hi ha): reaprofitar el full 7b o demanar-lo a Claude Design.
+- Marcar i desmarcar un pendent des del full d'accions de l'entrada (backlog 6), a més de la fila «Pendent» de l'`EntryForm`.
+- Textos en anglès i castellà que falten: «Pendent», els dos subtítols, «Pendents», «PENDENT», «Marca com a fet».
+- Recordatoris dels pendents: fora d'aquestes fases?
+
+## Fase 5 · Room v5 i flags
+
+- [x] Fases 5–7 i disseny a `docs/pro/`; backlog 6 i 8 actualitzats
+- [x] Room v5: `CustomChannelEntity`, `customChannelId`, `isPending` i `doneAt` a `EntryEntity`; `AutoMigration` 4→5 i test (4→5, `SET NULL` i 1→5 sense perdre dades); `connectedAndroidTest` a l'emulador (8/8) — `c726ce9`
+- [x] DAO, `ConversesRepository` i `FakeDb`: canals (crear, reanomenar, canviar de grup amb les entrades, esborrar, llistar amb el nombre d'entrades, nom únic) i pendents (llistar, fet, desfer, `openFollowUps` al llistat, 0 per a les protegides); tests de JVM (`ProFeaturesRepositoryTest`) — `c8e9c29`
+- [ ] Test instrumentat dels DAO sobre Room en memòria (`CustomChannelDaoTest` a `androidTest`): l'SQL real de `changeGroup`, `SET NULL`, `NOCASE` i `openFollowUps`. El `FakeDb` no el prova. Era a punt de començar quan es va aturar la sessió (02-11-2026)
+- [ ] Flags `CustomChannelsFeature` i `FollowUpsFeature` (Pro, apagats), al menú de debug i a «Turn on every Pro flag»; tests de JVM i emulador
+
+## Fase 6 · Canals propis (Pro)
+
+Tasques per proposar quan es comenci (camp «On» 7a/7c, full 7b, cronologia, exportar, Ajustos › Canals propis 7d, punts d'entrada `Locked` → paywall `Channels`).
+
+## Fase 7 · Pendents (Pro)
+
+Tasques per proposar quan es comenci (fila «Pendent» P5/7e, secció al detall P6, marcar com a fet 7f amb «Desfés» i haptic, etiqueta PENDENT, comptador al llistat P7 sense persones protegides, punts d'entrada `Locked` → paywall `FollowUps`).
