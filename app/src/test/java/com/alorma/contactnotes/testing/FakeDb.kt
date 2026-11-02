@@ -1,6 +1,9 @@
 package com.alorma.contactnotes.testing
 
 import com.alorma.contactnotes.data.ConversesRepository
+import com.alorma.contactnotes.data.db.CustomChannelDao
+import com.alorma.contactnotes.data.db.CustomChannelEntity
+import com.alorma.contactnotes.data.db.CustomChannelWithCount
 import com.alorma.contactnotes.data.db.EntryDao
 import com.alorma.contactnotes.data.db.EntryEntity
 import com.alorma.contactnotes.data.db.KindCount
@@ -9,6 +12,7 @@ import com.alorma.contactnotes.data.db.PersonEntity
 import com.alorma.contactnotes.data.db.PersonListItem
 import com.alorma.contactnotes.data.db.PinnedFactDao
 import com.alorma.contactnotes.data.db.PinnedFactEntity
+import com.alorma.contactnotes.data.db.isOpenFollowUp
 import com.alorma.contactnotes.shared.AvatarColor
 import com.alorma.contactnotes.shared.AvatarShape
 import com.alorma.contactnotes.shared.ChannelType
@@ -24,11 +28,22 @@ class FakeDb {
   val people = MutableStateFlow<List<PersonEntity>>(emptyList())
   val entries = MutableStateFlow<List<EntryEntity>>(emptyList())
   val facts = MutableStateFlow<List<PinnedFactEntity>>(emptyList())
+  val channels = MutableStateFlow<List<CustomChannelEntity>>(emptyList())
   private var next = 1L
 
   fun nextId(): Long = next++
 
-  val repository = ConversesRepository(FakePersonDao(this), FakeEntryDao(this), FakePinnedFactDao(this))
+  val repository =
+    ConversesRepository(FakePersonDao(this), FakeEntryDao(this), FakePinnedFactDao(this), FakeCustomChannelDao(this))
+
+  fun addCustomChannel(
+    name: String,
+    channelType: ChannelType = ChannelType.CHAT,
+  ): CustomChannelEntity {
+    val channel = CustomChannelEntity(id = nextId(), channelType = channelType, name = name, createdAt = 1_000)
+    channels.update { it + channel }
+    return channel
+  }
 
   fun addPerson(
     name: String,
@@ -59,6 +74,9 @@ class FakeDb {
     channel: ChannelType = ChannelType.CHAT,
     text: String = "text",
     occurredAt: Long = 10_000,
+    customChannelId: Long? = null,
+    isPending: Boolean = false,
+    doneAt: Long? = null,
   ): EntryEntity {
     val entry =
       EntryEntity(
@@ -68,6 +86,9 @@ class FakeDb {
         channelType = channel,
         text = text,
         occurredAt = occurredAt,
+        customChannelId = customChannelId,
+        isPending = isPending,
+        doneAt = doneAt,
       )
     entries.update { it + entry }
     return entry
@@ -112,8 +133,9 @@ class FakePersonDao(
       people
         .filter { it.archived == archived }
         .map { person ->
-          val last = entries.filter { it.personId == person.id }.maxWithOrNull(compareBy({ it.occurredAt }, { it.id }))
-          PersonListItem(person, last, entries.filter { it.personId == person.id }.map { it.channelType })
+          val own = entries.filter { it.personId == person.id }
+          val last = own.maxWithOrNull(compareBy({ it.occurredAt }, { it.id }))
+          PersonListItem(person, last, own.map { it.channelType }, openFollowUps = own.count { it.isOpenFollowUp })
         }.sortedByDescending { it.lastEntry?.occurredAt ?: it.person.createdAt }
     }
 
@@ -185,6 +207,69 @@ class FakeEntryDao(
     db.entries.map { list ->
       list.filter { it.personId == personId }.groupBy { it.kind }.map { (kind, items) -> KindCount(kind, items.size) }
     }
+
+  override fun observeOpenFollowUps(personId: Long): Flow<List<EntryEntity>> =
+    db.entries.map { list ->
+      list
+        .filter { it.personId == personId && it.isOpenFollowUp }
+        .sortedWith(compareByDescending<EntryEntity> { it.occurredAt }.thenByDescending { it.id })
+    }
+
+  override suspend fun setDoneAt(
+    id: Long,
+    doneAt: Long?,
+  ) {
+    db.entries.update { list -> list.map { if (it.id == id && it.isPending) it.copy(doneAt = doneAt) else it } }
+  }
+}
+
+class FakeCustomChannelDao(
+  private val db: FakeDb,
+) : CustomChannelDao() {
+  override suspend fun insert(channel: CustomChannelEntity): Long {
+    val id = if (channel.id == 0L) db.nextId() else channel.id
+    db.channels.update { it + channel.copy(id = id) }
+    return id
+  }
+
+  override suspend fun update(channel: CustomChannelEntity) {
+    db.channels.update { list -> list.map { if (it.id == channel.id) channel else it } }
+  }
+
+  /** Com `ON DELETE SET NULL`: les entrades es queden al grup. */
+  override suspend fun delete(channel: CustomChannelEntity) {
+    db.channels.update { list -> list.filterNot { it.id == channel.id } }
+    db.entries.update { list ->
+      list.map { if (it.customChannelId == channel.id) it.copy(customChannelId = null) else it }
+    }
+  }
+
+  override suspend fun get(id: Long): CustomChannelEntity? = db.channels.value.firstOrNull { it.id == id }
+
+  override fun observeAll(): Flow<List<CustomChannelWithCount>> =
+    combine(db.channels, db.entries) { channels, entries ->
+      channels
+        .sortedBy { it.name.lowercase() }
+        .map { channel -> CustomChannelWithCount(channel, entries.count { it.customChannelId == channel.id }) }
+    }
+
+  override suspend fun countNameConflicts(
+    channelType: ChannelType,
+    name: String,
+    excludeId: Long,
+  ): Int =
+    db.channels.value.count {
+      it.channelType == channelType && it.id != excludeId && it.name.equals(name, ignoreCase = true)
+    }
+
+  override suspend fun moveEntries(
+    channelId: Long,
+    channelType: ChannelType,
+  ) {
+    db.entries.update { list ->
+      list.map { if (it.customChannelId == channelId) it.copy(channelType = channelType) else it }
+    }
+  }
 }
 
 class FakePinnedFactDao(

@@ -115,4 +115,12 @@ data class PersonListItem(
   /** Grups de canal de les seves entrades (amb repeticions); la taula `channel` ja no s'usa. */
   @Relation(parentColumn = "id", entityColumn = "personId", entity = EntryEntity::class, projection = ["channelType"])
   val channels: List<ChannelType>,
+  /** Pendents sense fer ([isOpenFollowUp]); 0 per a les persones protegides (ho posa el repositori). */
+  val openFollowUps: Int = 0,
+)
+
+/** Canal propi amb el nombre d'entrades que el fan servir (Ajustos › Canals propis). */
+data class CustomChannelWithCount(
+  @Embedded val channel: CustomChannelEntity,
+  val entryCount: Int,
 )

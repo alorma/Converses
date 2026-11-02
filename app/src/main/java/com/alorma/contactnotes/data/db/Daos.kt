@@ -57,7 +57,8 @@ abstract class PersonDao {
     SELECT p.*,
       e.id AS last_id, e.personId AS last_personId, e.kind AS last_kind,
       e.channelType AS last_channelType, e.text AS last_text, e.occurredAt AS last_occurredAt,
-      e.customChannelId AS last_customChannelId, e.isPending AS last_isPending, e.doneAt AS last_doneAt
+      e.customChannelId AS last_customChannelId, e.isPending AS last_isPending, e.doneAt AS last_doneAt,
+      (SELECT COUNT(*) FROM entry WHERE personId = p.id AND isPending = 1 AND doneAt IS NULL) AS openFollowUps
     FROM person p
     LEFT JOIN entry e ON e.id = (
       SELECT id FROM entry WHERE personId = p.id ORDER BY occurredAt DESC, id DESC LIMIT 1
@@ -132,6 +133,76 @@ interface EntryDao {
 
   @Query("SELECT kind AS kind, COUNT(*) AS count FROM entry WHERE personId = :personId GROUP BY kind")
   fun observeCounts(personId: Long): Flow<List<KindCount>>
+
+  /** Pendents sense fer de la persona, del més recent al més antic (secció «Pendents» del detall). */
+  @Query(
+    """
+    SELECT * FROM entry
+    WHERE personId = :personId AND isPending = 1 AND doneAt IS NULL
+    ORDER BY occurredAt DESC, id DESC
+    """,
+  )
+  fun observeOpenFollowUps(personId: Long): Flow<List<EntryEntity>>
+
+  /** `doneAt = null` desfà el «fet»; l'entrada continua pendent. */
+  @Query("UPDATE entry SET doneAt = :doneAt WHERE id = :id AND isPending = 1")
+  suspend fun setDoneAt(
+    id: Long,
+    doneAt: Long?,
+  )
+}
+
+@Dao
+abstract class CustomChannelDao {
+  @Insert
+  abstract suspend fun insert(channel: CustomChannelEntity): Long
+
+  @Update
+  abstract suspend fun update(channel: CustomChannelEntity)
+
+  /** Les entrades que el feien servir es queden al seu grup (`ON DELETE SET NULL`). */
+  @Delete
+  abstract suspend fun delete(channel: CustomChannelEntity)
+
+  @Query("SELECT * FROM custom_channel WHERE id = :id")
+  abstract suspend fun get(id: Long): CustomChannelEntity?
+
+  @Query(
+    """
+    SELECT c.*, (SELECT COUNT(*) FROM entry WHERE customChannelId = c.id) AS entryCount
+    FROM custom_channel c
+    ORDER BY c.name COLLATE NOCASE
+    """,
+  )
+  abstract fun observeAll(): Flow<List<CustomChannelWithCount>>
+
+  @Query(
+    """
+    SELECT COUNT(*) FROM custom_channel
+    WHERE channelType = :channelType AND id != :excludeId AND name = :name COLLATE NOCASE
+    """,
+  )
+  abstract suspend fun countNameConflicts(
+    channelType: ChannelType,
+    name: String,
+    excludeId: Long,
+  ): Int
+
+  @Query("UPDATE entry SET channelType = :channelType WHERE customChannelId = :channelId")
+  protected abstract suspend fun moveEntries(
+    channelId: Long,
+    channelType: ChannelType,
+  )
+
+  /** Canvia el canal de grup i hi mou les seves entrades, perquè el filtre per grups quadri. */
+  @Transaction
+  open suspend fun changeGroup(
+    channel: CustomChannelEntity,
+    channelType: ChannelType,
+  ) {
+    update(channel.copy(channelType = channelType))
+    moveEntries(channel.id, channelType)
+  }
 }
 
 @Dao
