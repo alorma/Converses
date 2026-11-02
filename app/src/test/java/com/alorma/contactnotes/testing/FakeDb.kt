@@ -107,27 +107,6 @@ class FakePersonDao(
 
   override suspend fun get(id: Long): PersonEntity? = db.person(id)
 
-  override fun observeLinked(): Flow<List<PersonEntity>> =
-    db.people.map { list -> list.filter { it.contactId != null && it.contactLookupKey != null }.sortedBy { it.id } }
-
-  override suspend fun refreshContact(
-    personId: Long,
-    oldLookupKey: String,
-    contactId: Long,
-    lookupKey: String,
-    name: String,
-  ) {
-    db.people.update { list ->
-      list.map {
-        if (it.id == personId && it.contactLookupKey == oldLookupKey) {
-          it.copy(contactId = contactId, contactLookupKey = lookupKey, contactName = name)
-        } else {
-          it
-        }
-      }
-    }
-  }
-
   override fun observeList(archived: Boolean): Flow<List<PersonListItem>> =
     combine(db.people, db.entries) { people, entries ->
       people
@@ -137,8 +116,6 @@ class FakePersonDao(
           PersonListItem(person, last, entries.filter { it.personId == person.id }.map { it.channelType })
         }.sortedByDescending { it.lastEntry?.occurredAt ?: it.person.createdAt }
     }
-
-  override fun observeLinkedCount(): Flow<Int> = db.people.map { list -> list.count { it.contactLookupKey != null } }
 
   override suspend fun countAliasConflicts(
     alias: String,

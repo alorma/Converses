@@ -6,8 +6,6 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.provider.Settings
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -32,13 +30,11 @@ import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Mail
 import androidx.compose.material.icons.outlined.Policy
 import androidx.compose.material.icons.rounded.BrightnessAuto
-import androidx.compose.material.icons.rounded.Contacts
 import androidx.compose.material.icons.rounded.DarkMode
 import androidx.compose.material.icons.rounded.Face
 import androidx.compose.material.icons.rounded.Fingerprint
 import androidx.compose.material.icons.rounded.Language
 import androidx.compose.material.icons.rounded.LightMode
-import androidx.compose.material.icons.rounded.Lock
 import androidx.compose.material.icons.rounded.Palette
 import androidx.compose.material.icons.rounded.Timer
 import androidx.compose.material.icons.rounded.UnfoldMore
@@ -46,7 +42,6 @@ import androidx.compose.material.icons.rounded.Vibration
 import androidx.compose.material.icons.rounded.WorkspacePremium
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItemDefaults
@@ -58,13 +53,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.LinkAnnotation
 import androidx.compose.ui.text.SpanStyle
@@ -82,8 +75,6 @@ import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.alorma.compose.settings.ui.expressive.SettingsGroup
 import com.alorma.contactnotes.R
-import com.alorma.contactnotes.data.contacts.ContactsPermission
-import com.alorma.contactnotes.data.flags.ContactLinkFeature
 import com.alorma.contactnotes.data.flags.FeatureState
 import com.alorma.contactnotes.data.flags.PersonColorFeature
 import com.alorma.contactnotes.data.flags.rememberFeatureState
@@ -102,8 +93,6 @@ import com.alorma.contactnotes.designsystem.components.groupedItemShape
 import com.alorma.contactnotes.designsystem.components.rememberConversesHaptics
 import com.alorma.contactnotes.designsystem.components.rememberTopBarScrollBehavior
 import com.alorma.contactnotes.designsystem.theme.ThemeMode
-import com.alorma.contactnotes.ui.edit.ContactsExplainSheet
-import com.alorma.contactnotes.ui.edit.openAppDetailsSettings
 import com.alorma.contactnotes.ui.paywall.ProBenefit
 import com.alorma.contactnotes.ui.person.canUnlockWithDevice
 import com.alorma.contactnotes.ui.person.openSecuritySetup
@@ -135,33 +124,10 @@ fun SettingsScreen(
   val feedbackBody = stringResource(R.string.settings_feedback_body, remember { versionLabel(context) })
   val haptics = rememberConversesHaptics()
 
-  val contactsState by viewModel.contacts.collectAsStateWithLifecycle()
-  val requestContacts =
-    rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
-      viewModel.onContactsPermissionChanged()
-    }
-  // El permís es pot haver donat o retirat des dels ajustos de l'app
-  LifecycleEventEffect(Lifecycle.Event.ON_RESUME) { viewModel.onContactsPermissionChanged() }
-
   SettingsContent(
     settings = settings,
     isPro = isPro,
     onOpenPro = onOpenPro,
-    contacts =
-      when (rememberFeatureState<ContactLinkFeature>()) {
-        FeatureState.Hidden -> null
-        FeatureState.Locked -> ContactsSettingsState.Locked
-        FeatureState.Unlocked -> contactsState
-      },
-    onContactsExplainContinue = {
-      viewModel.onContactsExplained()
-      requestContacts.launch(ContactsPermission.permissions)
-    },
-    onContactsAllow = {
-      // Denegat per sempre: el sistema ja no mostra el diàleg, només es pot donar als ajustos de l'app
-      val canAsk = ContactsPermission.permissions.any { activity.shouldShowRequestPermissionRationale(it) }
-      if (canAsk) requestContacts.launch(ContactsPermission.permissions) else context.openAppDetailsSettings()
-    },
     personColor = rememberFeatureState<PersonColorFeature>(),
     canUnlock = canUnlock,
     languageName = remember { currentLanguageName(context) },
@@ -204,15 +170,11 @@ fun SettingsContent(
   onOpenPrivacyPolicy: () -> Unit,
   onOpenFeedback: () -> Unit,
   personColor: FeatureState = FeatureState.Unlocked,
-  contacts: ContactsSettingsState? = null,
-  onContactsExplainContinue: () -> Unit = {},
-  onContactsAllow: () -> Unit = {},
   /** `null`: sense la targeta de Pro (previews antigues). */
   isPro: Boolean? = null,
   /** Obre la pantalla de Pro; el benefici és l'origen (8b), `null` des de la targeta. */
   onOpenPro: (ProBenefit?) -> Unit = {},
 ) {
-  var showContactsExplain by rememberSaveable { mutableStateOf(false) }
   val scrollBehavior = rememberTopBarScrollBehavior()
   Scaffold(
     modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
@@ -362,15 +324,6 @@ fun SettingsContent(
         modifier = Modifier.padding(horizontal = 4.dp),
       )
 
-      if (contacts != null) {
-        ContactsSection(
-          state = contacts,
-          onTurnOn = { showContactsExplain = true },
-          onAllow = onContactsAllow,
-          onOpenPro = { onOpenPro(ProBenefit.Contacts) },
-        )
-      }
-
       val aboutCount = 3
       SettingsGroup(
         title = { SectionTitle(stringResource(R.string.settings_about)) },
@@ -399,16 +352,6 @@ fun SettingsContent(
       }
       MadeBy(modifier = Modifier.padding(start = 4.dp, top = 4.dp, bottom = 32.dp))
     }
-  }
-
-  if (showContactsExplain) {
-    ContactsExplainSheet(
-      onContinue = {
-        showContactsExplain = false
-        onContactsExplainContinue()
-      },
-      onDismiss = { showContactsExplain = false },
-    )
   }
 }
 
@@ -591,79 +534,6 @@ private fun SectionTitle(text: String) {
 @Composable
 private fun TileTitle(text: String) {
   Text(text = text, fontWeight = FontWeight.SemiBold)
-}
-
-@Composable
-private fun ContactsSection(
-  state: ContactsSettingsState,
-  onTurnOn: () -> Unit,
-  onAllow: () -> Unit,
-  onOpenPro: () -> Unit,
-) {
-  SettingsGroup(
-    title = {
-      Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
-        SectionTitle(stringResource(R.string.settings_contacts))
-        ProBadge(
-          text = stringResource(R.string.pro_badge),
-          contentDescription = stringResource(R.string.pro_description),
-        )
-      }
-    },
-    verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap),
-  ) {
-    when (state) {
-      ContactsSettingsState.Locked ->
-        SettingRow(
-          title = stringResource(R.string.settings_contacts_link),
-          subtitle = stringResource(R.string.settings_contacts_on_summary),
-          icon = Icons.Rounded.Contacts,
-          onClick = onOpenPro,
-          trailing = { Icon(Icons.AutoMirrored.Rounded.KeyboardArrowRight, contentDescription = null) },
-          shape = groupedItemShape(0, 1),
-        )
-      ContactsSettingsState.NeverOn ->
-        SettingRow(
-          title = stringResource(R.string.settings_contacts_link),
-          subtitle = stringResource(R.string.settings_contacts_off_summary),
-          icon = Icons.Rounded.Contacts,
-          trailing = {
-            FilledTonalButton(onClick = onTurnOn) {
-              Text(stringResource(R.string.settings_contacts_turn_on), fontWeight = FontWeight.Bold)
-            }
-          },
-          shape = groupedItemShape(0, 1),
-        )
-      is ContactsSettingsState.On ->
-        SettingRow(
-          title = pluralStringResource(R.plurals.settings_contacts_on, state.linkedCount, state.linkedCount),
-          subtitle = stringResource(R.string.settings_contacts_on_summary),
-          icon = Icons.Rounded.Contacts,
-          shape = groupedItemShape(0, 1),
-        )
-      ContactsSettingsState.Denied ->
-        SettingRow(
-          title = stringResource(R.string.contacts_no_permission),
-          subtitle = stringResource(R.string.settings_contacts_denied_summary),
-          icon = Icons.Rounded.Lock,
-          trailing = {
-            FilledTonalButton(onClick = onAllow) {
-              Text(stringResource(R.string.contacts_allow), fontWeight = FontWeight.Bold)
-            }
-          },
-          shape = groupedItemShape(0, 1),
-        )
-    }
-  }
-  // Bloquejada (5h, gratuït) no porta la nota
-  if (state != ContactsSettingsState.Locked) {
-    Text(
-      text = stringResource(R.string.settings_contacts_note),
-      style = MaterialTheme.typography.bodySmall,
-      color = MaterialTheme.colorScheme.onSurfaceVariant,
-      modifier = Modifier.padding(horizontal = 4.dp),
-    )
-  }
 }
 
 /** Targeta de Pro a dalt d'Ajustos (1c): destacada sense Pro, normal amb Pro; totes dues porten a la pantalla de Pro. */

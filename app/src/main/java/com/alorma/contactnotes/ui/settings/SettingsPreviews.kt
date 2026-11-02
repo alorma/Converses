@@ -2,7 +2,6 @@ package com.alorma.contactnotes.ui.settings
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
-import com.alorma.contactnotes.data.flags.FeatureState
 import com.alorma.contactnotes.data.settings.AppSettings
 import com.alorma.contactnotes.designsystem.preview.ConversesPreviewTheme
 
@@ -56,62 +55,4 @@ internal fun SettingsAppLockPreview() {
 @Composable
 internal fun SettingsNoLockPreview() {
   SettingsPreview(settings = AppSettings(), canUnlock = false)
-}
-
-@Composable
-private fun SettingsContactsPreview(
-  contacts: ContactsSettingsState,
-  personColor: FeatureState = FeatureState.Unlocked,
-) {
-  ConversesPreviewTheme {
-    SettingsContent(
-      settings = AppSettings(),
-      canUnlock = true,
-      languageName = "English",
-      versionName = "1.0 (1)",
-      onBack = {},
-      onThemeMode = {},
-      onDynamicColor = {},
-      onPersonColorTheme = {},
-      onHapticFeedback = {},
-      onAppLockChange = {},
-      onRelockAfter = {},
-      onOpenLanguage = {},
-      onOpenSecuritySetup = {},
-      onOpenPrivacyPolicy = {},
-      onOpenFeedback = {},
-      contacts = contacts,
-      personColor = personColor,
-      // Contactes fora de `Locked` vol dir que ja és Pro
-      isPro = contacts != ContactsSettingsState.Locked,
-    )
-  }
-}
-
-/** Contactes: mai activat (1c, 5h). */
-@Preview
-@Composable
-internal fun SettingsContactsNeverOnPreview() {
-  SettingsContactsPreview(ContactsSettingsState.NeverOn)
-}
-
-/** Contactes: activat amb tres files. */
-@Preview
-@Composable
-internal fun SettingsContactsOnPreview() {
-  SettingsContactsPreview(ContactsSettingsState.On(linkedCount = 3))
-}
-
-/** Usuari gratuït amb els flags oberts: Contactes (5h) i «Person color» bloquejats. */
-@Preview
-@Composable
-internal fun SettingsContactsLockedPreview() {
-  SettingsContactsPreview(ContactsSettingsState.Locked, personColor = FeatureState.Locked)
-}
-
-/** Contactes: permís denegat. */
-@Preview
-@Composable
-internal fun SettingsContactsDeniedPreview() {
-  SettingsContactsPreview(ContactsSettingsState.Denied)
 }

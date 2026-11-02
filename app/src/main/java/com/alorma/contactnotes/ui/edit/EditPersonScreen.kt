@@ -1,8 +1,6 @@
 package com.alorma.contactnotes.ui.edit
 
 import androidx.activity.compose.LocalActivity
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.BorderStroke
@@ -88,11 +86,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.fragment.app.FragmentActivity
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.alorma.contactnotes.R
-import com.alorma.contactnotes.data.contacts.ContactsPermission
 import com.alorma.contactnotes.data.flags.CustomAvatarFeature
 import com.alorma.contactnotes.data.flags.FeatureState
 import com.alorma.contactnotes.data.flags.rememberFeatureState
@@ -101,7 +96,6 @@ import com.alorma.contactnotes.designsystem.components.ConversesSaveButton
 import com.alorma.contactnotes.designsystem.components.ConversesSwitch
 import com.alorma.contactnotes.designsystem.components.ConversesTopBar
 import com.alorma.contactnotes.designsystem.components.GroupedListDefaults
-import com.alorma.contactnotes.designsystem.components.ProBadge
 import com.alorma.contactnotes.designsystem.components.asShape
 import com.alorma.contactnotes.designsystem.components.groupedItemShape
 import com.alorma.contactnotes.designsystem.components.rememberConversesHaptics
@@ -141,19 +135,6 @@ fun EditPersonScreen(
     if (secure) secureWindow.acquire()
     onDispose { if (secure) secureWindow.release() }
   }
-  // El selector dona accés només al contacte triat, sense permís; el permís cal per a les files a Contactes (C7)
-  val pickContact =
-    rememberLauncherForActivityResult(ActivityResultContracts.PickContact()) { uri ->
-      if (uri != null) viewModel.onContactPicked(uri.toString())
-    }
-  val requestContacts =
-    rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { result ->
-      viewModel.onContactsPermissionChanged()
-      if (result.isNotEmpty() && result.values.all { it }) pickContact.launch(null)
-    }
-  // El permís es pot haver donat o retirat des dels ajustos de l'app
-  LifecycleEventEffect(Lifecycle.Event.ON_RESUME) { viewModel.onContactsPermissionChanged() }
-
   EditPersonContent(
     state = state,
     canAuthenticate = canAuthenticate,
@@ -169,14 +150,7 @@ fun EditPersonScreen(
     },
     customAvatar = rememberFeatureState<CustomAvatarFeature>(),
     focus = focus,
-    onRequestContactsPermission = { requestContacts.launch(ContactsPermission.permissions) },
-    onPickContact = { pickContact.launch(null) },
     onOpenPro = onOpenPro,
-    onAllowContacts = {
-      // Denegat per sempre: el sistema ja no mostra el diàleg, només es pot donar als ajustos de l'app
-      val canAsk = ContactsPermission.permissions.any { activity.shouldShowRequestPermissionRationale(it) }
-      if (canAsk) requestContacts.launch(ContactsPermission.permissions) else activity.openAppDetailsSettings()
-    },
   )
 }
 
@@ -191,15 +165,11 @@ fun EditPersonContent(
   onProtectedChange: (Boolean) -> Unit,
   customAvatar: FeatureState = FeatureState.Unlocked,
   focus: EditFocus? = null,
-  onRequestContactsPermission: () -> Unit = {},
-  onPickContact: () -> Unit = {},
-  onAllowContacts: () -> Unit = {},
-  /** Des d'una funció `Locked` (fila de Contactes o full «Avatar»): obre la pantalla de Pro. */
+  /** Des d'una funció `Locked` (full «Avatar»): obre la pantalla de Pro. */
   onOpenPro: (ProBenefit) -> Unit = {},
 ) {
   var showDelete by remember { mutableStateOf(false) }
   var showAvatarSheet by remember { mutableStateOf(false) }
-  var showContactsExplain by rememberSaveable { mutableStateOf(false) }
 
   PersonTheme(state.color ?: AvatarColor.forName(state.name)) {
     val scrollBehavior = rememberTopBarScrollBehavior()
@@ -295,24 +265,6 @@ fun EditPersonContent(
           }
         }
 
-        val contactSection = state.contact.section
-        if (contactSection != ContactSection.Hidden) {
-          SectionHeader(title = stringResource(R.string.contact_section), pro = true)
-          ContactSectionRow(
-            section = contactSection,
-            onLink = {
-              when (state.contact.linkStep) {
-                ContactLinkStep.Explain -> showContactsExplain = true
-                ContactLinkStep.RequestPermission -> onRequestContactsPermission()
-                ContactLinkStep.Pick -> onPickContact()
-              }
-            },
-            onUnlink = actions::onUnlinkContact,
-            onAllow = onAllowContacts,
-            onOpenPro = { onOpenPro(ProBenefit.Contacts) },
-          )
-        }
-
         SectionHeader(title = stringResource(R.string.facts_title))
         FactsEditor(state.facts, actions, focusIndex = focusFactIndex.takeIf { focus == EditFocus.NEW_FACT })
 
@@ -374,17 +326,6 @@ fun EditPersonContent(
       )
     }
 
-    if (showContactsExplain) {
-      ContactsExplainSheet(
-        onContinue = {
-          showContactsExplain = false
-          actions.onContactsExplained()
-          onRequestContactsPermission()
-        },
-        onDismiss = { showContactsExplain = false },
-      )
-    }
-
     if (showAvatarSheet && customAvatar != FeatureState.Hidden) {
       AvatarSheet(
         name = state.name,
@@ -404,25 +345,14 @@ fun EditPersonContent(
 }
 
 @Composable
-private fun SectionHeader(
-  title: String,
-  pro: Boolean = false,
-) {
-  Row(
+private fun SectionHeader(title: String) {
+  Text(
+    text = title,
+    style = MaterialTheme.typography.titleMedium,
+    fontWeight = FontWeight.Bold,
+    color = MaterialTheme.colorScheme.onSurfaceVariant,
     modifier = Modifier.fillMaxWidth().padding(start = 4.dp, top = 8.dp),
-    horizontalArrangement = Arrangement.spacedBy(8.dp),
-    verticalAlignment = Alignment.CenterVertically,
-  ) {
-    Text(
-      text = title,
-      style = MaterialTheme.typography.titleMedium,
-      fontWeight = FontWeight.Bold,
-      color = MaterialTheme.colorScheme.onSurfaceVariant,
-    )
-    if (pro) {
-      ProBadge(text = stringResource(R.string.pro_badge), contentDescription = stringResource(R.string.pro_description))
-    }
-  }
+  )
 }
 
 @Composable

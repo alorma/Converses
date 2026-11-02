@@ -97,7 +97,6 @@
     <string name="paste">Enganxa del porta-retalls</string>
     <string name="yesterday">Ahir</string>
 
-
     <string name="channel_chat">Xat</string>
     <string name="channel_social">Xarxes</string>
     <string name="channel_other">Altres</string>
@@ -229,47 +228,6 @@
     <string name="shape_ghost">Fantasma</string>
     <string name="shape_pillow">Coixí</string>
 
-    <!-- Files de Converses a la fitxa d'un contacte vinculat (app Contactes) -->
-    <string name="contacts_row_view_notes">Veure notes</string>
-    <string name="contacts_row_create_note">Crear nota</string>
-
-    <!-- Secció «Contacte» de l'editor i explicació del permís (docs/contacts/disseny.md, 5a–5d) -->
-    <string name="contact_section">Contacte</string>
-    <string name="contact_link">Vincula un contacte</string>
-    <string name="contact_link_summary">Opcional · surt a la fitxa de Contactes</string>
-    <string name="contact_taken">Aquest contacte ja està vinculat a una altra persona</string>
-    <string name="contact_linked_to">VINCULAT A</string>
-    <string name="contact_unlink">Treu el vincle</string>
-    <string name="contacts_no_permission">Sense permís de Contactes</string>
-    <string name="contacts_no_permission_summary">Cal per vincular un contacte</string>
-    <string name="contacts_allow">Dona permís</string>
-    <string name="contacts_explain_title">Vincula persones amb Contactes</string>
-    <string name="contacts_explain_body">Per vincular, Converses necessita veure els teus contactes. Així les teves notes surten a la fitxa del contacte.</string>
-    <string name="contacts_explain_account_title">Apareixerà un compte «Converses»</string>
-    <string name="contacts_explain_account_body">Es veurà a Ajustos › Comptes. És normal: l\'Android el necessita per mostrar «Veure notes» i «Crear nota» dins del contacte.</string>
-    <string name="contacts_explain_copy_title">No es copia res a Contactes</string>
-    <string name="contacts_explain_copy_body">Només s\'hi afegeixen aquests dos accessos. Les notes es queden a Converses.</string>
-    <string name="contacts_explain_deny_title">Si no ho permets</string>
-    <string name="contacts_explain_deny_body">Converses funciona igual. Només no podràs vincular contactes ni veure l\'accés a Contactes al detall.</string>
-    <string name="contacts_explain_continue">Continua</string>
-    <string name="contacts_explain_not_now">Ara no</string>
-    <!-- Vincle amb Contactes al detall de la persona (docs/contacts/disseny.md, 5e i 5f) -->
-    <string name="contact_linked_name">Vinculada a %1$s</string>
-    <string name="contact_open">Obre a Contactes</string>
-    <string name="contact_deleted_title">El contacte ja no existeix</string>
-    <string name="contact_deleted_body">S\'ha esborrat de Contactes. Les notes es queden aquí.</string>
-    <string name="contact_unlink_button">Desvincula</string>
-    <string name="settings_contacts">Contactes</string>
-    <string name="settings_contacts_link">Vincle amb Contactes</string>
-    <string name="settings_contacts_off_summary">Encara no l\'has activat. Et demanarem permís per veure els contactes.</string>
-    <string name="settings_contacts_turn_on">Activa</string>
-    <plurals name="settings_contacts_on">
-        <item quantity="one">Activat · %d persona vinculada</item>
-        <item quantity="other">Activat · %d persones vinculades</item>
-    </plurals>
-    <string name="settings_contacts_on_summary">Mostra les teves notes dins de la fitxa de cada contacte</string>
-    <string name="settings_contacts_denied_summary">Les persones vinculades no mostren l\'accés a Contactes. Les notes no es perden.</string>
-    <string name="settings_contacts_note">Les notes no es copien a Contactes: només s\'hi afegeixen «Veure notes» i «Crear nota».</string>
     <string name="paywall_title">Converses Pro</string>
     <string name="paywall_subtitle">Un sol pagament. Per sempre.</string>
     <string name="paywall_benefit_people">Persones a la teva manera</string>
@@ -278,8 +236,6 @@
     <string name="paywall_benefit_channels_summary">WhatsApp, Discord… dins de cada grup</string>
     <string name="paywall_benefit_follow_ups">Pendents</string>
     <string name="paywall_benefit_follow_ups_summary">Apunta què has de fer i marca-ho com a fet</string>
-    <string name="paywall_benefit_contacts">Vincle amb Contactes</string>
-    <string name="paywall_benefit_contacts_summary">Les teves notes a la fitxa del contacte</string>
     <string name="paywall_note">Sense subscripció i sense compte. Les teves notes es queden al mòbil.</string>
     <string name="paywall_buy">Aconsegueix Pro · %s</string>
     <string name="paywall_buy_offline">Cal connexió per comprar.</string>
@@ -291,6 +247,6 @@
     <string name="paywall_pending">La compra està pendent. Pro s\'activarà quan es confirmi.</string>
     <string name="paywall_failed">No s\'ha pogut completar la compra.</string>
     <string name="paywall_nothing_to_restore">No hi ha cap compra per restaurar en aquest compte de Google.</string>
-    <string name="settings_pro_summary">Un sol pagament: canals propis, pendents, contactes i més</string>
+    <string name="settings_pro_summary">Un sol pagament: canals propis, pendents i més</string>
     <string name="settings_pro_owned_summary">Activat · gràcies pel suport</string>
 </resources>

@@ -4,15 +4,9 @@ import android.content.Context
 import android.content.pm.ApplicationInfo
 import androidx.room.Room
 import com.alorma.contactnotes.data.ConversesRepository
-import com.alorma.contactnotes.data.contacts.AndroidContactsGateway
-import com.alorma.contactnotes.data.contacts.AndroidContactsPermission
-import com.alorma.contactnotes.data.contacts.ContactsGateway
-import com.alorma.contactnotes.data.contacts.ContactsPermission
-import com.alorma.contactnotes.data.contacts.ContactsReconciler
 import com.alorma.contactnotes.data.db.ConversesDatabase
 import com.alorma.contactnotes.data.db.Migration1To2
 import com.alorma.contactnotes.data.db.Migration2To3
-import com.alorma.contactnotes.data.flags.ContactLinkFeature
 import com.alorma.contactnotes.data.flags.CustomAvatarFeature
 import com.alorma.contactnotes.data.flags.FeatureFlag
 import com.alorma.contactnotes.data.flags.FeatureFlagRunner
@@ -88,7 +82,6 @@ val settingsModule =
     }
     singleOf(::CustomAvatarFeature) bind FeatureFlag::class
     singleOf(::PersonColorFeature) bind FeatureFlag::class
-    singleOf(::ContactLinkFeature) bind FeatureFlag::class
     single { PersonExporter(androidContext(), get()) }
     single { PersonSelectionBridge() }
   }
@@ -100,25 +93,9 @@ val viewModelModule =
     viewModelOf(::PaywallViewModel)
     viewModel { (personId: Long) -> PersonViewModel(personId, get()) }
     viewModel { PersonLockViewModel() }
-    viewModel { (personId: Long) -> PersonDetailViewModel(personId, get(), get(), get(), get(), get()) }
+    viewModel { (personId: Long) -> PersonDetailViewModel(personId, get(), get()) }
     viewModel { (personId: Long) -> QuickNoteViewModel(personId, get(), get()) }
-    viewModel { (personId: Long) -> EditPersonViewModel(personId, get(), get(), get(), get(), get(), get()) }
-  }
-
-/** Vincle amb Contactes (`docs/contacts`), darrere de `ContactLinkFeature`. */
-val contactsModule =
-  module {
-    single<ContactsGateway> { AndroidContactsGateway(androidContext()) }
-    single<ContactsPermission> { AndroidContactsPermission(androidContext()) }
-    single {
-      ContactsReconciler(
-        repository = get(),
-        contactLink = get(),
-        permission = get(),
-        gateway = get(),
-        scope = CoroutineScope(SupervisorJob() + Dispatchers.Default),
-      )
-    }
+    viewModel { (personId: Long) -> EditPersonViewModel(personId, get(), get()) }
   }
 
 val appModules =
@@ -126,6 +103,5 @@ val appModules =
     databaseModule,
     proDataSourceModule,
     settingsModule,
-    contactsModule,
     viewModelModule,
   )

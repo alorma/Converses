@@ -1,27 +1,17 @@
 package com.alorma.contactnotes.ui.person
 
 import android.content.ContextWrapper
-import com.alorma.contactnotes.data.contacts.ResolvedContact
-import com.alorma.contactnotes.data.flags.ContactLinkFeature
-import com.alorma.contactnotes.data.flags.LocalFeatureFlagRunner
-import com.alorma.contactnotes.data.flags.ProFeatureFlagRunner
-import com.alorma.contactnotes.data.pro.LocalProDataSource
-import com.alorma.contactnotes.data.pro.ProRepository
 import com.alorma.contactnotes.shared.ChannelType
 import com.alorma.contactnotes.shared.EntryKind
-import com.alorma.contactnotes.testing.FakeContactsGateway
-import com.alorma.contactnotes.testing.FakeContactsPermission
 import com.alorma.contactnotes.testing.FakeDb
 import com.alorma.contactnotes.testing.MainDispatcherRule
 import java.time.LocalDate
 import java.time.ZoneId
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -43,122 +33,11 @@ class PersonDetailViewModelTest {
       .toInstant()
       .toEpochMilli()
 
-  private val flags = LocalFeatureFlagRunner()
-  private val pro = LocalProDataSource(initial = true)
-  private val contactLink =
-    ContactLinkFeature(ProFeatureFlagRunner(flags, ProRepository(pro), CoroutineScope(UnconfinedTestDispatcher())))
-  private val permission = FakeContactsPermission(granted = true)
-  private val contacts = FakeContactsGateway()
-  private val contact = ResolvedContact(id = 7, lookupKey = "lookup", name = "Marta Soler Puig")
-
   private fun kotlinx.coroutines.test.TestScope.viewModel(): PersonDetailViewModel {
-    val vm =
-      PersonDetailViewModel(
-        person.id,
-        db.repository,
-        PersonExporter(ContextWrapper(null), db.repository),
-        contactLink,
-        permission,
-        contacts,
-      )
+    val vm = PersonDetailViewModel(person.id, db.repository, PersonExporter(ContextWrapper(null), db.repository))
     backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { vm.uiState.collect {} }
     return vm
   }
-
-  private suspend fun linkToContact() {
-    flags.setOverride("contact_link_enabled", true)
-    db.repository.linkContact(person, contact.id, contact.lookupKey, contact.name)
-  }
-
-  @Test
-  fun aLinkedContactIsResolvedWhenTheDetailOpens() =
-    runTest {
-      linkToContact()
-      contacts.addContact(contact)
-      val vm = viewModel()
-
-      assertEquals(DetailContact.Linked(7, "lookup", "Marta Soler Puig"), vm.contact.value)
-    }
-
-  @Test
-  fun theLinkedContactFollowsProWhileTheDetailIsOpen() =
-    runTest {
-      linkToContact()
-      contacts.addContact(contact)
-      pro.setPro(false)
-      val vm = viewModel()
-      assertEquals(DetailContact.None, vm.contact.value)
-
-      pro.setPro(true)
-      assertEquals(DetailContact.Linked(7, "lookup", "Marta Soler Puig"), vm.contact.value)
-
-      // Sense Pro no es mostra, però el vincle es conserva
-      pro.setPro(false)
-      assertEquals(DetailContact.None, vm.contact.value)
-      assertEquals(7L, db.repository.getPerson(person.id)?.contactId)
-    }
-
-  @Test
-  fun aNewLookupKeyAndNameAreSavedWhenResolving() =
-    runTest {
-      linkToContact()
-      // El lookup key antic encara resol el contacte, però ara en torna un altre i el nom ha canviat
-      contacts.addContact(contact.copy(lookupKey = "lookup.agg", name = "Marta S."))
-      contacts.contacts["lookup"] = contact.copy(lookupKey = "lookup.agg", name = "Marta S.")
-      val vm = viewModel()
-
-      assertEquals(DetailContact.Linked(7, "lookup.agg", "Marta S."), vm.contact.value)
-      val saved = db.person(person.id)!!
-      assertEquals("lookup.agg", saved.contactLookupKey)
-      assertEquals("Marta S.", saved.contactName)
-    }
-
-  @Test
-  fun aDeletedContactCanBeUnlinked() =
-    runTest {
-      linkToContact()
-      val vm = viewModel()
-      assertEquals(DetailContact.Deleted, vm.contact.value)
-
-      vm.unlinkContact()
-
-      assertEquals(DetailContact.None, vm.contact.value)
-      assertNull(db.person(person.id)!!.contactLookupKey)
-    }
-
-  @Test
-  fun withoutPermissionOrWithTheFlagOffThereIsNoContactRow() =
-    runTest {
-      linkToContact()
-      contacts.addContact(contact)
-      permission.granted = false
-      assertEquals(DetailContact.None, viewModel().contact.value)
-
-      permission.granted = true
-      flags.setOverride("contact_link_enabled", false)
-      assertEquals(DetailContact.None, viewModel().contact.value)
-    }
-
-  @Test
-  fun withoutALinkThereIsNoContactRow() =
-    runTest {
-      flags.setOverride("contact_link_enabled", true)
-
-      assertEquals(DetailContact.None, viewModel().contact.value)
-    }
-
-  @Test
-  fun linkingFromTheEditorIsResolvedWhenComingBack() =
-    runTest {
-      flags.setOverride("contact_link_enabled", true)
-      contacts.addContact(contact)
-      val vm = viewModel()
-      assertEquals(DetailContact.None, vm.contact.value)
-
-      db.repository.linkContact(person, contact.id, contact.lookupKey, contact.name)
-
-      assertEquals(DetailContact.Linked(7, "lookup", "Marta Soler Puig"), vm.contact.value)
-    }
 
   @Test
   fun timelineIsNewestFirstAndCountsAreByKind() =

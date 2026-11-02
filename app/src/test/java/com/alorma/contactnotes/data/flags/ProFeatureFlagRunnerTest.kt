@@ -16,35 +16,35 @@ class ProFeatureFlagRunnerTest {
   private val local = LocalFeatureFlagRunner()
   private val pro = LocalProDataSource()
   private val runner = ProFeatureFlagRunner(local, ProRepository(pro), CoroutineScope(UnconfinedTestDispatcher()))
-  private val contactLink = ContactLinkFeature(runner)
+  private val personColor = PersonColorFeature(runner)
   private val free = object : FeatureFlag(runner, key = "free_feature") {}
 
   @Test
   fun flagOffIsHiddenWithoutPro() {
-    assertEquals(FeatureState.Hidden, contactLink.state())
-    assertFalse(contactLink.isEnabled())
+    assertEquals(FeatureState.Hidden, personColor.state())
+    assertFalse(personColor.isEnabled())
   }
 
   @Test
   fun flagOffIsHiddenWithPro() {
     pro.setPro(true)
-    assertEquals(FeatureState.Hidden, contactLink.state())
-    assertFalse(contactLink.isEnabled())
+    assertEquals(FeatureState.Hidden, personColor.state())
+    assertFalse(personColor.isEnabled())
   }
 
   @Test
   fun flagOnIsLockedWithoutPro() {
-    local.setOverride(contactLink.key, true)
-    assertEquals(FeatureState.Locked, contactLink.state())
-    assertFalse(contactLink.isEnabled())
+    local.setOverride(personColor.key, true)
+    assertEquals(FeatureState.Locked, personColor.state())
+    assertFalse(personColor.isEnabled())
   }
 
   @Test
   fun flagOnIsUnlockedWithPro() {
-    local.setOverride(contactLink.key, true)
+    local.setOverride(personColor.key, true)
     pro.setPro(true)
-    assertEquals(FeatureState.Unlocked, contactLink.state())
-    assertTrue(contactLink.isEnabled())
+    assertEquals(FeatureState.Unlocked, personColor.state())
+    assertTrue(personColor.isEnabled())
   }
 
   @Test
@@ -56,16 +56,16 @@ class ProFeatureFlagRunnerTest {
 
   @Test
   fun losingProLocksAgain() {
-    local.setOverride(contactLink.key, true)
+    local.setOverride(personColor.key, true)
     pro.setPro(true)
     pro.setPro(false)
-    assertEquals(FeatureState.Locked, contactLink.state())
+    assertEquals(FeatureState.Locked, personColor.state())
   }
 
   @Test
   fun changesEmitWhenTheFlagChanges() {
     val before = runner.changes.value
-    local.setOverride(contactLink.key, true)
+    local.setOverride(personColor.key, true)
     assertNotEquals(before, runner.changes.value)
   }
 

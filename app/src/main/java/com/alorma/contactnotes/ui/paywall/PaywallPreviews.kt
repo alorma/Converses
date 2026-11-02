@@ -28,11 +28,11 @@ internal fun PaywallPreview() {
   PaywallPreview(PaywallState(price = "4,99 €"))
 }
 
-/** 8b: des de Contactes, el benefici d'origen va primer i ressaltat. */
+/** 8b: des de Canals, el benefici d'origen va primer i ressaltat. */
 @Preview
 @Composable
-internal fun PaywallFromContactsPreview() {
-  PaywallPreview(PaywallState(price = "4,99 €"), highlight = ProBenefit.Contacts)
+internal fun PaywallFromChannelsPreview() {
+  PaywallPreview(PaywallState(price = "4,99 €"), highlight = ProBenefit.Channels)
 }
 
 /** Sense connexió: el botó es desactiva i ho diu. */
@@ -46,5 +46,5 @@ internal fun PaywallOfflinePreview() {
 @Preview
 @Composable
 internal fun PaywallOwnedPreview() {
-  PaywallPreview(PaywallState(isPro = true), highlight = ProBenefit.Contacts)
+  PaywallPreview(PaywallState(isPro = true), highlight = ProBenefit.Channels)
 }

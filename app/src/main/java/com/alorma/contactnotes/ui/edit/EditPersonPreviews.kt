@@ -29,14 +29,6 @@ private object NoOpEditPersonActions : EditPersonActions {
 
   override fun onRemoveFact(key: Long) = Unit
 
-  override fun onContactPicked(contactUri: String) = Unit
-
-  override fun onUnlinkContact() = Unit
-
-  override fun onContactsExplained() = Unit
-
-  override fun onContactsPermissionChanged() = Unit
-
   override fun onMoveFact(
     from: Int,
     to: Int,
@@ -159,81 +151,6 @@ internal fun EditPersonCustomAvatarPreview() {
     ),
     customAvatar = FeatureState.Unlocked,
   )
-}
-
-/** Secció «Contacte» amb `ContactLinkFeature` encès, en cadascun dels seus estats. */
-@Composable
-private fun EditPersonContactPreview(
-  contact: ContactLinkState,
-  isNew: Boolean = false,
-) {
-  EditPersonPreview(
-    EditPersonUiState(
-      isNew = isNew,
-      loaded = true,
-      name = if (isNew) "" else "Marta Soler",
-      alias = if (isNew) "" else "Marta",
-      shape = if (isNew) null else AvatarShape.Cookie9Sided,
-      color = if (isNew) null else AvatarColor.Lavender,
-      facts = if (isNew) emptyList() else Facts.take(1),
-      entryCount = 3,
-      contact = contact,
-    ),
-  )
-}
-
-@Preview
-@Composable
-internal fun EditPersonContactNotLinkedPreview() {
-  EditPersonContactPreview(ContactLinkState(enabled = true), isNew = true)
-}
-
-@Preview
-@Composable
-internal fun EditPersonContactLinkedPreview() {
-  EditPersonContactPreview(
-    ContactLinkState(
-      enabled = true,
-      permissionGranted = true,
-      explained = true,
-      linked = LinkedContact(id = 1, lookupKey = "key", name = "Marta Soler Puig"),
-    ),
-  )
-}
-
-@Preview
-@Composable
-internal fun EditPersonContactTakenPreview() {
-  EditPersonContactPreview(
-    ContactLinkState(enabled = true, permissionGranted = true, explained = true, pickedTaken = true),
-  )
-}
-
-/** Flag obert sense Pro: fila amb PRO i sense acció. */
-@Preview
-@Composable
-internal fun EditPersonContactLockedPreview() {
-  EditPersonContactPreview(ContactLinkState(locked = true))
-}
-
-@Preview
-@Composable
-internal fun EditPersonContactNoPermissionPreview() {
-  EditPersonContactPreview(ContactLinkState(enabled = true, explained = true))
-}
-
-@Preview
-@Composable
-internal fun ContactsExplainSheetPreview() {
-  ConversesPreviewTheme {
-    PersonTheme(AvatarColor.Lavender) {
-      androidx.compose.material3.Surface(
-        color = androidx.compose.material3.MaterialTheme.colorScheme.surfaceContainerLow,
-      ) {
-        ContactsExplainSheetContent(onContinue = {}, onNotNow = {})
-      }
-    }
-  }
 }
 
 @Composable

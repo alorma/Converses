@@ -1,6 +1,5 @@
 package com.alorma.contactnotes.data
 
-import com.alorma.contactnotes.data.contacts.ResolvedContact
 import com.alorma.contactnotes.data.db.EntryDao
 import com.alorma.contactnotes.data.db.EntryEntity
 import com.alorma.contactnotes.data.db.KindCount
@@ -29,8 +28,6 @@ class ConversesRepository(
     }
 
   fun observePerson(id: Long): Flow<PersonEntity?> = personDao.observe(id)
-
-  fun observeLinkedContactsCount(): Flow<Int> = personDao.observeLinkedCount()
 
   /** Grups de canal usats a les entrades de la persona, sempre en l'ordre fix de [ChannelType]. */
   fun observeChannels(personId: Long): Flow<List<ChannelType>> =
@@ -77,40 +74,6 @@ class ConversesRepository(
     person: PersonEntity,
     isProtected: Boolean,
   ) = personDao.update(person.copy(isProtected = isProtected, updatedAt = System.currentTimeMillis()))
-
-  /** Vincula la persona a un contacte del dispositiu, o en refresca el lookup key (`docs/contacts`). */
-  suspend fun linkContact(
-    person: PersonEntity,
-    contactId: Long,
-    lookupKey: String,
-    name: String,
-  ) = personDao.update(
-    person.copy(
-      contactId = contactId,
-      contactLookupKey = lookupKey,
-      contactName = name,
-      updatedAt = System.currentTimeMillis(),
-    ),
-  )
-
-  fun observeLinkedPeople(): Flow<List<PersonEntity>> = personDao.observeLinked()
-
-  /** El contacte del vincle ha canviat d'id, de lookup key o de nom; no toca res si entremig s'ha canviat el vincle. */
-  suspend fun refreshContact(
-    personId: Long,
-    oldLookupKey: String,
-    contact: ResolvedContact,
-  ) = personDao.refreshContact(personId, oldLookupKey, contact.id, contact.lookupKey, contact.name)
-
-  suspend fun unlinkContact(person: PersonEntity) =
-    personDao.update(
-      person.copy(
-        contactId = null,
-        contactLookupKey = null,
-        contactName = null,
-        updatedAt = System.currentTimeMillis(),
-      ),
-    )
 
   suspend fun countEntriesInRange(
     personId: Long,

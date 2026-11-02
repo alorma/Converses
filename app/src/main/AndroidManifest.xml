@@ -39,51 +39,6 @@
                 <data android:mimeType="text/plain" />
             </intent-filter>
         </activity-alias>
-
-        <!--
-            Compte local «Converses» i sync adapter buit: l'Android els necessita per mostrar «Veure notes» i
-            «Crear nota» a la fitxa d'un contacte vinculat (docs/contacts). Els permisos de contactes encara només
-            són al manifest de debug (C12): sense permisos, aquests serveis no fan res.
-        -->
-        <!-- «Veure notes» / «Crear nota» a la fitxa d'un contacte: llegeix la fila i obre MainActivity -->
-        <activity
-            android:name=".ui.contacts.ContactRowActivity"
-            android:excludeFromRecents="true"
-            android:exported="true"
-            android:noHistory="true"
-            android:theme="@style/Theme.ContactNotes.Transparent">
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <data android:mimeType="vnd.android.cursor.item/vnd.${applicationId}.person" />
-                <data android:mimeType="vnd.android.cursor.item/vnd.${applicationId}.note" />
-            </intent-filter>
-        </activity>
-
-        <service
-            android:name=".data.contacts.ContactsAuthenticatorService"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.accounts.AccountAuthenticator" />
-            </intent-filter>
-            <meta-data
-                android:name="android.accounts.AccountAuthenticator"
-                android:resource="@xml/contacts_authenticator" />
-        </service>
-
-        <service
-            android:name=".data.contacts.ContactsSyncAdapterService"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.content.SyncAdapter" />
-            </intent-filter>
-            <meta-data
-                android:name="android.content.SyncAdapter"
-                android:resource="@xml/contacts_syncadapter" />
-            <meta-data
-                android:name="android.provider.CONTACTS_STRUCTURE"
-                android:resource="@xml/contacts" />
-        </service>
     </application>
 
 </manifest>

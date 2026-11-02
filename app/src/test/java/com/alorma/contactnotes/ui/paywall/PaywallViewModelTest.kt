@@ -67,12 +67,12 @@ class PaywallViewModelTest {
   @Test
   fun benefitsKeepTheDesignOrderFromSettingsAndPutTheOriginFirst() {
     assertEquals(
-      listOf(ProBenefit.People, ProBenefit.Channels, ProBenefit.FollowUps, ProBenefit.Contacts),
+      listOf(ProBenefit.People, ProBenefit.Channels, ProBenefit.FollowUps),
       proBenefits(null),
     )
     assertEquals(
-      listOf(ProBenefit.Contacts, ProBenefit.People, ProBenefit.Channels, ProBenefit.FollowUps),
-      proBenefits(ProBenefit.Contacts),
+      listOf(ProBenefit.FollowUps, ProBenefit.People, ProBenefit.Channels),
+      proBenefits(ProBenefit.FollowUps),
     )
   }
 

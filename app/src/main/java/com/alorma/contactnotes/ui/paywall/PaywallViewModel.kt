@@ -33,9 +33,6 @@ enum class ProBenefit {
 
   /** Origen `pendents`. */
   FollowUps,
-
-  /** Origen `contactes`. */
-  Contacts,
 }
 
 /** [highlight] (8b, d'on ve l'usuari) va primer; des d'Ajustos (`null`), l'ordre del disseny. */

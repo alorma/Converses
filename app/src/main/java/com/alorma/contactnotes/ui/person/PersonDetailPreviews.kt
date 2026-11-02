@@ -14,14 +14,10 @@ import com.alorma.contactnotes.shared.EntryKind
 import com.alorma.contactnotes.ui.preview.PreviewData
 
 @Composable
-private fun PersonDetailScreenPreview(
-  state: PersonDetailUiState,
-  contact: DetailContact = DetailContact.None,
-) {
+private fun PersonDetailScreenPreview(state: PersonDetailUiState) {
   ConversesPreviewTheme {
     PersonTheme(state.person?.color) {
       PersonDetailScreen(
-        contact = contact,
         state = state,
         menuExpanded = false,
         onMenuExpandedChange = {},
@@ -92,22 +88,6 @@ private val martaWithFactsState =
     happenedCount = PreviewData.martaEntries.count { it.kind == EntryKind.HAPPENED },
     isLoading = false,
   )
-
-/** Vinculada a un contacte amb un nom llarg (`ContactLinkFeature` encès): ocupa dues línies. */
-@Preview
-@Composable
-internal fun PersonDetailScreenContactLinkedPreview() {
-  PersonDetailScreenPreview(
-    martaWithFactsState,
-    contact = DetailContact.Linked(id = 1, lookupKey = "key", name = "Marta Soler Puig de la Riba i Casademunt"),
-  )
-}
-
-@Preview
-@Composable
-internal fun PersonDetailScreenContactDeletedPreview() {
-  PersonDetailScreenPreview(martaWithFactsState, contact = DetailContact.Deleted)
-}
 
 internal class AvatarColorProvider : PreviewParameterProvider<AvatarColor> {
   override val values: Sequence<AvatarColor> = AvatarColor.entries.asSequence()

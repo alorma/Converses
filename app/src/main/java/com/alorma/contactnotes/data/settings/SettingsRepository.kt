@@ -19,8 +19,6 @@ data class AppSettings(
   val appLock: Boolean = false,
   val relockAfterSeconds: Int = 60,
   val onboardingDone: Boolean = false,
-  /** Ja s'ha vist l'explicació del permís de Contactes (5b): no es torna a mostrar abans del diàleg del sistema. */
-  val contactsExplained: Boolean = false,
 )
 
 interface SettingsRepository {
@@ -39,8 +37,6 @@ interface SettingsRepository {
   suspend fun setRelockAfterSeconds(seconds: Int)
 
   suspend fun setOnboardingDone(done: Boolean)
-
-  suspend fun setContactsExplained(explained: Boolean)
 }
 
 private val Context.settingsDataStore by preferencesDataStore(name = "settings")
@@ -66,8 +62,6 @@ class DataStoreSettingsRepository(
 
   override suspend fun setOnboardingDone(done: Boolean) = write { it[OnboardingDoneKey] = done }
 
-  override suspend fun setContactsExplained(explained: Boolean) = write { it[ContactsExplainedKey] = explained }
-
   private suspend fun write(block: (androidx.datastore.preferences.core.MutablePreferences) -> Unit) {
     dataStore.edit { block(it) }
   }
@@ -82,7 +76,6 @@ class DataStoreSettingsRepository(
       appLock = this[AppLockKey] ?: defaults.appLock,
       relockAfterSeconds = this[RelockAfterKey] ?: defaults.relockAfterSeconds,
       onboardingDone = this[OnboardingDoneKey] ?: defaults.onboardingDone,
-      contactsExplained = this[ContactsExplainedKey] ?: defaults.contactsExplained,
     )
   }
 
@@ -94,7 +87,6 @@ class DataStoreSettingsRepository(
     val AppLockKey = booleanPreferencesKey("app_lock")
     val RelockAfterKey = intPreferencesKey("relock_after")
     val OnboardingDoneKey = booleanPreferencesKey("onboarding_done")
-    val ContactsExplainedKey = booleanPreferencesKey("contacts_explained")
   }
 }
 

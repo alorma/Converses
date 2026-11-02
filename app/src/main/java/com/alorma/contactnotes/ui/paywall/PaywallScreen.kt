@@ -21,7 +21,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material.icons.rounded.CheckCircle
 import androidx.compose.material.icons.rounded.Close
-import androidx.compose.material.icons.rounded.Contacts
 import androidx.compose.material.icons.rounded.Flag
 import androidx.compose.material.icons.rounded.Forum
 import androidx.compose.material.icons.rounded.Lock
@@ -346,7 +345,6 @@ private val ProBenefit.icon: ImageVector
       ProBenefit.People -> Icons.Rounded.Palette
       ProBenefit.Channels -> Icons.Rounded.Forum
       ProBenefit.FollowUps -> Icons.Rounded.Flag
-      ProBenefit.Contacts -> Icons.Rounded.Contacts
     }
 
 private val ProBenefit.title: Int
@@ -355,7 +353,6 @@ private val ProBenefit.title: Int
       ProBenefit.People -> R.string.paywall_benefit_people
       ProBenefit.Channels -> R.string.paywall_benefit_channels
       ProBenefit.FollowUps -> R.string.paywall_benefit_follow_ups
-      ProBenefit.Contacts -> R.string.paywall_benefit_contacts
     }
 
 private val ProBenefit.summary: Int
@@ -364,5 +361,4 @@ private val ProBenefit.summary: Int
       ProBenefit.People -> R.string.paywall_benefit_people_summary
       ProBenefit.Channels -> R.string.paywall_benefit_channels_summary
       ProBenefit.FollowUps -> R.string.paywall_benefit_follow_ups_summary
-      ProBenefit.Contacts -> R.string.paywall_benefit_contacts_summary
     }

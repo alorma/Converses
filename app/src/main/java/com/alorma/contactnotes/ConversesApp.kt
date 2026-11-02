@@ -4,7 +4,6 @@ import android.app.Application
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
-import com.alorma.contactnotes.data.contacts.ContactsReconciler
 import com.alorma.contactnotes.data.pro.ProDataSource
 import com.alorma.contactnotes.data.settings.AppLockManager
 import com.alorma.contactnotes.di.appModules
@@ -21,8 +20,6 @@ class ConversesApp : Application() {
     }
     val pro: ProDataSource by inject()
     pro.start()
-    val contactsReconciler: ContactsReconciler by inject()
-    contactsReconciler.start()
     val appLock: AppLockManager by inject()
     ProcessLifecycleOwner.get().lifecycle.addObserver(
       object : DefaultLifecycleObserver {

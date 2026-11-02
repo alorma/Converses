@@ -1,22 +1,11 @@
 package com.alorma.contactnotes.ui.edit
 
 import android.content.ContextWrapper
-import com.alorma.contactnotes.data.contacts.ResolvedContact
-import com.alorma.contactnotes.data.flags.ContactLinkFeature
-import com.alorma.contactnotes.data.flags.LocalFeatureFlagRunner
-import com.alorma.contactnotes.data.flags.ProFeatureFlagRunner
-import com.alorma.contactnotes.data.pro.LocalProDataSource
-import com.alorma.contactnotes.data.pro.ProRepository
-import com.alorma.contactnotes.testing.FakeContactsGateway
-import com.alorma.contactnotes.testing.FakeContactsPermission
 import com.alorma.contactnotes.testing.FakeDb
-import com.alorma.contactnotes.testing.FakeSettingsRepository
 import com.alorma.contactnotes.testing.MainDispatcherRule
 import com.alorma.contactnotes.ui.person.PersonExporter
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -30,226 +19,13 @@ import org.junit.Test
 class EditPersonViewModelTest {
   @get:Rule val main = MainDispatcherRule()
   private val db = FakeDb()
-  private val flags = LocalFeatureFlagRunner()
-  private val pro = LocalProDataSource(initial = true)
-  private val contactLink =
-    ContactLinkFeature(ProFeatureFlagRunner(flags, ProRepository(pro), CoroutineScope(UnconfinedTestDispatcher())))
-  private val permission = FakeContactsPermission(granted = false)
-  private val contacts = FakeContactsGateway()
-  private val settings = FakeSettingsRepository()
 
   private fun viewModel(personId: Long = 0L) =
     EditPersonViewModel(
       personId,
       db.repository,
       PersonExporter(ContextWrapper(null), db.repository),
-      contactLink,
-      permission,
-      contacts,
-      settings,
     )
-
-  private fun enableContactLink() = flags.setOverride("contact_link_enabled", true)
-
-  private val picked = ResolvedContact(id = 7, lookupKey = "lookup", name = "Marta Soler")
-
-  @Test
-  fun withTheFlagOffTheContactSectionIsHidden() {
-    val vm = viewModel()
-
-    assertEquals(ContactSection.Hidden, vm.state.value.contact.section)
-  }
-
-  @Test
-  fun theContactSectionFollowsProWhileTheEditorIsOpen() {
-    enableContactLink()
-    pro.setPro(false)
-    val vm = viewModel()
-    assertEquals(ContactSection.Locked, vm.state.value.contact.section)
-
-    pro.setPro(true)
-    assertEquals(ContactSection.NotLinked, vm.state.value.contact.section)
-
-    pro.setPro(false)
-    assertEquals(ContactSection.Locked, vm.state.value.contact.section)
-
-    flags.setOverride("contact_link_enabled", false)
-    assertEquals(ContactSection.Hidden, vm.state.value.contact.section)
-  }
-
-  @Test
-  fun withoutProALinkedPersonIsLockedAndSavingKeepsTheLink() =
-    runTest {
-      enableContactLink()
-      pro.setPro(false)
-      val person = db.addPerson("Marta Soler")
-      db.repository.linkContact(person, picked.id, picked.lookupKey, picked.name)
-      val vm = viewModel(person.id)
-      assertEquals(ContactSection.Locked, vm.state.value.contact.section)
-
-      vm.onAlias("Marta")
-      var saved = false
-      vm.save { saved = true }
-
-      assertTrue(saved)
-      assertEquals("Marta", db.repository.getPerson(person.id)?.alias)
-      assertEquals(picked.id, db.repository.getPerson(person.id)?.contactId)
-    }
-
-  @Test
-  fun theFirstLinkExplainsThenAsksForPermissionThenPicks() {
-    enableContactLink()
-    val vm = viewModel()
-    assertEquals(ContactSection.NotLinked, vm.state.value.contact.section)
-    assertEquals(ContactLinkStep.Explain, vm.state.value.contact.linkStep)
-
-    vm.onContactsExplained()
-    assertTrue(settings.state.value.contactsExplained)
-    assertEquals(ContactLinkStep.RequestPermission, vm.state.value.contact.linkStep)
-
-    permission.granted = true
-    vm.onContactsPermissionChanged()
-    assertEquals(ContactLinkStep.Pick, vm.state.value.contact.linkStep)
-    assertEquals(ContactSection.NotLinked, vm.state.value.contact.section)
-  }
-
-  @Test
-  fun theExplanationIsOnlyShownOnce() {
-    enableContactLink()
-    settings.state.value = settings.state.value.copy(contactsExplained = true)
-    permission.granted = true
-
-    val vm = viewModel()
-
-    assertEquals(ContactLinkStep.Pick, vm.state.value.contact.linkStep)
-  }
-
-  @Test
-  fun aDeniedPermissionShowsNoPermissionUntilItIsGranted() {
-    enableContactLink()
-    val vm = viewModel()
-    vm.onContactsExplained()
-    vm.onContactsPermissionChanged()
-    assertEquals(ContactSection.NoPermission, vm.state.value.contact.section)
-
-    permission.granted = true
-    vm.onContactsPermissionChanged()
-    assertEquals(ContactSection.NotLinked, vm.state.value.contact.section)
-  }
-
-  @Test
-  fun linkingAnExistingPersonIsSavedAtOnce() {
-    enableContactLink()
-    val marta = db.addPerson("Marta")
-    contacts.pickable["content://picked"] = picked
-    val vm = viewModel(marta.id)
-
-    vm.onContactPicked("content://picked")
-
-    assertEquals(ContactSection.Linked("Marta Soler"), vm.state.value.contact.section)
-    assertFalse(vm.state.value.canSave)
-    val saved = db.person(marta.id)!!
-    assertEquals(7L, saved.contactId)
-    assertEquals("lookup", saved.contactLookupKey)
-    assertEquals("Marta Soler", saved.contactName)
-  }
-
-  @Test
-  fun unlinkingAnExistingPersonIsSavedAtOnceAndKeepsThePerson() =
-    runTest {
-      enableContactLink()
-      val marta = db.addPerson("Marta", alias = "marta")
-      db.repository.linkContact(marta, contactId = 7, lookupKey = "lookup", name = "Marta Soler")
-      val vm = viewModel(marta.id)
-      assertEquals(ContactSection.Linked("Marta Soler"), vm.state.value.contact.section)
-
-      vm.onUnlinkContact()
-
-      assertEquals(ContactSection.NotLinked, vm.state.value.contact.section)
-      val saved = db.person(marta.id)!!
-      assertNull(saved.contactId)
-      assertNull(saved.contactLookupKey)
-      assertNull(saved.contactName)
-      assertEquals("marta", saved.alias)
-    }
-
-  @Test
-  fun aNewPersonSavesItsLinkWithTheProfile() {
-    enableContactLink()
-    contacts.pickable["content://picked"] = picked
-    val vm = viewModel()
-    vm.onName("Marta")
-    vm.onContactPicked("content://picked")
-
-    var id = 0L
-    vm.save { id = it }
-
-    assertEquals(7L, db.person(id)!!.contactId)
-    assertEquals("Marta Soler", db.person(id)!!.contactName)
-  }
-
-  @Test
-  fun aContactLinkedToSomeoneElseIsNotLinked() =
-    runTest {
-      enableContactLink()
-      val luna = db.addPerson("Luna", isProtected = true)
-      db.repository.linkContact(luna, contactId = picked.id, lookupKey = picked.lookupKey, name = picked.name)
-      val marta = db.addPerson("Marta")
-      contacts.pickable["content://picked"] = picked
-      val vm = viewModel(marta.id)
-
-      vm.onContactPicked("content://picked")
-
-      assertEquals(ContactSection.Taken, vm.state.value.contact.section)
-      assertNull(db.person(marta.id)!!.contactId)
-
-      // Un altre contacte sí que es vincula, i el missatge se'n va
-      contacts.pickable["content://other"] = ResolvedContact(id = 8, lookupKey = "other", name = "Marta")
-      vm.onContactPicked("content://other")
-
-      assertEquals(ContactSection.Linked("Marta"), vm.state.value.contact.section)
-    }
-
-  @Test
-  fun aNewPersonCannotTakeALinkedContact() =
-    runTest {
-      enableContactLink()
-      val luna = db.addPerson("Luna")
-      db.repository.linkContact(luna, contactId = 99, lookupKey = picked.lookupKey, name = picked.name)
-      contacts.pickable["content://picked"] = picked
-      val vm = viewModel()
-
-      vm.onContactPicked("content://picked")
-
-      assertEquals(ContactSection.Taken, vm.state.value.contact.section)
-    }
-
-  @Test
-  fun relinkingTheSameContactIsAllowed() =
-    runTest {
-      enableContactLink()
-      val marta = db.addPerson("Marta")
-      db.repository.linkContact(marta, contactId = picked.id, lookupKey = picked.lookupKey, name = picked.name)
-      contacts.pickable["content://picked"] = picked
-      val vm = viewModel(marta.id)
-      vm.onUnlinkContact()
-
-      vm.onContactPicked("content://picked")
-
-      assertEquals(ContactSection.Linked("Marta Soler"), vm.state.value.contact.section)
-    }
-
-  @Test
-  fun aContactThatCannotBeReadIsNotLinked() {
-    enableContactLink()
-    val marta = db.addPerson("Marta")
-    val vm = viewModel(marta.id)
-
-    vm.onContactPicked("content://gone")
-
-    assertEquals(ContactSection.NotLinked, vm.state.value.contact.section)
-    assertNull(db.person(marta.id)!!.contactId)
-  }
 
   @Test
   fun aNewPersonNeedsANameToBeSaved() {
@@ -357,6 +133,7 @@ class EditPersonViewModelTest {
         .first()
         .key,
     )
+
     assertEquals(2, vm.state.value.facts.size)
   }
 
@@ -403,22 +180,6 @@ class EditPersonViewModelTest {
     assertTrue(saved.archived)
     assertEquals(123, saved.createdAt)
   }
-
-  @Test
-  fun savingAnExistingPersonKeepsTheContactLink() =
-    runTest {
-      val marta = db.addPerson("Marta")
-      db.repository.linkContact(marta, contactId = 7, lookupKey = "lookup", name = "Marta Soler")
-      val vm = viewModel(marta.id)
-      vm.onName("Marta S")
-
-      vm.save { }
-
-      val saved = db.person(marta.id)!!
-      assertEquals(7L, saved.contactId)
-      assertEquals("lookup", saved.contactLookupKey)
-      assertEquals("Marta Soler", saved.contactName)
-    }
 
   @Test
   fun saveIsIgnoredWhileTheFormIsNotValid() {
