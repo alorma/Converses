@@ -40,7 +40,7 @@ Dues dimensions independents per a cada funció Pro:
 - [x] Editor, fila «Vincula un contacte» `Locked` (PRO, sense acció; el vincle desat es conserva); al detall no surt res; tests, captures i emulador — `7825f7a`
 - [x] Editor, full «Avatar» `Locked`: el llapis es manté, el full porta PRO, cadenat a «Forma» i «Color» i opcions desactivades (es veu l'avatar desat); captures i emulador — `fedf1aa`
 - [x] Ajustos, «Color de la persona» `Locked`: PRO i interruptor desactivat; captures i emulador — `c1837d2`
-- [ ] Passar a Claude Design els estats `Locked` provisionals (fila de Contactes de l'editor, full «Avatar», «Color de la persona») per afinar-los
+- [ ] Passar a Claude Design els estats `Locked` provisionals (full «Avatar», «Color de la persona») per afinar-los
 
 ## Fase 2 · RevenueCat
 
@@ -78,7 +78,7 @@ Al menú de debug, l'apartat **Pro** té un sol interruptor, «Pro user», que e
 - **Visible a la release:** la targeta d'Ajustos i el paywall no van darrere de cap flag. Quan es prepari la release que obri Pro, es trauran els flags Pro i només quedarà la comprovació del Pro; fins aleshores no es publica cap release amb el paywall.
 - **Els quatre beneficis**, com el disseny, encara que Canals propis i Pendents no existeixin.
 - **Peu sense «Termes»:** només «Privacitat» (la política actual). «Termes» s'afegeix a la fase 4, quan hi hagi la pàgina.
-- **Origen:** `PaywallRoute(highlight: ProBenefit?)`; `People` cobreix `avatar` i «Color de la persona», `Contacts` és `contactes`, `null` és la targeta d'Ajustos. `Channels` i `FollowUps` esperen les seves funcions.
+- **Origen:** `PaywallRoute(highlight: ProBenefit?)`; `People` cobreix `avatar` i «Color de la persona», `null` és la targeta d'Ajustos. `Channels` i `FollowUps` esperen les seves funcions.
 - **Full «Avatar» `Locked`:** no hi havia disseny per a l'accés; tocar «Forma» o «Color» tanca el full i obre el paywall, sense cap canvi visual.
 
 ### Tasques
