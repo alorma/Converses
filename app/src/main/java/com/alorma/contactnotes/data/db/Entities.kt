@@ -1,5 +1,6 @@
 package com.alorma.contactnotes.data.db
 
+import androidx.room.ColumnInfo
 import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.ForeignKey
@@ -30,6 +31,21 @@ val PersonEntity.shape: AvatarShape get() = avatarShape ?: AvatarShape.Standard
 
 val PersonEntity.color: AvatarColor get() = avatarColor ?: AvatarColor.forName(name)
 
+/**
+ * Canal propi (Pro): global, dins d'un dels cinc grups, amb nom i sense valor. El nom és únic dins del grup sense
+ * distingir majúscules; ho valida el repositori, i l'índex únic només n'és la xarxa de seguretat.
+ */
+@Entity(
+  tableName = "custom_channel",
+  indices = [Index("channelType", "name", unique = true)],
+)
+data class CustomChannelEntity(
+  @PrimaryKey(autoGenerate = true) val id: Long = 0,
+  val channelType: ChannelType,
+  val name: String,
+  val createdAt: Long,
+)
+
 @Entity(
   tableName = "entry",
   foreignKeys = [
@@ -39,17 +55,34 @@ val PersonEntity.color: AvatarColor get() = avatarColor ?: AvatarColor.forName(n
       childColumns = ["personId"],
       onDelete = ForeignKey.CASCADE,
     ),
+    // Si s'esborra el canal propi, l'entrada es queda al seu grup (`channelType`).
+    ForeignKey(
+      entity = CustomChannelEntity::class,
+      parentColumns = ["id"],
+      childColumns = ["customChannelId"],
+      onDelete = ForeignKey.SET_NULL,
+    ),
   ],
-  indices = [Index("personId", "occurredAt")],
+  indices = [Index("personId", "occurredAt"), Index("customChannelId")],
 )
 data class EntryEntity(
   @PrimaryKey(autoGenerate = true) val id: Long = 0,
   val personId: Long,
   val kind: EntryKind,
+  /** Grup del canal; si hi ha [customChannelId], és el grup d'aquell canal. */
   val channelType: ChannelType,
   val text: String,
   val occurredAt: Long,
+  /** Canal propi opcional (Pro), dins de [channelType]. */
+  val customChannelId: Long? = null,
+  /** Marcada per fer-ne seguiment (Pro). Continua sent pendent mentre [doneAt] sigui `null`. */
+  @ColumnInfo(defaultValue = "0") val isPending: Boolean = false,
+  /** Quan es va marcar com a feta; `null` si no és pendent o encara no s'ha fet. */
+  val doneAt: Long? = null,
 )
+
+/** Pendent i encara no fet: surt a la secció «Pendents» del detall i porta l'etiqueta PENDENT. */
+val EntryEntity.isOpenFollowUp: Boolean get() = isPending && doneAt == null
 
 @Entity(
   tableName = "pinned_fact",

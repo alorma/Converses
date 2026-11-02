@@ -12,10 +12,14 @@ import androidx.room.migration.AutoMigrationSpec
     PersonEntity::class,
     EntryEntity::class,
     PinnedFactEntity::class,
+    CustomChannelEntity::class,
   ],
-  version = 4,
+  version = 5,
   autoMigrations = [
     AutoMigration(from = 3, to = 4, spec = ConversesDatabase.DropContactLink::class),
+    // v4 → v5: canals propis i pendents (Pro). Taula `custom_channel` nova; `entry` es recrea amb la clau forana nova
+    // i les columnes `customChannelId` (null), `isPending` (0) i `doneAt` (null). Cap dada no es perd.
+    AutoMigration(from = 4, to = 5),
   ],
 )
 @TypeConverters(AvatarShapeConverter::class)

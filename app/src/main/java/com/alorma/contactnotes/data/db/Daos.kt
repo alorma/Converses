@@ -56,7 +56,8 @@ abstract class PersonDao {
     """
     SELECT p.*,
       e.id AS last_id, e.personId AS last_personId, e.kind AS last_kind,
-      e.channelType AS last_channelType, e.text AS last_text, e.occurredAt AS last_occurredAt
+      e.channelType AS last_channelType, e.text AS last_text, e.occurredAt AS last_occurredAt,
+      e.customChannelId AS last_customChannelId, e.isPending AS last_isPending, e.doneAt AS last_doneAt
     FROM person p
     LEFT JOIN entry e ON e.id = (
       SELECT id FROM entry WHERE personId = p.id ORDER BY occurredAt DESC, id DESC LIMIT 1

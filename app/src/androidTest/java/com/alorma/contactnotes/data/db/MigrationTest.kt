@@ -158,6 +158,78 @@ class MigrationTest {
     assertEquals(listOf("CHAT"), db.strings("SELECT channelType FROM entry"))
   }
 
+  @Test
+  fun migrate4To5KeepsEverythingAndLeavesEntriesWithoutChannelOrFollowUp() {
+    helper.createDatabase(TEST_DB, 4).use { db ->
+      db.insertPerson(1)
+      db.execSQL(
+        "INSERT INTO person (id, name, alias, avatarShape, avatarColor, isProtected, archived, notes, createdAt, " +
+          "updatedAt) VALUES (2, 'P2', 'Alias', 'Sunny', 'Rose', 1, 1, 'n', 10, 20)",
+      )
+      db.execSQL(
+        "INSERT INTO entry (id, personId, kind, channelType, text, occurredAt) VALUES (5, 1, 'HEARD', 'CHAT', 'a', 100)",
+      )
+      db.execSQL(
+        "INSERT INTO entry (id, personId, kind, channelType, text, occurredAt) VALUES (9, 2, 'SAID', 'PHONE', 'b', 200)",
+      )
+      db.execSQL("INSERT INTO pinned_fact (personId, label, value, position) VALUES (2, 'L', 'V', 0)")
+    }
+
+    val db = helper.runMigrationsAndValidate(TEST_DB, 5, true)
+
+    assertEquals(listOf("P1", "P2"), db.strings("SELECT name FROM person ORDER BY id"))
+    assertEquals(
+      listOf("Alias|Sunny|Rose|1|1|n|10|20"),
+      db.strings(
+        "SELECT alias || '|' || avatarShape || '|' || avatarColor || '|' || isProtected || '|' || archived || '|' || " +
+          "notes || '|' || createdAt || '|' || updatedAt FROM person WHERE id = 2",
+      ),
+    )
+    assertEquals(
+      listOf("5|1|HEARD|CHAT|a|100|-|0|-", "9|2|SAID|PHONE|b|200|-|0|-"),
+      db.strings(
+        "SELECT id || '|' || personId || '|' || kind || '|' || channelType || '|' || text || '|' || " +
+          "occurredAt || '|' || IFNULL(customChannelId, '-') || '|' || isPending || '|' || IFNULL(doneAt, '-') " +
+          "FROM entry ORDER BY id",
+      ),
+    )
+    assertEquals(listOf("2|V"), db.strings("SELECT personId || '|' || value FROM pinned_fact"))
+    assertEquals(listOf("0"), db.strings("SELECT COUNT(*) FROM custom_channel"))
+  }
+
+  @Test
+  fun migrate4To5DeletingACustomChannelLeavesItsEntriesInTheGroup() {
+    helper.createDatabase(TEST_DB, 4).use { db ->
+      db.insertPerson(1)
+      db.insertEntry(1, "CHAT")
+    }
+
+    val db = helper.runMigrationsAndValidate(TEST_DB, 5, true)
+    db.execSQL("PRAGMA foreign_keys = ON")
+    db.execSQL("INSERT INTO custom_channel (id, channelType, name, createdAt) VALUES (3, 'CHAT', 'WhatsApp', 0)")
+    db.execSQL("UPDATE entry SET customChannelId = 3")
+    db.execSQL("DELETE FROM custom_channel WHERE id = 3")
+
+    assertEquals(
+      listOf("CHAT|-|t"),
+      db.strings("SELECT channelType || '|' || IFNULL(customChannelId, '-') || '|' || text FROM entry"),
+    )
+  }
+
+  @Test
+  fun migrate1To5RunsEveryMigration() {
+    helper.createDatabase(TEST_DB, 1).use { db ->
+      db.insertPerson(1)
+      db.insertChannel(1, "WHATSAPP")
+      db.insertEntry(1, "TELEGRAM")
+    }
+
+    val db = helper.runMigrationsAndValidate(TEST_DB, 5, true, Migration1To2(), Migration2To3())
+
+    assertEquals(listOf("P1"), db.strings("SELECT name FROM person"))
+    assertEquals(listOf("CHAT|0"), db.strings("SELECT channelType || '|' || isPending FROM entry"))
+  }
+
   private companion object {
     const val TEST_DB = "migration-test"
   }
