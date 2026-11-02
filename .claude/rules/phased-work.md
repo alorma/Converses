@@ -11,8 +11,8 @@ No `paths` on purpose: this is how every piece of work is done, not only a numbe
    - Unit tests (JVM): `./gradlew testDebugUnitTest` and the task's new tests.
    - `./gradlew ktlintCheck`.
    - Screenshots: previews and captures compared with the references; Claude validates them.
-   - Emulator: Claude validates UI changes on the Wear + phone emulator pair (or the phone emulator).
-   - Human validation only for what cannot be done alone (real watch, biometric unlock, TalkBack, feel of use).
+   - Emulator: Claude validates UI changes on the phone emulator.
+   - Human validation only for what cannot be done alone (real device, biometric unlock, TalkBack, feel of use).
 5. **Say how the phase is executed**, in the proposal (Bernat approves it with the rest):
    - **Model:** a smaller one (e.g. Haiku) for mechanical tasks, a more capable one for delicate ones (security, sync, Keystore and unlock, migrations).
    - **Agents:** whether a piece benefits from a subagent (exploration, docs research) or all is done in the main session.

@@ -28,7 +28,7 @@ Vincular una persona de Converses a un contacte del dispositiu i que aquest cont
 - Foto, telèfons, correus o accions de trucar o enviar missatges del contacte (C2).
 - **People Directory** (`PeopleContract`, API 37.2): descartat de moment (C10).
 - Avís de trucada entrant (`CallScreeningService`) i importació de diversos contactes alhora: són a «Més endavant» (fase 7).
-- Enviar el vincle al rellotge, a Android Auto o a l'exportació de notes.
+- Enviar el vincle a Android Auto o a l'exportació de notes.
 
 ## Què va sortir de la fase 0
 
@@ -82,7 +82,7 @@ Per quan els permisos passin al manifest principal. **No es toca Play sense perm
 
 - Columnes noves nul·lables a `person`: `contactLookupKey`, l'id del contacte i, segons C11, `contactName`. **Room v2 → v3:** migració, esquema `3.json` exportat i test amb `MigrationTestHelper`.
 - `null` vol dir sense vincle. Apagar el flag **no esborra el vincle** (mai no es perden dades de l'usuari); només s'amaga.
-- Les columnes no surten a l'snapshot de Wear, a Auto ni a l'exportació.
+- Les columnes no surten a Auto ni a l'exportació.
 
 ### Triar el contacte
 

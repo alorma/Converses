@@ -1,6 +1,6 @@
 # Converses per a Android Auto — Pla
 
-Esborrany del 12 d'oct. de 2026 · @Bernat · **encara no hi ha disseny.** Aquest document recull l'abast, l'arquitectura, les decisions i els riscos; les fases són a `docs/auto/fases.md`. Es va inspirar en el pla de Wear (ja esborrat, és a l'historial de git), però **és una plataforma diferent**: Android Auto és una projecció del mòbil, no un dispositiu amb la seva pròpia còpia de les dades.
+Esborrany del 12 d'oct. de 2026 · @Bernat · **encara no hi ha disseny.** Aquest document recull l'abast, l'arquitectura, les decisions i els riscos; les fases són a `docs/auto/fases.md`. **Android Auto és una plataforma pròpia**: és una projecció del mòbil, no un dispositiu amb la seva pròpia còpia de les dades.
 
 ## Objectiu
 
@@ -20,7 +20,7 @@ Al cotxe, sense mirar el mòbil: **dictar una nota per veu** a una persona exist
 
 - **Llista de persones** no arxivades i **no protegides** (nom i avatar si la plantilla ho permet; hora de l'última entrada).
 - **Últimes entrades** d'una persona (llista curta; text retallat; sense paginació infinita).
-- **Nota per veu:** persona → dictat → «Qui» (Jo / {persona} / Apunt, per defecte la persona) → desat. Mateix canal per defecte que la nota ràpida (P9 de Wear) i mateixes etiquetes `whoLabel(...)`.
+- **Nota per veu:** persona → dictat → «Qui» (Jo / {persona} / Apunt, per defecte la persona) → desat. Mateix canal per defecte que la nota ràpida i mateixes etiquetes `whoLabel(...)`.
 - **Bloqueig de l'app actiu:** vegeu A3.
 - Textos en ca/es/en, reutilitzant els del mòbil.
 
@@ -35,10 +35,10 @@ Al cotxe, sense mirar el mòbil: **dictar una nota per veu** a una persona exist
 - **Mòdul:** cap de nou a priori; el codi d'Auto viu a `:app` (`CarAppService`, `Session`, `Screen` a `auto/`). Si el volum ho demana, es treu a un mòdul `:auto` com a biblioteca. **Això es decideix a la fase 0.**
 - **Manifest:** servei `androidx.car.app.CarAppService` amb la categoria que Play accepti (A1) i `automotive_app_desc.xml` amb `<uses name="template"/>`; versió mínima de l'API de Car App.
 - **UI:** plantilles de la Car App Library (`ListTemplate`, `PaneTemplate`, `MessageTemplate`…), **no Compose**: no hi ha disseny propi de pantalla; el tema el posa Android Auto. El `ConversesTheme` no s'hi aplica.
-- **Dades:** `ConversesRepository` directament, amb consultes que **ja exclouen les protegides a SQL** (com el filtre de Wear, però en l'altre sentit: ni nom). Cap canvi d'esquema de Room, per tant cap migració. Si cal una consulta nova de DAO, no toca l'esquema.
+- **Dades:** `ConversesRepository` directament, amb consultes que **ja exclouen les protegides a SQL** (ni tan sols el nom). Cap canvi d'esquema de Room, per tant cap migració. Si cal una consulta nova de DAO, no toca l'esquema.
 - **Dictat:** per verificar (A4). Opcions: `CarAudioRecord` de la Car App Library + `SpeechRecognizer`, o l'entrada de veu del sistema. El text no s'ha d'escriure amb teclat.
 - **Desar:** el mateix cas d'ús que la nota ràpida del mòbil; no un camí nou.
-- **Privacitat:** l'app no ha de mostrar mai una protegida a la pantalla del cotxe ni al log; consulta SQL, test de JVM i `PrivacyAuditTest` equivalent al de Wear.
+- **Privacitat:** l'app no ha de mostrar mai una protegida a la pantalla del cotxe ni al log; consulta SQL i un test de JVM que ho audita.
 
 ## Decisions
 
@@ -48,7 +48,7 @@ Al cotxe, sense mirar el mòbil: **dictar una nota per veu** a una persona exist
 | --- | --- |
 | A0 | Plataforma: **Android Auto** (projecció). Android Automotive OS queda fora d'aquest pla (`FormFactor.AUTOMOTIVE` del VersionPlugin no s'usa). |
 | A0b | Abast: **nota per veu + llegir les últimes entrades**. |
-| A2 | Protegides: **no hi són**, ni a la llista ni com a cadenat (a diferència de Wear). Inclinació; es confirma amb el disseny. |
+| A2 | Protegides: **no hi són**, ni a la llista ni com a cadenat. Inclinació; es confirma amb el disseny. |
 
 ### Obertes
 
@@ -74,4 +74,4 @@ Al cotxe, sense mirar el mòbil: **dictar una nota per veu** a una persona exist
 
 ## Proves
 
-Tests de JVM per a la lògica (consulta que exclou protegides, mapatge a files, límit d'entrades, bloqueig de l'app, desat de la nota); els `Screen` es proven com a Wear prova els seus ViewModels, separant la lògica de la plantilla. Res d'instrumentat al CI. Validació manual amb **Desktop Head Unit** + emulador de mòbil i, després, un cotxe real o una unitat compatible. Casos obligats: persona protegida (no apareix), persona arxivada, bloqueig de l'app actiu, mòbil bloquejat, sense entrades, sense micròfon o permís, nota duplicada i canvi d'idioma.
+Tests de JVM per a la lògica (consulta que exclou protegides, mapatge a files, límit d'entrades, bloqueig de l'app, desat de la nota); els `Screen` es proven separant la lògica de la plantilla. Res d'instrumentat al CI. Validació manual amb **Desktop Head Unit** + emulador de mòbil i, després, un cotxe real o una unitat compatible. Casos obligats: persona protegida (no apareix), persona arxivada, bloqueig de l'app actiu, mòbil bloquejat, sense entrades, sense micròfon o permís, nota duplicada i canvi d'idioma.
