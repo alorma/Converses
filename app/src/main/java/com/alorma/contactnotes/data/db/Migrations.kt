@@ -26,8 +26,8 @@ class Migration1To2 : Migration(1, 2) {
 }
 
 /**
- * v2 → v3: la persona es pot vincular a un contacte del dispositiu (`docs/contacts`). Tres columnes nul·lables;
- * les persones existents queden sense vincle.
+ * v2 → v3: tres columnes nul·lables a `person` per al vincle amb Contactes, retirat a la v4
+ * ([ConversesDatabase.DropContactLink]); les persones existents queden sense vincle.
  */
 class Migration2To3 : Migration(2, 3) {
   override fun migrate(db: SupportSQLiteDatabase) {

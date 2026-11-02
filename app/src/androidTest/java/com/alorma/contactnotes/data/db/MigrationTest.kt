@@ -113,14 +113,46 @@ class MigrationTest {
   }
 
   @Test
-  fun migrate1To3RunsEveryMigration() {
+  fun migrate3To4DropsTheContactColumnsAndKeepsPeopleEntriesAndFacts() {
+    helper.createDatabase(TEST_DB, 3).use { db ->
+      db.insertPerson(1)
+      db.execSQL(
+        "INSERT INTO person (id, name, alias, avatarShape, avatarColor, isProtected, archived, notes, createdAt, " +
+          "updatedAt, contactId, contactLookupKey, contactName) " +
+          "VALUES (2, 'P2', 'Alias', 'Sunny', 'Rose', 1, 1, 'n', 10, 20, 7, 'lookup', 'Contact name')",
+      )
+      db.insertEntry(1, "CHAT")
+      db.insertEntry(2, "PHONE")
+      db.execSQL("INSERT INTO pinned_fact (personId, label, value, position) VALUES (2, 'L', 'V', 0)")
+    }
+
+    val db = helper.runMigrationsAndValidate(TEST_DB, 4, true)
+
+    assertEquals(listOf("P1", "P2"), db.strings("SELECT name FROM person ORDER BY id"))
+    assertEquals(
+      listOf("Alias|Sunny|Rose|1|1|n|10|20"),
+      db.strings(
+        "SELECT alias || '|' || avatarShape || '|' || avatarColor || '|' || isProtected || '|' || archived || '|' || " +
+          "notes || '|' || createdAt || '|' || updatedAt FROM person WHERE id = 2",
+      ),
+    )
+    assertEquals(
+      listOf("1|CHAT", "2|PHONE"),
+      db.strings("SELECT personId || '|' || channelType FROM entry ORDER BY id"),
+    )
+    assertEquals(listOf("2|V"), db.strings("SELECT personId || '|' || value FROM pinned_fact"))
+    assertTrue(db.strings("SELECT name FROM pragma_table_info('person') WHERE name LIKE 'contact%'").isEmpty())
+  }
+
+  @Test
+  fun migrate1To4RunsEveryMigration() {
     helper.createDatabase(TEST_DB, 1).use { db ->
       db.insertPerson(1)
       db.insertChannel(1, "WHATSAPP")
       db.insertEntry(1, "TELEGRAM")
     }
 
-    val db = helper.runMigrationsAndValidate(TEST_DB, 3, true, Migration1To2(), Migration2To3())
+    val db = helper.runMigrationsAndValidate(TEST_DB, 4, true, Migration1To2(), Migration2To3())
 
     assertEquals(listOf("P1"), db.strings("SELECT name FROM person"))
     assertEquals(listOf("CHAT"), db.strings("SELECT channelType FROM entry"))
