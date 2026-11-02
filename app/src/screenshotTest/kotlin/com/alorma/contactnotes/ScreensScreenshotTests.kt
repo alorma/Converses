@@ -5,7 +5,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import com.alorma.contactnotes.shared.AvatarColor
-import com.alorma.contactnotes.ui.approval.ApprovalConfirmPreview
 import com.alorma.contactnotes.ui.edit.AvatarSheetAutoPreview
 import com.alorma.contactnotes.ui.edit.AvatarSheetCustomPreview
 import com.alorma.contactnotes.ui.edit.AvatarSheetLockedPreview
@@ -66,8 +65,6 @@ import com.alorma.contactnotes.ui.settings.SettingsContactsNeverOnPreview
 import com.alorma.contactnotes.ui.settings.SettingsContactsOnPreview
 import com.alorma.contactnotes.ui.settings.SettingsNoLockPreview
 import com.alorma.contactnotes.ui.settings.SettingsProPreview
-import com.alorma.contactnotes.ui.watchinstall.WatchInstallFinishPreview
-import com.alorma.contactnotes.ui.watchinstall.WatchInstallProposePreview
 import com.android.tools.screenshot.PreviewTest
 
 /** Pantalla d'un mòbil de mida mitjana, en clar i en fosc, amb l'idioma fixat perquè no depengui de la màquina. */
@@ -520,29 +517,5 @@ class ScreensScreenshotTests {
   @Composable
   fun editEntrySheet() {
     EditEntrySheetPreview()
-  }
-
-  @ScreenPreviews
-  @LocalizedScreenPreviews
-  @PreviewTest
-  @Composable
-  fun approvalConfirm() {
-    ApprovalConfirmPreview()
-  }
-
-  @ScreenPreviews
-  @LocalizedScreenPreviews
-  @PreviewTest
-  @Composable
-  fun watchInstallPropose() {
-    WatchInstallProposePreview()
-  }
-
-  @ScreenPreviews
-  @LocalizedScreenPreviews
-  @PreviewTest
-  @Composable
-  fun watchInstallFinish() {
-    WatchInstallFinishPreview()
   }
 }

@@ -39,8 +39,6 @@
     <string name="settings_person_color_summary">Les pantalles de cada persona prenen el color del seu avatar</string>
     <string name="settings_haptic">Feedback tàctil</string>
     <string name="settings_haptic_summary">Vibra en desar, canviar un ajust o confirmar</string>
-    <string name="settings_watch_notifications">Notificacions del rellotge</string>
-    <string name="settings_watch_notifications_summary">Avisa quan el rellotge demana obrir una persona protegida amb l\'app tancada</string>
     <string name="settings_dynamic_color">Color dinàmic</string>
     <string name="settings_dynamic_color_summary">Pren el to del fons de pantalla</string>
     <string name="settings_language">Idioma</string>
@@ -230,28 +228,6 @@
     <string name="shape_sunny">Sol</string>
     <string name="shape_ghost">Fantasma</string>
     <string name="shape_pillow">Coixí</string>
-
-    <!-- Aprovació d'una persona protegida demanada des del rellotge: genèrica, sense el nom de ningú -->
-    <string name="approval_channel_name">Aprovacions del rellotge</string>
-    <string name="approval_notification_title">El rellotge demana obrir una persona protegida</string>
-    <string name="approval_title">El rellotge vol obrir una persona protegida</string>
-    <string name="approval_hint">Confirma que ets tu amb l\'empremta.</string>
-    <string name="approval_confirm">Confirma</string>
-    <string name="approval_deny">Denega</string>
-    <string name="approval_prompt_title">%1$s vol desbloquejar %2$s</string>
-    <string name="approval_watch_fallback">El rellotge</string>
-    <string name="approval_failed">No s\'ha pogut completar la petició</string>
-
-    <!-- Proposta d'instal·lar l'app al rellotge emparellat -->
-    <string name="install_watch_title">Instal·la Converses al rellotge</string>
-    <string name="install_watch_body">Hem detectat el teu %1$s. Hi veuràs les teves persones i podràs apuntar notes amb la veu.</string>
-    <string name="install_watch_action">Instal·la al rellotge</string>
-    <string name="install_watch_not_now">Ara no</string>
-    <string name="install_watch_never">No m\'ho tornis a demanar</string>
-    <string name="install_watch_finish_title">Acaba al rellotge</string>
-    <string name="install_watch_finish_body">Hem obert Google Play al teu %1$s. Toca Instal·la al rellotge per acabar.</string>
-    <string name="install_watch_done">Entesos</string>
-    <string name="install_watch_fallback_name">rellotge</string>
 
     <!-- Files de Converses a la fitxa d'un contacte vinculat (app Contactes) -->
     <string name="contacts_row_view_notes">Veure notes</string>

@@ -155,40 +155,6 @@ interface EntryDao {
     kinds: Set<EntryKind>,
   ): Flow<List<EntryEntity>>
 
-  /**
-   * Les últimes [limit] entrades de cada persona **no arxivada i no protegida**, per al rellotge.
-   * El filtre de protegides és aquí i també al constructor de l'instantani: una protegida no ha de sortir mai.
-   */
-  @Query(
-    """
-    SELECT id, personId, kind, channelType, text, occurredAt FROM (
-      SELECT e.*, ROW_NUMBER() OVER (PARTITION BY e.personId ORDER BY e.occurredAt DESC, e.id DESC) AS position
-      FROM entry e
-      JOIN person p ON p.id = e.personId
-      WHERE p.archived = 0 AND p.isProtected = 0
-    )
-    WHERE position <= :limit
-    ORDER BY personId, occurredAt DESC, id DESC
-    """,
-  )
-  fun observeRecentForWear(limit: Int): Flow<List<EntryEntity>>
-
-  /** Entrades de la persona estrictament anteriors al cursor ([beforeOccurredAt], [beforeId]), de la més nova a la més antiga. */
-  @Query(
-    """
-    SELECT * FROM entry
-    WHERE personId = :personId AND (occurredAt < :beforeOccurredAt OR (occurredAt = :beforeOccurredAt AND id < :beforeId))
-    ORDER BY occurredAt DESC, id DESC
-    LIMIT :limit
-    """,
-  )
-  suspend fun getPageBefore(
-    personId: Long,
-    beforeOccurredAt: Long,
-    beforeId: Long,
-    limit: Int,
-  ): List<EntryEntity>
-
   @Query("SELECT kind AS kind, COUNT(*) AS count FROM entry WHERE personId = :personId GROUP BY kind")
   fun observeCounts(personId: Long): Flow<List<KindCount>>
 }

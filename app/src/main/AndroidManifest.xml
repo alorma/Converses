@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <!-- Per avisar que el rellotge demana obrir una persona protegida (Android 13+) -->
-    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
-
     <application
         android:name=".ConversesApp"
         android:allowBackup="true"
@@ -42,14 +39,6 @@
                 <data android:mimeType="text/plain" />
             </intent-filter>
         </activity-alias>
-
-        <!-- S'obre en tocar la notificació d'aprovació i llança el BiometricPrompt; transparent, fora de l'historial i de la tasca principal -->
-        <activity
-            android:name=".ui.approval.ApprovalActivity"
-            android:excludeFromRecents="true"
-            android:exported="false"
-            android:taskAffinity=""
-            android:theme="@style/Theme.ContactNotes.Transparent" />
 
         <!--
             Compte local «Converses» i sync adapter buit: l'Android els necessita per mostrar «Veure notes» i
@@ -94,52 +83,6 @@
             <meta-data
                 android:name="android.provider.CONTACTS_STRUCTURE"
                 android:resource="@xml/contacts" />
-        </service>
-
-        <!-- Respon les peticions de «més entrades» del rellotge (només persones no protegides) -->
-        <service
-            android:name=".data.wear.WearEntriesService"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="com.google.android.gms.wearable.REQUEST_RECEIVED" />
-                <data
-                    android:host="*"
-                    android:pathPrefix="/converses/entries"
-                    android:scheme="wear" />
-            </intent-filter>
-        </service>
-
-        <!-- Rep les notes dictades al rellotge i les desa com a entrades noves -->
-        <service
-            android:name=".data.wear.WearNoteService"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="com.google.android.gms.wearable.REQUEST_RECEIVED" />
-                <data
-                    android:host="*"
-                    android:pathPrefix="/converses/note"
-                    android:scheme="wear" />
-            </intent-filter>
-        </service>
-
-        <!-- Rep les peticions d'aprovació d'una persona protegida i les cancel·lacions del rellotge -->
-        <service
-            android:name=".data.wear.WearApprovalService"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="com.google.android.gms.wearable.REQUEST_RECEIVED" />
-                <data
-                    android:host="*"
-                    android:path="/converses/approval"
-                    android:scheme="wear" />
-            </intent-filter>
-            <intent-filter>
-                <action android:name="com.google.android.gms.wearable.MESSAGE_RECEIVED" />
-                <data
-                    android:host="*"
-                    android:path="/converses/approval/cancel"
-                    android:scheme="wear" />
-            </intent-filter>
         </service>
     </application>
 

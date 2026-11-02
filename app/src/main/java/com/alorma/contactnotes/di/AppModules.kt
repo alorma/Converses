@@ -29,23 +29,6 @@ import com.alorma.contactnotes.data.settings.DataStoreSettingsRepository
 import com.alorma.contactnotes.data.settings.OnboardingFlag
 import com.alorma.contactnotes.data.settings.SecureWindow
 import com.alorma.contactnotes.data.settings.SettingsRepository
-import com.alorma.contactnotes.data.wear.AndroidApprovalNotifier
-import com.alorma.contactnotes.data.wear.ApprovalNotifier
-import com.alorma.contactnotes.data.wear.ApprovalResultSender
-import com.alorma.contactnotes.data.wear.ApprovalTokens
-import com.alorma.contactnotes.data.wear.DataStoreNoteIdRegistry
-import com.alorma.contactnotes.data.wear.GmsApprovalResultSender
-import com.alorma.contactnotes.data.wear.GmsWatchInstall
-import com.alorma.contactnotes.data.wear.GmsWatchNames
-import com.alorma.contactnotes.data.wear.GmsWearLink
-import com.alorma.contactnotes.data.wear.NoteIdRegistry
-import com.alorma.contactnotes.data.wear.WatchInstall
-import com.alorma.contactnotes.data.wear.WearApprovalCoordinator
-import com.alorma.contactnotes.data.wear.WearEntriesResponder
-import com.alorma.contactnotes.data.wear.WearLink
-import com.alorma.contactnotes.data.wear.WearNoteReceiver
-import com.alorma.contactnotes.data.wear.WearSnapshotPublisher
-import com.alorma.contactnotes.ui.approval.ApprovalViewModel
 import com.alorma.contactnotes.ui.edit.EditPersonViewModel
 import com.alorma.contactnotes.ui.entry.PersonSelectionBridge
 import com.alorma.contactnotes.ui.entry.QuickNoteViewModel
@@ -56,7 +39,6 @@ import com.alorma.contactnotes.ui.person.PersonExporter
 import com.alorma.contactnotes.ui.person.PersonLockViewModel
 import com.alorma.contactnotes.ui.person.PersonViewModel
 import com.alorma.contactnotes.ui.settings.SettingsViewModel
-import com.alorma.contactnotes.ui.watchinstall.WatchInstallViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -116,42 +98,11 @@ val viewModelModule =
     viewModel { (archived: Boolean) -> PeopleListViewModel(archived, get()) }
     viewModelOf(::SettingsViewModel)
     viewModelOf(::PaywallViewModel)
-    viewModel { WatchInstallViewModel(get(), get()) }
     viewModel { (personId: Long) -> PersonViewModel(personId, get()) }
     viewModel { PersonLockViewModel() }
-    viewModel { (requestId: String) -> ApprovalViewModel(requestId, get()) }
     viewModel { (personId: Long) -> PersonDetailViewModel(personId, get(), get(), get(), get(), get()) }
     viewModel { (personId: Long) -> QuickNoteViewModel(personId, get(), get()) }
     viewModel { (personId: Long) -> EditPersonViewModel(personId, get(), get(), get(), get(), get(), get()) }
-  }
-
-val wearModule =
-  module {
-    single<WearLink> { GmsWearLink(androidContext()) }
-    single<WatchInstall> { GmsWatchInstall(androidContext()) }
-    single { WearEntriesResponder(repository = get()) }
-    single { ApprovalTokens() }
-    single<ApprovalNotifier> { AndroidApprovalNotifier(androidContext()) }
-    single<ApprovalResultSender> { GmsApprovalResultSender(androidContext()) }
-    single {
-      WearApprovalCoordinator(
-        repository = get(),
-        notifier = get(),
-        sender = get(),
-        tokens = get(),
-        watchNames = GmsWatchNames(androidContext()),
-      )
-    }
-    single<NoteIdRegistry> { DataStoreNoteIdRegistry(androidContext()) }
-    single { WearNoteReceiver(repository = get(), registry = get(), tokens = get()) }
-    single {
-      WearSnapshotPublisher(
-        repository = get(),
-        settings = get(),
-        link = get(),
-        scope = CoroutineScope(SupervisorJob() + Dispatchers.Default),
-      )
-    }
   }
 
 /** Vincle amb Contactes (`docs/contacts`), darrere de `ContactLinkFeature`. */
@@ -175,7 +126,6 @@ val appModules =
     databaseModule,
     proDataSourceModule,
     settingsModule,
-    wearModule,
     contactsModule,
     viewModelModule,
   )

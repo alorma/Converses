@@ -27,7 +27,7 @@ data class PersonEntity(
   /**
    * Contacte del dispositiu vinculat (`docs/contacts`); tots tres `null` vol dir sense vincle. Es resol amb
    * `Contacts.getLookupUri(contactId, contactLookupKey)`; [contactName] és la còpia del nom triat, per mostrar el
-   * vincle sense `READ_CONTACTS`. No surt mai de Room (ni Wear, ni Auto, ni exportació).
+   * vincle sense `READ_CONTACTS`. No surt mai de Room (ni Auto, ni exportació).
    */
   val contactId: Long? = null,
   val contactLookupKey: String? = null,

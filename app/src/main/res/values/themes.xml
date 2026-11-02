@@ -4,7 +4,7 @@
         <item name="android:windowSplashScreenBackground">@color/window_background</item>
     </style>
 
-    <!-- L'aprovació des del rellotge no té pantalla pròpia: només el BiometricPrompt, sobre una finestra transparent -->
+    <!-- Activitats sense pantalla pròpia (ContactRowActivity): una finestra transparent que només redirigeix -->
     <style name="Theme.ContactNotes.Transparent">
         <item name="android:windowIsTranslucent">true</item>
         <item name="android:windowBackground">@android:color/transparent</item>

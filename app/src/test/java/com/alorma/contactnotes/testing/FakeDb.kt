@@ -204,32 +204,6 @@ class FakeEntryDao(
         .sortedWith(compareByDescending<EntryEntity> { it.occurredAt }.thenByDescending { it.id })
     }
 
-  override fun observeRecentForWear(limit: Int): Flow<List<EntryEntity>> =
-    combine(db.people, db.entries) { people, entries ->
-      val visible = people.filter { !it.archived && !it.isProtected }.map { it.id }.toSet()
-      entries
-        .filter { it.personId in visible }
-        .groupBy { it.personId }
-        .toSortedMap()
-        .values
-        .flatMap { list ->
-          list.sortedWith(compareByDescending<EntryEntity> { it.occurredAt }.thenByDescending { it.id }).take(limit)
-        }
-    }
-
-  override suspend fun getPageBefore(
-    personId: Long,
-    beforeOccurredAt: Long,
-    beforeId: Long,
-    limit: Int,
-  ): List<EntryEntity> =
-    db.entries.value
-      .filter {
-        it.personId == personId &&
-          (it.occurredAt < beforeOccurredAt || (it.occurredAt == beforeOccurredAt && it.id < beforeId))
-      }.sortedWith(compareByDescending<EntryEntity> { it.occurredAt }.thenByDescending { it.id })
-      .take(limit)
-
   override fun observeCounts(personId: Long): Flow<List<KindCount>> =
     db.entries.map { list ->
       list.filter { it.personId == personId }.groupBy { it.kind }.map { (kind, items) -> KindCount(kind, items.size) }

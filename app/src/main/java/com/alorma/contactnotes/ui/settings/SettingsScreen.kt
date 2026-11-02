@@ -1,6 +1,5 @@
 package com.alorma.contactnotes.ui.settings
 
-import android.Manifest
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
@@ -40,7 +39,6 @@ import androidx.compose.material.icons.rounded.Fingerprint
 import androidx.compose.material.icons.rounded.Language
 import androidx.compose.material.icons.rounded.LightMode
 import androidx.compose.material.icons.rounded.Lock
-import androidx.compose.material.icons.rounded.Notifications
 import androidx.compose.material.icons.rounded.Palette
 import androidx.compose.material.icons.rounded.Timer
 import androidx.compose.material.icons.rounded.UnfoldMore
@@ -77,7 +75,6 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withLink
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.pm.PackageInfoCompat
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.Lifecycle
@@ -93,7 +90,6 @@ import com.alorma.contactnotes.data.flags.rememberFeatureState
 import com.alorma.contactnotes.data.pro.ProRepository
 import com.alorma.contactnotes.data.settings.AppLockManager
 import com.alorma.contactnotes.data.settings.AppSettings
-import com.alorma.contactnotes.data.wear.WearLink
 import com.alorma.contactnotes.designsystem.components.ConversesSwitch
 import com.alorma.contactnotes.designsystem.components.ConversesToggleGroup
 import com.alorma.contactnotes.designsystem.components.ConversesTopBar
@@ -139,20 +135,6 @@ fun SettingsScreen(
   val feedbackBody = stringResource(R.string.settings_feedback_body, remember { versionLabel(context) })
   val haptics = rememberConversesHaptics()
 
-  // Les aprovacions del rellotge arriben com a notificació només amb l'app en segon pla: el permís es gestiona aquí
-  val wearLink: WearLink = koinInject()
-  val watchPresent by wearLink.watchPresent.collectAsStateWithLifecycle(false)
-  var watchNotifications by remember { mutableStateOf(context.notificationsEnabled()) }
-  LifecycleEventEffect(Lifecycle.Event.ON_RESUME) { watchNotifications = context.notificationsEnabled() }
-  val requestNotifications =
-    rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
-      watchNotifications = context.notificationsEnabled()
-      // Denegat per sempre: el sistema ja no mostra el diàleg, només es pot canviar als ajustos de l'app
-      if (!granted && !activity.shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS)) {
-        context.openNotificationSettings()
-      }
-    }
-
   val contactsState by viewModel.contacts.collectAsStateWithLifecycle()
   val requestContacts =
     rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
@@ -179,16 +161,6 @@ fun SettingsScreen(
       // Denegat per sempre: el sistema ja no mostra el diàleg, només es pot donar als ajustos de l'app
       val canAsk = ContactsPermission.permissions.any { activity.shouldShowRequestPermissionRationale(it) }
       if (canAsk) requestContacts.launch(ContactsPermission.permissions) else context.openAppDetailsSettings()
-    },
-    showWatchNotifications = watchPresent,
-    watchNotifications = watchNotifications,
-    onWatchNotifications = { enabled ->
-      if (enabled && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-        requestNotifications.launch(Manifest.permission.POST_NOTIFICATIONS)
-      } else {
-        // Per apagar-les (o abans d'Android 13) l'única via és el sistema
-        context.openNotificationSettings()
-      }
     },
     personColor = rememberFeatureState<PersonColorFeature>(),
     canUnlock = canUnlock,
@@ -232,9 +204,6 @@ fun SettingsContent(
   onOpenPrivacyPolicy: () -> Unit,
   onOpenFeedback: () -> Unit,
   personColor: FeatureState = FeatureState.Unlocked,
-  showWatchNotifications: Boolean = false,
-  watchNotifications: Boolean = false,
-  onWatchNotifications: (Boolean) -> Unit = {},
   contacts: ContactsSettingsState? = null,
   onContactsExplainContinue: () -> Unit = {},
   onContactsAllow: () -> Unit = {},
@@ -335,18 +304,8 @@ fun SettingsContent(
           icon = Icons.Rounded.Vibration,
           checked = settings.hapticFeedback,
           onCheckedChange = onHapticFeedback,
-          shape = groupedItemShape(0, if (showWatchNotifications) 2 else 1),
+          shape = groupedItemShape(0, 1),
         )
-        if (showWatchNotifications) {
-          SettingSwitchRow(
-            title = stringResource(R.string.settings_watch_notifications),
-            subtitle = stringResource(R.string.settings_watch_notifications_summary),
-            icon = Icons.Rounded.Notifications,
-            checked = watchNotifications,
-            onCheckedChange = onWatchNotifications,
-            shape = groupedItemShape(1, 2),
-          )
-        }
       }
 
       SettingsGroup(
@@ -634,8 +593,6 @@ private fun TileTitle(text: String) {
   Text(text = text, fontWeight = FontWeight.SemiBold)
 }
 
-private fun Context.notificationsEnabled() = NotificationManagerCompat.from(this).areNotificationsEnabled()
-
 @Composable
 private fun ContactsSection(
   state: ContactsSettingsState,
@@ -706,18 +663,6 @@ private fun ContactsSection(
       color = MaterialTheme.colorScheme.onSurfaceVariant,
       modifier = Modifier.padding(horizontal = 4.dp),
     )
-  }
-}
-
-private fun Context.openNotificationSettings() {
-  val intent =
-    Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS)
-      .putExtra(Settings.EXTRA_APP_PACKAGE, packageName)
-      .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-  try {
-    startActivity(intent)
-  } catch (_: ActivityNotFoundException) {
-    // Sense pantalla d'ajustos de notificacions: no hi ha res més a fer
   }
 }
 

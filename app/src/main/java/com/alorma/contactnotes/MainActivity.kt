@@ -36,15 +36,12 @@ import com.alorma.contactnotes.ui.navigation.EXTRA_CONTACT_ROW_PERSON_ID
 import com.alorma.contactnotes.ui.navigation.contactRowBackStack
 import com.alorma.contactnotes.ui.navigation.isTextImport
 import com.alorma.contactnotes.ui.navigation.toBackStack
-import com.alorma.contactnotes.ui.watchinstall.WatchInstallSheet
-import com.alorma.contactnotes.ui.watchinstall.WatchInstallViewModel
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.koin.android.ext.android.inject
-import org.koin.compose.viewmodel.koinViewModel
 
 class MainActivity : FragmentActivity() {
   private val settingsRepository: SettingsRepository by inject()
@@ -128,18 +125,6 @@ class MainActivity : FragmentActivity() {
           DebugMenuHost {
             Box {
               AppNavigation(startOnboarding = showOnboarding, initialBackStack = importStack)
-              // La proposta d'instal·lar l'app al rellotge no s'ensenya sobre l'onboarding, el bloqueig ni una importació
-              if (!showOnboarding && !showLock && importStack == null) {
-                val watchInstall = koinViewModel<WatchInstallViewModel>()
-                val watchInstallState by watchInstall.state.collectAsStateWithLifecycle()
-                WatchInstallSheet(
-                  state = watchInstallState,
-                  onInstall = watchInstall::onInstall,
-                  onNotNow = watchInstall::onNotNow,
-                  onNeverAgain = watchInstall::onNeverAgain,
-                  onDone = watchInstall::onDone,
-                )
-              }
               if (showLock) {
                 AppLockScreen(
                   onUnlocked = appLock::unlock,

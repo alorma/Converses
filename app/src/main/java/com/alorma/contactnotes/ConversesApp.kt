@@ -7,7 +7,6 @@ import androidx.lifecycle.ProcessLifecycleOwner
 import com.alorma.contactnotes.data.contacts.ContactsReconciler
 import com.alorma.contactnotes.data.pro.ProDataSource
 import com.alorma.contactnotes.data.settings.AppLockManager
-import com.alorma.contactnotes.data.wear.WearSnapshotPublisher
 import com.alorma.contactnotes.di.appModules
 import org.koin.android.ext.android.inject
 import org.koin.android.ext.koin.androidContext
@@ -22,8 +21,6 @@ class ConversesApp : Application() {
     }
     val pro: ProDataSource by inject()
     pro.start()
-    val wearPublisher: WearSnapshotPublisher by inject()
-    wearPublisher.start()
     val contactsReconciler: ContactsReconciler by inject()
     contactsReconciler.start()
     val appLock: AppLockManager by inject()
