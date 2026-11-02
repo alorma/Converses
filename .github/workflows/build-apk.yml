@@ -51,7 +51,7 @@ jobs:
           retention-days: 3
 
       - name: Build debug APK
-        run: ./gradlew :app:assembleDebug :wear:assembleDebug
+        run: ./gradlew :app:assembleDebug
         # El Test Store de RevenueCat, perquè l'APK que es descarrega pugui provar compres
         env:
           REVENUECAT_TEST_API_KEY: ${{ secrets.REVENUECAT_TEST_API_KEY }}
@@ -62,7 +62,6 @@ jobs:
           name: converses-debug
           path: |
             app/build/outputs/apk/debug/*.apk
-            wear/build/outputs/apk/debug/*.apk
           if-no-files-found: error
           retention-days: 3
 
@@ -81,5 +80,5 @@ jobs:
       - uses: gradle/actions/setup-gradle@v6
 
       # Sense keystore es construeix sense signar; serveix per comprovar que R8 i els recursos no trenquen el release
-      - name: Build release APKs
-        run: ./gradlew :app:assembleRelease :wear:assembleRelease
+      - name: Build release APK
+        run: ./gradlew :app:assembleRelease
