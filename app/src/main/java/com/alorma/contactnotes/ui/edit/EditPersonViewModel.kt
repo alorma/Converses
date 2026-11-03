@@ -41,7 +41,15 @@ data class EditPersonUiState(
   val aliasTaken: Boolean = false,
   val entryCount: Int = 0,
   val baseline: EditSnapshot = EditSnapshot(),
+  /** Prova d'una forma Pro al full «Avatar» sense Pro (11c): es veu al full, però no es desa mai. */
+  val trialShape: AvatarShape? = null,
+  /** Prova d'un color Pro; `null` vol dir que no se'n prova cap («Automàtic» és lliure). */
+  val trialColor: AvatarColor? = null,
+  /** «Desbloqueja amb Pro» ha tancat el full per obrir la pantalla de Pro: en tornar a l'editor, es reobre. */
+  val reopenAvatarSheet: Boolean = false,
 ) {
+  val hasTrial: Boolean get() = trialShape != null || trialColor != null
+
   private val snapshot: EditSnapshot
     get() = EditSnapshot(name, alias, shape, color, isProtected, facts)
 
@@ -57,6 +65,22 @@ interface EditPersonActions {
   fun onShape(shape: AvatarShape)
 
   fun onColor(color: AvatarColor?)
+
+  /** Sense Pro: previsualitza una forma Pro al full «Avatar» (11c). */
+  fun onTrialShape(shape: AvatarShape)
+
+  fun onTrialColor(color: AvatarColor)
+
+  /** «Descarta la prova», scrim o enrere: torna a l'avatar desat. */
+  fun onDiscardTrial()
+
+  /** «Desbloqueja amb Pro»: es manté la prova i el full es reobrirà en tornar de la pantalla de Pro. */
+  fun onUnlockTrial()
+
+  fun onAvatarSheetReopened()
+
+  /** Ara és Pro: la prova passa a ser la forma i el color de l'editor, i es poden desar. */
+  fun onApplyTrial()
 
   fun onProtected(value: Boolean)
 
@@ -141,9 +165,32 @@ class EditPersonViewModel(
     }
   }
 
-  override fun onShape(shape: AvatarShape) = _state.update { it.copy(shape = shape) }
+  override fun onShape(shape: AvatarShape) = _state.update { it.copy(shape = shape, trialShape = null) }
 
-  override fun onColor(color: AvatarColor?) = _state.update { it.copy(color = color) }
+  override fun onColor(color: AvatarColor?) = _state.update { it.copy(color = color, trialColor = null) }
+
+  override fun onTrialShape(shape: AvatarShape) = _state.update { it.copy(trialShape = shape) }
+
+  override fun onTrialColor(color: AvatarColor) = _state.update { it.copy(trialColor = color) }
+
+  override fun onDiscardTrial() =
+    _state.update {
+      it.copy(trialShape = null, trialColor = null, reopenAvatarSheet = false)
+    }
+
+  override fun onUnlockTrial() = _state.update { it.copy(reopenAvatarSheet = true) }
+
+  override fun onAvatarSheetReopened() = _state.update { it.copy(reopenAvatarSheet = false) }
+
+  override fun onApplyTrial() =
+    _state.update {
+      it.copy(
+        shape = it.trialShape ?: it.shape,
+        color = it.trialColor ?: it.color,
+        trialShape = null,
+        trialColor = null,
+      )
+    }
 
   /** En una persona que ja existeix, el canvi es desa a l'acte; en una de nova, es desa amb el perfil. */
   override fun onProtected(value: Boolean) {

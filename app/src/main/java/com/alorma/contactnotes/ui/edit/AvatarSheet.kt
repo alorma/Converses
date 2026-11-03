@@ -5,7 +5,6 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,6 +16,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.shape.CircleShape
@@ -26,24 +26,30 @@ import androidx.compose.material.icons.rounded.Autorenew
 import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material.icons.rounded.Edit
 import androidx.compose.material.icons.rounded.Lock
+import androidx.compose.material.icons.rounded.Palette
+import androidx.compose.material.icons.rounded.WorkspacePremium
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
@@ -171,6 +177,29 @@ internal fun NameAvatar(
   }
 }
 
+/**
+ * Estat del full «Avatar» sense Pro (11b–11d). Galeta i Automàtic són lliures, i també la forma i el color desats (si
+ * ha deixat de ser Pro, els pot mantenir). Tocar qualsevol altra opció només la prova: no es desa mai.
+ */
+data class AvatarSheetLock(
+  val savedShape: AvatarShape? = null,
+  val savedColor: AvatarColor? = null,
+  val trialShape: AvatarShape? = null,
+  val trialColor: AvatarColor? = null,
+) {
+  val hasTrial: Boolean get() = trialShape != null || trialColor != null
+
+  fun isFree(shape: AvatarShape): Boolean = shape == AvatarShape.Standard || shape == savedShape
+
+  fun isFree(color: AvatarColor?): Boolean = color == null || color == savedColor
+
+  /** La forma o el color de l'editor són una tria Pro que es manté després d'una baixada (11d). */
+  fun keepsProChoice(
+    shape: AvatarShape?,
+    color: AvatarColor?,
+  ): Boolean = (shape ?: AvatarShape.Standard) != AvatarShape.Standard || color != null
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AvatarSheet(
@@ -179,19 +208,37 @@ fun AvatarSheet(
   color: AvatarColor?,
   onShape: (AvatarShape) -> Unit,
   onColor: (AvatarColor?) -> Unit,
+  /** «Fet». */
+  onDone: () -> Unit,
+  /** Scrim o enrere: amb una prova, equival a «Descarta la prova». */
   onDismiss: () -> Unit,
-  locked: Boolean = false,
-  onOpenPro: () -> Unit = {},
+  lock: AvatarSheetLock? = null,
+  onTrialShape: (AvatarShape) -> Unit = {},
+  onTrialColor: (AvatarColor) -> Unit = {},
+  onUnlock: () -> Unit = {},
+  onDiscardTrial: () -> Unit = {},
 ) {
   ModalBottomSheet(
     onDismissRequest = onDismiss,
     sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
   ) {
-    AvatarSheetContent(name, shape, color, onShape, onColor, onDone = onDismiss, locked = locked, onOpenPro = onOpenPro)
+    AvatarSheetContent(
+      name = name,
+      shape = shape,
+      color = color,
+      onShape = onShape,
+      onColor = onColor,
+      onDone = onDone,
+      lock = lock,
+      onTrialShape = onTrialShape,
+      onTrialColor = onTrialColor,
+      onUnlock = onUnlock,
+      onDiscardTrial = onDiscardTrial,
+    )
   }
 }
 
-/** Contingut del full «Avatar»; el `ModalBottomSheet` és una finestra a part. */
+/** Contingut del full «Avatar»; el `ModalBottomSheet` és una finestra a part. Sense Pro, [lock] no és `null`. */
 @Composable
 fun AvatarSheetContent(
   name: String,
@@ -200,22 +247,25 @@ fun AvatarSheetContent(
   onShape: (AvatarShape) -> Unit,
   onColor: (AvatarColor?) -> Unit,
   onDone: () -> Unit,
-  locked: Boolean = false,
-  /** Amb [locked], tocar «Forma» o «Color» porta a la pantalla de Pro (origen `avatar`). */
-  onOpenPro: () -> Unit = {},
+  lock: AvatarSheetLock? = null,
+  onTrialShape: (AvatarShape) -> Unit = {},
+  onTrialColor: (AvatarColor) -> Unit = {},
+  /** «Desbloqueja amb Pro»: obre la pantalla de Pro (origen `People`). */
+  onUnlock: () -> Unit = {},
+  onDiscardTrial: () -> Unit = {},
 ) {
-  // Sense Pro es veu el que hi ha desat, com a la resta de l'app, però no es pot canviar
-  val resolvedShape = shape ?: AvatarShape.Standard
-  val resolvedColor = color ?: AvatarColor.forName(name)
-  val shapeName = stringResource(shapeNameRes(resolvedShape))
-  val colorName = stringResource(colorNameRes(resolvedColor.name))
+  val trial = lock?.hasTrial == true
+  // L'avatar gran i la selecció mostren la prova; l'avatar de l'editor, no
+  val shownShape = lock?.trialShape ?: shape ?: AvatarShape.Standard
+  val selectedColor = lock?.trialColor ?: color
+  val shownColor = selectedColor ?: AvatarColor.forName(name)
+  val shapeName = stringResource(shapeNameRes(shownShape))
+  val colorName = stringResource(colorNameRes(shownColor.name))
   val summary =
-    if (color ==
-      null
-    ) {
-      stringResource(R.string.avatar_summary_auto, shapeName, colorName)
-    } else {
-      "$shapeName · $colorName"
+    when {
+      trial -> stringResource(R.string.avatar_trial_summary, shapeName, colorName)
+      color == null -> stringResource(R.string.avatar_summary_auto, shapeName, colorName)
+      else -> "$shapeName · $colorName"
     }
 
   Column(
@@ -225,8 +275,8 @@ fun AvatarSheetContent(
     Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(16.dp)) {
       EditorAvatar(
         name = name,
-        shape = resolvedShape,
-        color = resolvedColor,
+        shape = shownShape,
+        color = shownColor,
         size = 88.dp,
         initialsSize = 30,
         blankPlaceholder = false,
@@ -238,7 +288,7 @@ fun AvatarSheetContent(
             style = SheetTitleStyle,
             color = MaterialTheme.colorScheme.onSurface,
           )
-          if (locked) {
+          if (lock != null) {
             ProBadge(
               text = stringResource(R.string.pro_badge),
               contentDescription = stringResource(R.string.pro_description),
@@ -250,23 +300,49 @@ fun AvatarSheetContent(
           style = MaterialTheme.typography.bodySmall,
           fontSize = 13.sp,
           color = MaterialTheme.colorScheme.onSurfaceVariant,
+          modifier = if (lock != null) Modifier.semantics { liveRegion = LiveRegionMode.Polite } else Modifier,
         )
       }
     }
 
-    SheetSection(stringResource(R.string.avatar_shape), locked, onOpenPro) {
+    if (lock != null) {
+      when {
+        trial ->
+          AvatarProCard(
+            icon = Icons.Rounded.WorkspacePremium,
+            title = stringResource(R.string.avatar_trial_title),
+            text = stringResource(R.string.avatar_trial_text),
+            highlighted = true,
+          )
+        lock.keepsProChoice(shape, color) ->
+          AvatarProCard(
+            icon = Icons.Rounded.Lock,
+            title = stringResource(R.string.avatar_kept_title),
+            text = stringResource(R.string.avatar_kept_text),
+          )
+        else ->
+          AvatarProCard(
+            icon = Icons.Rounded.Palette,
+            title = stringResource(R.string.avatar_pro_info_title),
+            text = stringResource(R.string.avatar_pro_info_text),
+          )
+      }
+    }
+
+    SheetSection(stringResource(R.string.avatar_shape)) {
       // Dues files de 3: amb 6 formes en una fila les etiquetes no hi caben
       Column(modifier = Modifier.fillMaxWidth().selectableGroup(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
         AvatarShape.entries.chunked(ShapesPerRow).forEach { row ->
           Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             row.forEachIndexed { index, option ->
+              val proLocked = lock != null && !lock.isFree(option)
               ShapeButton(
                 shape = option,
-                selected = option == resolvedShape,
+                selected = option == shownShape,
                 first = index == 0,
                 last = index == row.lastIndex,
-                enabled = !locked,
-                onClick = { onShape(option) },
+                proLocked = proLocked,
+                onClick = { if (proLocked) onTrialShape(option) else onShape(option) },
                 modifier = Modifier.weight(1f),
               )
             }
@@ -275,21 +351,72 @@ fun AvatarSheetContent(
       }
     }
 
-    SheetSection(stringResource(R.string.avatar_color), locked, onOpenPro) {
+    SheetSection(stringResource(R.string.avatar_color)) {
       Row(
         modifier = Modifier.fillMaxWidth().selectableGroup(),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
       ) {
-        Swatch(color = null, selected = color == null, enabled = !locked, onClick = { onColor(null) })
+        Swatch(color = null, selected = selectedColor == null, proLocked = false, onClick = { onColor(null) })
         AvatarColor.entries.forEach { option ->
-          Swatch(color = option, selected = color == option, enabled = !locked, onClick = { onColor(option) })
+          val proLocked = lock != null && !lock.isFree(option)
+          Swatch(
+            color = option,
+            selected = selectedColor == option,
+            proLocked = proLocked,
+            onClick = { if (proLocked) onTrialColor(option) else onColor(option) },
+          )
         }
       }
     }
 
-    Button(onClick = onDone, modifier = Modifier.fillMaxWidth().height(56.dp), shape = CircleShape) {
-      Text(stringResource(R.string.avatar_done), fontWeight = FontWeight.Bold, fontSize = 16.sp)
+    if (trial) {
+      Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+        Button(onClick = onUnlock, modifier = Modifier.fillMaxWidth().height(56.dp), shape = CircleShape) {
+          Icon(Icons.Rounded.WorkspacePremium, contentDescription = null, modifier = Modifier.size(20.dp))
+          Spacer(Modifier.width(8.dp))
+          Text(stringResource(R.string.avatar_unlock_pro), fontWeight = FontWeight.Bold, fontSize = 16.sp)
+        }
+        TextButton(onClick = onDiscardTrial, modifier = Modifier.fillMaxWidth().height(48.dp)) {
+          Text(stringResource(R.string.avatar_discard_trial), fontWeight = FontWeight.Bold, fontSize = 15.sp)
+        }
+      }
+    } else {
+      Button(onClick = onDone, modifier = Modifier.fillMaxWidth().height(56.dp), shape = CircleShape) {
+        Text(stringResource(R.string.avatar_done), fontWeight = FontWeight.Bold, fontSize = 16.sp)
+      }
+    }
+  }
+}
+
+/** Targeta del full sense Pro (11b, 11c, 11d); en prova ([highlighted]) va sobre `primaryContainer`. */
+@Composable
+private fun AvatarProCard(
+  icon: ImageVector,
+  title: String,
+  text: String,
+  highlighted: Boolean = false,
+) {
+  val scheme = MaterialTheme.colorScheme
+  val content = if (highlighted) scheme.onPrimaryContainer else scheme.onSurface
+  Row(
+    modifier =
+      Modifier
+        .fillMaxWidth()
+        .clip(RoundedCornerShape(18.dp))
+        .background(if (highlighted) scheme.primaryContainer else scheme.surfaceContainerLowest)
+        .padding(horizontal = 16.dp, vertical = 14.dp),
+    horizontalArrangement = Arrangement.spacedBy(12.dp),
+  ) {
+    Icon(icon, contentDescription = null, tint = content, modifier = Modifier.size(20.dp))
+    Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+      Text(title, fontSize = 14.sp, fontWeight = FontWeight.Bold, color = content)
+      Text(
+        text,
+        fontSize = 13.sp,
+        lineHeight = 18.sp,
+        color = if (highlighted) scheme.onPrimaryContainer else scheme.onSurfaceVariant,
+      )
     }
   }
 }
@@ -297,36 +424,11 @@ fun AvatarSheetContent(
 @Composable
 private fun SheetSection(
   title: String,
-  locked: Boolean,
-  onLockedClick: () -> Unit,
   content: @Composable () -> Unit,
 ) {
   Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-      Text(title, fontSize = 14.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
-      if (locked) {
-        Icon(
-          Icons.Rounded.Lock,
-          contentDescription = null,
-          tint = MaterialTheme.colorScheme.onSurfaceVariant,
-          modifier = Modifier.size(16.dp),
-        )
-      }
-    }
-    Box {
-      // Opacitat de contingut desactivat de Material
-      Box(modifier = if (locked) Modifier.alpha(0.38f) else Modifier) { content() }
-      if (locked) {
-        // Les opcions són desactivades: el toc de tota la secció porta a la pantalla de Pro
-        Box(
-          modifier =
-            Modifier.matchParentSize().clickable(
-              onClickLabel = stringResource(R.string.pro_description),
-              onClick = onLockedClick,
-            ),
-        )
-      }
-    }
+    Text(title, fontSize = 14.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
+    content()
   }
 }
 
@@ -336,7 +438,7 @@ private fun ShapeButton(
   selected: Boolean,
   first: Boolean,
   last: Boolean,
-  enabled: Boolean,
+  proLocked: Boolean,
   onClick: () -> Unit,
   modifier: Modifier = Modifier,
 ) {
@@ -354,76 +456,115 @@ private fun ShapeButton(
         bottomEnd = if (last) outer else inner,
       )
     }
-  Column(
+  val label = stringResource(shapeNameRes(shape))
+  // El cadenat és decoratiu: l'estat va a la descripció («Trèvol, Pro»)
+  val description = if (proLocked) stringResource(R.string.avatar_option_pro, label) else label
+  Box(
     modifier =
       modifier
         .height(84.dp)
         .clip(buttonShape)
         .background(if (selected) scheme.primaryContainer else scheme.surfaceContainerLowest)
-        .selectable(selected = selected, enabled = enabled, role = Role.RadioButton, onClick = onClick),
-    horizontalAlignment = Alignment.CenterHorizontally,
-    verticalArrangement = Arrangement.Center,
+        .selectable(selected = selected, role = Role.RadioButton, onClick = onClick)
+        .semantics { contentDescription = description },
   ) {
-    Box(
-      modifier =
-        Modifier
-          .size(32.dp)
-          .clip(shape.asShape())
-          .background(if (selected) scheme.onPrimaryContainer else scheme.outline),
-    )
-    Spacer(Modifier.height(6.dp))
-    Text(
-      text = stringResource(shapeNameRes(shape)),
-      fontSize = 12.sp,
-      fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal,
-      color = if (selected) scheme.onPrimaryContainer else scheme.onSurfaceVariant,
-    )
+    Column(
+      modifier = Modifier.fillMaxSize().clearAndSetSemantics {},
+      horizontalAlignment = Alignment.CenterHorizontally,
+      verticalArrangement = Arrangement.Center,
+    ) {
+      Box(
+        modifier =
+          Modifier
+            .size(32.dp)
+            .clip(shape.asShape())
+            .background(if (selected) scheme.onPrimaryContainer else scheme.outline),
+      )
+      Spacer(Modifier.height(6.dp))
+      Text(
+        text = label,
+        fontSize = 12.sp,
+        fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal,
+        color = if (selected) scheme.onPrimaryContainer else scheme.onSurfaceVariant,
+      )
+    }
+    if (proLocked) {
+      Icon(
+        Icons.Rounded.Lock,
+        contentDescription = null,
+        tint = if (selected) scheme.onPrimaryContainer else scheme.onSurfaceVariant,
+        modifier = Modifier.align(Alignment.TopEnd).padding(top = 6.dp, end = 6.dp).size(16.dp),
+      )
+    }
   }
 }
 
-/** Mostra de 30 dp dins d'un anell de 40 dp; `null` és «Automàtic». */
+/** Mostra de 30 dp dins d'un anell de 40 dp; `null` és «Automàtic». Sense Pro, els colors Pro porten un cadenat. */
 @Composable
 private fun Swatch(
   color: AvatarColor?,
   selected: Boolean,
-  enabled: Boolean,
+  proLocked: Boolean,
   onClick: () -> Unit,
 ) {
   val scheme = MaterialTheme.colorScheme
-  val description = stringResource(if (color == null) R.string.avatar_color_auto else colorNameRes(color.name))
-  Box(
-    modifier =
-      Modifier
-        .size(40.dp)
-        .clip(CircleShape)
-        .then(if (selected) Modifier.border(BorderStroke(2.dp, scheme.primary), CircleShape) else Modifier)
-        .selectable(selected = selected, enabled = enabled, role = Role.RadioButton, onClick = onClick)
-        .semantics { contentDescription = description },
-    contentAlignment = Alignment.Center,
-  ) {
+  val name = stringResource(if (color == null) R.string.avatar_color_auto else colorNameRes(color.name))
+  val description = if (proLocked) stringResource(R.string.avatar_option_pro, name) else name
+  Box(modifier = Modifier.size(40.dp)) {
     Box(
       modifier =
         Modifier
-          .size(30.dp)
+          .fillMaxSize()
           .clip(CircleShape)
-          .background(color?.color ?: scheme.surfaceContainerHigh),
+          .then(if (selected) Modifier.border(BorderStroke(2.dp, scheme.primary), CircleShape) else Modifier)
+          .selectable(selected = selected, role = Role.RadioButton, onClick = onClick)
+          .semantics { contentDescription = description },
       contentAlignment = Alignment.Center,
     ) {
-      when {
-        color == null ->
-          Icon(
-            Icons.Rounded.Autorenew,
-            contentDescription = null,
-            tint = scheme.onSurfaceVariant,
-            modifier = Modifier.size(18.dp),
-          )
-        selected ->
-          Icon(
-            Icons.Rounded.Check,
-            contentDescription = null,
-            tint = InitialsColor,
-            modifier = Modifier.size(18.dp),
-          )
+      Box(
+        modifier =
+          Modifier
+            .size(30.dp)
+            .clip(CircleShape)
+            .background(color?.color ?: scheme.surfaceContainerHigh),
+        contentAlignment = Alignment.Center,
+      ) {
+        when {
+          color == null ->
+            Icon(
+              Icons.Rounded.Autorenew,
+              contentDescription = null,
+              tint = scheme.onSurfaceVariant,
+              modifier = Modifier.size(18.dp),
+            )
+          selected ->
+            Icon(
+              Icons.Rounded.Check,
+              contentDescription = null,
+              tint = InitialsColor,
+              modifier = Modifier.size(18.dp),
+            )
+        }
+      }
+    }
+    if (proLocked) {
+      // Cercle del color del full (el de `ModalBottomSheet`) perquè el cadenat es llegeixi sobre qualsevol color
+      Box(
+        modifier =
+          Modifier
+            .align(Alignment.BottomEnd)
+            .offset(x = 2.dp, y = 2.dp)
+            .size(18.dp)
+            .clip(CircleShape)
+            .background(scheme.surfaceContainerLow),
+        contentAlignment = Alignment.Center,
+      ) {
+        Icon(
+          Icons.Rounded.Lock,
+          contentDescription = null,
+          tint = scheme.onSurfaceVariant,
+          modifier = Modifier.size(12.dp),
+        )
       }
     }
   }

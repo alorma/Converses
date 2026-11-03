@@ -17,6 +17,18 @@ private object NoOpEditPersonActions : EditPersonActions {
 
   override fun onColor(color: AvatarColor?) = Unit
 
+  override fun onTrialShape(shape: AvatarShape) = Unit
+
+  override fun onTrialColor(color: AvatarColor) = Unit
+
+  override fun onDiscardTrial() = Unit
+
+  override fun onUnlockTrial() = Unit
+
+  override fun onAvatarSheetReopened() = Unit
+
+  override fun onApplyTrial() = Unit
+
   override fun onProtected(value: Boolean) = Unit
 
   override fun onAddFact() = Unit
@@ -157,7 +169,7 @@ internal fun EditPersonCustomAvatarPreview() {
 private fun AvatarSheetPreview(
   shape: AvatarShape?,
   color: AvatarColor?,
-  locked: Boolean = false,
+  lock: AvatarSheetLock? = null,
 ) {
   ConversesPreviewTheme {
     androidx.compose.material3.Surface(
@@ -170,17 +182,36 @@ private fun AvatarSheetPreview(
         onShape = {},
         onColor = {},
         onDone = {},
-        locked = locked,
+        lock = lock,
       )
     }
   }
 }
 
-/** Sense Pro: PRO i opcions desactivades; l'avatar desat es veu però no es pot canviar. */
+/** Sense Pro (11b): PRO, targeta «Formes i colors amb Pro» i cadenats; Galeta i Automàtic són lliures. */
 @Preview
 @Composable
-internal fun AvatarSheetLockedPreview() =
-  AvatarSheetPreview(shape = AvatarShape.Clover8Leaf, color = AvatarColor.Rose, locked = true)
+internal fun AvatarSheetLockedPreview() = AvatarSheetPreview(shape = null, color = null, lock = AvatarSheetLock())
+
+/** Sense Pro, provant una forma i un color Pro (11c): «Així quedaria», «Desbloqueja amb Pro» i «Descarta la prova». */
+@Preview
+@Composable
+internal fun AvatarSheetTrialPreview() =
+  AvatarSheetPreview(
+    shape = null,
+    color = null,
+    lock = AvatarSheetLock(trialShape = AvatarShape.Clover4Leaf, trialColor = AvatarColor.Sky),
+  )
+
+/** Ha deixat de ser Pro (11d): la forma i el color desats es poden mantenir, sense cadenat. */
+@Preview
+@Composable
+internal fun AvatarSheetDowngradePreview() =
+  AvatarSheetPreview(
+    shape = AvatarShape.Clover8Leaf,
+    color = AvatarColor.Lavender,
+    lock = AvatarSheetLock(savedShape = AvatarShape.Clover8Leaf, savedColor = AvatarColor.Lavender),
+  )
 
 /** Forma i color per defecte: el resum diu «color automàtic». */
 @Preview

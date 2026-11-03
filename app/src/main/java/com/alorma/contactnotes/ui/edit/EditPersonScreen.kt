@@ -169,7 +169,18 @@ fun EditPersonContent(
   onOpenPro: (ProBenefit) -> Unit = {},
 ) {
   var showDelete by remember { mutableStateOf(false) }
-  var showAvatarSheet by remember { mutableStateOf(false) }
+  var showAvatarSheet by rememberSaveable { mutableStateOf(false) }
+  // L'editor surt de la composició mentre es veu la pantalla de Pro: en tornar-hi, el full es reobre amb la prova
+  LaunchedEffect(Unit) {
+    if (state.reopenAvatarSheet) {
+      showAvatarSheet = true
+      actions.onAvatarSheetReopened()
+    }
+  }
+  // Si ha comprat, la prova passa a l'editor i ja es pot desar
+  LaunchedEffect(customAvatar, state.hasTrial) {
+    if (customAvatar == FeatureState.Unlocked && state.hasTrial) actions.onApplyTrial()
+  }
 
   PersonTheme(state.color ?: AvatarColor.forName(state.name)) {
     val scrollBehavior = rememberTopBarScrollBehavior()
@@ -334,12 +345,30 @@ fun EditPersonContent(
         color = state.color,
         onShape = actions::onShape,
         onColor = actions::onColor,
-        onDismiss = { showAvatarSheet = false },
-        locked = customAvatar == FeatureState.Locked,
-        onOpenPro = {
+        onDone = { showAvatarSheet = false },
+        onDismiss = {
           showAvatarSheet = false
+          actions.onDiscardTrial()
+        },
+        lock =
+          if (customAvatar == FeatureState.Locked) {
+            AvatarSheetLock(
+              savedShape = state.baseline.shape,
+              savedColor = state.baseline.color,
+              trialShape = state.trialShape,
+              trialColor = state.trialColor,
+            )
+          } else {
+            null
+          },
+        onTrialShape = actions::onTrialShape,
+        onTrialColor = actions::onTrialColor,
+        onUnlock = {
+          showAvatarSheet = false
+          actions.onUnlockTrial()
           onOpenPro(ProBenefit.People)
         },
+        onDiscardTrial = actions::onDiscardTrial,
       )
     }
   }

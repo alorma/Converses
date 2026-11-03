@@ -1,11 +1,14 @@
 package com.alorma.contactnotes.ui.edit
 
 import android.content.ContextWrapper
+import com.alorma.contactnotes.shared.AvatarColor
+import com.alorma.contactnotes.shared.AvatarShape
 import com.alorma.contactnotes.testing.FakeDb
 import com.alorma.contactnotes.testing.MainDispatcherRule
 import com.alorma.contactnotes.ui.person.PersonExporter
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -214,4 +217,113 @@ class EditPersonViewModelTest {
 
     assertEquals(2, viewModel(marta.id).state.value.entryCount)
   }
+
+  @Test
+  fun aTrialIsShownButNeverSaved() {
+    val marta = db.addPerson("Marta")
+    val vm = viewModel(marta.id)
+
+    vm.onTrialShape(AvatarShape.Clover4Leaf)
+    vm.onTrialColor(AvatarColor.Sky)
+
+    assertTrue(vm.state.value.hasTrial)
+    assertEquals(AvatarShape.Cookie9Sided, vm.state.value.shape)
+    assertEquals(marta.avatarColor, vm.state.value.color)
+    assertFalse(vm.state.value.canSave)
+  }
+
+  @Test
+  fun choosingAFreeOptionClearsTheTrialOfThatDimensionOnly() {
+    val vm = viewModel()
+    vm.onTrialShape(AvatarShape.Clover4Leaf)
+    vm.onTrialColor(AvatarColor.Sky)
+
+    vm.onShape(AvatarShape.Cookie9Sided)
+
+    assertNull(vm.state.value.trialShape)
+    assertEquals(AvatarColor.Sky, vm.state.value.trialColor)
+
+    vm.onColor(null)
+
+    assertFalse(vm.state.value.hasTrial)
+  }
+
+  @Test
+  fun discardingTheTrialGoesBackToTheSavedAvatar() {
+    val vm = viewModel()
+    vm.onTrialShape(AvatarShape.Sunny)
+    vm.onTrialColor(AvatarColor.Rose)
+
+    vm.onDiscardTrial()
+
+    assertNull(vm.state.value.trialShape)
+    assertNull(vm.state.value.trialColor)
+    assertNull(vm.state.value.shape)
+    assertNull(vm.state.value.color)
+  }
+
+  @Test
+  fun unlockingKeepsTheTrialAndReopensTheSheetOnce() {
+    val vm = viewModel()
+    vm.onTrialShape(AvatarShape.Sunny)
+
+    vm.onUnlockTrial()
+
+    assertTrue(vm.state.value.reopenAvatarSheet)
+    assertEquals(AvatarShape.Sunny, vm.state.value.trialShape)
+
+    vm.onAvatarSheetReopened()
+
+    assertFalse(vm.state.value.reopenAvatarSheet)
+    assertEquals(AvatarShape.Sunny, vm.state.value.trialShape)
+  }
+
+  @Test
+  fun afterBuyingTheTrialIsAppliedAndCanBeSaved() =
+    runTest {
+      val marta = db.addPerson("Marta")
+      val vm = viewModel(marta.id)
+      vm.onTrialShape(AvatarShape.Clover4Leaf)
+      vm.onTrialColor(AvatarColor.Sky)
+
+      vm.onApplyTrial()
+
+      assertFalse(vm.state.value.hasTrial)
+      assertEquals(AvatarShape.Clover4Leaf, vm.state.value.shape)
+      assertEquals(AvatarColor.Sky, vm.state.value.color)
+      assertTrue(vm.state.value.canSave)
+
+      vm.save {}
+
+      assertEquals(AvatarShape.Clover4Leaf, db.person(marta.id)?.avatarShape)
+      assertEquals(AvatarColor.Sky, db.person(marta.id)?.avatarColor)
+    }
+
+  @Test
+  fun applyingOnlyAShapeTrialKeepsTheCurrentColor() {
+    val vm = viewModel()
+    vm.onColor(AvatarColor.Mint)
+    vm.onTrialShape(AvatarShape.Ghostish)
+
+    vm.onApplyTrial()
+
+    assertEquals(AvatarShape.Ghostish, vm.state.value.shape)
+    assertEquals(AvatarColor.Mint, vm.state.value.color)
+  }
+
+  @Test
+  fun afterADowngradeChoosingCookieDropsTheProShapeOnSave() =
+    runTest {
+      val marta = db.addPerson("Marta")
+      db.people.update { list ->
+        list.map { it.copy(avatarShape = AvatarShape.Clover8Leaf, avatarColor = AvatarColor.Lavender) }
+      }
+      val vm = viewModel(marta.id)
+
+      vm.onShape(AvatarShape.Cookie9Sided)
+      vm.save {}
+
+      assertEquals(AvatarShape.Cookie9Sided, db.person(marta.id)?.avatarShape)
+      assertEquals(AvatarColor.Lavender, db.person(marta.id)?.avatarColor)
+    }
 }

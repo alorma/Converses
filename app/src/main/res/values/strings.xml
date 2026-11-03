@@ -224,6 +224,16 @@
     <string name="avatar_color_auto">Automatic</string>
     <string name="avatar_summary_auto">%1$s · automatic colour (%2$s)</string>
     <string name="avatar_done">Done</string>
+    <string name="avatar_pro_info_title">Shapes and colours with Pro</string>
+    <string name="avatar_pro_info_text">Tap any option to try it. Without Pro, the avatar is Cookie with an automatic colour.</string>
+    <string name="avatar_trial_title">This is how it would look</string>
+    <string name="avatar_trial_text">You need Converses Pro to save this avatar.</string>
+    <string name="avatar_trial_summary">Preview: %1$s · %2$s</string>
+    <string name="avatar_unlock_pro">Unlock with Pro</string>
+    <string name="avatar_discard_trial">Discard preview</string>
+    <string name="avatar_kept_title">Chosen with Pro</string>
+    <string name="avatar_kept_text">It stays as it is. To change it to another shape or colour you need Pro; Cookie and Automatic are free.</string>
+    <string name="avatar_option_pro">%s, Pro</string>
     <string name="shape_cookie">Cookie</string>
     <string name="shape_clover">Clover</string>
     <string name="shape_flower">Flower</string>

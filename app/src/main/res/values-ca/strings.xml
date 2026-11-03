@@ -222,6 +222,16 @@
     <string name="avatar_color_auto">Automàtic</string>
     <string name="avatar_summary_auto">%1$s · color automàtic (%2$s)</string>
     <string name="avatar_done">Fet</string>
+    <string name="avatar_pro_info_title">Formes i colors amb Pro</string>
+    <string name="avatar_pro_info_text">Toca qualsevol opció per provar-la. Sense Pro, l\'avatar és Galeta amb color automàtic.</string>
+    <string name="avatar_trial_title">Així quedaria</string>
+    <string name="avatar_trial_text">Per desar aquest avatar cal Converses Pro.</string>
+    <string name="avatar_trial_summary">Prova: %1$s · %2$s</string>
+    <string name="avatar_unlock_pro">Desbloqueja amb Pro</string>
+    <string name="avatar_discard_trial">Descarta la prova</string>
+    <string name="avatar_kept_title">Triat amb Pro</string>
+    <string name="avatar_kept_text">Es manté tal com està. Per canviar-lo a una altra forma o color cal Pro; Galeta i Automàtic són lliures.</string>
+    <string name="avatar_option_pro">%s, Pro</string>
     <string name="shape_cookie">Galeta</string>
     <string name="shape_clover">Trèvol</string>
     <string name="shape_flower">Flor</string>

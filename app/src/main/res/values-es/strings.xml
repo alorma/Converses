@@ -222,6 +222,16 @@
     <string name="avatar_color_auto">Automático</string>
     <string name="avatar_summary_auto">%1$s · color automático (%2$s)</string>
     <string name="avatar_done">Hecho</string>
+    <string name="avatar_pro_info_title">Formas y colores con Pro</string>
+    <string name="avatar_pro_info_text">Toca cualquier opción para probarla. Sin Pro, el avatar es Galleta con color automático.</string>
+    <string name="avatar_trial_title">Así quedaría</string>
+    <string name="avatar_trial_text">Para guardar este avatar necesitas Converses Pro.</string>
+    <string name="avatar_trial_summary">Prueba: %1$s · %2$s</string>
+    <string name="avatar_unlock_pro">Desbloquear con Pro</string>
+    <string name="avatar_discard_trial">Descartar la prueba</string>
+    <string name="avatar_kept_title">Elegido con Pro</string>
+    <string name="avatar_kept_text">Se mantiene tal cual. Para cambiarlo a otra forma o color necesitas Pro; Galleta y Automático son libres.</string>
+    <string name="avatar_option_pro">%s, Pro</string>
     <string name="shape_cookie">Galleta</string>
     <string name="shape_clover">Trébol</string>
     <string name="shape_flower">Flor</string>

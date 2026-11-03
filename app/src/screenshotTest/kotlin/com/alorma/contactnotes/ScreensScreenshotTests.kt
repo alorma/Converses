@@ -7,7 +7,9 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import com.alorma.contactnotes.shared.AvatarColor
 import com.alorma.contactnotes.ui.edit.AvatarSheetAutoPreview
 import com.alorma.contactnotes.ui.edit.AvatarSheetCustomPreview
+import com.alorma.contactnotes.ui.edit.AvatarSheetDowngradePreview
 import com.alorma.contactnotes.ui.edit.AvatarSheetLockedPreview
+import com.alorma.contactnotes.ui.edit.AvatarSheetTrialPreview
 import com.alorma.contactnotes.ui.edit.DeletePersonDialogPreview
 import com.alorma.contactnotes.ui.edit.EditPersonCustomAvatarPreview
 import com.alorma.contactnotes.ui.edit.EditPersonExistingPreview
@@ -313,6 +315,20 @@ class ScreensScreenshotTests {
   @Composable
   fun avatarSheetLocked() {
     AvatarSheetLockedPreview()
+  }
+
+  @ScreenPreviews
+  @PreviewTest
+  @Composable
+  fun avatarSheetTrial() {
+    AvatarSheetTrialPreview()
+  }
+
+  @ScreenPreviews
+  @PreviewTest
+  @Composable
+  fun avatarSheetDowngrade() {
+    AvatarSheetDowngradePreview()
   }
 
   @ScreenPreviews
