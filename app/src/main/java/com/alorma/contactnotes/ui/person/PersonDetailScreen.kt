@@ -64,11 +64,7 @@ import com.alorma.contactnotes.data.db.EntryEntity
 import com.alorma.contactnotes.data.db.PersonEntity
 import com.alorma.contactnotes.data.db.PinnedFactEntity
 import com.alorma.contactnotes.data.db.color
-import com.alorma.contactnotes.data.db.isOpenFollowUp
 import com.alorma.contactnotes.data.db.shape
-import com.alorma.contactnotes.data.flags.FeatureState
-import com.alorma.contactnotes.data.flags.FollowUpsFeature
-import com.alorma.contactnotes.data.flags.rememberFeatureState
 import com.alorma.contactnotes.data.settings.SecureWindow
 import com.alorma.contactnotes.designsystem.components.Avatar
 import com.alorma.contactnotes.designsystem.components.CollapsibleFacts
@@ -164,8 +160,6 @@ fun PersonDetailRoute(
   val scope = androidx.compose.runtime.rememberCoroutineScope()
   val snackbarHostState = remember { SnackbarHostState() }
   val deletedMessage = stringResource(R.string.entry_deleted)
-  val doneMessage = stringResource(R.string.follow_up_marked_done)
-  val followUps = rememberFeatureState<FollowUpsFeature>()
   val undoLabel = stringResource(R.string.undo)
   var dayCount by remember { mutableIntStateOf(0) }
   LaunchedEffect(actionEntry?.id) { actionEntry?.let { dayCount = viewModel.countDay(it) } }
@@ -173,29 +167,6 @@ fun PersonDetailRoute(
   fun closeAction() {
     action = EntryAction.None
     actionEntryId = null
-  }
-
-  // Snackbar amb «Desfés» durant [UndoWindowMillis]; substitueix el que hi hagi
-  fun showUndo(
-    message: String,
-    onUndo: () -> Unit,
-  ) {
-    scope.launch {
-      snackbarHostState.currentSnackbarData?.dismiss()
-      val timeout =
-        launch {
-          delay(UndoWindowMillis)
-          snackbarHostState.currentSnackbarData?.dismiss()
-        }
-      val result =
-        snackbarHostState.showSnackbar(
-          message = message,
-          actionLabel = undoLabel,
-          duration = SnackbarDuration.Indefinite,
-        )
-      timeout.cancel()
-      if (result == SnackbarResult.ActionPerformed) onUndo()
-    }
   }
 
   PersonTheme(person.color) {
@@ -230,12 +201,6 @@ fun PersonDetailRoute(
         haptics.confirm()
         viewModel.setArchived(!person.archived) { if (!person.archived) onBack() }
       },
-      followUps = followUps,
-      onFollowUpDone = { entry ->
-        haptics.confirm()
-        viewModel.markFollowUpDone(entry)
-        showUndo(doneMessage) { viewModel.undoFollowUpDone(entry) }
-      },
       snackbarHostState = snackbarHostState,
     )
 
@@ -246,9 +211,9 @@ fun PersonDetailRoute(
         initialKind = newEntryKind,
         focusText = newEntryFocus,
         onDismiss = { showNewEntry = false },
-        onOpenPro = onOpenPro,
-        onSave = { kind, channel, text, at, pending ->
-          viewModel.addEntry(kind, channel, text, at, pending)
+        onOpenPro = { onOpenPro(ProBenefit.Channels) },
+        onSave = { kind, channel, text, at ->
+          viewModel.addEntry(kind, channel, text, at)
           showNewEntry = false
         },
       )
@@ -275,7 +240,22 @@ fun PersonDetailRoute(
               haptics.confirm()
               viewModel.deleteEntry(deleted)
               closeAction()
-              showUndo(deletedMessage) { viewModel.restoreEntry(deleted) }
+              scope.launch {
+                snackbarHostState.currentSnackbarData?.dismiss()
+                val timeout =
+                  launch {
+                    delay(UndoWindowMillis)
+                    snackbarHostState.currentSnackbarData?.dismiss()
+                  }
+                val result =
+                  snackbarHostState.showSnackbar(
+                    message = deletedMessage,
+                    actionLabel = undoLabel,
+                    duration = SnackbarDuration.Indefinite,
+                  )
+                timeout.cancel()
+                if (result == SnackbarResult.ActionPerformed) viewModel.restoreEntry(deleted)
+              }
             },
             onDeleteDay = { action = EntryAction.ConfirmDeleteDay },
           )
@@ -285,9 +265,9 @@ fun PersonDetailRoute(
             defaultChannel = null,
             initial = actionEntry,
             onDismiss = ::closeAction,
-            onOpenPro = onOpenPro,
-            onSave = { kind, channel, text, at, pending ->
-              viewModel.updateEntry(actionEntry, kind, channel, text, at, pending)
+            onOpenPro = { onOpenPro(ProBenefit.Channels) },
+            onSave = { kind, channel, text, at ->
+              viewModel.updateEntry(actionEntry, kind, channel, text, at)
               closeAction()
             },
           )
@@ -338,8 +318,6 @@ fun PersonDetailScreen(
   onExport: () -> Unit,
   onToggleArchived: () -> Unit,
   snackbarHostState: SnackbarHostState,
-  followUps: FeatureState = FeatureState.Hidden,
-  onFollowUpDone: (EntryEntity) -> Unit = {},
 ) {
   val person = state.person
   var factsExpanded by rememberSaveable { mutableStateOf(false) }
@@ -421,17 +399,6 @@ fun PersonDetailScreen(
             onToggle = { factsExpanded = !factsExpanded },
             onAddFirst = { onEditFocus(EditFocus.NEW_FACT) },
           )
-        }
-        if (followUps != FeatureState.Hidden && state.followUps.isNotEmpty()) {
-          item(key = "follow-ups") {
-            FollowUpsSection(
-              followUps = state.followUps,
-              firstName = firstName,
-              channelName = { entryChannelName(it, state.customChannelNames) },
-              onDone = onFollowUpDone,
-              onOpen = onEntryMenu,
-            )
-          }
         }
         item(key = "timeline-header") {
           SectionHeader(
@@ -531,7 +498,6 @@ fun PersonDetailScreen(
                   item.entry,
                   firstName,
                   channel = entryChannelName(item.entry, state.customChannelNames),
-                  showFollowUp = followUps != FeatureState.Hidden && item.entry.isOpenFollowUp,
                   onMenu = { onEntryMenu(item.entry) },
                 )
               }
@@ -637,7 +603,6 @@ private fun EntryCard(
   firstName: String,
   channel: String,
   onMenu: () -> Unit,
-  showFollowUp: Boolean = false,
 ) {
   Surface(
     shape = MaterialTheme.shapes.extraLarge,
@@ -673,7 +638,6 @@ private fun EntryCard(
           color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
         Text(text = entry.text, style = MaterialTheme.typography.bodyLarge)
-        if (showFollowUp) FollowUpLabel(Modifier.padding(top = 8.dp))
       }
       IconButton(onClick = onMenu) {
         Icon(Icons.Rounded.MoreVert, contentDescription = stringResource(R.string.entry_actions))

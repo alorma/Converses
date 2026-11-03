@@ -12,7 +12,7 @@ import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Test
 
-/** L'SQL real dels canals propis i dels pendents sobre Room en memòria (el `FakeDb` no el prova). */
+/** L'SQL real dels canals propis sobre Room en memòria (el `FakeDb` no el prova). */
 class CustomChannelDaoTest {
   private lateinit var db: ConversesDatabase
   private lateinit var channels: CustomChannelDao
@@ -48,7 +48,6 @@ class CustomChannelDaoTest {
     personId: Long,
     channelType: ChannelType = ChannelType.CHAT,
     customChannelId: Long? = null,
-    isPending: Boolean = false,
     occurredAt: Long = 0,
   ): Long =
     entries.insert(
@@ -59,7 +58,6 @@ class CustomChannelDaoTest {
         text = "t",
         occurredAt = occurredAt,
         customChannelId = customChannelId,
-        isPending = isPending,
       ),
     )
 
@@ -120,53 +118,5 @@ class CustomChannelDaoTest {
 
       assertEquals(listOf("Alpha", "beta"), all.map { it.channel.name })
       assertEquals(listOf(0, 2), all.map { it.entryCount })
-    }
-
-  @Test
-  fun doneOnlyAppliesToPendingEntriesAndCanBeUndone() =
-    runTest {
-      val p = person()
-      val pending = entry(p, isPending = true)
-      val normal = entry(p)
-
-      entries.setDoneAt(pending, 10)
-      entries.setDoneAt(normal, 10)
-
-      assertEquals(10L, entries.get(pending)!!.doneAt)
-      assertNull(entries.get(normal)!!.doneAt)
-
-      entries.setDoneAt(pending, null)
-      assertNull(entries.get(pending)!!.doneAt)
-    }
-
-  @Test
-  fun openFollowUpsSkipDoneAndNonPendingEntries() =
-    runTest {
-      val p = person()
-      val other = person("Bru")
-      val older = entry(p, isPending = true, occurredAt = 1)
-      val newer = entry(p, isPending = true, occurredAt = 2)
-      val done = entry(p, isPending = true, occurredAt = 3)
-      entry(p, occurredAt = 4)
-      entry(other, isPending = true)
-      entries.setDoneAt(done, 5)
-
-      assertEquals(listOf(newer, older), entries.observeOpenFollowUps(p).first().map { it.id })
-    }
-
-  @Test
-  fun peopleListCountsOpenFollowUps() =
-    runTest {
-      val p = person()
-      val other = person("Bru")
-      entry(p, isPending = true)
-      val done = entry(p, isPending = true)
-      entry(p)
-      entries.setDoneAt(done, 5)
-
-      val counts = people.observeList(archived = false).first().associate { it.person.id to it.openFollowUps }
-
-      assertEquals(1, counts[p])
-      assertEquals(0, counts[other])
     }
 }

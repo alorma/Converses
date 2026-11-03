@@ -284,14 +284,4 @@
     <string name="custom_channel_delete">Esborra</string>
     <string name="custom_channel_delete_title">Esborrar «%s»?</string>
     <string name="custom_channel_delete_body">Les seves entrades es quedaran a %s.</string>
-    <string name="follow_up">Pendent</string>
-    <string name="follow_up_off_summary">Per fer-ne seguiment més endavant</string>
-    <string name="follow_up_on_summary">Sortirà a dalt del detall fins que el marquis com a fet</string>
-    <string name="follow_up_locked_summary">Fes-ne seguiment amb Converses Pro</string>
-    <string name="follow_ups_title">Pendents</string>
-    <string name="follow_up_label">PENDENT</string>
-    <string name="follow_up_mark_done">Marca com a fet</string>
-    <string name="follow_up_marked_done">Marcat com a fet</string>
-    <string name="follow_up_set">Marca com a pendent</string>
-    <string name="follow_up_remove">Treu de pendents</string>
 </resources>

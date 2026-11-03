@@ -61,6 +61,7 @@ val databaseModule =
     single { get<ConversesDatabase>().entryDao() }
     single { get<ConversesDatabase>().pinnedFactDao() }
     single { get<ConversesDatabase>().customChannelDao() }
+    single { get<ConversesDatabase>().taskDao() }
     singleOf(::ConversesRepository)
   }
 

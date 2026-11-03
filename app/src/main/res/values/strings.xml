@@ -286,14 +286,4 @@
     <string name="custom_channel_delete">Delete</string>
     <string name="custom_channel_delete_title">Delete “%s”?</string>
     <string name="custom_channel_delete_body">Its entries will stay in %s.</string>
-    <string name="follow_up">Follow-up</string>
-    <string name="follow_up_off_summary">To follow up on later</string>
-    <string name="follow_up_on_summary">It\'ll stay at the top until you mark it done</string>
-    <string name="follow_up_locked_summary">Follow it up with Converses Pro</string>
-    <string name="follow_ups_title">Follow-ups</string>
-    <string name="follow_up_label">FOLLOW-UP</string>
-    <string name="follow_up_mark_done">Mark as done</string>
-    <string name="follow_up_marked_done">Marked as done</string>
-    <string name="follow_up_set">Mark as follow-up</string>
-    <string name="follow_up_remove">Remove from follow-ups</string>
 </resources>

@@ -13,12 +13,13 @@ import androidx.room.migration.AutoMigrationSpec
     EntryEntity::class,
     PinnedFactEntity::class,
     CustomChannelEntity::class,
+    TaskEntity::class,
   ],
   version = 5,
   autoMigrations = [
     AutoMigration(from = 3, to = 4, spec = ConversesDatabase.DropContactLink::class),
-    // v4 → v5: canals propis i pendents (Pro). Taula `custom_channel` nova; `entry` es recrea amb la clau forana nova
-    // i les columnes `customChannelId` (null), `isPending` (0) i `doneAt` (null). Cap dada no es perd.
+    // v4 → v5: canals propis i tasques (Pro). Taules `custom_channel` i `task` noves; `entry` es recrea amb la clau
+    // forana nova i la columna `customChannelId` (null). Cap dada no es perd.
     AutoMigration(from = 4, to = 5),
   ],
 )
@@ -31,6 +32,8 @@ abstract class ConversesDatabase : RoomDatabase() {
   abstract fun pinnedFactDao(): PinnedFactDao
 
   abstract fun customChannelDao(): CustomChannelDao
+
+  abstract fun taskDao(): TaskDao
 
   /**
    * v3 → v4: es retira el vincle amb Contactes. Room recrea `person` sense les tres columnes; la resta de dades i les

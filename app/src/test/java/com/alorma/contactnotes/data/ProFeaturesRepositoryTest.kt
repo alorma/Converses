@@ -1,12 +1,11 @@
 package com.alorma.contactnotes.data
 
-import com.alorma.contactnotes.data.db.withOpenFollowUp
+import com.alorma.contactnotes.data.db.TaskEntity
 import com.alorma.contactnotes.shared.ChannelType
 import com.alorma.contactnotes.testing.FakeDb
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -177,97 +176,73 @@ class ProFeaturesRepositoryTest {
     }
 
   @Test
-  fun openFollowUpsAreOnlyThePendingOnesNotDoneNewestFirst() =
+  fun openTasksAreDatedOldestFirstThenUndated() =
     runTest {
       val person = db.addPerson("Marta")
-      val older = db.addEntry(person.id, isPending = true, occurredAt = 1_000)
-      val newer = db.addEntry(person.id, isPending = true, occurredAt = 2_000)
-      db.addEntry(person.id, isPending = true, doneAt = 3_000)
-      db.addEntry(person.id)
+      val undated = db.addTask(person.id, text = "undated")
+      val later = db.addTask(person.id, dueDate = 20_010)
+      val sooner = db.addTask(person.id, dueDate = 20_000)
+      db.addTask(person.id, doneAt = 5)
 
-      assertEquals(listOf(newer.id, older.id), repository.observeOpenFollowUps(person.id).first().map { it.id })
-    }
-
-  @Test
-  fun markingAsDoneKeepsTheEntryAndUndoBringsItBack() =
-    runTest {
-      val person = db.addPerson("Marta")
-      val entry = db.addEntry(person.id, isPending = true)
-
-      repository.markFollowUpDone(entry, at = 7_000)
-
-      assertTrue(repository.observeOpenFollowUps(person.id).first().isEmpty())
       assertEquals(
-        7_000L,
-        db.entries.value
-          .single()
-          .doneAt,
+        listOf(sooner.id, later.id, undated.id),
+        repository.observeOpenTasks(person.id).first().map { it.id },
       )
-      assertEquals(1, repository.getEntries(person.id).size)
-
-      repository.undoFollowUpDone(entry)
-
-      assertEquals(listOf(entry.id), repository.observeOpenFollowUps(person.id).first().map { it.id })
     }
 
   @Test
-  fun anEntryThatIsNotPendingCannotBeMarkedAsDone() =
+  fun savingTrimsTheTextAndEditingKeepsTheId() =
     runTest {
       val person = db.addPerson("Marta")
-      val entry = db.addEntry(person.id)
 
-      repository.markFollowUpDone(entry)
+      val id = repository.saveTask(TaskEntity(personId = person.id, text = "  ask  ", createdAt = 1))
+      repository.saveTask(repository.getTask(id)!!.copy(text = "ask again", dueDate = 20_000))
 
-      assertNull(
-        db.entries.value
-          .single()
-          .doneAt,
-      )
+      val task = db.tasks.value.single()
+      assertEquals(id, task.id)
+      assertEquals("ask again", task.text)
+      assertEquals(20_000L, task.dueDate)
     }
 
   @Test
-  fun theListCountsOpenFollowUpsButNeverForProtectedPeople() =
+  fun markingAsDoneMovesItToDoneAndReopeningBringsItBack() =
+    runTest {
+      val person = db.addPerson("Marta")
+      val task = db.addTask(person.id)
+
+      repository.markTaskDone(task, at = 7_000)
+      assertTrue(repository.observeOpenTasks(person.id).first().isEmpty())
+      assertEquals(listOf(7_000L), repository.observeDoneTasks(person.id).first().map { it.doneAt })
+
+      repository.reopenTask(task)
+      assertEquals(listOf(task.id), repository.observeOpenTasks(person.id).first().map { it.id })
+      assertTrue(repository.observeDoneTasks(person.id).first().isEmpty())
+    }
+
+  @Test
+  fun deletingATaskRemovesIt() =
+    runTest {
+      val person = db.addPerson("Marta")
+      val task = db.addTask(person.id)
+
+      repository.deleteTask(task)
+
+      assertTrue(db.tasks.value.isEmpty())
+    }
+
+  @Test
+  fun theListCountsOpenTasksButNeverForProtectedPeople() =
     runTest {
       val open = db.addPerson("Marta")
       val secret = db.addPerson("Luna", isProtected = true)
-      db.addEntry(open.id, isPending = true)
-      db.addEntry(open.id, isPending = true)
-      db.addEntry(open.id, isPending = true, doneAt = 1)
-      db.addEntry(secret.id, isPending = true)
+      db.addTask(open.id)
+      db.addTask(open.id)
+      db.addTask(open.id, doneAt = 1)
+      db.addTask(secret.id)
 
       val list = repository.observePeople().first().associateBy { it.person.id }
 
-      assertEquals(2, list.getValue(open.id).openFollowUps)
-      assertEquals(0, list.getValue(secret.id).openFollowUps)
-    }
-
-  @Test
-  fun settingAFollowUpOpensItAndRemovingItClearsBothFields() =
-    runTest {
-      val person = db.addPerson("Marta")
-      val entry = db.addEntry(person.id)
-
-      repository.setOpenFollowUp(entry, open = true)
-      val opened = db.entries.value.single()
-      assertTrue(opened.isPending)
-      assertNull(opened.doneAt)
-
-      repository.setOpenFollowUp(opened, open = false)
-      val removed = db.entries.value.single()
-      assertFalse(removed.isPending)
-      assertNull(removed.doneAt)
-    }
-
-  @Test
-  fun openingADoneFollowUpReopensItAndClosingItLeavesItDone() =
-    runTest {
-      val person = db.addPerson("Marta")
-      val done = db.addEntry(person.id, isPending = true, doneAt = 5_000)
-
-      assertEquals(done, done.withOpenFollowUp(false))
-
-      repository.setOpenFollowUp(done, open = true)
-
-      assertEquals(listOf(done.id), repository.observeOpenFollowUps(person.id).first().map { it.id })
+      assertEquals(2, list.getValue(open.id).openTasks)
+      assertEquals(0, list.getValue(secret.id).openTasks)
     }
 }

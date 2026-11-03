@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 5,
-    "identityHash": "7f3f10dff5a67515ab4fa90a2071ab45",
+    "identityHash": "f6ff54f6d66c09453f1378ad4bea99db",
     "entities": [
       {
         "tableName": "person",
@@ -74,7 +74,7 @@
       },
       {
         "tableName": "entry",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `personId` INTEGER NOT NULL, `kind` TEXT NOT NULL, `channelType` TEXT NOT NULL, `text` TEXT NOT NULL, `occurredAt` INTEGER NOT NULL, `customChannelId` INTEGER, `isPending` INTEGER NOT NULL DEFAULT 0, `doneAt` INTEGER, FOREIGN KEY(`personId`) REFERENCES `person`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`customChannelId`) REFERENCES `custom_channel`(`id`) ON UPDATE NO ACTION ON DELETE SET NULL )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `personId` INTEGER NOT NULL, `kind` TEXT NOT NULL, `channelType` TEXT NOT NULL, `text` TEXT NOT NULL, `occurredAt` INTEGER NOT NULL, `customChannelId` INTEGER, FOREIGN KEY(`personId`) REFERENCES `person`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`customChannelId`) REFERENCES `custom_channel`(`id`) ON UPDATE NO ACTION ON DELETE SET NULL )",
         "fields": [
           {
             "fieldPath": "id",
@@ -115,18 +115,6 @@
           {
             "fieldPath": "customChannelId",
             "columnName": "customChannelId",
-            "affinity": "INTEGER"
-          },
-          {
-            "fieldPath": "isPending",
-            "columnName": "isPending",
-            "affinity": "INTEGER",
-            "notNull": true,
-            "defaultValue": "0"
-          },
-          {
-            "fieldPath": "doneAt",
-            "columnName": "doneAt",
             "affinity": "INTEGER"
           }
         ],
@@ -295,11 +283,88 @@
             "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_custom_channel_channelType_name` ON `${TABLE_NAME}` (`channelType`, `name`)"
           }
         ]
+      },
+      {
+        "tableName": "task",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `personId` INTEGER NOT NULL, `text` TEXT NOT NULL, `dueDate` INTEGER, `remind` INTEGER NOT NULL DEFAULT 0, `createdAt` INTEGER NOT NULL, `doneAt` INTEGER, FOREIGN KEY(`personId`) REFERENCES `person`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "personId",
+            "columnName": "personId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "text",
+            "columnName": "text",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "dueDate",
+            "columnName": "dueDate",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "remind",
+            "columnName": "remind",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "0"
+          },
+          {
+            "fieldPath": "createdAt",
+            "columnName": "createdAt",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "doneAt",
+            "columnName": "doneAt",
+            "affinity": "INTEGER"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_task_personId",
+            "unique": false,
+            "columnNames": [
+              "personId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_task_personId` ON `${TABLE_NAME}` (`personId`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "person",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "personId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
       }
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '7f3f10dff5a67515ab4fa90a2071ab45')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'f6ff54f6d66c09453f1378ad4bea99db')"
     ]
   }
 }

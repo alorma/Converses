@@ -57,8 +57,8 @@ abstract class PersonDao {
     SELECT p.*,
       e.id AS last_id, e.personId AS last_personId, e.kind AS last_kind,
       e.channelType AS last_channelType, e.text AS last_text, e.occurredAt AS last_occurredAt,
-      e.customChannelId AS last_customChannelId, e.isPending AS last_isPending, e.doneAt AS last_doneAt,
-      (SELECT COUNT(*) FROM entry WHERE personId = p.id AND isPending = 1 AND doneAt IS NULL) AS openFollowUps
+      e.customChannelId AS last_customChannelId,
+      (SELECT COUNT(*) FROM task WHERE personId = p.id AND doneAt IS NULL) AS openTasks
     FROM person p
     LEFT JOIN entry e ON e.id = (
       SELECT id FROM entry WHERE personId = p.id ORDER BY occurredAt DESC, id DESC LIMIT 1
@@ -133,19 +133,38 @@ interface EntryDao {
 
   @Query("SELECT kind AS kind, COUNT(*) AS count FROM entry WHERE personId = :personId GROUP BY kind")
   fun observeCounts(personId: Long): Flow<List<KindCount>>
+}
 
-  /** Pendents sense fer de la persona, del més recent al més antic (secció «Pendents» del detall). */
+@Dao
+interface TaskDao {
+  @Insert
+  suspend fun insert(task: TaskEntity): Long
+
+  @Update
+  suspend fun update(task: TaskEntity)
+
+  @Delete
+  suspend fun delete(task: TaskEntity)
+
+  @Query("SELECT * FROM task WHERE id = :id")
+  suspend fun get(id: Long): TaskEntity?
+
+  /** Pendents (9d): primer les que tenen data, de la més antiga a la més nova, i després les que no en tenen. */
   @Query(
     """
-    SELECT * FROM entry
-    WHERE personId = :personId AND isPending = 1 AND doneAt IS NULL
-    ORDER BY occurredAt DESC, id DESC
+    SELECT * FROM task
+    WHERE personId = :personId AND doneAt IS NULL
+    ORDER BY dueDate IS NULL, dueDate, createdAt, id
     """,
   )
-  fun observeOpenFollowUps(personId: Long): Flow<List<EntryEntity>>
+  fun observeOpen(personId: Long): Flow<List<TaskEntity>>
 
-  /** `doneAt = null` desfà el «fet»; l'entrada continua pendent. */
-  @Query("UPDATE entry SET doneAt = :doneAt WHERE id = :id AND isPending = 1")
+  /** Fetes (9f), la més recent primer. */
+  @Query("SELECT * FROM task WHERE personId = :personId AND doneAt IS NOT NULL ORDER BY doneAt DESC, id DESC")
+  fun observeDone(personId: Long): Flow<List<TaskEntity>>
+
+  /** `doneAt = null` la torna a pendents («Desfés» o tocar el check d'una feta). */
+  @Query("UPDATE task SET doneAt = :doneAt WHERE id = :id")
   suspend fun setDoneAt(
     id: Long,
     doneAt: Long?,

@@ -53,9 +53,6 @@ import com.alorma.contactnotes.data.db.EntryEntity
 import com.alorma.contactnotes.data.db.PersonEntity
 import com.alorma.contactnotes.data.db.color
 import com.alorma.contactnotes.data.db.shape
-import com.alorma.contactnotes.data.flags.FeatureState
-import com.alorma.contactnotes.data.flags.FollowUpsFeature
-import com.alorma.contactnotes.data.flags.rememberFeatureState
 import com.alorma.contactnotes.data.settings.SecureWindow
 import com.alorma.contactnotes.designsystem.components.Avatar
 import com.alorma.contactnotes.designsystem.components.ConversesSaveButton
@@ -67,7 +64,6 @@ import com.alorma.contactnotes.shared.ChannelType
 import com.alorma.contactnotes.shared.EntryKind
 import com.alorma.contactnotes.shared.initialsOf
 import com.alorma.contactnotes.ui.navigation.isOnlyUrl
-import com.alorma.contactnotes.ui.paywall.ProBenefit
 import com.alorma.contactnotes.ui.person.canUnlockWithDevice
 import com.alorma.contactnotes.ui.person.openSecuritySetup
 import com.alorma.contactnotes.ui.person.promptUnlock
@@ -170,7 +166,6 @@ class QuickNoteViewModel(
     channel: EntryChannel,
     text: String,
     occurredAt: Long?,
-    pending: Boolean = false,
     onSaved: () -> Unit,
   ) {
     viewModelScope.launch {
@@ -182,7 +177,6 @@ class QuickNoteViewModel(
           customChannelId = channel.customChannelId,
           text = text,
           occurredAt = occurredAt ?: System.currentTimeMillis(),
-          isPending = pending,
         ),
       )
       onSaved()
@@ -208,7 +202,7 @@ fun importedKind(
 fun QuickNoteScreen(
   personId: Long,
   onClose: () -> Unit,
-  onOpenPro: (ProBenefit) -> Unit = {},
+  onOpenPro: () -> Unit = {},
   onNewPerson: () -> Unit,
   sharedText: String? = null,
   viewModel: QuickNoteViewModel = koinViewModel(parameters = { parametersOf(personId) }),
@@ -252,11 +246,10 @@ fun QuickNoteScreen(
     onClose = onClose,
     onSelectPerson = viewModel::select,
     customChannels = rememberCustomChannelsUi(),
-    followUps = rememberFeatureState<FollowUpsFeature>(),
     onOpenPro = onOpenPro,
     onNewPerson = onNewPerson,
     onSave = { person, channel ->
-      viewModel.save(person.id, form.kind, channel, form.text.trim(), form.occurredAt, form.pending, onClose)
+      viewModel.save(person.id, form.kind, channel, form.text.trim(), form.occurredAt, onClose)
     },
   )
 
@@ -293,8 +286,7 @@ fun QuickNoteContent(
   onSave: (person: PersonEntity, channel: EntryChannel) -> Unit,
   importedText: String? = null,
   customChannels: CustomChannelsUi = CustomChannelsUi(),
-  followUps: FeatureState = FeatureState.Hidden,
-  onOpenPro: (ProBenefit) -> Unit = {},
+  onOpenPro: () -> Unit = {},
 ) {
   val selected = state.selected
   val channel =
@@ -370,7 +362,6 @@ fun QuickNoteContent(
           channel = channel,
           onChannelChange = { form.channel = it },
           customChannels = customChannels,
-          followUps = followUps,
           onOpenPro = onOpenPro,
           onPickPerson = {
             pickedFromChip = true

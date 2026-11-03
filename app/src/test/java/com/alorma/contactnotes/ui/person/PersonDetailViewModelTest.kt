@@ -13,8 +13,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
-import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -263,109 +261,5 @@ class PersonDetailViewModelTest {
       val names = vm.uiState.value.customChannelNames
       assertEquals(mapOf(whatsapp.id to "WhatsApp"), names)
       assertEquals("WhatsApp", entryChannelName(ContextWrapper(null), entry, names))
-    }
-
-  @Test
-  fun addEntryCanStartAsAnOpenFollowUp() =
-    runTest {
-      val vm = viewModel()
-
-      vm.addEntry(EntryKind.SAID, EntryChannel(ChannelType.CHAT), "ask", occurredAt = 1_000, pending = true)
-      vm.addEntry(EntryKind.SAID, EntryChannel(ChannelType.CHAT), "plain", occurredAt = 2_000)
-
-      val entries =
-        vm.uiState.value.entries
-          .associateBy { it.text }
-      assertTrue(entries.getValue("ask").isPending)
-      assertFalse(entries.getValue("plain").isPending)
-    }
-
-  @Test
-  fun editingKeepsADoneFollowUpDoneUnlessItIsReopened() =
-    runTest {
-      val entry = db.addEntry(person.id, isPending = true, doneAt = 3_000)
-      val vm = viewModel()
-
-      vm.updateEntry(entry, entry.kind, EntryChannel(entry.channelType), "edited", occurredAt = null, pending = false)
-      val kept =
-        vm.uiState.value.entries
-          .single()
-      assertTrue(kept.isPending)
-      assertEquals(3_000L, kept.doneAt)
-
-      vm.updateEntry(kept, kept.kind, EntryChannel(kept.channelType), "again", occurredAt = null, pending = true)
-      assertNull(
-        vm.uiState.value.entries
-          .single()
-          .doneAt,
-      )
-    }
-
-  @Test
-  fun editingCanRemoveAnOpenFollowUp() =
-    runTest {
-      val entry = db.addEntry(person.id, isPending = true)
-      val vm = viewModel()
-
-      vm.updateEntry(entry, entry.kind, EntryChannel(entry.channelType), entry.text, occurredAt = null, pending = false)
-
-      assertFalse(
-        vm.uiState.value.entries
-          .single()
-          .isPending,
-      )
-    }
-
-  @Test
-  fun openFollowUpsAreListedAndMarkingOneDoneRemovesItUntilUndone() =
-    runTest {
-      val open = db.addEntry(person.id, text = "ask", isPending = true)
-      db.addEntry(person.id, text = "done", isPending = true, doneAt = 1)
-      db.addEntry(person.id, text = "plain")
-      val vm = viewModel()
-
-      assertEquals(
-        listOf("ask"),
-        vm.uiState.value.followUps
-          .map { it.text },
-      )
-
-      vm.markFollowUpDone(open)
-      assertTrue(
-        vm.uiState.value.followUps
-          .isEmpty(),
-      )
-      assertEquals(3, vm.uiState.value.entries.size)
-
-      vm.undoFollowUpDone(open)
-      assertEquals(
-        listOf("ask"),
-        vm.uiState.value.followUps
-          .map { it.text },
-      )
-    }
-
-  @Test
-  fun theActionsSheetSetsAndRemovesAFollowUp() =
-    runTest {
-      val entry = db.addEntry(person.id)
-      val vm = viewModel()
-
-      vm.setOpenFollowUp(entry, open = true)
-      assertEquals(
-        listOf(entry.id),
-        vm.uiState.value.followUps
-          .map { it.id },
-      )
-
-      vm.setOpenFollowUp(
-        vm.uiState.value.followUps
-          .single(),
-        open = false,
-      )
-      assertTrue(
-        vm.uiState.value.followUps
-          .isEmpty(),
-      )
     }
 }

@@ -11,7 +11,8 @@ import com.alorma.contactnotes.data.db.PersonEntity
 import com.alorma.contactnotes.data.db.PersonListItem
 import com.alorma.contactnotes.data.db.PinnedFactDao
 import com.alorma.contactnotes.data.db.PinnedFactEntity
-import com.alorma.contactnotes.data.db.withOpenFollowUp
+import com.alorma.contactnotes.data.db.TaskDao
+import com.alorma.contactnotes.data.db.TaskEntity
 import com.alorma.contactnotes.shared.ChannelType
 import com.alorma.contactnotes.shared.EntryKind
 import kotlinx.coroutines.flow.Flow
@@ -36,13 +37,14 @@ class ConversesRepository(
   private val entryDao: EntryDao,
   private val pinnedFactDao: PinnedFactDao,
   private val customChannelDao: CustomChannelDao,
+  private val taskDao: TaskDao,
 ) {
   /** Les persones protegides no exposen última entrada, canals ni pendents. */
   fun observePeople(archived: Boolean = false): Flow<List<PersonListItem>> =
     personDao.observeList(archived).map { items ->
       items.map { item ->
         if (item.person.isProtected) {
-          item.copy(lastEntry = null, channels = emptyList(), openFollowUps = 0)
+          item.copy(lastEntry = null, channels = emptyList(), openTasks = 0)
         } else {
           item
         }
@@ -116,26 +118,34 @@ class ConversesRepository(
   suspend fun getEntries(personId: Long): List<EntryEntity> =
     entryDao.observeTimeline(personId, EntryKind.entries.toSet()).first()
 
-  // Pendents (Pro). Marcar com a fet i desfer-ho funcionen també sense Pro: els pendents que hi ha no es perden.
+  // Tasques (Pro): independents de les entrades. Marcar com a fet i desfer-ho funcionen també sense Pro.
 
-  fun observeOpenFollowUps(personId: Long): Flow<List<EntryEntity>> = entryDao.observeOpenFollowUps(personId)
+  fun observeOpenTasks(personId: Long): Flow<List<TaskEntity>> = taskDao.observeOpen(personId)
 
-  suspend fun markFollowUpDone(
-    entry: EntryEntity,
-    at: Long = System.currentTimeMillis(),
-  ) = entryDao.setDoneAt(entry.id, at)
+  fun observeDoneTasks(personId: Long): Flow<List<TaskEntity>> = taskDao.observeDone(personId)
 
-  /** Full d'accions: «Marca com a pendent» (`true`) o «Treu de pendents» (`false`). */
-  suspend fun setOpenFollowUp(
-    entry: EntryEntity,
-    open: Boolean,
-  ) {
-    val updated = entry.withOpenFollowUp(open)
-    if (updated != entry) entryDao.update(updated)
+  suspend fun getTask(id: Long): TaskEntity? = taskDao.get(id)
+
+  /** Crea (`id == 0`) o desa una tasca; el text es desa sense espais als extrems. */
+  suspend fun saveTask(task: TaskEntity): Long {
+    val trimmed = task.copy(text = task.text.trim())
+    return if (trimmed.id == 0L) {
+      taskDao.insert(trimmed)
+    } else {
+      taskDao.update(trimmed)
+      trimmed.id
+    }
   }
 
-  /** «Desfés» del snackbar: torna a ser pendent sense fer. */
-  suspend fun undoFollowUpDone(entry: EntryEntity) = entryDao.setDoneAt(entry.id, null)
+  suspend fun deleteTask(task: TaskEntity) = taskDao.delete(task)
+
+  suspend fun markTaskDone(
+    task: TaskEntity,
+    at: Long = System.currentTimeMillis(),
+  ) = taskDao.setDoneAt(task.id, at)
+
+  /** «Desfés» o tocar el check d'una feta: torna a pendents. */
+  suspend fun reopenTask(task: TaskEntity) = taskDao.setDoneAt(task.id, null)
 
   // Canals propis (Pro): globals, únics dins del grup sense distingir majúscules.
 

@@ -143,22 +143,31 @@ Al menú de debug, l'apartat **Pro** té un sol interruptor, «Pro user», que e
 - [x] Ajustos › Canals propis (7d): fila i pantalla (llista per grups, reanomena, canvia de grup, esborra, FAB); tests de JVM, captures i emulador — `a792e5d`
 - [x] `docs/pro/` i backlog 8 al dia
 
-## Fase 7 · Pendents (Pro)
+## Fase 7 · Pendents (Pro): tasques
+
+### Redisseny (03-11-2026)
+
+El primer plantejament (estat `isPending` d'una entrada, amb la fila «Pendent» a l'`EntryForm`) es va descartar a mitja fase: no quadrava amb una cosa que mira cap al futur. Claude Design ho va redissenyar com a **tasques** (taules 9a–9h de `converses-canals-pendents.zip`, a `~/Downloads`; resum a «Disseny · Canals propis i Pendents» del `README.md`). Els commits `be85bd8`, `0108a61` i `1f9a0f9` són d'aquell primer plantejament i es desfan o s'adapten a les tasques següents.
 
 ### Decisions (03-11-2026)
 
-- **Sense el zip del disseny:** es treballa amb el resum del `README.md`.
-- **Baixada de Pro (`Locked`) amb una entrada ja pendent:** com els canals. A l'editor, l'interruptor surt encès i es pot apagar, però no encendre; al full d'accions, «Treu de pendents» funciona i «Marca com a pendent» porta PRO → paywall.
-- **Tocar una fila de «Pendents»** (fora del cercle) obre el full d'accions, com a la cronologia.
+- **Taula pròpia, independent de les notes:** `task(id, personId → CASCADE, text, dueDate?, remind, createdAt, doneAt?)`. Les tasques no surten a la cronologia ni tenen vincle amb cap entrada.
+- **Es refà la Room v5, sense v6:** Play té la v3 (1.7.10, 26-10-2026) i la v4 i la v5 no han sortit mai. La v5 queda amb `custom_channel` i `customChannelId`, sense `isPending` ni `doneAt` a `entry`, i amb la taula `task`. Es regenera el `5.json` (excepció a «mai editar un esquema exportat», perquè no és a cap dispositiu d'usuari) i no cal convertir entrades pendents en tasques. Les instal·lacions de debug amb la v5 vella han d'esborrar les dades.
+- **«Avisa'm» (notificació a les 9:00) queda per més endavant:** la columna `remind` ja hi és, però la fila no surt al formulari.
+- **Tocar una tasca** (pendent o feta, fora del cercle) obre el formulari en mode edició, amb l'opció d'esborrar-la.
 - **Exportar:** sense canvis en aquesta fase.
-- **Un pendent fet** perd l'etiqueta i es veu com una entrada normal. Editar-lo no el torna a obrir si no s'encén «Pendent» (`withOpenFollowUp`).
-- **Textos en i es:** Follow-up / Pendiente; To follow up on later / Para hacer seguimiento más adelante; It'll stay at the top until you mark it done / Saldrá arriba del detalle hasta que lo marques como hecho; Follow it up with Converses Pro / Haz seguimiento con Converses Pro; Follow-ups / Pendientes; FOLLOW-UP / PENDIENTE; Mark as done / Marcar como hecho; Marked as done / Marcado como hecho. Nous (full d'accions): «Marca com a pendent» / Mark as follow-up / Marcar como pendiente i «Treu de pendents» / Remove from follow-ups / Quitar de pendientes.
+
+### Handoff (03-11-2026)
+
+- **Estat:** la primera tasca (base de dades i dades, amb el revert dels tres commits del primer plantejament) és al commit `57a4d29`, pujat a petició de Bernat amb els tests de l'emulador encara pendents.
+- **Següent pas:** avisar Bernat, esborrar les dades de l'app `.dev` a l'emulador (la v5 vella fa petar Room per hash), executar `ANDROID_SERIAL=<emulador> ./gradlew :app:connectedDebugAndroidTest` i, si passa, marcar la tasca; si falla, arreglar-ho en un commit nou. Després, el formulari (9b, 9c).
+- **Disseny:** `~/Downloads/converses-canals-pendents.zip`, `INSTRUCCIONS.md` §2 i `pantalles.html` (taulers 9a–9h, textos al 7g). Textos ja decidits que es poden reaprofitar de l'historial (`git show 0108a61 -- app/src/main/res`): «Pendents», «Marca com a fet», «Marcat com a fet». La secció antiga del detall és a `git show 1f9a0f9:app/src/main/java/com/alorma/contactnotes/ui/person/FollowUpsSection.kt`.
+- **Formulari (9b, 9c):** pantalla completa, TopAppBar Medium «Nova tasca», «AMB QUI» (ve triada des del detall), «Què has de fer?» amb enganxar, «Quan» amb xips cap al futur (Sense data, Avui, Demà, proper dia rellevant, La setmana que ve, Tria dia… amb només dates futures), sense «Avisa'm» (més endavant), botó fix «Guarda a pendents» amb `flag`. Sense «Qui» ni «On». Ruta nova (p. ex. `TaskRoute(personId, taskId?)`); en mode edició, opció d'esborrar. `dueDate` és `LocalDate.toEpochDay()`.
 
 ### Tasques
 
-- [x] Estat i desament: `pending` a `EntryFormState`; el desen la nota ràpida, la nova entrada i l'edició; `setOpenFollowUp` al repositori; tests de JVM — `be85bd8`
-- [x] Fila «Pendent» a l'`EntryForm` (P5 `Unlocked`, 7e `Locked` → paywall `FollowUps`, `Hidden` no surt); captures i emulador — `0108a61`
-- [ ] Detall: secció «Pendents» (P6), etiqueta PENDENT a la cronologia, marcar com a fet (7f) amb «Desfés» i haptic; tests, captures i emulador
-- [ ] Full d'accions: «Marca com a pendent» / «Treu de pendents»; tests, captures i emulador
-- [ ] Llistat (P7): pastilla amb `flag` i el nombre, mai a les protegides; captures i emulador
+- [ ] Room v5 refeta i dades (unides): `TaskEntity` + `TaskDao`, sense `isPending`/`doneAt` a `entry`, `5.json` regenerat, repositori (`observeOpenTasks`, `observeDoneTasks`, `getTask`, `saveTask`, `deleteTask`, `markTaskDone`, `reopenTask`), `openTasks` al llistat, `FakeDb` amb `FakeTaskDao`, i desfets `be85bd8`, `0108a61` i `1f9a0f9` (revert). Tests de JVM i ktlint verds; **falta** `connectedDebugAndroidTest` a l'emulador (`MigrationTest`, `CustomChannelDaoTest`, `TaskDaoTest` nou; avisar Bernat abans, desinstal·la l'app) — `57a4d29`
+- [ ] Formulari «Nova tasca» / edició (9b, 9c): persona, text amb enganxar, «Quan» en futur, «Guarda a pendents»; tests, captures i emulador
+- [ ] Detall: «Nova tasca» al menú amb PRO (9a), secció «Pendents» amb «+ Nova tasca» i estat buit (9d, 9h), marcar com a fet (9e), «Fets · N» (9f); tests, captures i emulador
+- [ ] Llistat (9g): pastilla amb `flag` i el nombre, mai a les protegides; captures i emulador
 - [ ] `docs/pro/` i backlog 6 al dia

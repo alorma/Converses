@@ -12,7 +12,8 @@ import com.alorma.contactnotes.data.db.PersonEntity
 import com.alorma.contactnotes.data.db.PersonListItem
 import com.alorma.contactnotes.data.db.PinnedFactDao
 import com.alorma.contactnotes.data.db.PinnedFactEntity
-import com.alorma.contactnotes.data.db.isOpenFollowUp
+import com.alorma.contactnotes.data.db.TaskDao
+import com.alorma.contactnotes.data.db.TaskEntity
 import com.alorma.contactnotes.shared.AvatarColor
 import com.alorma.contactnotes.shared.AvatarShape
 import com.alorma.contactnotes.shared.ChannelType
@@ -29,12 +30,19 @@ class FakeDb {
   val entries = MutableStateFlow<List<EntryEntity>>(emptyList())
   val facts = MutableStateFlow<List<PinnedFactEntity>>(emptyList())
   val channels = MutableStateFlow<List<CustomChannelEntity>>(emptyList())
+  val tasks = MutableStateFlow<List<TaskEntity>>(emptyList())
   private var next = 1L
 
   fun nextId(): Long = next++
 
   val repository =
-    ConversesRepository(FakePersonDao(this), FakeEntryDao(this), FakePinnedFactDao(this), FakeCustomChannelDao(this))
+    ConversesRepository(
+      FakePersonDao(this),
+      FakeEntryDao(this),
+      FakePinnedFactDao(this),
+      FakeCustomChannelDao(this),
+      FakeTaskDao(this),
+    )
 
   fun addCustomChannel(
     name: String,
@@ -75,8 +83,6 @@ class FakeDb {
     text: String = "text",
     occurredAt: Long = 10_000,
     customChannelId: Long? = null,
-    isPending: Boolean = false,
-    doneAt: Long? = null,
   ): EntryEntity {
     val entry =
       EntryEntity(
@@ -87,11 +93,29 @@ class FakeDb {
         text = text,
         occurredAt = occurredAt,
         customChannelId = customChannelId,
-        isPending = isPending,
-        doneAt = doneAt,
       )
     entries.update { it + entry }
     return entry
+  }
+
+  fun addTask(
+    personId: Long,
+    text: String = "task",
+    dueDate: Long? = null,
+    createdAt: Long = 1_000,
+    doneAt: Long? = null,
+  ): TaskEntity {
+    val task =
+      TaskEntity(
+        id = nextId(),
+        personId = personId,
+        text = text,
+        dueDate = dueDate,
+        createdAt = createdAt,
+        doneAt = doneAt,
+      )
+    tasks.update { it + task }
+    return task
   }
 
   fun person(id: Long): PersonEntity? = people.value.firstOrNull { it.id == id }
@@ -114,6 +138,7 @@ class FakePersonDao(
     db.people.update { list -> list.filterNot { it.id == person.id } }
     db.entries.update { list -> list.filterNot { it.personId == person.id } }
     db.facts.update { list -> list.filterNot { it.personId == person.id } }
+    db.tasks.update { list -> list.filterNot { it.personId == person.id } }
   }
 
   override suspend fun insertFacts(facts: List<PinnedFactEntity>) {
@@ -129,13 +154,18 @@ class FakePersonDao(
   override suspend fun get(id: Long): PersonEntity? = db.person(id)
 
   override fun observeList(archived: Boolean): Flow<List<PersonListItem>> =
-    combine(db.people, db.entries) { people, entries ->
+    combine(db.people, db.entries, db.tasks) { people, entries, tasks ->
       people
         .filter { it.archived == archived }
         .map { person ->
           val own = entries.filter { it.personId == person.id }
           val last = own.maxWithOrNull(compareBy({ it.occurredAt }, { it.id }))
-          PersonListItem(person, last, own.map { it.channelType }, openFollowUps = own.count { it.isOpenFollowUp })
+          PersonListItem(
+            person,
+            last,
+            own.map { it.channelType },
+            openTasks = tasks.count { it.personId == person.id && it.doneAt == null },
+          )
         }.sortedByDescending { it.lastEntry?.occurredAt ?: it.person.createdAt }
     }
 
@@ -207,20 +237,6 @@ class FakeEntryDao(
     db.entries.map { list ->
       list.filter { it.personId == personId }.groupBy { it.kind }.map { (kind, items) -> KindCount(kind, items.size) }
     }
-
-  override fun observeOpenFollowUps(personId: Long): Flow<List<EntryEntity>> =
-    db.entries.map { list ->
-      list
-        .filter { it.personId == personId && it.isOpenFollowUp }
-        .sortedWith(compareByDescending<EntryEntity> { it.occurredAt }.thenByDescending { it.id })
-    }
-
-  override suspend fun setDoneAt(
-    id: Long,
-    doneAt: Long?,
-  ) {
-    db.entries.update { list -> list.map { if (it.id == id && it.isPending) it.copy(doneAt = doneAt) else it } }
-  }
 }
 
 class FakeCustomChannelDao(
@@ -277,4 +293,50 @@ class FakePinnedFactDao(
 ) : PinnedFactDao {
   override fun observeForPerson(personId: Long): Flow<List<PinnedFactEntity>> =
     db.facts.map { list -> list.filter { it.personId == personId }.sortedBy { it.position } }
+}
+
+class FakeTaskDao(
+  private val db: FakeDb,
+) : TaskDao {
+  override suspend fun insert(task: TaskEntity): Long {
+    val id = if (task.id == 0L) db.nextId() else task.id
+    db.tasks.update { it + task.copy(id = id) }
+    return id
+  }
+
+  override suspend fun update(task: TaskEntity) {
+    db.tasks.update { list -> list.map { if (it.id == task.id) task else it } }
+  }
+
+  override suspend fun delete(task: TaskEntity) {
+    db.tasks.update { list -> list.filterNot { it.id == task.id } }
+  }
+
+  override suspend fun get(id: Long): TaskEntity? = db.tasks.value.firstOrNull { it.id == id }
+
+  override fun observeOpen(personId: Long): Flow<List<TaskEntity>> =
+    db.tasks.map { list ->
+      list
+        .filter { it.personId == personId && it.doneAt == null }
+        .sortedWith(
+          compareBy<TaskEntity> { it.dueDate == null }
+            .thenBy { it.dueDate }
+            .thenBy { it.createdAt }
+            .thenBy { it.id },
+        )
+    }
+
+  override fun observeDone(personId: Long): Flow<List<TaskEntity>> =
+    db.tasks.map { list ->
+      list
+        .filter { it.personId == personId && it.doneAt != null }
+        .sortedWith(compareByDescending<TaskEntity> { it.doneAt }.thenByDescending { it.id })
+    }
+
+  override suspend fun setDoneAt(
+    id: Long,
+    doneAt: Long?,
+  ) {
+    db.tasks.update { list -> list.map { if (it.id == id) it.copy(doneAt = doneAt) else it } }
+  }
 }

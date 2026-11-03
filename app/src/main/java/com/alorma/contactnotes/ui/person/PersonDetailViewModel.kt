@@ -6,8 +6,6 @@ import com.alorma.contactnotes.data.ConversesRepository
 import com.alorma.contactnotes.data.db.EntryEntity
 import com.alorma.contactnotes.data.db.PersonEntity
 import com.alorma.contactnotes.data.db.PinnedFactEntity
-import com.alorma.contactnotes.data.db.isOpenFollowUp
-import com.alorma.contactnotes.data.db.withOpenFollowUp
 import com.alorma.contactnotes.shared.ChannelType
 import com.alorma.contactnotes.shared.EntryKind
 import com.alorma.contactnotes.ui.entry.EntryChannel
@@ -30,8 +28,6 @@ data class PersonDetailUiState(
   val entries: List<EntryEntity> = emptyList(),
   /** Noms dels canals propis per id, per mostrar-los a la cronologia en lloc del grup. */
   val customChannelNames: Map<Long, String> = emptyMap(),
-  /** Pendents sense fer (P6), els més nous primer. */
-  val followUps: List<EntryEntity> = emptyList(),
   val selectedKinds: Set<EntryKind> = EntryKind.entries.toSet(),
   val saidCount: Int = 0,
   val heardCount: Int = 0,
@@ -81,8 +77,6 @@ class PersonDetailViewModel(
       )
     }.combine(repository.observeCustomChannels()) { state, channels ->
       state.copy(customChannelNames = channels.associate { it.channel.id to it.channel.name })
-    }.combine(repository.observeOpenFollowUps(personId)) { state, followUps ->
-      state.copy(followUps = followUps)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), PersonDetailUiState())
 
   /** Persones a les quals es pot moure una entrada. */
@@ -101,7 +95,6 @@ class PersonDetailViewModel(
     channel: EntryChannel,
     text: String,
     occurredAt: Long?,
-    pending: Boolean = false,
   ) {
     viewModelScope.launch {
       repository.addEntry(
@@ -112,7 +105,6 @@ class PersonDetailViewModel(
           customChannelId = channel.customChannelId,
           text = text,
           occurredAt = occurredAt ?: System.currentTimeMillis(),
-          isPending = pending,
         ),
       )
     }
@@ -124,38 +116,18 @@ class PersonDetailViewModel(
     channel: EntryChannel,
     text: String,
     occurredAt: Long?,
-    pending: Boolean = entry.isOpenFollowUp,
   ) {
     viewModelScope.launch {
       repository.updateEntry(
-        entry
-          .copy(
-            kind = kind,
-            channelType = channel.group,
-            customChannelId = channel.customChannelId,
-            text = text,
-            occurredAt = occurredAt ?: entry.occurredAt,
-          ).withOpenFollowUp(pending),
+        entry.copy(
+          kind = kind,
+          channelType = channel.group,
+          customChannelId = channel.customChannelId,
+          text = text,
+          occurredAt = occurredAt ?: entry.occurredAt,
+        ),
       )
     }
-  }
-
-  /** «Marca com a fet» (7f); funciona també sense Pro. */
-  fun markFollowUpDone(entry: EntryEntity) {
-    viewModelScope.launch { repository.markFollowUpDone(entry) }
-  }
-
-  /** «Desfés» del snackbar de «Marcat com a fet». */
-  fun undoFollowUpDone(entry: EntryEntity) {
-    viewModelScope.launch { repository.undoFollowUpDone(entry) }
-  }
-
-  /** Full d'accions: «Marca com a pendent» o «Treu de pendents». */
-  fun setOpenFollowUp(
-    entry: EntryEntity,
-    open: Boolean,
-  ) {
-    viewModelScope.launch { repository.setOpenFollowUp(entry, open) }
   }
 
   fun moveEntry(

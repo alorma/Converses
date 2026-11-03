@@ -22,8 +22,6 @@ import com.alorma.contactnotes.ui.entry.PersonPickerManyPreview
 import com.alorma.contactnotes.ui.entry.QuickNoteCustomChannelsLockedPreview
 import com.alorma.contactnotes.ui.entry.QuickNoteCustomChannelsPreview
 import com.alorma.contactnotes.ui.entry.QuickNoteFilledPreview
-import com.alorma.contactnotes.ui.entry.QuickNoteFollowUpLockedPreview
-import com.alorma.contactnotes.ui.entry.QuickNoteFollowUpPreview
 import com.alorma.contactnotes.ui.entry.QuickNoteNoPersonPreview
 import com.alorma.contactnotes.ui.entry.QuickNoteSharedNoPeoplePreview
 import com.alorma.contactnotes.ui.entry.QuickNoteSharedPreview
@@ -50,7 +48,6 @@ import com.alorma.contactnotes.ui.person.MoveEntryDialogPreview
 import com.alorma.contactnotes.ui.person.PersonDetailScreenCustomChannelPreview
 import com.alorma.contactnotes.ui.person.PersonDetailScreenEmptyPreview
 import com.alorma.contactnotes.ui.person.PersonDetailScreenFilteredEmptyPreview
-import com.alorma.contactnotes.ui.person.PersonDetailScreenFollowUpsPreview
 import com.alorma.contactnotes.ui.person.PersonDetailScreenLoadedPreview
 import com.alorma.contactnotes.ui.person.PersonDetailScreenSingleFactPreview
 import com.alorma.contactnotes.ui.person.PersonDetailScreenThemedPreview
@@ -124,14 +121,6 @@ class ScreensScreenshotTests {
   @Composable
   fun personDetailLoaded() {
     PersonDetailScreenLoadedPreview()
-  }
-
-  @ScreenPreviews
-  @LocalizedScreenPreviews
-  @PreviewTest
-  @Composable
-  fun personDetailFollowUps() {
-    PersonDetailScreenFollowUpsPreview()
   }
 
   @ScreenPreviews
@@ -230,22 +219,6 @@ class ScreensScreenshotTests {
   @Composable
   fun quickNoteCustomChannelsLocked() {
     QuickNoteCustomChannelsLockedPreview()
-  }
-
-  @ScreenPreviews
-  @LocalizedScreenPreviews
-  @PreviewTest
-  @Composable
-  fun quickNoteFollowUp() {
-    QuickNoteFollowUpPreview()
-  }
-
-  @ScreenPreviews
-  @LocalizedScreenPreviews
-  @PreviewTest
-  @Composable
-  fun quickNoteFollowUpLocked() {
-    QuickNoteFollowUpLockedPreview()
   }
 
   @ScreenPreviews

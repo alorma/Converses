@@ -159,7 +159,7 @@ class MigrationTest {
   }
 
   @Test
-  fun migrate4To5KeepsEverythingAndLeavesEntriesWithoutChannelOrFollowUp() {
+  fun migrate4To5KeepsEverythingAndLeavesEntriesWithoutChannelAndNoTasks() {
     helper.createDatabase(TEST_DB, 4).use { db ->
       db.insertPerson(1)
       db.execSQL(
@@ -186,15 +186,16 @@ class MigrationTest {
       ),
     )
     assertEquals(
-      listOf("5|1|HEARD|CHAT|a|100|-|0|-", "9|2|SAID|PHONE|b|200|-|0|-"),
+      listOf("5|1|HEARD|CHAT|a|100|-", "9|2|SAID|PHONE|b|200|-"),
       db.strings(
         "SELECT id || '|' || personId || '|' || kind || '|' || channelType || '|' || text || '|' || " +
-          "occurredAt || '|' || IFNULL(customChannelId, '-') || '|' || isPending || '|' || IFNULL(doneAt, '-') " +
+          "occurredAt || '|' || IFNULL(customChannelId, '-') " +
           "FROM entry ORDER BY id",
       ),
     )
     assertEquals(listOf("2|V"), db.strings("SELECT personId || '|' || value FROM pinned_fact"))
     assertEquals(listOf("0"), db.strings("SELECT COUNT(*) FROM custom_channel"))
+    assertEquals(listOf("0"), db.strings("SELECT COUNT(*) FROM task"))
   }
 
   @Test
@@ -217,6 +218,25 @@ class MigrationTest {
   }
 
   @Test
+  fun migrate4To5TasksAreDeletedWithTheirPerson() {
+    helper.createDatabase(TEST_DB, 4).use { db ->
+      db.insertPerson(1)
+      db.insertPerson(2)
+    }
+
+    val db = helper.runMigrationsAndValidate(TEST_DB, 5, true)
+    db.execSQL("PRAGMA foreign_keys = ON")
+    db.execSQL("INSERT INTO task (personId, text, dueDate, createdAt) VALUES (1, 'a', NULL, 0)")
+    db.execSQL("INSERT INTO task (personId, text, dueDate, createdAt) VALUES (2, 'b', 20000, 0)")
+    db.execSQL("DELETE FROM person WHERE id = 1")
+
+    assertEquals(
+      listOf("b|20000|0|-"),
+      db.strings("SELECT text || '|' || dueDate || '|' || remind || '|' || IFNULL(doneAt, '-') FROM task"),
+    )
+  }
+
+  @Test
   fun migrate1To5RunsEveryMigration() {
     helper.createDatabase(TEST_DB, 1).use { db ->
       db.insertPerson(1)
@@ -227,7 +247,8 @@ class MigrationTest {
     val db = helper.runMigrationsAndValidate(TEST_DB, 5, true, Migration1To2(), Migration2To3())
 
     assertEquals(listOf("P1"), db.strings("SELECT name FROM person"))
-    assertEquals(listOf("CHAT|0"), db.strings("SELECT channelType || '|' || isPending FROM entry"))
+    assertEquals(listOf("CHAT"), db.strings("SELECT channelType FROM entry"))
+    assertEquals(listOf("0"), db.strings("SELECT COUNT(*) FROM task"))
   }
 
   private companion object {

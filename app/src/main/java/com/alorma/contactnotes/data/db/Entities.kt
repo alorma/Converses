@@ -75,25 +75,36 @@ data class EntryEntity(
   val occurredAt: Long,
   /** Canal propi opcional (Pro), dins de [channelType]. */
   val customChannelId: Long? = null,
-  /** Marcada per fer-ne seguiment (Pro). Continua sent pendent mentre [doneAt] sigui `null`. */
-  @ColumnInfo(defaultValue = "0") val isPending: Boolean = false,
-  /** Quan es va marcar com a feta; `null` si no és pendent o encara no s'ha fet. */
-  val doneAt: Long? = null,
 )
 
-/** Pendent i encara no fet: surt a la secció «Pendents» del detall i porta l'etiqueta PENDENT. */
-val EntryEntity.isOpenFollowUp: Boolean get() = isPending && doneAt == null
-
 /**
- * L'entrada amb el pendent obert ([open]) o no. Si ja ho era, no canvia (un pendent fet continua fet si no
- * es torna a obrir); obrir-lo esborra [EntryEntity.doneAt] i treure'l deixa l'entrada sense pendent.
+ * Tasca (Pro): una cosa per fer amb una persona. Independent de les entrades: no surt a la cronologia.
+ * Es queda a «Pendents» mentre [doneAt] sigui `null`.
  */
-fun EntryEntity.withOpenFollowUp(open: Boolean): EntryEntity =
-  when {
-    open == isOpenFollowUp -> this
-    open -> copy(isPending = true, doneAt = null)
-    else -> copy(isPending = false, doneAt = null)
-  }
+@Entity(
+  tableName = "task",
+  foreignKeys = [
+    ForeignKey(
+      entity = PersonEntity::class,
+      parentColumns = ["id"],
+      childColumns = ["personId"],
+      onDelete = ForeignKey.CASCADE,
+    ),
+  ],
+  indices = [Index("personId")],
+)
+data class TaskEntity(
+  @PrimaryKey(autoGenerate = true) val id: Long = 0,
+  val personId: Long,
+  val text: String,
+  /** Dia previst com a `LocalDate.toEpochDay()` (sense hora ni zona); `null` és «Sense data». */
+  val dueDate: Long? = null,
+  /** «Avisa'm» (notificació aquell dia a les 9:00). Encara no es fa servir: la fila surt més endavant. */
+  @ColumnInfo(defaultValue = "0") val remind: Boolean = false,
+  val createdAt: Long,
+  /** Quan es va marcar com a feta; `null` mentre és pendent. */
+  val doneAt: Long? = null,
+)
 
 @Entity(
   tableName = "pinned_fact",
@@ -126,8 +137,8 @@ data class PersonListItem(
   /** Grups de canal de les seves entrades (amb repeticions); la taula `channel` ja no s'usa. */
   @Relation(parentColumn = "id", entityColumn = "personId", entity = EntryEntity::class, projection = ["channelType"])
   val channels: List<ChannelType>,
-  /** Pendents sense fer ([isOpenFollowUp]); 0 per a les persones protegides (ho posa el repositori). */
-  val openFollowUps: Int = 0,
+  /** Tasques pendents (sense fer); 0 per a les persones protegides (ho posa el repositori). */
+  val openTasks: Int = 0,
 )
 
 /** Canal propi amb el nombre d'entrades que el fan servir (Ajustos › Canals propis). */
