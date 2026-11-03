@@ -175,5 +175,5 @@ El primer plantejament (estat `isPending` d'una entrada, amb la fila «Pendent»
 - [x] Room v5 refeta i dades (unides): `TaskEntity` + `TaskDao`, sense `isPending`/`doneAt` a `entry`, `5.json` regenerat, repositori (`observeOpenTasks`, `observeDoneTasks`, `getTask`, `saveTask`, `deleteTask`, `markTaskDone`, `reopenTask`), `openTasks` al llistat, `FakeDb` amb `FakeTaskDao`, i desfets `be85bd8`, `0108a61` i `1f9a0f9` (revert). Tests de JVM i ktlint verds; `connectedDebugAndroidTest` a l'emulador (17/17: `MigrationTest`, `CustomChannelDaoTest`, `TaskDaoTest`) — `ed075af`
 - [x] Formulari «Nova tasca» / edició (9b, 9c): persona, text amb enganxar, «Quan» en futur, «Guarda a pendents», esborrar; tests de JVM (`TaskFormViewModelTest`, `TaskDueTest`), captures i emulador — `3c267a0` (un sol commit amb la tasca següent, perquè comparteixen textos, navegació i captures)
 - [x] Detall: «Nova tasca» al menú amb PRO (9a), secció «Pendents» amb «+ Nova tasca» i estat buit (9d, 9h), marcar com a fet amb «Desfés» (9e), «Fets · N» (9f), editar i esborrar; tests de JVM (`PersonDetailViewModelTest`, `TaskLabelsTest`), captures i emulador (gratuït, Pro i baixada de Pro) — `3c267a0`
-- [x] Llistat (9g): pastilla amb `flag` i el nombre, mai a les protegides; captures i emulador — COMMIT_LIST
-- [x] `docs/pro/` i backlog 6 al dia — COMMIT_LIST
+- [x] Llistat (9g): pastilla amb `flag` i el nombre, mai a les protegides; captures i emulador — `c63c64d`
+- [x] `docs/pro/` i backlog 6 al dia — `c63c64d`
