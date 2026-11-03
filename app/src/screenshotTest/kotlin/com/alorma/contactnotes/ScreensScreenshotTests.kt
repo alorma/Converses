@@ -45,6 +45,7 @@ import com.alorma.contactnotes.ui.person.ConfirmDeleteDialogPreview
 import com.alorma.contactnotes.ui.person.EntryActionsDayPreview
 import com.alorma.contactnotes.ui.person.EntryActionsSinglePreview
 import com.alorma.contactnotes.ui.person.MoveEntryDialogPreview
+import com.alorma.contactnotes.ui.person.PersonDetailScreenCustomChannelPreview
 import com.alorma.contactnotes.ui.person.PersonDetailScreenEmptyPreview
 import com.alorma.contactnotes.ui.person.PersonDetailScreenFilteredEmptyPreview
 import com.alorma.contactnotes.ui.person.PersonDetailScreenLoadedPreview
@@ -118,6 +119,13 @@ class ScreensScreenshotTests {
   @Composable
   fun personDetailLoaded() {
     PersonDetailScreenLoadedPreview()
+  }
+
+  @ScreenPreviews
+  @PreviewTest
+  @Composable
+  fun personDetailCustomChannel() {
+    PersonDetailScreenCustomChannelPreview()
   }
 
   @ScreenPreviews

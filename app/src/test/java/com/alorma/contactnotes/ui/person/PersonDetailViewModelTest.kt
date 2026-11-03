@@ -250,4 +250,16 @@ class PersonDetailViewModelTest {
       assertEquals(ChannelType.PHONE, updated.channelType)
       assertEquals(null, updated.customChannelId)
     }
+
+  @Test
+  fun theStateNamesTheCustomChannelsForTheTimeline() =
+    runTest {
+      val whatsapp = db.addCustomChannel("WhatsApp", ChannelType.CHAT)
+      val entry = db.addEntry(person.id, channel = ChannelType.CHAT, customChannelId = whatsapp.id)
+      val vm = viewModel()
+
+      val names = vm.uiState.value.customChannelNames
+      assertEquals(mapOf(whatsapp.id to "WhatsApp"), names)
+      assertEquals("WhatsApp", entryChannelName(ContextWrapper(null), entry, names))
+    }
 }

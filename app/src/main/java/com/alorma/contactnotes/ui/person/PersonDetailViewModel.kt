@@ -26,6 +26,8 @@ data class PersonDetailUiState(
   val channels: List<ChannelType> = emptyList(),
   val facts: List<PinnedFactEntity> = emptyList(),
   val entries: List<EntryEntity> = emptyList(),
+  /** Noms dels canals propis per id, per mostrar-los a la cronologia en lloc del grup. */
+  val customChannelNames: Map<Long, String> = emptyMap(),
   val selectedKinds: Set<EntryKind> = EntryKind.entries.toSet(),
   val saidCount: Int = 0,
   val heardCount: Int = 0,
@@ -73,6 +75,8 @@ class PersonDetailViewModel(
         happenedCount = byKind[EntryKind.HAPPENED] ?: 0,
         isLoading = false,
       )
+    }.combine(repository.observeCustomChannels()) { state, channels ->
+      state.copy(customChannelNames = channels.associate { it.channel.id to it.channel.name })
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), PersonDetailUiState())
 
   /** Persones a les quals es pot moure una entrada. */

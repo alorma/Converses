@@ -11,6 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import com.alorma.contactnotes.R
+import com.alorma.contactnotes.data.db.EntryEntity
 import com.alorma.contactnotes.shared.ChannelType
 import com.alorma.contactnotes.ui.dateFormatter
 import com.alorma.contactnotes.ui.people.label
@@ -69,3 +70,16 @@ fun channelName(
   context: Context,
   type: ChannelType,
 ): String = context.getString(type.label())
+
+/** Nom del canal d'una entrada a la cronologia: el canal propi si en té, si no el grup (7a, «On es veu»). */
+@Composable
+fun entryChannelName(
+  entry: EntryEntity,
+  customChannelNames: Map<Long, String>,
+): String = entry.customChannelId?.let(customChannelNames::get) ?: channelName(entry.channelType)
+
+fun entryChannelName(
+  context: Context,
+  entry: EntryEntity,
+  customChannelNames: Map<Long, String>,
+): String = entry.customChannelId?.let(customChannelNames::get) ?: channelName(context, entry.channelType)

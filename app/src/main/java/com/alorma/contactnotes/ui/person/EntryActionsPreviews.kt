@@ -21,6 +21,7 @@ private fun EntryActionsPreview(dayCount: Int) {
           EntryActionsContent(
             entry = PreviewData.martaEntries.first(),
             firstName = firstName(PreviewData.marta.name),
+            channel = channelName(PreviewData.martaEntries.first().channelType),
             dayCount = dayCount,
             onEdit = {},
             onCopy = {},

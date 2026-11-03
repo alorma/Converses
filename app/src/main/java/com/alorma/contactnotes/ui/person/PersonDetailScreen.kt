@@ -225,6 +225,7 @@ fun PersonDetailRoute(
           EntryActionsSheet(
             entry = actionEntry,
             firstName = firstName(person.name),
+            channel = entryChannelName(actionEntry, state.customChannelNames),
             dayCount = dayCount,
             onDismiss = ::closeAction,
             onEdit = { action = EntryAction.Edit },
@@ -493,7 +494,12 @@ fun PersonDetailScreen(
                 isLast = isLast,
                 marker = { EntryMarker(item.entry.kind, person) },
               ) {
-                EntryCard(item.entry, firstName, onMenu = { onEntryMenu(item.entry) })
+                EntryCard(
+                  item.entry,
+                  firstName,
+                  channel = entryChannelName(item.entry, state.customChannelNames),
+                  onMenu = { onEntryMenu(item.entry) },
+                )
               }
           }
         }
@@ -595,6 +601,7 @@ private fun SectionHeader(
 private fun EntryCard(
   entry: EntryEntity,
   firstName: String,
+  channel: String,
   onMenu: () -> Unit,
 ) {
   Surface(
@@ -608,7 +615,7 @@ private fun EntryCard(
         whoLabel(entry.kind, firstName),
         dayLabel(entryDate(entry.occurredAt)),
         formatTime(entry.occurredAt),
-        channelName(entry.channelType),
+        channel,
         entry.text,
       )
     Row(verticalAlignment = Alignment.Top) {
@@ -624,7 +631,7 @@ private fun EntryCard(
             listOf(
               whoLabel(entry.kind, firstName),
               formatTime(entry.occurredAt),
-              channelName(entry.channelType),
+              channel,
             ).joinToString(" · ") { it.uppercase() },
           style = MaterialTheme.typography.labelMedium,
           fontWeight = FontWeight.SemiBold,

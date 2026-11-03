@@ -131,3 +131,31 @@ internal fun PersonDetailScreenFilteredEmptyPreview() {
     ),
   )
 }
+
+/** Cronologia amb un canal propi: l'etiqueta diu WHATSAPP en lloc del grup. */
+@Preview
+@Composable
+internal fun PersonDetailScreenCustomChannelPreview() {
+  val entries =
+    PreviewData.martaEntries.mapIndexed { index, entry ->
+      if (index ==
+        0
+      ) {
+        entry.copy(customChannelId = 1)
+      } else {
+        entry
+      }
+    }
+  PersonDetailScreenPreview(
+    PersonDetailUiState(
+      person = PreviewData.marta,
+      channels = PreviewData.martaChannels,
+      entries = entries,
+      customChannelNames = mapOf(1L to "WhatsApp"),
+      saidCount = 1,
+      heardCount = 1,
+      happenedCount = entries.count { it.kind == EntryKind.HAPPENED },
+      isLoading = false,
+    ),
+  )
+}

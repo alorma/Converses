@@ -22,6 +22,8 @@ class PersonExporter(
     val channels = repository.observeChannels(personId).first()
     val facts = repository.observePinnedFacts(personId).first()
     val entries = repository.getEntries(personId)
+    val customChannelNames =
+      repository.observeCustomChannels().first().associate { it.channel.id to it.channel.name }
     val formatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT).withLocale(Locale.getDefault())
     val zone = ZoneId.systemDefault()
 
@@ -39,18 +41,23 @@ class PersonExporter(
       if (entries.isNotEmpty()) {
         appendLine()
         val name = firstName(person.name)
-        entries.asReversed().forEach { entry -> appendLine(entry.line(name, formatter, zone)) }
+        entries.asReversed().forEach { entry -> appendLine(entry.line(name, customChannelNames, formatter, zone)) }
       }
     }.trimEnd()
   }
 
   private fun EntryEntity.line(
     firstName: String,
+    customChannelNames: Map<Long, String>,
     formatter: DateTimeFormatter,
     zone: ZoneId,
   ): String {
     val whenText = Instant.ofEpochMilli(occurredAt).atZone(zone).format(formatter)
-    return "[$whenText · ${channelName(context, channelType)}] ${whoLabel(context, kind, firstName)}: $text"
+    return "[$whenText · ${entryChannelName(
+      context,
+      this,
+      customChannelNames,
+    )}] ${whoLabel(context, kind, firstName)}: $text"
   }
 
   fun share(
