@@ -36,3 +36,4 @@ Es construeix sobre els 5 grups de canals (ja fets). Dins de qualsevol grup, inc
 - Si s'esborra un canal, les seves entrades queden al grup (no es perd res); si canvia de grup, les entrades s'hi mouen.
 - Els canals de la beta (WhatsApp, Discord…) no es poden recuperar: la migració 1→2 els va esborrar.
 - Pla, disseny i decisions: `docs/pro/` (fases 5 i 6).
+- **Estat (03-11-2026):** fet a la fase 6, darrere de `CustomChannelsFeature`; pendent de la validació de Bernat per tancar la fase.

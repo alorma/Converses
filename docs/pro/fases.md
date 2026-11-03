@@ -132,6 +132,7 @@ Al menú de debug, l'apartat **Pro** té un sol interruptor, «Pro user», que e
 
 - **Canal per defecte:** la nota ràpida i la nova entrada del detall prenen el grup i el canal propi de l'última entrada de la persona (el canal només si està `Unlocked`).
 - **Baixada de Pro a l'editor:** una entrada amb canal propi el mostra triat (es pot desmarcar), sense els altres canals ni «+ Nou», amb PRO → paywall.
+- **Textos que no eren al tauler 7g** (proposats per Claude, per revisar): «Edita el canal» / «Edit channel» / «Editar canal»; nom repetit: «Ja hi ha un canal amb aquest nom a %s.» / «There's already a channel with this name in %s.» / «Ya hay un canal con este nombre en %s.»; el botó d'editar fa servir «Desa».
 
 ### Tasques
 
@@ -139,8 +140,8 @@ Al menú de debug, l'apartat **Pro** té un sol interruptor, «Pro user», que e
 - [x] Camp «On» (7a, 7c): targeta del grup amb els canals i «+ Nou»; `Locked` amb «Canal propi» i PRO → paywall `Channels`; captures i emulador — `4e1a78f`
 - [x] Full «Nou canal» / «Edita el canal» (7b); en crear-lo queda triat; tests de JVM, captures i emulador — `7b6a037`
 - [x] Cronologia, full d'accions i exportar amb el nom del canal; tests de JVM, captures i emulador — `ef06f32`
-- [ ] Ajustos › Canals propis (7d): fila i pantalla (llista per grups, reanomena, canvia de grup, esborra, FAB); tests de JVM, captures i emulador
-- [ ] `docs/pro/` i backlog 8 al dia
+- [x] Ajustos › Canals propis (7d): fila i pantalla (llista per grups, reanomena, canvia de grup, esborra, FAB); tests de JVM, captures i emulador — `a792e5d`
+- [x] `docs/pro/` i backlog 8 al dia
 
 ## Fase 7 · Pendents (Pro)
 
