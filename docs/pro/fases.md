@@ -57,6 +57,7 @@ Dues dimensions independents per a cada funció Pro:
 - El producte de Play Console no es podia crear fins que hi hagués una build amb `BILLING`: es va pujar la 1.7.9 al track intern.
 - **Notificacions de Google (RTDN):** topic `projects/converses/topics/Play-Store-Notifications` (Google Cloud, projecte `converses`), posat a Play Console › Monetization setup. Google Play hi ha de poder publicar: `google-play-developer-notifications@system.gserviceaccount.com` amb el rol *Pub/Sub Publisher* al topic (sense, la notificació de prova falla).
 - L'SDK també va a la release: la fitxa de Play ja no diu «sense accés a internet».
+- **SDK 11.0.1 (03-11-2026, Dependabot):** l'API no canvia; porta Play Billing 9.1.0 i demana Kotlin 2.1+ i `compileSdk` 35+ (ja els complim). Quan Play està bloquejat, l'error passa de `StoreProblemError` a `PurchaseNotAllowedError`, i tots dos van a `PurchaseResult.Failed`. Provat amb el Test Store a l'emulador (offering, compra fallida i vàlida); Billing 9 es valida amb la compra real del track intern (fase 3).
 
 ### Debug
 
@@ -110,12 +111,12 @@ Al menú de debug, l'apartat **Pro** té un sol interruptor, «Pro user», que e
 - **Nom únic dins del grup, sense distingir majúscules** («WhatsApp» i «whatsapp» són el mateix nom); validat al repositori.
 - **Canals antics (beta):** no es poden recuperar. La migració 1→2 els va convertir al grup i va esborrar la taula `channel`; no en queda cap rastre.
 
-### Per decidir abans de les fases 6 i 7
+### Decisions per a les fases 6 i 7 (03-11-2026)
 
-- Disseny de «Reanomena» i «Canvia de grup» (no n'hi ha): reaprofitar el full 7b o demanar-lo a Claude Design.
-- Marcar i desmarcar un pendent des del full d'accions de l'entrada (backlog 6), a més de la fila «Pendent» de l'`EntryForm`.
-- Textos en anglès i castellà que falten: «Pendent», els dos subtítols, «Pendents», «PENDENT», «Marca com a fet».
-- Recordatoris dels pendents: fora d'aquestes fases?
+- **«Reanomena» i «Canvia de grup»:** es reaprofita el full 7b («Nou canal», nom i grup) amb el títol «Edita el canal» i els camps omplerts. No es demana disseny nou.
+- **Marcar i desmarcar un pendent** també des del full d'accions de l'entrada (backlog 6), a més de la fila «Pendent» de l'`EntryForm`.
+- **Textos en anglès i castellà** dels pendents («Pendent», els dos subtítols, «Pendents», «PENDENT», «Marca com a fet»): els proposa Claude a partir del català i es revisen a la proposta de la fase 7.
+- **Recordatoris dels pendents:** fora de les fases 6 i 7; queden al backlog.
 
 ## Fase 5 · Room v5 i flags
 

@@ -20,7 +20,8 @@ Poder marcar coses per fer-ne seguiment amb una persona ("li he de preguntar com
 
 - És un estat d'una entrada (`isPending`, `doneAt`), no un quart tipus: «Qui» (Jo · {nom} · Apunt) no canvia.
 - Pla, disseny i decisions: `docs/pro/` (fases 5 i 7).
-- Per decidir: marcar i desmarcar des del full d'accions de l'entrada, i recordatoris o notificacions en una data.
+- Decidit (03-11-2026): també es marca i desmarca des del full d'accions de l'entrada (fase 7).
+- Més endavant, fora de les fases 6 i 7: recordatoris o notificacions en una data.
 
 ## 7 · Feature: nou canal "Empresa" (entrevistes de feina)
 
