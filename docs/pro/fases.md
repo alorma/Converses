@@ -122,8 +122,8 @@ Al menú de debug, l'apartat **Pro** té un sol interruptor, «Pro user», que e
 - [x] Fases 5–7 i disseny a `docs/pro/`; backlog 6 i 8 actualitzats
 - [x] Room v5: `CustomChannelEntity`, `customChannelId`, `isPending` i `doneAt` a `EntryEntity`; `AutoMigration` 4→5 i test (4→5, `SET NULL` i 1→5 sense perdre dades); `connectedAndroidTest` a l'emulador (8/8) — `c726ce9`
 - [x] DAO, `ConversesRepository` i `FakeDb`: canals (crear, reanomenar, canviar de grup amb les entrades, esborrar, llistar amb el nombre d'entrades, nom únic) i pendents (llistar, fet, desfer, `openFollowUps` al llistat, 0 per a les protegides); tests de JVM (`ProFeaturesRepositoryTest`) — `c8e9c29`
-- [ ] Test instrumentat dels DAO sobre Room en memòria (`CustomChannelDaoTest` a `androidTest`): l'SQL real de `changeGroup`, `SET NULL`, `NOCASE` i `openFollowUps`. El `FakeDb` no el prova. Era a punt de començar quan es va aturar la sessió (02-11-2026)
-- [ ] Flags `CustomChannelsFeature` i `FollowUpsFeature` (Pro, apagats), al menú de debug i a «Turn on every Pro flag»; tests de JVM i emulador
+- [x] Test instrumentat dels DAO sobre Room en memòria (`CustomChannelDaoTest` a `androidTest`): l'SQL real de `changeGroup`, `SET NULL`, `NOCASE`, `setDoneAt`, `observeOpenFollowUps` i `openFollowUps` al llistat; emulador (7/7) — `495733c`
+- [x] Flags `CustomChannelsFeature` (`custom_channels_enabled`) i `FollowUpsFeature` (`follow_ups_enabled`), Pro i apagats, al menú de debug i a «Turn on every Pro flag»; tests de JVM (Hidden → Locked → Unlocked) i emulador — `03bf5fe`
 
 ## Fase 6 · Canals propis (Pro)
 
