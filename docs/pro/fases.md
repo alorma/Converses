@@ -193,7 +193,36 @@ El primer plantejament (estat `isPending` d'una entrada, amb la fila «Pendent»
 
 ### Tasques
 
-- [ ] Editor: píndola PRO en lloc del llapis i contentDescription (11a); captures
-- [ ] Full «Avatar» sense Pro i en prova (11b, 11c) i baixada de Pro (11d): cadenats, targeta, prova, «Desbloqueja amb Pro», «Descarta la prova», tornada de la compra; tests de JVM de l'estat de prova, captures i emulador (gratuït, Pro, baixada)
-- [ ] Ajustos: fila «Color de la persona» amb PRO i `chevron_right` sense Pro (11e); captures i emulador
-- [ ] Textos de l'11f en en/ca/es; `docs/pro/` al dia
+- [x] Editor: píndola PRO en lloc del llapis i contentDescription (11a); captures — `b9fc04c`
+- [x] Full «Avatar» sense Pro i en prova (11b, 11c) i baixada de Pro (11d): cadenats, targeta, prova, «Desbloqueja amb Pro», «Descarta la prova», tornada de la compra; tests de JVM de l'estat de prova, captures i emulador (gratuït, Pro, baixada) — `0f15bdf`
+- [x] Ajustos: fila «Color de la persona» amb PRO i `chevron_right` sense Pro (11e); captures — `130cc02` (falta l'emulador, vegeu el handoff)
+- [ ] ~~Textos de l'11f en en/ca/es~~ (fets dins de cada tasca); `docs/pro/` al dia
+
+Fora de la llista, aprovat per Bernat: `cb7c231` treu les captures en català i castellà (`LocalizedScreenPreviews` → `LargeFontScreenPreviews`, només font 2×). Amb elles, `validateDebugScreenshotTest` es quedava sense memòria (Java heap space al procés de tests).
+
+### Handoff (03-11-2026, segona sessió)
+
+Tasques 1–3 fetes, validades amb `testDebugUnitTest`, `ktlintCheck` i `validateDebugScreenshotTest`, i commitejades. No s'ha fet push.
+
+- **Com ha quedat:**
+  - `ProPill` és al designsystem (`ProBadge.kt`).
+  - `SettingRow` té el paràmetre `titleBadge`.
+  - Al full, `AvatarSheetLock` (a `AvatarSheet.kt`) decideix què és lliure: Galeta, Automàtic, i la forma i el color de `baseline`. Té tests a `AvatarSheetLockTest`.
+  - La prova viu a `EditPersonUiState` (`trialShape`, `trialColor`, `reopenAvatarSheet`), amb tests a `EditPersonViewModelTest`.
+  - `EditPersonContent` reobre el full amb `LaunchedEffect(Unit)` i aplica la prova quan `customAvatar` passa a `Unlocked`.
+- **Emulador (tasca 2, fet):** amb Marta Soler sense Pro (té Lavanda desada, és el cas de baixada, 11d), s'ha provat:
+  - la prova i que «Desa» queda desactivat;
+  - «Desbloqueja», tornar enrere i que el full es reobre amb la prova;
+  - «Descarta» i tancar amb enrere;
+  - la compra amb el Test Store: la prova s'aplica, surt el llapis i «Desa» s'activa (no s'ha desat).
+- **Pendent:**
+  - Emulador de la fila d'Ajustos (11e) sense Pro i amb Pro. Ara l'emulador **té Pro comprat al Test Store**: per tornar a gratuït, cal tenir-ho en compte (l'override del menú de debug només força Pro).
+  - Emulador de l'editor amb una persona sense tria Pro, per veure la targeta «Formes i colors amb Pro» (11b): la captura ja és bona.
+  - Tasca 4: posar `docs/pro/README.md` al dia amb el comportament de l'11 i tancar la fase (estat a la taula de dalt) quan Bernat la validi.
+  - Notes de la versió: proposar una línia (la prova d'avatar sense Pro és visible per a l'usuari).
+  - **Release a internal (ho vam deixar per a una sessió nova):**
+    - Pujar la versió a 1.8.0 (`minor=8`, `patch=0`), perquè hi ha novetats visibles des de la 1.7.10.
+    - Reescriure les notes de la versió en els tres idiomes, que encara diuen 1.7.10.
+    - Mirar el Baseline Profile.
+    - Esbrinar com es calcula el `versionCode`.
+    - Hi ha un esborrany sense commitejar, `.github/workflows/upload-aab.yml`, que només puja l'AAB al track triat. Si el `versionCode` surt del número de versió, és millor fer `release.yml` amb `track: internal` i promoure-ho des de la consola de Play.
