@@ -12,6 +12,7 @@ Android app to remember what I said, what people said to me and what happened wi
 - `docs/auto/`: plan for Android Auto (`README.md` with scope and decisions, `fases.md` with the phases).
 - `docs/navigation/README.md`: plan to make navigation behave like Caducity (single back stack, fixed floating toolbar).
 - `docs/pro/`: what is free forever and what will be Pro (behind feature flags); future paid-tier notes go here.
+- `docs/analytics/README.md`: opt-in usage statistics (not Pro); agnostic `Tracker`, Firebase is never initialized without consent.
 
 ## Stack
 

@@ -11,6 +11,7 @@ Què és gratis i què és Pro, i la regla, són a `docs/pro/README.md`. Disseny
 | 5 | Room v5 i flags de Canals propis i Pendents | — | Feta i validada (03-11-2026) |
 | 6 | Canals propis: camp «On» (7a, 7c), full «Nou canal» (7b), cronologia, exportar, Ajustos › Canals propis (7d) | 5 | Feta i validada (03-11-2026) |
 | 7 | Pendents com a tasques: formulari «Nova tasca» (9b, 9c), menú i secció al detall (9a, 9d–9h), marcar com a fet i comptador al llistat (9g) | 5 | Feta i validada (03-11-2026) |
+| 8 | Personalització sense Pro: píndola PRO a l'editor (11a), full «Avatar» amb prova (11b, 11c), baixada de Pro (11d), fila del color de la persona (11e) | — | Pendent |
 
 Canals propis i Pendents: lliurament de Claude Design del 02-11-2026 (`converses-canals-pendents.zip`, resumit a «Disseny · Canals propis i Pendents» del `README.md`). La personalització de l'avatar tindrà el seu lliurament i la seva fase.
 
@@ -176,3 +177,23 @@ El primer plantejament (estat `isPending` d'una entrada, amb la fila «Pendent»
 - [x] Detall: «Nova tasca» al menú amb PRO (9a), secció «Pendents» amb «+ Nova tasca» i estat buit (9d, 9h), marcar com a fet amb «Desfés» (9e), «Fets · N» (9f), editar i esborrar; tests de JVM (`PersonDetailViewModelTest`, `TaskLabelsTest`), captures i emulador (gratuït, Pro i baixada de Pro) — `3c267a0`
 - [x] Llistat (9g): pastilla amb `flag` i el nombre, mai a les protegides; captures i emulador — `c63c64d`
 - [x] `docs/pro/` i backlog 6 al dia — `c63c64d`
+
+## Fase 8 · Personalització sense Pro
+
+**Disseny:** lliurament de Claude Design del 03-11-2026, `~/Downloads/converses-analitica-avatar.zip`: `INSTRUCCIONS.md` §2 i `pantalles.html` (taulers 11a–11f, textos al 11f). Substitueix els estats `Locked` provisionals de l'avatar i del color de la persona (els de `~/Desktop/converses-pendent-disseny/`).
+
+### Decisions (03-11-2026)
+
+- Els flags `CustomAvatarFeature` i `PersonColorFeature` ja són encesos per defecte (`0a7c1a9`): sense Pro surten `Locked`.
+- **Editor (11a):** sense Pro, la píndola PRO (20 dp, radi 10, `primary`/`onPrimary`, 10 sp pes 800, vora de 2 dp del color de la targeta, a −10/−6 dp de la cantonada inferior dreta) substitueix el llapis. Es pot tocar i obre el full. contentDescription «Avatar. Funció Pro: canvia la forma i el color». Val per a persona nova i existent.
+- **Full «Avatar» (11b): «prova abans de comprar».** PRO al costat del títol; targeta amb `palette`, «Formes i colors amb Pro». Les opcions es veuen normals: les formes Pro porten un `lock` de 16 dp a dalt a la dreta; els colors Pro, un `lock` de 12 dp en un cercle de 18 dp del color de fons a baix a la dreta. Galeta i Automàtic són lliures. contentDescription «%s, Pro».
+- **Prova (11c):** tocar una opció Pro la previsualitza a l'avatar gran (no obre el paywall). Subtítol «Prova: forma · color» (liveRegion); la targeta passa a `primaryContainer` amb `workspace_premium`, «Així quedaria». «Fet» es converteix en «Desbloqueja amb Pro» (56 dp, obre el paywall amb `ProBenefit.People`) i «Descarta la prova» (botó de text). Triar opcions lliures treu la prova. Tancar el full (scrim o enrere) equival a descartar. Si compra, torna al full amb la prova aplicada i la pot desar. L'avatar de l'editor no canvia mai mentre es prova.
+- **Baixada de Pro (11d):** la forma i el color desats surten triats i sense cadenat; la targeta diu «Triat amb Pro». Triar Galeta o Automàtic i desar fa perdre la tria Pro; no s'esborra res més. A l'editor surt la tria desada amb la píndola PRO.
+- **Color de la persona (11e):** sense Pro (o després d'una baixada), PRO al costat del títol i `chevron_right` en lloc de l'interruptor, com «Canals propis»; tota la fila obre el paywall amb `ProBenefit.People`. Amb Pro, l'interruptor de sempre (apagat per defecte). Cap altre punt d'entrada. A la baixada, el tema de la persona s'apaga però la preferència queda desada i torna si torna a ser Pro.
+
+### Tasques
+
+- [ ] Editor: píndola PRO en lloc del llapis i contentDescription (11a); captures
+- [ ] Full «Avatar» sense Pro i en prova (11b, 11c) i baixada de Pro (11d): cadenats, targeta, prova, «Desbloqueja amb Pro», «Descarta la prova», tornada de la compra; tests de JVM de l'estat de prova, captures i emulador (gratuït, Pro, baixada)
+- [ ] Ajustos: fila «Color de la persona» amb PRO i `chevron_right` sense Pro (11e); captures i emulador
+- [ ] Textos de l'11f en en/ca/es; `docs/pro/` al dia
