@@ -27,7 +27,7 @@ Mai es cobra per **accedir, protegir o treure** les dades pròpies. Al Pro hi va
 | --- | --- | --- |
 | **Avatar personalitzat** (color i forma) | Forma fixa **Galeta** (`Cookie9Sided`) i color automàtic a partir del nom; no es poden canviar | Selector de color i forma a Editar persona / Nova persona |
 | **Canals propis** (backlog 8, `CustomChannelsFeature`) | Només els 5 grups; el camp «On» mostra «Canal propi» amb PRO | Canals globals dins de qualsevol grup, amb nom (únic dins del grup) i sense valor; es trien a l'entrada i es gestionen a Ajustos › Canals propis |
-| **Pendents** (backlog 6, `FollowUpsFeature`) | La fila «Pendent» mostra PRO | Marcar entrades com a pendents, secció «Pendents» al detall, marcar com a fet i comptador al llistat |
+| **Pendents** (backlog 6, `FollowUpsFeature`) | «Nova tasca» al menú del detall mostra PRO | Tasques per persona (formulari propi), secció «Pendents» al detall, marcar com a fet i comptador al llistat |
 | **Color de la persona** (tema del detall, `PersonColorFeature`) | No hi és: les pantalles de la persona usen el tema de l'app i l'avatar només té el color automàtic pel nom | Activar el tema que pren el color de l'avatar (i l'ajust «Color de la persona» a Ajustos) |
 | ~~**Contact integration**~~ | Retirada el novembre de 2026 (canvien els permisos de Contactes): s'ha tret tot el codi (vincle, compte local, sync adapter, files a Contactes) i les columnes de Room (v4) | — |
 
@@ -82,14 +82,13 @@ Lliurament de Claude Design del 02-11-2026 (`converses-canals-pendents.zip`: `pa
 - **Ajustos › Canals (7d):** secció «Canals» amb PRO entre Seguretat i Quant a, fila «Canals propis» (`forum`, «N canals dins dels grups»); gratuït → paywall. Pantalla amb TopAppBar («Canals propis» + PRO), text d'explicació, llista agrupada per grup (capçalera amb la icona del grup; fila amb nom, «N entrades» i `more_vert`: Reanomena, Canvia de grup, Esborra amb confirmació). Grups buits no surten. FAB estès «Nou canal» i nota al peu.
 - **Baixada de Pro:** les entrades conserven i mostren el canal; no se'n creen ni se'n trien de nous.
 
-### Pendents
+### Pendents (tasques, redisseny del 03-11-2026)
 
-- **Model:** estat d'una entrada (`isPending`, `doneAt`), no un tipus nou.
-- **Crear (P5):** fila «Pendent» a sota de «Quan» (`flag` en un cercle de 44 dp i interruptor); subtítol «Per fer-ne seguiment més endavant» / «Sortirà a dalt del detall fins que el marquis com a fet».
-- **Gratuït (7e):** PRO i `chevron_right` en lloc de l'interruptor, subtítol «Fes-ne seguiment amb Converses Pro»; tota la fila → paywall `pendents`.
-- **Detall (P6):** secció «Pendents» entre «Dades» i «Cronologia» (capçalera amb `flag` ple, títol i nombre); no surt si no n'hi ha. Fila de llista agrupada: cercle de 24 dp en àrea de 48 dp («Marca com a fet»), etiqueta «QUI · DIA · CANAL» i text. A la cronologia, etiqueta «PENDENT» amb `flag`.
-- **Marcar com a fet (7f):** surt de la secció i perd l'etiqueta, però es queda a la cronologia; snackbar «Marcat com a fet» amb «Desfés»; haptic `Confirm`.
-- **Llistat (P7):** pastilla `primary-container` amb `flag` i el nombre, al costat dels canals. Mai a les persones protegides.
-- **Baixada de Pro:** els que hi ha es veuen i es poden marcar com a fets; no se'n creen de nous.
+- **Model:** taula pròpia `task` (`personId`, `text`, `dueDate?`, `remind`, `createdAt`, `doneAt?`), independent de les entrades; no surten a la cronologia.
+- **Crear (9a, 9b, 9c):** «Nova tasca» és la primera opció del menú «Nota ▾» del detall (gratuït: PRO → paywall `pendents`) i el botó «+ Nova tasca» de la secció. Formulari a pantalla completa: «Amb qui» (ve triada), «Què has de fer?» amb enganxar, «Quan» cap al futur (Sense data, Avui, Demà, el proper dia rellevant, La setmana que ve, Tria dia…) i el botó fix «Guarda a pendents». «Avisa'm» queda per més endavant.
+- **Detall (9d, 9h):** secció «Pendents · N» entre «Dades» i «Cronologia»; amb Pro surt sempre (targeta buida si no n'hi ha). Fila: cercle «Marca com a fet» de 24 dp en 48 dp, etiqueta de data («DEMÀ», «DIVENDRES», «SENSE DATA», «FA 3 DIES», sense vermell) i text. Tocar la fila obre l'editor, amb l'opció d'esborrar.
+- **Marcar com a fet (9e, 9f):** snackbar «Marcat com a fet» amb «Desfés» i haptic `Confirm`; passa a «Fets · N», plegable, amb text ratllat i «FET AHIR». El check d'una feta la torna a pendents.
+- **Llistat (9g):** pastilla `primary-container` amb `flag` i el nombre, al costat dels canals. Mai a les persones protegides.
+- **Baixada de Pro:** les tasques es veuen i es marquen com a fetes; no se'n creen de noves (sense botó ni targeta buida).
 
 Textos ca, en i es al tauler 7g, més els del menú i el diàleg d'esborrar a `INSTRUCCIONS.md`.

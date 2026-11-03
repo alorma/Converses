@@ -310,4 +310,8 @@
     <string name="task_done_today">Done today</string>
     <string name="task_done_yesterday">Done yesterday</string>
     <string name="task_done_on">Done on %1$s</string>
+    <plurals name="tasks_open_count">
+        <item quantity="one">%1$d follow-up</item>
+        <item quantity="other">%1$d follow-ups</item>
+    </plurals>
 </resources>

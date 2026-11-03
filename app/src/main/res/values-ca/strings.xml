@@ -308,4 +308,8 @@
     <string name="task_done_today">Fet avui</string>
     <string name="task_done_yesterday">Fet ahir</string>
     <string name="task_done_on">Fet el %1$s</string>
+    <plurals name="tasks_open_count">
+        <item quantity="one">%1$d pendent</item>
+        <item quantity="other">%1$d pendents</item>
+    </plurals>
 </resources>

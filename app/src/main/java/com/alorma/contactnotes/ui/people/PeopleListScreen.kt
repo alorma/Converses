@@ -27,6 +27,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Archive
 import androidx.compose.material.icons.rounded.Check
+import androidx.compose.material.icons.rounded.Flag
 import androidx.compose.material.icons.rounded.Forum
 import androidx.compose.material.icons.rounded.Groups
 import androidx.compose.material.icons.rounded.Lock
@@ -37,6 +38,7 @@ import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -49,6 +51,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -59,6 +63,9 @@ import com.alorma.contactnotes.data.db.PersonEntity
 import com.alorma.contactnotes.data.db.PersonListItem
 import com.alorma.contactnotes.data.db.color
 import com.alorma.contactnotes.data.db.shape
+import com.alorma.contactnotes.data.flags.FeatureState
+import com.alorma.contactnotes.data.flags.FollowUpsFeature
+import com.alorma.contactnotes.data.flags.rememberFeatureState
 import com.alorma.contactnotes.designsystem.components.Avatar
 import com.alorma.contactnotes.designsystem.components.BetaBadge
 import com.alorma.contactnotes.designsystem.components.DashedActionRow
@@ -87,6 +94,7 @@ fun PeopleListRoute(
   PeopleListScreen(
     state = state,
     archived = archived,
+    showTasks = rememberFeatureState<FollowUpsFeature>() != FeatureState.Hidden,
     onFilterToggled = viewModel::onFilterToggled,
     onPersonClick = onPersonClick,
     onNewPerson = onNewPerson,
@@ -100,6 +108,8 @@ fun PeopleListScreen(
   onFilterToggled: (ChannelType) -> Unit,
   onPersonClick: (PersonEntity) -> Unit,
   onNewPerson: () -> Unit,
+  /** El comptador de tasques pendents (9g); amagat si el flag està apagat. */
+  showTasks: Boolean = false,
 ) {
   val listState = rememberLazyListState()
   // Drawn once the rows are laid out (or there is nothing to show), not just when the data arrives
@@ -176,7 +186,7 @@ fun PeopleListScreen(
         }
       }
       groupedItems(state.people, key = { it.person.id }) { item ->
-        PersonRow(item, onClick = { onPersonClick(item.person) })
+        PersonRow(item, showTasks = showTasks, onClick = { onPersonClick(item.person) })
       }
       if (!state.isLoading && !archived && state.people.isNotEmpty()) {
         item(key = "add_person") {
@@ -311,6 +321,7 @@ private fun FilterRow(
 @Composable
 private fun PersonRow(
   item: PersonListItem,
+  showTasks: Boolean,
   onClick: () -> Unit,
 ) {
   val person = item.person
@@ -368,15 +379,20 @@ private fun PersonRow(
         )
       } else {
         val channels = item.channels.distinct().sorted()
-        if (channels.isNotEmpty()) {
-          Text(
-            text = channels.map { channelName(it).uppercase() }.joinToString(" · "),
-            style = MaterialTheme.typography.labelMedium,
-            fontWeight = FontWeight.SemiBold,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-          )
+        val tasks = if (showTasks) item.openTasks else 0
+        if (channels.isNotEmpty() || tasks > 0) {
+          Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+            Text(
+              text = channels.map { channelName(it).uppercase() }.joinToString(" · "),
+              style = MaterialTheme.typography.labelMedium,
+              fontWeight = FontWeight.SemiBold,
+              color = MaterialTheme.colorScheme.onSurfaceVariant,
+              maxLines = 1,
+              overflow = TextOverflow.Ellipsis,
+              modifier = Modifier.weight(1f),
+            )
+            if (tasks > 0) TasksPill(tasks)
+          }
         }
         Text(
           text = item.lastEntry?.text ?: stringResource(R.string.no_entries_yet),
@@ -386,6 +402,27 @@ private fun PersonRow(
           overflow = TextOverflow.Ellipsis,
         )
       }
+    }
+  }
+}
+
+/** Pastilla `primaryContainer` amb `flag` i el nombre de tasques pendents (9g); mai a les protegides. */
+@Composable
+private fun TasksPill(count: Int) {
+  val description = pluralStringResource(R.plurals.tasks_open_count, count, count)
+  Surface(
+    shape = RoundedCornerShape(10.dp),
+    color = MaterialTheme.colorScheme.primaryContainer,
+    contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+    modifier = Modifier.clearAndSetSemantics { contentDescription = description },
+  ) {
+    Row(
+      modifier = Modifier.height(20.dp).padding(start = 4.dp, end = 7.dp),
+      verticalAlignment = Alignment.CenterVertically,
+      horizontalArrangement = Arrangement.spacedBy(2.dp),
+    ) {
+      Icon(Icons.Rounded.Flag, contentDescription = null, modifier = Modifier.size(14.dp))
+      Text(text = count.toString(), fontSize = 12.sp, fontWeight = FontWeight.Bold)
     }
   }
 }

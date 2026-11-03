@@ -40,6 +40,7 @@ import com.alorma.contactnotes.ui.paywall.PaywallPreview
 import com.alorma.contactnotes.ui.people.PeopleListScreenArchivedPreview
 import com.alorma.contactnotes.ui.people.PeopleListScreenEmptyPreview
 import com.alorma.contactnotes.ui.people.PeopleListScreenLoadedPreview
+import com.alorma.contactnotes.ui.people.PeopleListScreenTasksPreview
 import com.alorma.contactnotes.ui.person.AvatarColorProvider
 import com.alorma.contactnotes.ui.person.ConfirmDeleteDialogPreview
 import com.alorma.contactnotes.ui.person.EntryActionsDayPreview
@@ -530,5 +531,13 @@ class ScreensScreenshotTests {
   @Composable
   fun tasksSectionDone() {
     TasksSectionDonePreview()
+  }
+
+  @ScreenPreviews
+  @LocalizedScreenPreviews
+  @PreviewTest
+  @Composable
+  fun peopleListTasks() {
+    PeopleListScreenTasksPreview()
   }
 }

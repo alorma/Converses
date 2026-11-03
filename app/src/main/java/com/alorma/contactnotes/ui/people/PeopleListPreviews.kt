@@ -9,6 +9,7 @@ import com.alorma.contactnotes.ui.preview.PreviewData
 private fun PeopleListScreenPreview(
   state: PeopleListUiState,
   archived: Boolean = false,
+  showTasks: Boolean = false,
 ) {
   ConversesPreviewTheme {
     PeopleListScreen(
@@ -17,6 +18,7 @@ private fun PeopleListScreenPreview(
       onFilterToggled = {},
       onPersonClick = {},
       onNewPerson = {},
+      showTasks = showTasks,
     )
   }
 }
@@ -41,5 +43,17 @@ internal fun PeopleListScreenArchivedPreview() {
   PeopleListScreenPreview(
     PeopleListUiState(people = PreviewData.people.take(2), total = 2, isLoading = false),
     archived = true,
+  )
+}
+
+/** 9g: comptador de tasques pendents; la protegida (Luna) no el mostra encara que en tingui. */
+@Preview
+@Composable
+internal fun PeopleListScreenTasksPreview() {
+  val counts = listOf(2, 3, 1)
+  val people = PreviewData.people.mapIndexed { index, item -> item.copy(openTasks = counts.getOrElse(index) { 0 }) }
+  PeopleListScreenPreview(
+    PeopleListUiState(people = people, total = people.size, isLoading = false),
+    showTasks = true,
   )
 }

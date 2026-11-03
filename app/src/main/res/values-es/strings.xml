@@ -310,4 +310,8 @@
     <string name="task_done_today">Hecho hoy</string>
     <string name="task_done_yesterday">Hecho ayer</string>
     <string name="task_done_on">Hecho el %1$s</string>
+    <plurals name="tasks_open_count">
+        <item quantity="one">%1$d pendiente</item>
+        <item quantity="other">%1$d pendientes</item>
+    </plurals>
 </resources>
