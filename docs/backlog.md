@@ -17,6 +17,6 @@ Issue: [#5](https://github.com/alorma/Converses/issues/5)
 Poder marcar coses per fer-ne seguiment amb una persona ("li he de preguntar com li ha anat l'entrevista", "m'ha de tornar el llibre"...).
 
 - Redissenyat el 03-11-2026 com a **tasques**: taula pròpia `task`, formulari propi i fora de la cronologia; «Qui» (Jo · {nom} · Apunt) no canvia.
-- Pla, disseny i decisions: `docs/pro/` (fases 5 i 7). Fet a la fase 7 (formulari, detall i llistat); falta que Bernat la validi i la tanqui.
+- Pla, disseny i decisions: `docs/pro/` (fases 5 i 7). Fet a la fase 7 (formulari, detall i llistat), validada el 03-11-2026.
 - Més endavant: «Avisa'm» (notificació a les 9:00; la columna `remind` ja hi és).
 

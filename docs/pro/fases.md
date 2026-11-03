@@ -10,7 +10,7 @@ Què és gratis i què és Pro, i la regla, són a `docs/pro/README.md`. Disseny
 | 4 | Publicació: política de privacitat, seguretat de dades de Play, termes | 3 | Pendent |
 | 5 | Room v5 i flags de Canals propis i Pendents | — | Feta i validada (03-11-2026) |
 | 6 | Canals propis: camp «On» (7a, 7c), full «Nou canal» (7b), cronologia, exportar, Ajustos › Canals propis (7d) | 5 | Feta i validada (03-11-2026) |
-| 7 | Pendents: fila «Pendent» (P5, 7e), secció al detall (P6), marcar com a fet (7f), cronologia i comptador al llistat (P7) | 5 | Pendent |
+| 7 | Pendents com a tasques: formulari «Nova tasca» (9b, 9c), menú i secció al detall (9a, 9d–9h), marcar com a fet i comptador al llistat (9g) | 5 | Feta i validada (03-11-2026) |
 
 Canals propis i Pendents: lliurament de Claude Design del 02-11-2026 (`converses-canals-pendents.zip`, resumit a «Disseny · Canals propis i Pendents» del `README.md`). La personalització de l'avatar tindrà el seu lliurament i la seva fase.
 
@@ -165,8 +165,7 @@ El primer plantejament (estat `isPending` d'una entrada, amb la fila «Pendent»
 
 ### Handoff (03-11-2026)
 
-- **Estat (03-11-2026, tarda):** les quatre tasques de la fase 7 estan fetes i validades (JVM, ktlint, captures i emulador); falta que Bernat la validi i la tanqui. No s'ha pujat res des de `ed075af`.
-- **Per revisar:** les decisions «Decidit per Claude mentre Bernat era fora» de més amunt (dia rellevant, etiquetes de data i textos nous).
+- **Estat:** fase 7 feta, validada per Bernat i pujada el 03-11-2026. Les decisions «Decidit per Claude mentre Bernat era fora» queden acceptades.
 - **Pendent fora de la fase:** «Avisa'm» (backlog 6); el botó flotant de debug tapa l'acció «Desfés» del snackbar (només a debug).
 - **Disseny:** `~/Downloads/converses-canals-pendents.zip`, `INSTRUCCIONS.md` §2 i `pantalles.html` (taulers 9a–9h, textos al 7g). Textos ja decidits que es poden reaprofitar de l'historial (`git show 0108a61 -- app/src/main/res`): «Pendents», «Marca com a fet», «Marcat com a fet». La secció antiga del detall és a `git show 1f9a0f9:app/src/main/java/com/alorma/contactnotes/ui/person/FollowUpsSection.kt`.
 
