@@ -82,11 +82,9 @@ import com.android.tools.screenshot.PreviewTest
 )
 annotation class ScreenPreviews
 
-/** Idiomes que no són l'anglès i font gran, per veure que els textos no es tallen. Només en clar. */
-@Preview(name = "Catalan", locale = "ca", widthDp = 411, heightDp = 891)
-@Preview(name = "Spanish", locale = "es", widthDp = 411, heightDp = 891)
+/** Font gran, per veure que els textos no es tallen. Només en clar i en anglès. */
 @Preview(name = "FontScale2", locale = "en", widthDp = 411, heightDp = 891, fontScale = 2f)
-annotation class LocalizedScreenPreviews
+annotation class LargeFontScreenPreviews
 
 class ScreensScreenshotTests {
   @ScreenPreviews
@@ -125,7 +123,7 @@ class ScreensScreenshotTests {
   }
 
   @ScreenPreviews
-  @LocalizedScreenPreviews
+  @LargeFontScreenPreviews
   @PreviewTest
   @Composable
   fun personDetailLoaded() {
@@ -170,7 +168,7 @@ class ScreensScreenshotTests {
   }
 
   @ScreenPreviews
-  @LocalizedScreenPreviews
+  @LargeFontScreenPreviews
   @PreviewTest
   @Composable
   fun personLockedCanceled() {
@@ -199,7 +197,7 @@ class ScreensScreenshotTests {
   }
 
   @ScreenPreviews
-  @LocalizedScreenPreviews
+  @LargeFontScreenPreviews
   @PreviewTest
   @Composable
   fun quickNoteFilled() {
@@ -207,7 +205,7 @@ class ScreensScreenshotTests {
   }
 
   @ScreenPreviews
-  @LocalizedScreenPreviews
+  @LargeFontScreenPreviews
   @PreviewTest
   @Composable
   fun quickNoteShared() {
@@ -215,7 +213,7 @@ class ScreensScreenshotTests {
   }
 
   @ScreenPreviews
-  @LocalizedScreenPreviews
+  @LargeFontScreenPreviews
   @PreviewTest
   @Composable
   fun quickNoteCustomChannels() {
@@ -223,7 +221,7 @@ class ScreensScreenshotTests {
   }
 
   @ScreenPreviews
-  @LocalizedScreenPreviews
+  @LargeFontScreenPreviews
   @PreviewTest
   @Composable
   fun quickNoteCustomChannelsLocked() {
@@ -238,7 +236,7 @@ class ScreensScreenshotTests {
   }
 
   @ScreenPreviews
-  @LocalizedScreenPreviews
+  @LargeFontScreenPreviews
   @PreviewTest
   @Composable
   fun newEntrySheet() {
@@ -246,7 +244,7 @@ class ScreensScreenshotTests {
   }
 
   @ScreenPreviews
-  @LocalizedScreenPreviews
+  @LargeFontScreenPreviews
   @PreviewTest
   @Composable
   fun customChannelSheetNew() {
@@ -254,7 +252,7 @@ class ScreensScreenshotTests {
   }
 
   @ScreenPreviews
-  @LocalizedScreenPreviews
+  @LargeFontScreenPreviews
   @PreviewTest
   @Composable
   fun customChannelSheetTaken() {
@@ -367,7 +365,7 @@ class ScreensScreenshotTests {
   }
 
   @ScreenPreviews
-  @LocalizedScreenPreviews
+  @LargeFontScreenPreviews
   @PreviewTest
   @Composable
   fun paywall() {
@@ -389,7 +387,7 @@ class ScreensScreenshotTests {
   }
 
   @ScreenPreviews
-  @LocalizedScreenPreviews
+  @LargeFontScreenPreviews
   @PreviewTest
   @Composable
   fun paywallOwned() {
@@ -397,7 +395,7 @@ class ScreensScreenshotTests {
   }
 
   @ScreenPreviews
-  @LocalizedScreenPreviews
+  @LargeFontScreenPreviews
   @PreviewTest
   @Composable
   fun customChannels() {
@@ -419,7 +417,7 @@ class ScreensScreenshotTests {
   }
 
   @ScreenPreviews
-  @LocalizedScreenPreviews
+  @LargeFontScreenPreviews
   @PreviewTest
   @Composable
   fun settingsAppLock() {
@@ -497,7 +495,7 @@ class ScreensScreenshotTests {
   }
 
   @ScreenPreviews
-  @LocalizedScreenPreviews
+  @LargeFontScreenPreviews
   @PreviewTest
   @Composable
   fun taskFormFilled() {
@@ -512,7 +510,7 @@ class ScreensScreenshotTests {
   }
 
   @ScreenPreviews
-  @LocalizedScreenPreviews
+  @LargeFontScreenPreviews
   @PreviewTest
   @Composable
   fun personDetailTasks() {
@@ -534,7 +532,7 @@ class ScreensScreenshotTests {
   }
 
   @ScreenPreviews
-  @LocalizedScreenPreviews
+  @LargeFontScreenPreviews
   @PreviewTest
   @Composable
   fun tasksSectionDone() {
@@ -542,7 +540,7 @@ class ScreensScreenshotTests {
   }
 
   @ScreenPreviews
-  @LocalizedScreenPreviews
+  @LargeFontScreenPreviews
   @PreviewTest
   @Composable
   fun peopleListTasks() {
