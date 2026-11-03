@@ -166,7 +166,7 @@ El primer plantejament (estat `isPending` d'una entrada, amb la fila «Pendent»
 
 ### Tasques
 
-- [ ] Room v5 refeta i dades (unides): `TaskEntity` + `TaskDao`, sense `isPending`/`doneAt` a `entry`, `5.json` regenerat, repositori (`observeOpenTasks`, `observeDoneTasks`, `getTask`, `saveTask`, `deleteTask`, `markTaskDone`, `reopenTask`), `openTasks` al llistat, `FakeDb` amb `FakeTaskDao`, i desfets `be85bd8`, `0108a61` i `1f9a0f9` (revert). Tests de JVM i ktlint verds; **falta** `connectedDebugAndroidTest` a l'emulador (`MigrationTest`, `CustomChannelDaoTest`, `TaskDaoTest` nou; avisar Bernat abans, desinstal·la l'app) — `ed075af`
+- [x] Room v5 refeta i dades (unides): `TaskEntity` + `TaskDao`, sense `isPending`/`doneAt` a `entry`, `5.json` regenerat, repositori (`observeOpenTasks`, `observeDoneTasks`, `getTask`, `saveTask`, `deleteTask`, `markTaskDone`, `reopenTask`), `openTasks` al llistat, `FakeDb` amb `FakeTaskDao`, i desfets `be85bd8`, `0108a61` i `1f9a0f9` (revert). Tests de JVM i ktlint verds; `connectedDebugAndroidTest` a l'emulador (17/17: `MigrationTest`, `CustomChannelDaoTest`, `TaskDaoTest`) — `ed075af`
 - [ ] Formulari «Nova tasca» / edició (9b, 9c): persona, text amb enganxar, «Quan» en futur, «Guarda a pendents»; tests, captures i emulador
 - [ ] Detall: «Nova tasca» al menú amb PRO (9a), secció «Pendents» amb «+ Nova tasca» i estat buit (9d, 9h), marcar com a fet (9e), «Fets · N» (9f); tests, captures i emulador
 - [ ] Llistat (9g): pastilla amb `flag` i el nombre, mai a les protegides; captures i emulador
