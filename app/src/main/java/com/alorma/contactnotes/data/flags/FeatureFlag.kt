@@ -32,3 +32,13 @@ class CustomAvatarFeature(
 class PersonColorFeature(
   runner: FeatureFlagRunner,
 ) : FeatureFlag(runner, key = "person_color_enabled", pro = true)
+
+/** Canals propis (fase 6): camp «On», full «Nou canal» i Ajustos › Canals propis. */
+class CustomChannelsFeature(
+  runner: FeatureFlagRunner,
+) : FeatureFlag(runner, key = "custom_channels_enabled", pro = true)
+
+/** Pendents (fase 7): fila «Pendent», secció al detall, marcar com a fet i comptador al llistat. */
+class FollowUpsFeature(
+  runner: FeatureFlagRunner,
+) : FeatureFlag(runner, key = "follow_ups_enabled", pro = true)

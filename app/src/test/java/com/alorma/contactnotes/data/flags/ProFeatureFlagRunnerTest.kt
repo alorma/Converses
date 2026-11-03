@@ -70,6 +70,18 @@ class ProFeatureFlagRunnerTest {
   }
 
   @Test
+  fun customChannelsAndFollowUpsAreHiddenThenLockedThenUnlocked() {
+    listOf(CustomChannelsFeature(runner), FollowUpsFeature(runner)).forEach { flag ->
+      assertEquals(flag.key, FeatureState.Hidden, flag.state())
+      local.setOverride(flag.key, true)
+      assertEquals(flag.key, FeatureState.Locked, flag.state())
+      pro.setPro(true)
+      assertEquals(flag.key, FeatureState.Unlocked, flag.state())
+      pro.setPro(false)
+    }
+  }
+
+  @Test
   fun changesEmitWhenProChanges() {
     val before = runner.changes.value
     pro.setPro(true)
