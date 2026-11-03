@@ -21,7 +21,7 @@ abstract class FeatureFlagRunner {
 }
 
 /**
- * Cada flag val el seu valor per defecte (a la v1, apagat) tret que s'hi hagi posat un override. Els overrides els
+ * Cada flag val el seu valor per defecte (encès per a les funcions acabades, apagat per a les que són a mitges) tret que s'hi hagi posat un override. Els overrides els
  * posa només el menú de debug. Les lectures són de memòria; cada canvi es passa a [persist] perquè es conservi.
  * No sap res de Pro: un flag encès és [FeatureState.Unlocked].
  */

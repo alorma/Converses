@@ -8,6 +8,9 @@ import kotlinx.coroutines.flow.map
  * Una funció que es pot amagar o mostrar, al estil de FireAndForget: cada flag defineix la seva clau i el valor per
  * defecte, i el [FeatureFlagRunner] diu en quin [FeatureState] és. Una funció apagada simplement no hi és; una de Pro
  * encesa, sense Pro, és [FeatureState.Locked].
+ *
+ * Una funció acabada té el flag encès per defecte i, si és Pro, queda només darrere del Pro; una de nova o a mitges
+ * neix apagada i s'encén des del menú de debug fins que està llesta.
  */
 abstract class FeatureFlag(
   val runner: FeatureFlagRunner,
@@ -27,18 +30,18 @@ abstract class FeatureFlag(
 
 class CustomAvatarFeature(
   runner: FeatureFlagRunner,
-) : FeatureFlag(runner, key = "custom_avatar_enabled", pro = true)
+) : FeatureFlag(runner, key = "custom_avatar_enabled", defaultValue = true, pro = true)
 
 class PersonColorFeature(
   runner: FeatureFlagRunner,
-) : FeatureFlag(runner, key = "person_color_enabled", pro = true)
+) : FeatureFlag(runner, key = "person_color_enabled", defaultValue = true, pro = true)
 
 /** Canals propis (fase 6): camp «On», full «Nou canal» i Ajustos › Canals propis. */
 class CustomChannelsFeature(
   runner: FeatureFlagRunner,
-) : FeatureFlag(runner, key = "custom_channels_enabled", pro = true)
+) : FeatureFlag(runner, key = "custom_channels_enabled", defaultValue = true, pro = true)
 
-/** Pendents (fase 7): fila «Pendent», secció al detall, marcar com a fet i comptador al llistat. */
+/** Pendents (fase 7): tasques, secció al detall, marcar com a fet i comptador al llistat. */
 class FollowUpsFeature(
   runner: FeatureFlagRunner,
-) : FeatureFlag(runner, key = "follow_ups_enabled", pro = true)
+) : FeatureFlag(runner, key = "follow_ups_enabled", defaultValue = true, pro = true)

@@ -14,8 +14,8 @@ class FeatureFlagTest {
   private val all = listOf(avatar, personColor, channels, followUps)
 
   @Test
-  fun everythingIsOffByDefault() {
-    all.forEach { assertFalse(it.key, it.isEnabled()) }
+  fun everyFinishedFeatureIsOnByDefault() {
+    all.forEach { assertTrue(it.key, it.isEnabled()) }
   }
 
   @Test
@@ -26,23 +26,23 @@ class FeatureFlagTest {
 
   @Test
   fun eachFlagIsOverriddenIndependently() {
-    runner.setOverride(avatar.key, true)
-    runner.setOverride(personColor.key, true)
-    assertTrue(avatar.isEnabled())
-    assertTrue(personColor.isEnabled())
+    runner.setOverride(avatar.key, false)
+    runner.setOverride(personColor.key, false)
+    assertFalse(avatar.isEnabled())
+    assertFalse(personColor.isEnabled())
 
     runner.clearOverride(avatar.key)
-    assertFalse(avatar.isEnabled())
-    assertTrue(personColor.isEnabled())
+    assertTrue(avatar.isEnabled())
+    assertFalse(personColor.isEnabled())
 
     runner.clearAllOverrides()
-    assertFalse(personColor.isEnabled())
+    assertTrue(personColor.isEnabled())
   }
 
   @Test
   fun changesEmitWhenAnOverrideChanges() {
     val before = runner.changes.value
-    runner.setOverride(personColor.key, true)
+    runner.setOverride(personColor.key, false)
     assertNotEquals(before, runner.changes.value)
   }
 
@@ -50,12 +50,12 @@ class FeatureFlagTest {
   fun overridesArePersistedAndRestored() {
     var saved: Map<String, Boolean> = emptyMap()
     val first = LocalFeatureFlagRunner(persist = { saved = it })
-    first.setOverride(avatar.key, true)
+    first.setOverride(avatar.key, false)
     first.setOverride(personColor.key, false)
     first.clearOverride(personColor.key)
 
     val restored = LocalFeatureFlagRunner(initial = saved)
-    assertTrue(CustomAvatarFeature(restored).isEnabled())
+    assertFalse(CustomAvatarFeature(restored).isEnabled())
     assertFalse(restored.hasOverride(personColor.key))
   }
 

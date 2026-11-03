@@ -1,6 +1,6 @@
 # Converses — Versió gratuïta (v1) i Pro
 
-Què queda fora de la versió gratuïta, perquè passarà a ser Pro, i què es queda gratis per sempre. **La v1 (publicada) no té Pro:** les funcions Pro existeixen al codi però són darrere de feature flags apagats. Document de treball per al Pro.
+Què queda fora de la versió gratuïta, perquè passarà a ser Pro, i què es queda gratis per sempre. **La v1 (publicada) no té Pro:** les funcions Pro existeixen al codi, darrere de feature flags Pro (encesos per defecte: sense Pro es veuen amb l'etiqueta PRO). Document de treball per al Pro.
 
 Model previst per al Pro: **pagament únic**, sense subscripció i sense anuncis. La compra es farà amb **RevenueCat**: un producte no consumible (`lifetime`) i un entitlement `converses_pro`; el codi consulta l'entitlement, mai el producte. Sense compte: RevenueCat fa servir el seu identificador anònim i no rep mai notes ni persones. Fases a `docs/pro/fases.md`.
 
@@ -33,7 +33,7 @@ Mai es cobra per **accedir, protegir o treure** les dades pròpies. Al Pro hi va
 
 ## Fet a la v1 gratuïta
 
-- **Feature flags** (`data/flags/`): `CustomAvatarFeature` i `PersonColorFeature`, tots dos apagats. `CustomChannelsFeature` i `FollowUpsFeature` s'afegeixen a la fase 5. Cada flag Pro és `Hidden`, `Locked` o `Unlocked` segons el flag i el `ProRepository` (`docs/pro/fases.md`, «Model»); al menú de debug, l'apartat Pro ensenya l'estat de RevenueCat (Test Store) i permet fer override, i «Turn on every Pro flag» obre tots els flags. A release, Pro surt de RevenueCat (fase 2).
+- **Feature flags** (`data/flags/`): `CustomAvatarFeature`, `PersonColorFeature`, `CustomChannelsFeature` i `FollowUpsFeature`, tots quatre Pro i **encesos per defecte** des del 3 de novembre de 2026: són funcions acabades i a release només depenen del Pro (`Locked` sense Pro, `Unlocked` amb Pro). El sistema de flags es manté per encendre i apagar funcions des del menú de debug; una funció nova o a mitges neix amb el flag apagat. Cada flag Pro és `Hidden`, `Locked` o `Unlocked` segons el flag i el `ProRepository` (`docs/pro/fases.md`, «Model»); al menú de debug, l'apartat Pro ensenya l'estat de RevenueCat (Test Store) i permet fer override, i «Turn on every Pro flag» obre tots els flags. A release, Pro surt de RevenueCat (fase 2).
 - **Avatar estàndard:** Galeta i color automàtic pel nom (`AvatarColor.forName`); `avatarShape` i `avatarColor` nul·lables (`null` = estàndard).
 - **Editor:** sense targeta d'avatar; l'avatar és a la fila del nom i, amb `CustomAvatarFeature`, obre el full «Avatar».
 - **Canals propis (fase 6, darrere de `CustomChannelsFeature`):** targeta sota «On» (7a, 7c) amb el full «Nou canal» / «Edita el canal» (7b), nom del canal a la cronologia, al full d'accions i a l'exportació, i Ajustos › Canals propis (7d). La nota ràpida i la nova entrada prenen per defecte el canal de l'última entrada (només amb Pro).
