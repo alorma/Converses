@@ -217,6 +217,7 @@
     <string name="onb_sample_3_label">NOTE · YESTERDAY · IN PERSON</string>
     <string name="onb_sample_3_text">Tea with the gang.</string>
     <string name="avatar_edit_cd">Change avatar shape and colour</string>
+    <string name="avatar_edit_locked_cd">Avatar. Pro feature: change shape and colour</string>
     <string name="avatar_sheet_title">Avatar</string>
     <string name="avatar_shape">Shape</string>
     <string name="avatar_color">Colour</string>

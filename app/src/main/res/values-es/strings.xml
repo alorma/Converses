@@ -215,6 +215,7 @@
     <string name="onb_sample_3_label">APUNTE · AYER · EN PERSONA</string>
     <string name="onb_sample_3_text">Paella con la pandilla.</string>
     <string name="avatar_edit_cd">Cambia la forma y el color del avatar</string>
+    <string name="avatar_edit_locked_cd">Avatar. Función Pro: cambia la forma y el color</string>
     <string name="avatar_sheet_title">Avatar</string>
     <string name="avatar_shape">Forma</string>
     <string name="avatar_color">Color</string>

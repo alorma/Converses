@@ -190,3 +190,19 @@ internal fun AvatarSheetAutoPreview() = AvatarSheetPreview(shape = null, color =
 @Preview
 @Composable
 internal fun AvatarSheetCustomPreview() = AvatarSheetPreview(shape = AvatarShape.Clover8Leaf, color = AvatarColor.Rose)
+
+/** Sense Pro (11a): la píndola PRO en lloc del llapis; l'avatar es pot tocar i obre el full. */
+@Preview
+@Composable
+internal fun EditPersonLockedAvatarPreview() {
+  EditPersonPreview(
+    EditPersonUiState(
+      isNew = false,
+      loaded = true,
+      name = "Helena",
+      alias = "Dax",
+      entryCount = 3,
+    ),
+    customAvatar = FeatureState.Locked,
+  )
+}

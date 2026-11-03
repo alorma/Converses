@@ -51,6 +51,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.alorma.contactnotes.R
 import com.alorma.contactnotes.designsystem.components.ProBadge
+import com.alorma.contactnotes.designsystem.components.ProPill
 import com.alorma.contactnotes.designsystem.components.asShape
 import com.alorma.contactnotes.designsystem.components.color
 import com.alorma.contactnotes.designsystem.theme.SheetTitleStyle
@@ -106,7 +107,10 @@ internal fun EditorAvatar(
   }
 }
 
-/** Avatar de la fila del nom: amb Pro és un botó amb una insígnia d'edició que obre el full «Avatar». */
+/**
+ * Avatar de la fila del nom: és un botó que obre el full «Avatar». Amb Pro porta la insígnia d'edició; sense Pro
+ * ([locked]), la píndola PRO (11a).
+ */
 @Composable
 internal fun NameAvatar(
   name: String,
@@ -115,8 +119,9 @@ internal fun NameAvatar(
   editable: Boolean,
   onClick: () -> Unit,
   badgeBorder: Color,
+  locked: Boolean = false,
 ) {
-  val description = stringResource(R.string.avatar_edit_cd)
+  val description = stringResource(if (locked) R.string.avatar_edit_locked_cd else R.string.avatar_edit_cd)
   // El clic es retalla amb la forma de l'avatar, no amb un cercle: si no, es mengen les puntes de la forma
   val avatarShape = shape.asShape()
   Box(modifier = Modifier.size(56.dp)) {
@@ -137,7 +142,13 @@ internal fun NameAvatar(
     ) {
       EditorAvatar(name = name, shape = shape, color = color, size = 56.dp, initialsSize = 20)
     }
-    if (editable) {
+    if (editable && locked) {
+      ProPill(
+        text = stringResource(R.string.pro_badge),
+        borderColor = badgeBorder,
+        modifier = Modifier.align(Alignment.BottomEnd).offset(x = 10.dp, y = 6.dp),
+      )
+    } else if (editable) {
       Box(
         modifier =
           Modifier

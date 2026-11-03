@@ -234,6 +234,7 @@ fun EditPersonContent(
                 editable = customAvatar != FeatureState.Hidden,
                 onClick = { showAvatarSheet = true },
                 badgeBorder = GroupedListDefaults.containerColor,
+                locked = customAvatar == FeatureState.Locked,
               )
               LabeledField(
                 label = stringResource(R.string.field_name),
