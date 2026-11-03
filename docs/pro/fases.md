@@ -159,14 +159,14 @@ El primer plantejament (estat `isPending` d'una entrada, amb la fila «Pendent»
 
 ### Handoff (03-11-2026)
 
-- **Estat:** la primera tasca (base de dades i dades, amb el revert dels tres commits del primer plantejament) és al commit `57a4d29`, pujat a petició de Bernat amb els tests de l'emulador encara pendents.
+- **Estat:** la primera tasca (base de dades i dades, amb el revert dels tres commits del primer plantejament) és al commit `ed075af`, pujat a petició de Bernat amb els tests de l'emulador encara pendents.
 - **Següent pas:** avisar Bernat, esborrar les dades de l'app `.dev` a l'emulador (la v5 vella fa petar Room per hash), executar `ANDROID_SERIAL=<emulador> ./gradlew :app:connectedDebugAndroidTest` i, si passa, marcar la tasca; si falla, arreglar-ho en un commit nou. Després, el formulari (9b, 9c).
 - **Disseny:** `~/Downloads/converses-canals-pendents.zip`, `INSTRUCCIONS.md` §2 i `pantalles.html` (taulers 9a–9h, textos al 7g). Textos ja decidits que es poden reaprofitar de l'historial (`git show 0108a61 -- app/src/main/res`): «Pendents», «Marca com a fet», «Marcat com a fet». La secció antiga del detall és a `git show 1f9a0f9:app/src/main/java/com/alorma/contactnotes/ui/person/FollowUpsSection.kt`.
 - **Formulari (9b, 9c):** pantalla completa, TopAppBar Medium «Nova tasca», «AMB QUI» (ve triada des del detall), «Què has de fer?» amb enganxar, «Quan» amb xips cap al futur (Sense data, Avui, Demà, proper dia rellevant, La setmana que ve, Tria dia… amb només dates futures), sense «Avisa'm» (més endavant), botó fix «Guarda a pendents» amb `flag`. Sense «Qui» ni «On». Ruta nova (p. ex. `TaskRoute(personId, taskId?)`); en mode edició, opció d'esborrar. `dueDate` és `LocalDate.toEpochDay()`.
 
 ### Tasques
 
-- [ ] Room v5 refeta i dades (unides): `TaskEntity` + `TaskDao`, sense `isPending`/`doneAt` a `entry`, `5.json` regenerat, repositori (`observeOpenTasks`, `observeDoneTasks`, `getTask`, `saveTask`, `deleteTask`, `markTaskDone`, `reopenTask`), `openTasks` al llistat, `FakeDb` amb `FakeTaskDao`, i desfets `be85bd8`, `0108a61` i `1f9a0f9` (revert). Tests de JVM i ktlint verds; **falta** `connectedDebugAndroidTest` a l'emulador (`MigrationTest`, `CustomChannelDaoTest`, `TaskDaoTest` nou; avisar Bernat abans, desinstal·la l'app) — `57a4d29`
+- [ ] Room v5 refeta i dades (unides): `TaskEntity` + `TaskDao`, sense `isPending`/`doneAt` a `entry`, `5.json` regenerat, repositori (`observeOpenTasks`, `observeDoneTasks`, `getTask`, `saveTask`, `deleteTask`, `markTaskDone`, `reopenTask`), `openTasks` al llistat, `FakeDb` amb `FakeTaskDao`, i desfets `be85bd8`, `0108a61` i `1f9a0f9` (revert). Tests de JVM i ktlint verds; **falta** `connectedDebugAndroidTest` a l'emulador (`MigrationTest`, `CustomChannelDaoTest`, `TaskDaoTest` nou; avisar Bernat abans, desinstal·la l'app) — `ed075af`
 - [ ] Formulari «Nova tasca» / edició (9b, 9c): persona, text amb enganxar, «Quan» en futur, «Guarda a pendents»; tests, captures i emulador
 - [ ] Detall: «Nova tasca» al menú amb PRO (9a), secció «Pendents» amb «+ Nova tasca» i estat buit (9d, 9h), marcar com a fet (9e), «Fets · N» (9f); tests, captures i emulador
 - [ ] Llistat (9g): pastilla amb `flag` i el nombre, mai a les protegides; captures i emulador
