@@ -157,7 +157,7 @@ Al menú de debug, l'apartat **Pro** té un sol interruptor, «Pro user», que e
 ### Tasques
 
 - [x] Estat i desament: `pending` a `EntryFormState`; el desen la nota ràpida, la nova entrada i l'edició; `setOpenFollowUp` al repositori; tests de JVM — `be85bd8`
-- [ ] Fila «Pendent» a l'`EntryForm` (P5 `Unlocked`, 7e `Locked` → paywall `FollowUps`, `Hidden` no surt); captures i emulador
+- [x] Fila «Pendent» a l'`EntryForm` (P5 `Unlocked`, 7e `Locked` → paywall `FollowUps`, `Hidden` no surt); captures i emulador — `0108a61`
 - [ ] Detall: secció «Pendents» (P6), etiqueta PENDENT a la cronologia, marcar com a fet (7f) amb «Desfés» i haptic; tests, captures i emulador
 - [ ] Full d'accions: «Marca com a pendent» / «Treu de pendents»; tests, captures i emulador
 - [ ] Llistat (P7): pastilla amb `flag` i el nombre, mai a les protegides; captures i emulador

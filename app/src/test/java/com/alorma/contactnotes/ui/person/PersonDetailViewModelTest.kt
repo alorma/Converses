@@ -315,4 +315,57 @@ class PersonDetailViewModelTest {
           .isPending,
       )
     }
+
+  @Test
+  fun openFollowUpsAreListedAndMarkingOneDoneRemovesItUntilUndone() =
+    runTest {
+      val open = db.addEntry(person.id, text = "ask", isPending = true)
+      db.addEntry(person.id, text = "done", isPending = true, doneAt = 1)
+      db.addEntry(person.id, text = "plain")
+      val vm = viewModel()
+
+      assertEquals(
+        listOf("ask"),
+        vm.uiState.value.followUps
+          .map { it.text },
+      )
+
+      vm.markFollowUpDone(open)
+      assertTrue(
+        vm.uiState.value.followUps
+          .isEmpty(),
+      )
+      assertEquals(3, vm.uiState.value.entries.size)
+
+      vm.undoFollowUpDone(open)
+      assertEquals(
+        listOf("ask"),
+        vm.uiState.value.followUps
+          .map { it.text },
+      )
+    }
+
+  @Test
+  fun theActionsSheetSetsAndRemovesAFollowUp() =
+    runTest {
+      val entry = db.addEntry(person.id)
+      val vm = viewModel()
+
+      vm.setOpenFollowUp(entry, open = true)
+      assertEquals(
+        listOf(entry.id),
+        vm.uiState.value.followUps
+          .map { it.id },
+      )
+
+      vm.setOpenFollowUp(
+        vm.uiState.value.followUps
+          .single(),
+        open = false,
+      )
+      assertTrue(
+        vm.uiState.value.followUps
+          .isEmpty(),
+      )
+    }
 }

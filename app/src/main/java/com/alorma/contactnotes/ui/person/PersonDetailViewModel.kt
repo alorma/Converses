@@ -30,6 +30,8 @@ data class PersonDetailUiState(
   val entries: List<EntryEntity> = emptyList(),
   /** Noms dels canals propis per id, per mostrar-los a la cronologia en lloc del grup. */
   val customChannelNames: Map<Long, String> = emptyMap(),
+  /** Pendents sense fer (P6), els més nous primer. */
+  val followUps: List<EntryEntity> = emptyList(),
   val selectedKinds: Set<EntryKind> = EntryKind.entries.toSet(),
   val saidCount: Int = 0,
   val heardCount: Int = 0,
@@ -79,6 +81,8 @@ class PersonDetailViewModel(
       )
     }.combine(repository.observeCustomChannels()) { state, channels ->
       state.copy(customChannelNames = channels.associate { it.channel.id to it.channel.name })
+    }.combine(repository.observeOpenFollowUps(personId)) { state, followUps ->
+      state.copy(followUps = followUps)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), PersonDetailUiState())
 
   /** Persones a les quals es pot moure una entrada. */
@@ -134,6 +138,24 @@ class PersonDetailViewModel(
           ).withOpenFollowUp(pending),
       )
     }
+  }
+
+  /** «Marca com a fet» (7f); funciona també sense Pro. */
+  fun markFollowUpDone(entry: EntryEntity) {
+    viewModelScope.launch { repository.markFollowUpDone(entry) }
+  }
+
+  /** «Desfés» del snackbar de «Marcat com a fet». */
+  fun undoFollowUpDone(entry: EntryEntity) {
+    viewModelScope.launch { repository.undoFollowUpDone(entry) }
+  }
+
+  /** Full d'accions: «Marca com a pendent» o «Treu de pendents». */
+  fun setOpenFollowUp(
+    entry: EntryEntity,
+    open: Boolean,
+  ) {
+    viewModelScope.launch { repository.setOpenFollowUp(entry, open) }
   }
 
   fun moveEntry(

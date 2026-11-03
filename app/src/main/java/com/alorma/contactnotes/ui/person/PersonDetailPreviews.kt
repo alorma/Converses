@@ -7,6 +7,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import com.alorma.contactnotes.data.db.color
+import com.alorma.contactnotes.data.flags.FeatureState
 import com.alorma.contactnotes.designsystem.preview.ConversesPreviewTheme
 import com.alorma.contactnotes.designsystem.theme.PersonTheme
 import com.alorma.contactnotes.shared.AvatarColor
@@ -14,7 +15,10 @@ import com.alorma.contactnotes.shared.EntryKind
 import com.alorma.contactnotes.ui.preview.PreviewData
 
 @Composable
-private fun PersonDetailScreenPreview(state: PersonDetailUiState) {
+private fun PersonDetailScreenPreview(
+  state: PersonDetailUiState,
+  followUps: FeatureState = FeatureState.Hidden,
+) {
   ConversesPreviewTheme {
     PersonTheme(state.person?.color) {
       PersonDetailScreen(
@@ -31,6 +35,7 @@ private fun PersonDetailScreenPreview(state: PersonDetailUiState) {
         onExport = {},
         onToggleArchived = {},
         snackbarHostState = remember { SnackbarHostState() },
+        followUps = followUps,
       )
     }
   }
@@ -50,6 +55,27 @@ internal fun PersonDetailScreenLoadedPreview() {
       happenedCount = PreviewData.martaEntries.count { it.kind == EntryKind.HAPPENED },
       isLoading = false,
     ),
+  )
+}
+
+/** Pendents (P6): secció entre «Dades» i «Cronologia» i etiqueta PENDENT a la cronologia. */
+@Preview
+@Composable
+internal fun PersonDetailScreenFollowUpsPreview() {
+  val entries = PreviewData.martaEntries.mapIndexed { index, entry -> entry.copy(isPending = index < 2) }
+  PersonDetailScreenPreview(
+    PersonDetailUiState(
+      person = PreviewData.marta,
+      channels = PreviewData.martaChannels,
+      facts = PreviewData.martaFacts,
+      entries = entries,
+      followUps = entries.filter { it.isPending },
+      saidCount = 1,
+      heardCount = 1,
+      happenedCount = entries.count { it.kind == EntryKind.HAPPENED },
+      isLoading = false,
+    ),
+    followUps = FeatureState.Unlocked,
   )
 }
 

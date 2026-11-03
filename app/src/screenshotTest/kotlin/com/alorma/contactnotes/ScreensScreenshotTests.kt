@@ -50,6 +50,7 @@ import com.alorma.contactnotes.ui.person.MoveEntryDialogPreview
 import com.alorma.contactnotes.ui.person.PersonDetailScreenCustomChannelPreview
 import com.alorma.contactnotes.ui.person.PersonDetailScreenEmptyPreview
 import com.alorma.contactnotes.ui.person.PersonDetailScreenFilteredEmptyPreview
+import com.alorma.contactnotes.ui.person.PersonDetailScreenFollowUpsPreview
 import com.alorma.contactnotes.ui.person.PersonDetailScreenLoadedPreview
 import com.alorma.contactnotes.ui.person.PersonDetailScreenSingleFactPreview
 import com.alorma.contactnotes.ui.person.PersonDetailScreenThemedPreview
@@ -123,6 +124,14 @@ class ScreensScreenshotTests {
   @Composable
   fun personDetailLoaded() {
     PersonDetailScreenLoadedPreview()
+  }
+
+  @ScreenPreviews
+  @LocalizedScreenPreviews
+  @PreviewTest
+  @Composable
+  fun personDetailFollowUps() {
+    PersonDetailScreenFollowUpsPreview()
   }
 
   @ScreenPreviews
