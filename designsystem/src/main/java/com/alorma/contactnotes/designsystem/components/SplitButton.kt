@@ -88,17 +88,19 @@ fun ConversesSplitButton(
   }
 }
 
-/** Element del menú del split button: 52 dp d'alçada i icona en `onSurfaceVariant`. */
+/** Element del menú del split button: 52 dp d'alçada i icona en `onSurfaceVariant`; [trailing] va a la dreta (p. ex. l'etiqueta PRO). */
 @Composable
 fun ConversesMenuItem(
   text: String,
   icon: ImageVector,
   onClick: () -> Unit,
   modifier: Modifier = Modifier,
+  trailing: (@Composable () -> Unit)? = null,
 ) {
   DropdownMenuItem(
     text = { Text(text) },
     leadingIcon = { Icon(icon, contentDescription = null) },
+    trailingIcon = trailing,
     onClick = onClick,
     modifier = modifier.heightIn(min = 52.dp),
     colors = MenuDefaults.itemColors(leadingIconColor = MaterialTheme.colorScheme.onSurfaceVariant),

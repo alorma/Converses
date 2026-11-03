@@ -6,6 +6,7 @@ import com.alorma.contactnotes.data.ConversesRepository
 import com.alorma.contactnotes.data.db.EntryEntity
 import com.alorma.contactnotes.data.db.PersonEntity
 import com.alorma.contactnotes.data.db.PinnedFactEntity
+import com.alorma.contactnotes.data.db.TaskEntity
 import com.alorma.contactnotes.shared.ChannelType
 import com.alorma.contactnotes.shared.EntryKind
 import com.alorma.contactnotes.ui.entry.EntryChannel
@@ -28,6 +29,10 @@ data class PersonDetailUiState(
   val entries: List<EntryEntity> = emptyList(),
   /** Noms dels canals propis per id, per mostrar-los a la cronologia en lloc del grup. */
   val customChannelNames: Map<Long, String> = emptyMap(),
+  /** Tasques pendents (9d), en l'ordre del DAO: amb data primer, de la més antiga a la més nova. */
+  val openTasks: List<TaskEntity> = emptyList(),
+  /** Tasques fetes (9f), de la més recent a la més antiga. */
+  val doneTasks: List<TaskEntity> = emptyList(),
   val selectedKinds: Set<EntryKind> = EntryKind.entries.toSet(),
   val saidCount: Int = 0,
   val heardCount: Int = 0,
@@ -77,6 +82,10 @@ class PersonDetailViewModel(
       )
     }.combine(repository.observeCustomChannels()) { state, channels ->
       state.copy(customChannelNames = channels.associate { it.channel.id to it.channel.name })
+    }.combine(
+      combine(repository.observeOpenTasks(personId), repository.observeDoneTasks(personId), ::Pair),
+    ) { state, (open, done) ->
+      state.copy(openTasks = open, doneTasks = done)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), PersonDetailUiState())
 
   /** Persones a les quals es pot moure una entrada. */
@@ -155,6 +164,15 @@ class PersonDetailViewModel(
       val (from, to) = dayRange(entry)
       repository.deleteEntriesInRange(personId, entry.channelType, from, to)
     }
+  }
+
+  fun markTaskDone(task: TaskEntity) {
+    viewModelScope.launch { repository.markTaskDone(task) }
+  }
+
+  /** «Desfés» del snackbar o el check d'una feta. */
+  fun reopenTask(task: TaskEntity) {
+    viewModelScope.launch { repository.reopenTask(task) }
   }
 
   fun setArchived(

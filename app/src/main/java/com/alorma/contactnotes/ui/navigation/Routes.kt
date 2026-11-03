@@ -61,3 +61,10 @@ data class PaywallRoute(
 /** Ajustos › Canals propis (7d): només hi arriba qui té Pro; sense, la fila d'Ajustos porta al paywall. */
 @Serializable
 data object CustomChannelsRoute : AppRoute
+
+/** Formulari de tasca (Pro): nova per a [personId] o, amb [taskId], edició. S'hi arriba des del detall. */
+@Serializable
+data class TaskRoute(
+  val personId: Long,
+  val taskId: Long = 0L,
+) : AppRoute

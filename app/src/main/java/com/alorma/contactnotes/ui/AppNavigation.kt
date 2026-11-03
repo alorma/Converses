@@ -42,6 +42,7 @@ import com.alorma.contactnotes.ui.navigation.PersonLockedRoute
 import com.alorma.contactnotes.ui.navigation.PersonRoute
 import com.alorma.contactnotes.ui.navigation.QuickNoteRoute
 import com.alorma.contactnotes.ui.navigation.SettingsRoute
+import com.alorma.contactnotes.ui.navigation.TaskRoute
 import com.alorma.contactnotes.ui.navigation.TopLevelBackStack
 import com.alorma.contactnotes.ui.navigation.TopLevelRoute
 import com.alorma.contactnotes.ui.onboarding.OnboardingScreen
@@ -52,6 +53,7 @@ import com.alorma.contactnotes.ui.person.PersonDetailRoute
 import com.alorma.contactnotes.ui.person.PersonLockedScreen
 import com.alorma.contactnotes.ui.settings.CustomChannelsScreen
 import com.alorma.contactnotes.ui.settings.SettingsScreen
+import com.alorma.contactnotes.ui.task.TaskFormScreen
 import org.koin.compose.koinInject
 
 @Composable
@@ -116,6 +118,14 @@ fun AppNavigation(
               onOpenPro = { navigation.navigate(PaywallRoute(ProBenefit.Channels)) },
             )
           }
+          entry<TaskRoute>(metadata = modalTransitions) { route ->
+            TaskFormScreen(
+              personId = route.personId,
+              taskId = route.taskId,
+              onClose = { navigation.pop() },
+              onNewPerson = { navigation.navigate(EditPersonRoute(returnSelection = true)) },
+            )
+          }
           entry<PaywallRoute>(metadata = modalTransitions) { route ->
             PaywallScreen(highlight = route.highlight, onClose = { navigation.pop() })
           }
@@ -146,6 +156,8 @@ fun AppNavigation(
               onBack = { navigation.pop() },
               onEdit = { focus -> navigation.navigate(EditPersonRoute(route.id, focus = focus)) },
               onOpenPro = { navigation.navigate(PaywallRoute(it)) },
+              onNewTask = { navigation.navigate(TaskRoute(route.id)) },
+              onOpenTask = { navigation.navigate(TaskRoute(route.id, it.id)) },
             )
           }
           entry<EditPersonRoute>(metadata = modalTransitions) { route ->

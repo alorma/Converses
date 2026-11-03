@@ -286,4 +286,28 @@
     <string name="custom_channel_delete">Delete</string>
     <string name="custom_channel_delete_title">Delete “%s”?</string>
     <string name="custom_channel_delete_body">Its entries will stay in %s.</string>
+    <!-- Tasques (Pro) -->
+    <string name="task_new">New task</string>
+    <string name="task_edit">Edit task</string>
+    <string name="task_text_hint">What do you need to do?</string>
+    <string name="task_no_date">No date</string>
+    <string name="task_tomorrow">Tomorrow</string>
+    <string name="task_next_week">Next week</string>
+    <string name="task_pick_day">Pick a day…</string>
+    <string name="task_save">Save to follow-ups</string>
+    <string name="task_delete">Delete task</string>
+    <string name="task_delete_title">Delete this task?</string>
+    <string name="tasks_title">Follow-ups</string>
+    <string name="tasks_empty">No pending tasks. Note what you need to do with this person.</string>
+    <string name="task_mark_done">Mark as done</string>
+    <string name="task_marked_done">Marked as done</string>
+    <string name="task_reopen">Move back to follow-ups</string>
+    <string name="tasks_done_count">Done · %1$d</string>
+    <plurals name="task_overdue_days">
+        <item quantity="one">%1$d day ago</item>
+        <item quantity="other">%1$d days ago</item>
+    </plurals>
+    <string name="task_done_today">Done today</string>
+    <string name="task_done_yesterday">Done yesterday</string>
+    <string name="task_done_on">Done on %1$s</string>
 </resources>

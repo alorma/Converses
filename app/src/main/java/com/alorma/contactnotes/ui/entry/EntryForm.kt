@@ -35,6 +35,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -164,7 +165,7 @@ fun EntryForm(
 }
 
 @Composable
-private fun FormSection(
+internal fun FormSection(
   title: String,
   modifier: Modifier = Modifier,
   content: @Composable () -> Unit,
@@ -246,6 +247,26 @@ fun EntryTextField(
   /** Va dins del contenidor del camp, sota el text (p. ex. el xip «Enganxa»). */
   footer: @Composable () -> Unit = {},
 ) {
+  FormTextField(
+    value = state.text,
+    onValueChange = { state.text = it },
+    placeholder = placeholder,
+    modifier = modifier,
+    requestFocus = requestFocus,
+    footer = footer,
+  )
+}
+
+/** Camp de text gran dels formularis (entrada i tasca), amb [footer] dins del contenidor. */
+@Composable
+fun FormTextField(
+  value: String,
+  onValueChange: (String) -> Unit,
+  placeholder: String,
+  modifier: Modifier = Modifier,
+  requestFocus: Boolean = false,
+  footer: @Composable () -> Unit = {},
+) {
   val focusRequester = remember { FocusRequester() }
   if (requestFocus) LaunchedEffect(Unit) { focusRequester.requestFocus() }
   Surface(
@@ -255,8 +276,8 @@ fun EntryTextField(
   ) {
     Column {
       TextField(
-        value = state.text,
-        onValueChange = { state.text = it },
+        value = value,
+        onValueChange = onValueChange,
         modifier = Modifier.fillMaxWidth().heightIn(min = 120.dp).focusRequester(focusRequester),
         textStyle = MaterialTheme.typography.bodyLarge.copy(fontSize = 17.sp),
         placeholder = { Text(placeholder, fontSize = 17.sp) },
@@ -309,25 +330,26 @@ internal fun SelectableChip(
   selected: Boolean,
   onClick: () -> Unit,
   modifier: Modifier = Modifier,
+  /** Icona quan no està triat (p. ex. `edit_calendar` a «Tria dia…»); triat, sempre `check`. */
+  leadingIcon: ImageVector? = null,
 ) {
   val scheme = MaterialTheme.colorScheme
   val isSelected = selected
+  val icon = if (isSelected) Icons.Rounded.Check else leadingIcon
   FilterChip(
     selected = isSelected,
     onClick = onClick,
     modifier = modifier.height(36.dp),
     label = { Text(label) },
     leadingIcon =
-      if (isSelected) {
+      icon?.let {
         {
           Icon(
-            Icons.Rounded.Check,
+            it,
             contentDescription = null,
             modifier = Modifier.size(FilterChipDefaults.IconSize),
           )
         }
-      } else {
-        null
       },
     shape = RoundedCornerShape(12.dp),
     colors =

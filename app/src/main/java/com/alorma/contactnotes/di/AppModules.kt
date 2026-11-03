@@ -36,6 +36,7 @@ import com.alorma.contactnotes.ui.person.PersonLockViewModel
 import com.alorma.contactnotes.ui.person.PersonViewModel
 import com.alorma.contactnotes.ui.settings.CustomChannelsViewModel
 import com.alorma.contactnotes.ui.settings.SettingsViewModel
+import com.alorma.contactnotes.ui.task.TaskFormViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -103,6 +104,7 @@ val viewModelModule =
     viewModel { PersonLockViewModel() }
     viewModel { (personId: Long) -> PersonDetailViewModel(personId, get(), get()) }
     viewModel { (personId: Long) -> QuickNoteViewModel(personId, get(), get()) }
+    viewModel { (personId: Long, taskId: Long) -> TaskFormViewModel(personId, taskId, get(), get()) }
     viewModel { (personId: Long) -> EditPersonViewModel(personId, get(), get()) }
   }
 

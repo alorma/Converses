@@ -286,4 +286,28 @@
     <string name="custom_channel_delete">Borrar</string>
     <string name="custom_channel_delete_title">¿Borrar «%s»?</string>
     <string name="custom_channel_delete_body">Sus entradas se quedarán en %s.</string>
+    <!-- Tasques (Pro) -->
+    <string name="task_new">Nueva tarea</string>
+    <string name="task_edit">Editar tarea</string>
+    <string name="task_text_hint">¿Qué tienes que hacer?</string>
+    <string name="task_no_date">Sin fecha</string>
+    <string name="task_tomorrow">Mañana</string>
+    <string name="task_next_week">La semana que viene</string>
+    <string name="task_pick_day">Elegir día…</string>
+    <string name="task_save">Guardar en pendientes</string>
+    <string name="task_delete">Borrar tarea</string>
+    <string name="task_delete_title">¿Borrar esta tarea?</string>
+    <string name="tasks_title">Pendientes</string>
+    <string name="tasks_empty">Ninguna tarea pendiente. Apunta lo que tienes que hacer con esta persona.</string>
+    <string name="task_mark_done">Marcar como hecho</string>
+    <string name="task_marked_done">Marcado como hecho</string>
+    <string name="task_reopen">Volver a pendientes</string>
+    <string name="tasks_done_count">Hechos · %1$d</string>
+    <plurals name="task_overdue_days">
+        <item quantity="one">Hace %1$d día</item>
+        <item quantity="other">Hace %1$d días</item>
+    </plurals>
+    <string name="task_done_today">Hecho hoy</string>
+    <string name="task_done_yesterday">Hecho ayer</string>
+    <string name="task_done_on">Hecho el %1$s</string>
 </resources>

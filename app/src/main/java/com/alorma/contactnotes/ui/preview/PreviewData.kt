@@ -4,10 +4,12 @@ import com.alorma.contactnotes.data.db.EntryEntity
 import com.alorma.contactnotes.data.db.PersonEntity
 import com.alorma.contactnotes.data.db.PersonListItem
 import com.alorma.contactnotes.data.db.PinnedFactEntity
+import com.alorma.contactnotes.data.db.TaskEntity
 import com.alorma.contactnotes.shared.AvatarColor
 import com.alorma.contactnotes.shared.AvatarShape
 import com.alorma.contactnotes.shared.ChannelType
 import com.alorma.contactnotes.shared.EntryKind
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneId
 
@@ -132,6 +134,55 @@ internal object PreviewData {
         person = laia,
         lastEntry = null,
         channels = listOf(ChannelType.PHONE),
+      ),
+    )
+
+  /** «Avui» fix de les previews de tasques: dilluns, perquè el dia rellevant sigui divendres com al disseny. */
+  val taskToday: LocalDate = LocalDate.of(2026, 11, 2)
+
+  private fun doneOn(date: LocalDate): Long =
+    date
+      .atTime(18, 30)
+      .atZone(ZoneId.systemDefault())
+      .toInstant()
+      .toEpochMilli()
+
+  /** 9d: demà, divendres i sense data (amb data primer, com el DAO). */
+  val martaOpenTasks =
+    listOf(
+      TaskEntity(
+        id = 1,
+        personId = 1,
+        text = "Ask her if she's joining.",
+        dueDate = taskToday.plusDays(1).toEpochDay(),
+        createdAt = 0,
+      ),
+      TaskEntity(
+        id = 2,
+        personId = 1,
+        text = "Get the Mothership manual back.",
+        dueDate = taskToday.plusDays(4).toEpochDay(),
+        createdAt = 0,
+      ),
+      TaskEntity(id = 3, personId = 1, text = "Suggest a date for the new game.", createdAt = 0),
+    )
+
+  /** 9f: feta ahir i feta el 3 de maig. */
+  val martaDoneTasks =
+    listOf(
+      TaskEntity(
+        id = 4,
+        personId = 1,
+        text = "Send her the mine map.",
+        createdAt = 0,
+        doneAt = doneOn(taskToday.minusDays(1)),
+      ),
+      TaskEntity(
+        id = 5,
+        personId = 1,
+        text = "Wish her a happy birthday.",
+        createdAt = 0,
+        doneAt = doneOn(LocalDate.of(2026, 5, 3)),
       ),
     )
 }

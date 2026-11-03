@@ -262,4 +262,50 @@ class PersonDetailViewModelTest {
       assertEquals(mapOf(whatsapp.id to "WhatsApp"), names)
       assertEquals("WhatsApp", entryChannelName(ContextWrapper(null), entry, names))
     }
+
+  @Test
+  fun theStateSplitsOpenAndDoneTasksOfThisPersonOnly() =
+    runTest {
+      val other = db.addPerson("Jordi")
+      val undated = db.addTask(person.id, text = "sense data")
+      val soon = db.addTask(person.id, text = "demà", dueDate = 10)
+      val done = db.addTask(person.id, text = "feta", doneAt = 2_000)
+      db.addTask(other.id, text = "d'un altre")
+      val vm = viewModel()
+
+      val state = vm.uiState.value
+      assertEquals(listOf(soon.id, undated.id), state.openTasks.map { it.id })
+      assertEquals(listOf(done.id), state.doneTasks.map { it.id })
+    }
+
+  @Test
+  fun markingATaskDoneAndUndoingItMovesItBetweenTheLists() =
+    runTest {
+      val task = db.addTask(person.id)
+      val vm = viewModel()
+
+      vm.markTaskDone(task)
+      assertTrue(
+        vm.uiState.value.openTasks
+          .isEmpty(),
+      )
+      assertEquals(
+        task.id,
+        vm.uiState.value.doneTasks
+          .single()
+          .id,
+      )
+
+      vm.reopenTask(task)
+      assertEquals(
+        task.id,
+        vm.uiState.value.openTasks
+          .single()
+          .id,
+      )
+      assertTrue(
+        vm.uiState.value.doneTasks
+          .isEmpty(),
+      )
+    }
 }

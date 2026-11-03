@@ -156,6 +156,12 @@ El primer plantejament (estat `isPending` d'una entrada, amb la fila «Pendent»
 - **«Avisa'm» (notificació a les 9:00) queda per més endavant:** la columna `remind` ja hi és, però la fila no surt al formulari.
 - **Tocar una tasca** (pendent o feta, fora del cercle) obre el formulari en mode edició, amb l'opció d'esborrar-la.
 - **Exportar:** sense canvis en aquesta fase.
+- **Decidit per Claude mentre Bernat era fora (per revisar):**
+  - **Proper dia rellevant** (el xip amb el nom del dia): el divendres o el dilluns més proper que caigui d'aquí a 2 dies o més (dl–dc → divendres; dj–ds → dilluns; dg → divendres), perquè no coincideixi mai amb «Avui», «Demà» ni «La setmana que ve». «La setmana que ve» és d'aquí a 7 dies. «Tria dia…» deixa triar des d'avui.
+  - **Etiquetes de data:** d'aquí a 2–6 dies, el nom del dia; d'aquí a 7 o més, «DC. 18 DE NOV.»; passades, «AHIR» i «FA N DIES». Les fetes avui diuen «FET AVUI».
+  - **Textos nous que no eren al tauler 7g:** «Edita la tasca» / «Edit task» / «Editar tarea»; «Esborra la tasca» / «Delete task» / «Borrar tarea»; «Vols esborrar aquesta tasca?» / «Delete this task?» / «¿Borrar esta tarea?»; «Fa %d dies» / «%d days ago» / «Hace %d días»; «Fet avui» / «Done today» / «Hecho hoy». L'edició desa amb «Desa els canvis».
+  - **Sense Pro:** la secció només surt si hi ha tasques (pendents o fetes), sense «+ Nova tasca» ni la targeta buida.
+  - **Formulari obert des del detall:** la persona inicial (o la de la tasca) compta com a desbloquejada; triar-ne una altra de protegida demana desbloquejar-la, com a la nota ràpida.
 
 ### Handoff (03-11-2026)
 

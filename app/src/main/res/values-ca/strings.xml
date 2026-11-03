@@ -284,4 +284,28 @@
     <string name="custom_channel_delete">Esborra</string>
     <string name="custom_channel_delete_title">Esborrar «%s»?</string>
     <string name="custom_channel_delete_body">Les seves entrades es quedaran a %s.</string>
+    <!-- Tasques (Pro) -->
+    <string name="task_new">Nova tasca</string>
+    <string name="task_edit">Edita la tasca</string>
+    <string name="task_text_hint">Què has de fer?</string>
+    <string name="task_no_date">Sense data</string>
+    <string name="task_tomorrow">Demà</string>
+    <string name="task_next_week">La setmana que ve</string>
+    <string name="task_pick_day">Tria dia…</string>
+    <string name="task_save">Guarda a pendents</string>
+    <string name="task_delete">Esborra la tasca</string>
+    <string name="task_delete_title">Vols esborrar aquesta tasca?</string>
+    <string name="tasks_title">Pendents</string>
+    <string name="tasks_empty">Cap tasca pendent. Apunta què has de fer amb aquesta persona.</string>
+    <string name="task_mark_done">Marca com a fet</string>
+    <string name="task_marked_done">Marcat com a fet</string>
+    <string name="task_reopen">Torna a pendents</string>
+    <string name="tasks_done_count">Fets · %1$d</string>
+    <plurals name="task_overdue_days">
+        <item quantity="one">Fa %1$d dia</item>
+        <item quantity="other">Fa %1$d dies</item>
+    </plurals>
+    <string name="task_done_today">Fet avui</string>
+    <string name="task_done_yesterday">Fet ahir</string>
+    <string name="task_done_on">Fet el %1$s</string>
 </resources>

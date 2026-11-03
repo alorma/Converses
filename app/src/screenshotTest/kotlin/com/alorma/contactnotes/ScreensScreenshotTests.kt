@@ -51,15 +51,22 @@ import com.alorma.contactnotes.ui.person.PersonDetailScreenFilteredEmptyPreview
 import com.alorma.contactnotes.ui.person.PersonDetailScreenLoadedPreview
 import com.alorma.contactnotes.ui.person.PersonDetailScreenSingleFactPreview
 import com.alorma.contactnotes.ui.person.PersonDetailScreenThemedPreview
+import com.alorma.contactnotes.ui.person.PersonDetailTasksEmptyPreview
+import com.alorma.contactnotes.ui.person.PersonDetailTasksLockedPreview
+import com.alorma.contactnotes.ui.person.PersonDetailTasksPreview
 import com.alorma.contactnotes.ui.person.PersonLockedCanceledPreview
 import com.alorma.contactnotes.ui.person.PersonLockedLockedOutPreview
 import com.alorma.contactnotes.ui.person.PersonLockedNoCredentialsPreview
 import com.alorma.contactnotes.ui.person.PersonLockedWaitingPreview
+import com.alorma.contactnotes.ui.person.TasksSectionDonePreview
 import com.alorma.contactnotes.ui.settings.CustomChannelsEmptyPreview
 import com.alorma.contactnotes.ui.settings.CustomChannelsPreview
 import com.alorma.contactnotes.ui.settings.SettingsAppLockPreview
 import com.alorma.contactnotes.ui.settings.SettingsNoLockPreview
 import com.alorma.contactnotes.ui.settings.SettingsProPreview
+import com.alorma.contactnotes.ui.task.TaskFormEditPreview
+import com.alorma.contactnotes.ui.task.TaskFormEmptyPreview
+import com.alorma.contactnotes.ui.task.TaskFormFilledPreview
 import com.android.tools.screenshot.PreviewTest
 
 /** Pantalla d'un mòbil de mida mitjana, en clar i en fosc, amb l'idioma fixat perquè no depengui de la màquina. */
@@ -471,5 +478,57 @@ class ScreensScreenshotTests {
   @Composable
   fun editEntrySheet() {
     EditEntrySheetPreview()
+  }
+
+  @ScreenPreviews
+  @PreviewTest
+  @Composable
+  fun taskFormEmpty() {
+    TaskFormEmptyPreview()
+  }
+
+  @ScreenPreviews
+  @LocalizedScreenPreviews
+  @PreviewTest
+  @Composable
+  fun taskFormFilled() {
+    TaskFormFilledPreview()
+  }
+
+  @ScreenPreviews
+  @PreviewTest
+  @Composable
+  fun taskFormEdit() {
+    TaskFormEditPreview()
+  }
+
+  @ScreenPreviews
+  @LocalizedScreenPreviews
+  @PreviewTest
+  @Composable
+  fun personDetailTasks() {
+    PersonDetailTasksPreview()
+  }
+
+  @ScreenPreviews
+  @PreviewTest
+  @Composable
+  fun personDetailTasksEmpty() {
+    PersonDetailTasksEmptyPreview()
+  }
+
+  @ScreenPreviews
+  @PreviewTest
+  @Composable
+  fun personDetailTasksLocked() {
+    PersonDetailTasksLockedPreview()
+  }
+
+  @ScreenPreviews
+  @LocalizedScreenPreviews
+  @PreviewTest
+  @Composable
+  fun tasksSectionDone() {
+    TasksSectionDonePreview()
   }
 }

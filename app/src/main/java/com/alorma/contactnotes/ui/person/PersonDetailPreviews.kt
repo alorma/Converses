@@ -1,20 +1,30 @@
 package com.alorma.contactnotes.ui.person
 
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
+import androidx.compose.ui.unit.dp
 import com.alorma.contactnotes.data.db.color
+import com.alorma.contactnotes.data.flags.FeatureState
 import com.alorma.contactnotes.designsystem.preview.ConversesPreviewTheme
 import com.alorma.contactnotes.designsystem.theme.PersonTheme
 import com.alorma.contactnotes.shared.AvatarColor
 import com.alorma.contactnotes.shared.EntryKind
 import com.alorma.contactnotes.ui.preview.PreviewData
+import com.alorma.contactnotes.ui.task.TasksSection
 
 @Composable
-private fun PersonDetailScreenPreview(state: PersonDetailUiState) {
+private fun PersonDetailScreenPreview(
+  state: PersonDetailUiState,
+  tasksState: FeatureState = FeatureState.Hidden,
+) {
   ConversesPreviewTheme {
     PersonTheme(state.person?.color) {
       PersonDetailScreen(
@@ -31,6 +41,8 @@ private fun PersonDetailScreenPreview(state: PersonDetailUiState) {
         onExport = {},
         onToggleArchived = {},
         snackbarHostState = remember { SnackbarHostState() },
+        tasksState = tasksState,
+        today = PreviewData.taskToday,
       )
     }
   }
@@ -158,4 +170,66 @@ internal fun PersonDetailScreenCustomChannelPreview() {
       isLoading = false,
     ),
   )
+}
+
+private val martaTasksState =
+  PersonDetailUiState(
+    person = PreviewData.marta,
+    channels = PreviewData.martaChannels,
+    facts = PreviewData.martaFacts,
+    entries = PreviewData.martaEntries,
+    openTasks = PreviewData.martaOpenTasks,
+    doneTasks = PreviewData.martaDoneTasks,
+    saidCount = 1,
+    heardCount = 1,
+    happenedCount = PreviewData.martaEntries.count { it.kind == EntryKind.HAPPENED },
+    isLoading = false,
+  )
+
+/** 9d: secció «Pendents» amb Pro, amb «Fets · 2» plegat. */
+@Preview
+@Composable
+internal fun PersonDetailTasksPreview() {
+  PersonDetailScreenPreview(martaTasksState, tasksState = FeatureState.Unlocked)
+}
+
+/** 9h: amb Pro i sense cap tasca, la targeta buida. */
+@Preview
+@Composable
+internal fun PersonDetailTasksEmptyPreview() {
+  PersonDetailScreenPreview(
+    martaTasksState.copy(openTasks = emptyList(), doneTasks = emptyList()),
+    tasksState = FeatureState.Unlocked,
+  )
+}
+
+/** Ha deixat de ser Pro: les tasques es veuen, sense «+ Nova tasca». */
+@Preview
+@Composable
+internal fun PersonDetailTasksLockedPreview() {
+  PersonDetailScreenPreview(martaTasksState, tasksState = FeatureState.Locked)
+}
+
+/** 9f: «Fets» desplegat (text ratllat, «FET AHIR», «FET EL …»). */
+@Preview
+@Composable
+internal fun TasksSectionDonePreview() {
+  ConversesPreviewTheme {
+    PersonTheme(PreviewData.marta.color) {
+      Surface(color = MaterialTheme.colorScheme.surface) {
+        TasksSection(
+          open = PreviewData.martaOpenTasks,
+          done = PreviewData.martaDoneTasks,
+          canCreate = true,
+          today = PreviewData.taskToday,
+          onNewTask = {},
+          onOpen = {},
+          onDone = {},
+          onReopen = {},
+          initialDoneExpanded = true,
+          modifier = Modifier.padding(horizontal = 16.dp).padding(bottom = 16.dp),
+        )
+      }
+    }
+  }
 }

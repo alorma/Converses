@@ -25,6 +25,7 @@ import androidx.compose.material.icons.rounded.Archive
 import androidx.compose.material.icons.rounded.ChatBubbleOutline
 import androidx.compose.material.icons.rounded.Edit
 import androidx.compose.material.icons.rounded.EditNote
+import androidx.compose.material.icons.rounded.Flag
 import androidx.compose.material.icons.rounded.IosShare
 import androidx.compose.material.icons.rounded.MoreVert
 import androidx.compose.material.icons.rounded.Unarchive
@@ -63,8 +64,12 @@ import com.alorma.contactnotes.R
 import com.alorma.contactnotes.data.db.EntryEntity
 import com.alorma.contactnotes.data.db.PersonEntity
 import com.alorma.contactnotes.data.db.PinnedFactEntity
+import com.alorma.contactnotes.data.db.TaskEntity
 import com.alorma.contactnotes.data.db.color
 import com.alorma.contactnotes.data.db.shape
+import com.alorma.contactnotes.data.flags.FeatureState
+import com.alorma.contactnotes.data.flags.FollowUpsFeature
+import com.alorma.contactnotes.data.flags.rememberFeatureState
 import com.alorma.contactnotes.data.settings.SecureWindow
 import com.alorma.contactnotes.designsystem.components.Avatar
 import com.alorma.contactnotes.designsystem.components.CollapsibleFacts
@@ -76,6 +81,7 @@ import com.alorma.contactnotes.designsystem.components.DashedHintRow
 import com.alorma.contactnotes.designsystem.components.EmptyState
 import com.alorma.contactnotes.designsystem.components.FactItem
 import com.alorma.contactnotes.designsystem.components.GroupedListDefaults
+import com.alorma.contactnotes.designsystem.components.ProBadge
 import com.alorma.contactnotes.designsystem.components.TimelineRow
 import com.alorma.contactnotes.designsystem.components.rememberConversesHaptics
 import com.alorma.contactnotes.designsystem.theme.PersonNameStyle
@@ -89,6 +95,7 @@ import com.alorma.contactnotes.ui.entry.EntryChannel
 import com.alorma.contactnotes.ui.entry.NewEntrySheet
 import com.alorma.contactnotes.ui.paywall.ProBenefit
 import com.alorma.contactnotes.ui.people.label
+import com.alorma.contactnotes.ui.task.TasksSection
 import java.time.LocalDate
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -132,6 +139,8 @@ fun PersonDetailRoute(
   onEdit: (EditFocus?) -> Unit,
   onOpenPro: (ProBenefit) -> Unit = {},
   openNewEntry: Boolean = false,
+  onNewTask: () -> Unit = {},
+  onOpenTask: (TaskEntity) -> Unit = {},
   viewModel: PersonDetailViewModel = koinViewModel(parameters = { parametersOf(personId) }),
 ) {
   val state by viewModel.uiState.collectAsStateWithLifecycle()
@@ -161,12 +170,37 @@ fun PersonDetailRoute(
   val snackbarHostState = remember { SnackbarHostState() }
   val deletedMessage = stringResource(R.string.entry_deleted)
   val undoLabel = stringResource(R.string.undo)
+  val taskDoneMessage = stringResource(R.string.task_marked_done)
+  val tasksState = rememberFeatureState<FollowUpsFeature>()
   var dayCount by remember { mutableIntStateOf(0) }
   LaunchedEffect(actionEntry?.id) { actionEntry?.let { dayCount = viewModel.countDay(it) } }
 
   fun closeAction() {
     action = EntryAction.None
     actionEntryId = null
+  }
+
+  // Snackbar amb «Desfés» durant [UndoWindowMillis]; [onUndo] si l'usuari el toca
+  fun showUndo(
+    message: String,
+    onUndo: () -> Unit,
+  ) {
+    scope.launch {
+      snackbarHostState.currentSnackbarData?.dismiss()
+      val timeout =
+        launch {
+          delay(UndoWindowMillis)
+          snackbarHostState.currentSnackbarData?.dismiss()
+        }
+      val result =
+        snackbarHostState.showSnackbar(
+          message = message,
+          actionLabel = undoLabel,
+          duration = SnackbarDuration.Indefinite,
+        )
+      timeout.cancel()
+      if (result == SnackbarResult.ActionPerformed) onUndo()
+    }
   }
 
   PersonTheme(person.color) {
@@ -201,6 +235,18 @@ fun PersonDetailRoute(
         haptics.confirm()
         viewModel.setArchived(!person.archived) { if (!person.archived) onBack() }
       },
+      tasksState = tasksState,
+      onNewTask = {
+        menuExpanded = false
+        if (tasksState == FeatureState.Unlocked) onNewTask() else onOpenPro(ProBenefit.FollowUps)
+      },
+      onOpenTask = onOpenTask,
+      onTaskDone = { task ->
+        haptics.confirm()
+        viewModel.markTaskDone(task)
+        showUndo(taskDoneMessage) { viewModel.reopenTask(task) }
+      },
+      onTaskReopen = viewModel::reopenTask,
       snackbarHostState = snackbarHostState,
     )
 
@@ -240,22 +286,7 @@ fun PersonDetailRoute(
               haptics.confirm()
               viewModel.deleteEntry(deleted)
               closeAction()
-              scope.launch {
-                snackbarHostState.currentSnackbarData?.dismiss()
-                val timeout =
-                  launch {
-                    delay(UndoWindowMillis)
-                    snackbarHostState.currentSnackbarData?.dismiss()
-                  }
-                val result =
-                  snackbarHostState.showSnackbar(
-                    message = deletedMessage,
-                    actionLabel = undoLabel,
-                    duration = SnackbarDuration.Indefinite,
-                  )
-                timeout.cancel()
-                if (result == SnackbarResult.ActionPerformed) viewModel.restoreEntry(deleted)
-              }
+              showUndo(deletedMessage) { viewModel.restoreEntry(deleted) }
             },
             onDeleteDay = { action = EntryAction.ConfirmDeleteDay },
           )
@@ -318,6 +349,12 @@ fun PersonDetailScreen(
   onExport: () -> Unit,
   onToggleArchived: () -> Unit,
   snackbarHostState: SnackbarHostState,
+  tasksState: FeatureState = FeatureState.Hidden,
+  onNewTask: () -> Unit = {},
+  onOpenTask: (TaskEntity) -> Unit = {},
+  onTaskDone: (TaskEntity) -> Unit = {},
+  onTaskReopen: (TaskEntity) -> Unit = {},
+  today: LocalDate = LocalDate.now(),
 ) {
   val person = state.person
   var factsExpanded by rememberSaveable { mutableStateOf(false) }
@@ -356,6 +393,24 @@ fun PersonDetailScreen(
           onMenuExpandedChange = onMenuExpandedChange,
           menuContentDescription = stringResource(R.string.more_options),
         ) {
+          if (tasksState != FeatureState.Hidden) {
+            ConversesMenuItem(
+              text = stringResource(R.string.task_new),
+              icon = Icons.Rounded.Flag,
+              onClick = onNewTask,
+              trailing =
+                if (tasksState == FeatureState.Locked) {
+                  {
+                    ProBadge(
+                      text = stringResource(R.string.pro_badge),
+                      contentDescription = stringResource(R.string.pro_description),
+                    )
+                  }
+                } else {
+                  null
+                },
+            )
+          }
           ConversesMenuItem(
             text = stringResource(R.string.menu_export),
             icon = Icons.Rounded.IosShare,
@@ -399,6 +454,22 @@ fun PersonDetailScreen(
             onToggle = { factsExpanded = !factsExpanded },
             onAddFirst = { onEditFocus(EditFocus.NEW_FACT) },
           )
+        }
+        // Amb Pro, sempre; sense, només si ja té tasques (es continuen veient i marcant)
+        val hasTasks = state.openTasks.isNotEmpty() || state.doneTasks.isNotEmpty()
+        if (tasksState == FeatureState.Unlocked || (tasksState == FeatureState.Locked && hasTasks)) {
+          item(key = "tasks") {
+            TasksSection(
+              open = state.openTasks,
+              done = state.doneTasks,
+              canCreate = tasksState == FeatureState.Unlocked,
+              today = today,
+              onNewTask = onNewTask,
+              onOpen = onOpenTask,
+              onDone = onTaskDone,
+              onReopen = onTaskReopen,
+            )
+          }
         }
         item(key = "timeline-header") {
           SectionHeader(

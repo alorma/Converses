@@ -1,6 +1,5 @@
 package com.alorma.contactnotes.ui.entry
 
-import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -20,20 +19,16 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.PersonOutline
 import androidx.compose.material.icons.rounded.UnfoldMore
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -43,7 +38,6 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewModelScope
@@ -53,7 +47,6 @@ import com.alorma.contactnotes.data.db.EntryEntity
 import com.alorma.contactnotes.data.db.PersonEntity
 import com.alorma.contactnotes.data.db.color
 import com.alorma.contactnotes.data.db.shape
-import com.alorma.contactnotes.data.settings.SecureWindow
 import com.alorma.contactnotes.designsystem.components.Avatar
 import com.alorma.contactnotes.designsystem.components.ConversesSaveButton
 import com.alorma.contactnotes.designsystem.components.ConversesTopBar
@@ -64,9 +57,6 @@ import com.alorma.contactnotes.shared.ChannelType
 import com.alorma.contactnotes.shared.EntryKind
 import com.alorma.contactnotes.shared.initialsOf
 import com.alorma.contactnotes.ui.navigation.isOnlyUrl
-import com.alorma.contactnotes.ui.person.canUnlockWithDevice
-import com.alorma.contactnotes.ui.person.openSecuritySetup
-import com.alorma.contactnotes.ui.person.promptUnlock
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -79,7 +69,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 
@@ -213,31 +202,8 @@ fun QuickNoteScreen(
       initialKind = sharedText?.let { importedKind(it, hasPerson = false) } ?: EntryKind.SAID,
       initialText = sharedText.orEmpty(),
     )
-  val activity = LocalActivity.current as FragmentActivity
-  var showNoLock by remember { mutableStateOf(false) }
-
-  // Amb una persona protegida triada (o a punt de ser-ho) la pantalla no es pot capturar ni surt a Recents
-  val secureWindow: SecureWindow = koinInject()
-  val secure = state.selected?.isProtected == true || state.pending != null
-  DisposableEffect(secure) {
-    if (secure) secureWindow.acquire()
-    onDispose { if (secure) secureWindow.release() }
-  }
-
-  val pending = state.pending
-  val authTitle = stringResource(R.string.unlock_title, pending?.name.orEmpty())
-  val authSubtitle = stringResource(R.string.unlock_subtitle)
-  LaunchedEffect(pending?.id) {
-    if (pending != null) {
-      if (activity.canUnlockWithDevice()) {
-        activity.promptUnlock(authTitle, authSubtitle, onError = { viewModel.cancelPending() }) {
-          viewModel.unlock(pending.id)
-        }
-      } else {
-        showNoLock = true
-      }
-    }
-  }
+  SecureWhile(state.selected?.isProtected == true || state.pending != null)
+  PendingPersonUnlock(state.pending, onUnlock = viewModel::unlock, onCancel = viewModel::cancelPending)
 
   QuickNoteContent(
     state = state,
@@ -252,28 +218,6 @@ fun QuickNoteScreen(
       viewModel.save(person.id, form.kind, channel, form.text.trim(), form.occurredAt, onClose)
     },
   )
-
-  if (showNoLock) {
-    AlertDialog(
-      onDismissRequest = {
-        showNoLock = false
-        viewModel.cancelPending()
-      },
-      title = { Text(stringResource(R.string.lock_none_title)) },
-      text = { Text(stringResource(R.string.lock_none_body)) },
-      confirmButton = {
-        TextButton(onClick = { activity.openSecuritySetup() }) { Text(stringResource(R.string.lock_setup)) }
-      },
-      dismissButton = {
-        TextButton(
-          onClick = {
-            showNoLock = false
-            viewModel.cancelPending()
-          },
-        ) { Text(stringResource(android.R.string.cancel)) }
-      },
-    )
-  }
 }
 
 @Composable
@@ -402,8 +346,9 @@ fun QuickNoteContent(
   }
 }
 
+/** Targeta «Amb qui» (nota ràpida i tasca): obre el selector de persones. */
 @Composable
-private fun PersonPicker(
+internal fun PersonPicker(
   selected: PersonEntity?,
   noPeople: Boolean,
   onClick: () -> Unit,
