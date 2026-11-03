@@ -99,6 +99,49 @@ class ProFeaturesRepositoryTest {
     }
 
   @Test
+  fun editingRenamesAndChangesTheGroupAtOnceMovingItsEntries() =
+    runTest {
+      val channel = db.addCustomChannel("Feina", ChannelType.CHAT)
+      val person = db.addPerson("Marta")
+      db.addEntry(person.id, channel = ChannelType.CHAT, customChannelId = channel.id)
+
+      val result = repository.saveCustomChannel(channel, ChannelType.OTHER, " Empresa ")
+
+      assertEquals(CustomChannelResult.Saved(channel.id), result)
+      val saved = repository.getCustomChannel(channel.id)!!
+      assertEquals("Empresa", saved.name)
+      assertEquals(ChannelType.OTHER, saved.channelType)
+      assertEquals(
+        ChannelType.OTHER,
+        db.entries.value
+          .single()
+          .channelType,
+      )
+    }
+
+  @Test
+  fun editingIntoATakenNameOfTheNewGroupChangesNothing() =
+    runTest {
+      val channel = db.addCustomChannel("Feina", ChannelType.CHAT)
+      db.addCustomChannel("empresa", ChannelType.OTHER)
+
+      assertEquals(
+        CustomChannelResult.NameTaken,
+        repository.saveCustomChannel(channel, ChannelType.OTHER, "Empresa"),
+      )
+      assertEquals(channel, repository.getCustomChannel(channel.id))
+    }
+
+  @Test
+  fun savingWithoutAChannelCreatesOne() =
+    runTest {
+      val result = repository.saveCustomChannel(null, ChannelType.SOCIAL, "Bluesky")
+
+      val id = (result as CustomChannelResult.Saved).id
+      assertEquals(ChannelType.SOCIAL, repository.getCustomChannel(id)!!.channelType)
+    }
+
+  @Test
   fun deletingAChannelLeavesItsEntriesInTheGroup() =
     runTest {
       val channel = db.addCustomChannel("WhatsApp", ChannelType.CHAT)

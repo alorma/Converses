@@ -258,4 +258,12 @@
     <string name="custom_channel_new_chip">Nuevo</string>
     <string name="custom_channels_overline">CANALES PROPIOS</string>
     <string name="custom_channel_locked_chip">Canal propio</string>
+    <string name="custom_channel_new_title">Nuevo canal</string>
+    <string name="custom_channel_edit_title">Editar canal</string>
+    <string name="custom_channel_sheet_body">Podrás elegirlo en cualquier entrada, dentro de su grupo.</string>
+    <string name="custom_channel_name">Nombre</string>
+    <string name="custom_channel_group">GRUPO</string>
+    <string name="custom_channel_create">Crear</string>
+    <string name="custom_channel_cancel">Cancelar</string>
+    <string name="custom_channel_name_taken">Ya hay un canal con este nombre en %s.</string>
 </resources>

@@ -163,6 +163,24 @@ class ConversesRepository(
       channel.id
     }
 
+  /**
+   * Full «Nou canal» / «Edita el canal» (7b): crea el canal o en canvia el nom i el grup alhora.
+   * Si el grup canvia, les seves entrades s'hi mouen; si el nom no és vàlid al grup nou, no es canvia res.
+   */
+  suspend fun saveCustomChannel(
+    editing: CustomChannelEntity?,
+    channelType: ChannelType,
+    name: String,
+  ): CustomChannelResult =
+    if (editing == null) {
+      createCustomChannel(channelType, name)
+    } else {
+      validateName(channelType, name, excludeId = editing.id) { trimmed ->
+        customChannelDao.changeGroup(editing.copy(name = trimmed), channelType)
+        editing.id
+      }
+    }
+
   /** Les seves entrades es queden al grup; no es perd cap nota. */
   suspend fun deleteCustomChannel(channel: CustomChannelEntity) = customChannelDao.delete(channel)
 

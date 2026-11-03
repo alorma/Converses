@@ -260,4 +260,12 @@
     <string name="custom_channel_new_chip">New</string>
     <string name="custom_channels_overline">CUSTOM CHANNELS</string>
     <string name="custom_channel_locked_chip">Custom channel</string>
+    <string name="custom_channel_new_title">New channel</string>
+    <string name="custom_channel_edit_title">Edit channel</string>
+    <string name="custom_channel_sheet_body">You can pick it on any entry, within its group.</string>
+    <string name="custom_channel_name">Name</string>
+    <string name="custom_channel_group">GROUP</string>
+    <string name="custom_channel_create">Create</string>
+    <string name="custom_channel_cancel">Cancel</string>
+    <string name="custom_channel_name_taken">There\'s already a channel with this name in %s.</string>
 </resources>

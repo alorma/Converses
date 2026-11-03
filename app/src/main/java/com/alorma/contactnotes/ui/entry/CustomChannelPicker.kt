@@ -21,7 +21,10 @@ import androidx.compose.material3.minimumInteractiveComponentSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -75,7 +78,6 @@ fun CustomChannelCard(
   channel: EntryChannel,
   customChannels: CustomChannelsUi,
   onChannelChange: (EntryChannel) -> Unit,
-  onNewChannel: (ChannelType) -> Unit,
   onOpenPro: () -> Unit,
   modifier: Modifier = Modifier,
 ) {
@@ -85,6 +87,7 @@ fun CustomChannelCard(
   val haptics = rememberConversesHaptics()
   val inGroup = customChannels.channels.filter { it.channelType == channel.group }
   val shown = if (unlocked) inGroup else inGroup.filter { it.id == channel.customChannelId }
+  var newChannelFor by rememberSaveable { mutableStateOf<ChannelType?>(null) }
 
   Surface(
     modifier = modifier.fillMaxWidth(),
@@ -126,7 +129,7 @@ fun CustomChannelCard(
           )
         }
         if (unlocked) {
-          DashedChip(onClick = { onNewChannel(channel.group) }) {
+          DashedChip(onClick = { newChannelFor = channel.group }) {
             Text(stringResource(R.string.custom_channel_new_chip))
           }
         } else {
@@ -141,6 +144,16 @@ fun CustomChannelCard(
         }
       }
     }
+  }
+  newChannelFor?.let { group ->
+    CustomChannelSheet(
+      initialGroup = group,
+      onDismiss = { newChannelFor = null },
+      onSaved = { created ->
+        newChannelFor = null
+        onChannelChange(EntryChannel(created.channelType, created.id))
+      },
+    )
   }
 }
 

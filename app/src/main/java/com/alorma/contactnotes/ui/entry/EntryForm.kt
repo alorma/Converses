@@ -129,7 +129,6 @@ fun EntryForm(
   onChannelChange: (EntryChannel) -> Unit,
   modifier: Modifier = Modifier,
   customChannels: CustomChannelsUi = CustomChannelsUi(),
-  onNewChannel: (ChannelType) -> Unit = {},
   onOpenPro: () -> Unit = {},
   focusText: Boolean = false,
   onPickPerson: (() -> Unit)? = null,
@@ -154,7 +153,6 @@ fun EntryForm(
         channel = channel,
         customChannels = customChannels,
         onChannelChange = onChannelChange,
-        onNewChannel = onNewChannel,
         onOpenPro = onOpenPro,
       )
     }

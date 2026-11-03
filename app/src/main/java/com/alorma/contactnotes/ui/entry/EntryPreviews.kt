@@ -206,3 +206,40 @@ internal fun WhenSheetCustomPreview() =
       PreviewData.formTime - 3 * 24 * 60 * 60 * 1000L,
     ),
   )
+
+@Composable
+private fun CustomChannelSheetPreview(
+  isNew: Boolean,
+  name: String,
+  takenIn: ChannelType? = null,
+) {
+  ConversesPreviewTheme {
+    Surface(color = MaterialTheme.colorScheme.surface) {
+      CustomChannelSheetContent(
+        isNew = isNew,
+        name = name,
+        onNameChange = {},
+        group = ChannelType.CHAT,
+        onGroupChange = {},
+        takenIn = takenIn,
+        onCancel = {},
+        onSave = {},
+        modifier = Modifier.padding(top = 16.dp),
+      )
+    }
+  }
+}
+
+/** Full «Nou canal» (7b). */
+@Preview
+@Composable
+internal fun CustomChannelSheetNewPreview() {
+  CustomChannelSheetPreview(isNew = true, name = "Signal")
+}
+
+/** Mateix full per reanomenar i canviar de grup, amb el nom repetit al grup. */
+@Preview
+@Composable
+internal fun CustomChannelSheetTakenPreview() {
+  CustomChannelSheetPreview(isNew = false, name = "WhatsApp", takenIn = ChannelType.CHAT)
+}

@@ -13,6 +13,8 @@ import com.alorma.contactnotes.ui.edit.EditPersonCustomAvatarPreview
 import com.alorma.contactnotes.ui.edit.EditPersonExistingPreview
 import com.alorma.contactnotes.ui.edit.EditPersonNewPreview
 import com.alorma.contactnotes.ui.edit.EditPersonProtectedPreview
+import com.alorma.contactnotes.ui.entry.CustomChannelSheetNewPreview
+import com.alorma.contactnotes.ui.entry.CustomChannelSheetTakenPreview
 import com.alorma.contactnotes.ui.entry.EditEntrySheetPreview
 import com.alorma.contactnotes.ui.entry.NewEntrySheetPreview
 import com.alorma.contactnotes.ui.entry.PersonPickerFewPreview
@@ -222,6 +224,22 @@ class ScreensScreenshotTests {
   @Composable
   fun newEntrySheet() {
     NewEntrySheetPreview()
+  }
+
+  @ScreenPreviews
+  @LocalizedScreenPreviews
+  @PreviewTest
+  @Composable
+  fun customChannelSheetNew() {
+    CustomChannelSheetNewPreview()
+  }
+
+  @ScreenPreviews
+  @LocalizedScreenPreviews
+  @PreviewTest
+  @Composable
+  fun customChannelSheetTaken() {
+    CustomChannelSheetTakenPreview()
   }
 
   @ScreenPreviews
