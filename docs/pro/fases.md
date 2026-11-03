@@ -9,7 +9,7 @@ Què és gratis i què és Pro, i la regla, són a `docs/pro/README.md`. Disseny
 | 3 | Paywall: pantalla «Converses Pro» (8a, 8b, 8c) i punts d'entrada | 2 | Pendent |
 | 4 | Publicació: política de privacitat, seguretat de dades de Play, termes | 3 | Pendent |
 | 5 | Room v5 i flags de Canals propis i Pendents | — | Feta i validada (03-11-2026) |
-| 6 | Canals propis: camp «On» (7a, 7c), full «Nou canal» (7b), cronologia, exportar, Ajustos › Canals propis (7d) | 5 | Pendent |
+| 6 | Canals propis: camp «On» (7a, 7c), full «Nou canal» (7b), cronologia, exportar, Ajustos › Canals propis (7d) | 5 | Feta i validada (03-11-2026) |
 | 7 | Pendents: fila «Pendent» (P5, 7e), secció al detall (P6), marcar com a fet (7f), cronologia i comptador al llistat (P7) | 5 | Pendent |
 
 Canals propis i Pendents: lliurament de Claude Design del 02-11-2026 (`converses-canals-pendents.zip`, resumit a «Disseny · Canals propis i Pendents» del `README.md`). La personalització de l'avatar tindrà el seu lliurament i la seva fase.
