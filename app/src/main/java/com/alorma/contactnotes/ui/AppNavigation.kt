@@ -46,7 +46,6 @@ import com.alorma.contactnotes.ui.navigation.TopLevelBackStack
 import com.alorma.contactnotes.ui.navigation.TopLevelRoute
 import com.alorma.contactnotes.ui.onboarding.OnboardingScreen
 import com.alorma.contactnotes.ui.paywall.PaywallScreen
-import com.alorma.contactnotes.ui.paywall.ProBenefit
 import com.alorma.contactnotes.ui.people.PeopleListRoute
 import com.alorma.contactnotes.ui.person.PersonDetailRoute
 import com.alorma.contactnotes.ui.person.PersonLockedScreen
@@ -113,7 +112,7 @@ fun AppNavigation(
               // Entrat des d'una altra app: tancar torna a l'app d'origen
               onClose = { if (imported) activity?.finish() else navigation.pop() },
               onNewPerson = { navigation.navigate(EditPersonRoute(returnSelection = true)) },
-              onOpenPro = { navigation.navigate(PaywallRoute(ProBenefit.Channels)) },
+              onOpenPro = { navigation.navigate(PaywallRoute(it)) },
             )
           }
           entry<PaywallRoute>(metadata = modalTransitions) { route ->

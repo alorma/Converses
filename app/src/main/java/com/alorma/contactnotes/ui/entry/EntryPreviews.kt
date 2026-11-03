@@ -25,12 +25,14 @@ private fun QuickNotePreview(
   state: QuickNoteUiState,
   form: EntryFormState,
   customChannels: CustomChannelsUi = CustomChannelsUi(),
+  followUps: FeatureState = FeatureState.Hidden,
 ) {
   ConversesPreviewTheme {
     QuickNoteContent(
       state = state,
       form = form,
       customChannels = customChannels,
+      followUps = followUps,
       onClose = {},
       onSelectPerson = {},
       onNewPerson = {},
@@ -103,6 +105,41 @@ internal fun QuickNoteCustomChannelsLockedPreview() {
         whenChoice = WhenChoice.Stored(PreviewData.formTime),
       ),
     customChannels = CustomChannelsUi(FeatureState.Locked, PreviewCustomChannels),
+  )
+}
+
+/** Pendent amb Pro (P5): la fila «Pendent» encesa a sota de «Quan». */
+@Preview
+@Composable
+internal fun QuickNoteFollowUpPreview() {
+  QuickNotePreview(
+    state = QuickNoteUiState(people = listOf(PreviewData.marta), selected = PreviewData.marta),
+    form =
+      EntryFormState(
+        kind = EntryKind.HEARD,
+        channel = EntryChannel(ChannelType.CHAT),
+        text = "She'll lend me the book next week.",
+        whenChoice = WhenChoice.Stored(PreviewData.formTime),
+        pending = true,
+      ),
+    followUps = FeatureState.Unlocked,
+  )
+}
+
+/** Pendent sense Pro (7e): PRO i `chevron_right` en lloc de l'interruptor. */
+@Preview
+@Composable
+internal fun QuickNoteFollowUpLockedPreview() {
+  QuickNotePreview(
+    state = QuickNoteUiState(people = listOf(PreviewData.marta), selected = PreviewData.marta),
+    form =
+      EntryFormState(
+        kind = EntryKind.HEARD,
+        channel = EntryChannel(ChannelType.CHAT),
+        text = "She'll lend me the book next week.",
+        whenChoice = WhenChoice.Stored(PreviewData.formTime),
+      ),
+    followUps = FeatureState.Locked,
   )
 }
 

@@ -43,11 +43,13 @@ import com.alorma.contactnotes.R
 import com.alorma.contactnotes.data.db.EntryEntity
 import com.alorma.contactnotes.data.db.PersonEntity
 import com.alorma.contactnotes.data.db.isOpenFollowUp
+import com.alorma.contactnotes.data.flags.FeatureState
 import com.alorma.contactnotes.designsystem.components.ConversesToggleGroup
 import com.alorma.contactnotes.designsystem.components.ToggleOption
 import com.alorma.contactnotes.designsystem.components.rememberConversesHaptics
 import com.alorma.contactnotes.shared.ChannelType
 import com.alorma.contactnotes.shared.EntryKind
+import com.alorma.contactnotes.ui.paywall.ProBenefit
 import com.alorma.contactnotes.ui.people.label
 import com.alorma.contactnotes.ui.person.PersonInitialAvatar
 import com.alorma.contactnotes.ui.person.channelName
@@ -137,7 +139,8 @@ fun EntryForm(
   onChannelChange: (EntryChannel) -> Unit,
   modifier: Modifier = Modifier,
   customChannels: CustomChannelsUi = CustomChannelsUi(),
-  onOpenPro: () -> Unit = {},
+  followUps: FeatureState = FeatureState.Hidden,
+  onOpenPro: (ProBenefit) -> Unit = {},
   focusText: Boolean = false,
   onPickPerson: (() -> Unit)? = null,
   header: @Composable () -> Unit = {},
@@ -161,11 +164,17 @@ fun EntryForm(
         channel = channel,
         customChannels = customChannels,
         onChannelChange = onChannelChange,
-        onOpenPro = onOpenPro,
+        onOpenPro = { onOpenPro(ProBenefit.Channels) },
       )
     }
     FormSection(title = stringResource(R.string.entry_when_title)) {
       WhenRow(choice = state.whenChoice, onChoice = { state.whenChoice = it })
+      FollowUpRow(
+        state = followUps,
+        pending = state.pending,
+        onPendingChange = { state.pending = it },
+        onOpenPro = { onOpenPro(ProBenefit.FollowUps) },
+      )
     }
     saveButton()
   }

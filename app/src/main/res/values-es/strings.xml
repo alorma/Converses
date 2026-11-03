@@ -286,4 +286,14 @@
     <string name="custom_channel_delete">Borrar</string>
     <string name="custom_channel_delete_title">¿Borrar «%s»?</string>
     <string name="custom_channel_delete_body">Sus entradas se quedarán en %s.</string>
+    <string name="follow_up">Pendiente</string>
+    <string name="follow_up_off_summary">Para hacer seguimiento más adelante</string>
+    <string name="follow_up_on_summary">Saldrá arriba del detalle hasta que lo marques como hecho</string>
+    <string name="follow_up_locked_summary">Haz seguimiento con Converses Pro</string>
+    <string name="follow_ups_title">Pendientes</string>
+    <string name="follow_up_label">PENDIENTE</string>
+    <string name="follow_up_mark_done">Marcar como hecho</string>
+    <string name="follow_up_marked_done">Marcado como hecho</string>
+    <string name="follow_up_set">Marcar como pendiente</string>
+    <string name="follow_up_remove">Quitar de pendientes</string>
 </resources>

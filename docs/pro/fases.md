@@ -145,4 +145,20 @@ Al menú de debug, l'apartat **Pro** té un sol interruptor, «Pro user», que e
 
 ## Fase 7 · Pendents (Pro)
 
-Tasques per proposar quan es comenci (fila «Pendent» P5/7e, secció al detall P6, marcar com a fet 7f amb «Desfés» i haptic, etiqueta PENDENT, comptador al llistat P7 sense persones protegides, punts d'entrada `Locked` → paywall `FollowUps`).
+### Decisions (03-11-2026)
+
+- **Sense el zip del disseny:** es treballa amb el resum del `README.md`.
+- **Baixada de Pro (`Locked`) amb una entrada ja pendent:** com els canals. A l'editor, l'interruptor surt encès i es pot apagar, però no encendre; al full d'accions, «Treu de pendents» funciona i «Marca com a pendent» porta PRO → paywall.
+- **Tocar una fila de «Pendents»** (fora del cercle) obre el full d'accions, com a la cronologia.
+- **Exportar:** sense canvis en aquesta fase.
+- **Un pendent fet** perd l'etiqueta i es veu com una entrada normal. Editar-lo no el torna a obrir si no s'encén «Pendent» (`withOpenFollowUp`).
+- **Textos en i es:** Follow-up / Pendiente; To follow up on later / Para hacer seguimiento más adelante; It'll stay at the top until you mark it done / Saldrá arriba del detalle hasta que lo marques como hecho; Follow it up with Converses Pro / Haz seguimiento con Converses Pro; Follow-ups / Pendientes; FOLLOW-UP / PENDIENTE; Mark as done / Marcar como hecho; Marked as done / Marcado como hecho. Nous (full d'accions): «Marca com a pendent» / Mark as follow-up / Marcar como pendiente i «Treu de pendents» / Remove from follow-ups / Quitar de pendientes.
+
+### Tasques
+
+- [x] Estat i desament: `pending` a `EntryFormState`; el desen la nota ràpida, la nova entrada i l'edició; `setOpenFollowUp` al repositori; tests de JVM — `be85bd8`
+- [ ] Fila «Pendent» a l'`EntryForm` (P5 `Unlocked`, 7e `Locked` → paywall `FollowUps`, `Hidden` no surt); captures i emulador
+- [ ] Detall: secció «Pendents» (P6), etiqueta PENDENT a la cronologia, marcar com a fet (7f) amb «Desfés» i haptic; tests, captures i emulador
+- [ ] Full d'accions: «Marca com a pendent» / «Treu de pendents»; tests, captures i emulador
+- [ ] Llistat (P7): pastilla amb `flag` i el nombre, mai a les protegides; captures i emulador
+- [ ] `docs/pro/` i backlog 6 al dia

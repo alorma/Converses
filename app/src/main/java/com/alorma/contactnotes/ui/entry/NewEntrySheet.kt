@@ -33,12 +33,16 @@ import com.alorma.contactnotes.data.db.EntryEntity
 import com.alorma.contactnotes.data.db.PersonEntity
 import com.alorma.contactnotes.data.db.color
 import com.alorma.contactnotes.data.db.shape
+import com.alorma.contactnotes.data.flags.FeatureState
+import com.alorma.contactnotes.data.flags.FollowUpsFeature
+import com.alorma.contactnotes.data.flags.rememberFeatureState
 import com.alorma.contactnotes.designsystem.components.Avatar
 import com.alorma.contactnotes.designsystem.components.ConversesSaveButton
 import com.alorma.contactnotes.designsystem.theme.SheetTitleStyle
 import com.alorma.contactnotes.shared.ChannelType
 import com.alorma.contactnotes.shared.EntryKind
 import com.alorma.contactnotes.shared.initialsOf
+import com.alorma.contactnotes.ui.paywall.ProBenefit
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -49,12 +53,13 @@ fun NewEntrySheet(
   onDismiss: () -> Unit,
   initial: EntryEntity? = null,
   initialKind: EntryKind = EntryKind.SAID,
-  onOpenPro: () -> Unit = {},
+  onOpenPro: (ProBenefit) -> Unit = {},
   focusText: Boolean = false,
   onSave: (kind: EntryKind, channel: EntryChannel, text: String, occurredAt: Long?, pending: Boolean) -> Unit,
 ) {
   val form = rememberEntryFormState(initial, initialKind)
   val customChannels = rememberCustomChannelsUi()
+  val followUps = rememberFeatureState<FollowUpsFeature>()
   val channel = form.channel ?: customChannels.defaultFor(defaultChannel) ?: EntryChannel(ChannelType.entries.first())
 
   ModalBottomSheet(
@@ -69,6 +74,7 @@ fun NewEntrySheet(
       isNew = initial == null,
       focusText = focusText,
       customChannels = customChannels,
+      followUps = followUps,
       onOpenPro = onOpenPro,
       onDismiss = onDismiss,
       onSave = { onSave(form.kind, channel, form.text.trim(), form.occurredAt, form.pending) },
@@ -87,7 +93,8 @@ fun NewEntrySheetContent(
   onSave: () -> Unit,
   focusText: Boolean = false,
   customChannels: CustomChannelsUi = CustomChannelsUi(),
-  onOpenPro: () -> Unit = {},
+  followUps: FeatureState = FeatureState.Hidden,
+  onOpenPro: (ProBenefit) -> Unit = {},
 ) {
   Column(
     modifier =
@@ -124,6 +131,7 @@ fun NewEntrySheetContent(
         channel = channel,
         onChannelChange = { form.channel = it },
         customChannels = customChannels,
+        followUps = followUps,
         onOpenPro = onOpenPro,
         focusText = focusText,
       )

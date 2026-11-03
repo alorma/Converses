@@ -22,6 +22,8 @@ import com.alorma.contactnotes.ui.entry.PersonPickerManyPreview
 import com.alorma.contactnotes.ui.entry.QuickNoteCustomChannelsLockedPreview
 import com.alorma.contactnotes.ui.entry.QuickNoteCustomChannelsPreview
 import com.alorma.contactnotes.ui.entry.QuickNoteFilledPreview
+import com.alorma.contactnotes.ui.entry.QuickNoteFollowUpLockedPreview
+import com.alorma.contactnotes.ui.entry.QuickNoteFollowUpPreview
 import com.alorma.contactnotes.ui.entry.QuickNoteNoPersonPreview
 import com.alorma.contactnotes.ui.entry.QuickNoteSharedNoPeoplePreview
 import com.alorma.contactnotes.ui.entry.QuickNoteSharedPreview
@@ -219,6 +221,22 @@ class ScreensScreenshotTests {
   @Composable
   fun quickNoteCustomChannelsLocked() {
     QuickNoteCustomChannelsLockedPreview()
+  }
+
+  @ScreenPreviews
+  @LocalizedScreenPreviews
+  @PreviewTest
+  @Composable
+  fun quickNoteFollowUp() {
+    QuickNoteFollowUpPreview()
+  }
+
+  @ScreenPreviews
+  @LocalizedScreenPreviews
+  @PreviewTest
+  @Composable
+  fun quickNoteFollowUpLocked() {
+    QuickNoteFollowUpLockedPreview()
   }
 
   @ScreenPreviews
