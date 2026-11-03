@@ -266,4 +266,24 @@
     <string name="custom_channel_create">Crear</string>
     <string name="custom_channel_cancel">Cancelar</string>
     <string name="custom_channel_name_taken">Ya hay un canal con este nombre en %s.</string>
+    <string name="settings_channels">Canales</string>
+    <string name="custom_channels_title">Canales propios</string>
+    <plurals name="custom_channels_count">
+        <item quantity="one">%d canal dentro de los grupos</item>
+        <item quantity="many">%d canales dentro de los grupos</item>
+        <item quantity="other">%d canales dentro de los grupos</item>
+    </plurals>
+    <string name="custom_channels_intro">Canales dentro de los cinco grupos. Los eliges en el campo «Dónde» de cada entrada.</string>
+    <plurals name="custom_channel_entries">
+        <item quantity="one">%d entrada</item>
+        <item quantity="many">%d entradas</item>
+        <item quantity="other">%d entradas</item>
+    </plurals>
+    <string name="custom_channel_options">Opciones de %s</string>
+    <string name="custom_channels_footer">Si borras uno, sus entradas se quedan en el grupo (por ejemplo, Chat). No se pierde ninguna nota.</string>
+    <string name="custom_channel_rename">Renombrar</string>
+    <string name="custom_channel_change_group">Cambiar de grupo</string>
+    <string name="custom_channel_delete">Borrar</string>
+    <string name="custom_channel_delete_title">¿Borrar «%s»?</string>
+    <string name="custom_channel_delete_body">Sus entradas se quedarán en %s.</string>
 </resources>

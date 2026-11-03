@@ -33,6 +33,7 @@ import com.alorma.contactnotes.ui.entry.QuickNoteScreen
 import com.alorma.contactnotes.ui.navigation.AppRoute
 import com.alorma.contactnotes.ui.navigation.AppShell
 import com.alorma.contactnotes.ui.navigation.ArchivedRoute
+import com.alorma.contactnotes.ui.navigation.CustomChannelsRoute
 import com.alorma.contactnotes.ui.navigation.EditPersonRoute
 import com.alorma.contactnotes.ui.navigation.OnboardingRoute
 import com.alorma.contactnotes.ui.navigation.PaywallRoute
@@ -49,6 +50,7 @@ import com.alorma.contactnotes.ui.paywall.ProBenefit
 import com.alorma.contactnotes.ui.people.PeopleListRoute
 import com.alorma.contactnotes.ui.person.PersonDetailRoute
 import com.alorma.contactnotes.ui.person.PersonLockedScreen
+import com.alorma.contactnotes.ui.settings.CustomChannelsScreen
 import com.alorma.contactnotes.ui.settings.SettingsScreen
 import org.koin.compose.koinInject
 
@@ -118,7 +120,14 @@ fun AppNavigation(
             PaywallScreen(highlight = route.highlight, onClose = { navigation.pop() })
           }
           entry<SettingsRoute> {
-            SettingsScreen(onBack = { navigation.pop() }, onOpenPro = { navigation.navigate(PaywallRoute(it)) })
+            SettingsScreen(
+              onBack = { navigation.pop() },
+              onOpenPro = { navigation.navigate(PaywallRoute(it)) },
+              onOpenCustomChannels = { navigation.navigate(CustomChannelsRoute) },
+            )
+          }
+          entry<CustomChannelsRoute> {
+            CustomChannelsScreen(onBack = { navigation.pop() })
           }
           entry<PersonLockedRoute> { route ->
             PersonLockedScreen(

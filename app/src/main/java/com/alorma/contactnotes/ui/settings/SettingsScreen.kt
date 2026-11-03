@@ -33,6 +33,7 @@ import androidx.compose.material.icons.rounded.BrightnessAuto
 import androidx.compose.material.icons.rounded.DarkMode
 import androidx.compose.material.icons.rounded.Face
 import androidx.compose.material.icons.rounded.Fingerprint
+import androidx.compose.material.icons.rounded.Forum
 import androidx.compose.material.icons.rounded.Language
 import androidx.compose.material.icons.rounded.LightMode
 import androidx.compose.material.icons.rounded.Palette
@@ -58,6 +59,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.LinkAnnotation
 import androidx.compose.ui.text.SpanStyle
@@ -75,6 +77,7 @@ import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.alorma.compose.settings.ui.expressive.SettingsGroup
 import com.alorma.contactnotes.R
+import com.alorma.contactnotes.data.flags.CustomChannelsFeature
 import com.alorma.contactnotes.data.flags.FeatureState
 import com.alorma.contactnotes.data.flags.PersonColorFeature
 import com.alorma.contactnotes.data.flags.rememberFeatureState
@@ -107,12 +110,14 @@ private val RelockOptions = listOf(0, 60, 300)
 fun SettingsScreen(
   onBack: () -> Unit,
   onOpenPro: (ProBenefit?) -> Unit,
+  onOpenCustomChannels: () -> Unit = {},
   viewModel: SettingsViewModel = koinViewModel(),
   appLock: AppLockManager = koinInject(),
   pro: ProRepository = koinInject(),
 ) {
   val settings by viewModel.settings.collectAsStateWithLifecycle()
   val isPro by pro.isPro.collectAsStateWithLifecycle()
+  val customChannelCount by viewModel.customChannelCount.collectAsStateWithLifecycle()
   val context = LocalContext.current
   val activity = context as FragmentActivity
   var canUnlock by remember { mutableStateOf(activity.canUnlockWithDevice()) }
@@ -129,6 +134,9 @@ fun SettingsScreen(
     isPro = isPro,
     onOpenPro = onOpenPro,
     personColor = rememberFeatureState<PersonColorFeature>(),
+    customChannels = rememberFeatureState<CustomChannelsFeature>(),
+    customChannelCount = customChannelCount,
+    onOpenCustomChannels = onOpenCustomChannels,
     canUnlock = canUnlock,
     languageName = remember { currentLanguageName(context) },
     versionName = remember { versionLabel(context) },
@@ -174,6 +182,9 @@ fun SettingsContent(
   isPro: Boolean? = null,
   /** Obre la pantalla de Pro; el benefici és l'origen (8b), `null` des de la targeta. */
   onOpenPro: (ProBenefit?) -> Unit = {},
+  customChannels: FeatureState = FeatureState.Hidden,
+  customChannelCount: Int = 0,
+  onOpenCustomChannels: () -> Unit = {},
 ) {
   val scrollBehavior = rememberTopBarScrollBehavior()
   Scaffold(
@@ -323,6 +334,32 @@ fun SettingsContent(
         color = MaterialTheme.colorScheme.onSurfaceVariant,
         modifier = Modifier.padding(horizontal = 4.dp),
       )
+
+      if (customChannels != FeatureState.Hidden) {
+        SettingsGroup(
+          title = {
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+              SectionTitle(stringResource(R.string.settings_channels))
+              ProBadge(
+                text = stringResource(R.string.pro_badge),
+                contentDescription = stringResource(R.string.pro_description),
+              )
+            }
+          },
+          verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap),
+        ) {
+          SettingRow(
+            title = stringResource(R.string.custom_channels_title),
+            subtitle = pluralStringResource(R.plurals.custom_channels_count, customChannelCount, customChannelCount),
+            icon = Icons.Rounded.Forum,
+            trailing = { Icon(Icons.AutoMirrored.Rounded.KeyboardArrowRight, contentDescription = null) },
+            shape = groupedItemShape(0, 1),
+            onClick = {
+              if (customChannels == FeatureState.Unlocked) onOpenCustomChannels() else onOpenPro(ProBenefit.Channels)
+            },
+          )
+        }
+      }
 
       val aboutCount = 3
       SettingsGroup(

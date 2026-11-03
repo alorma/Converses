@@ -266,4 +266,22 @@
     <string name="custom_channel_create">Crea</string>
     <string name="custom_channel_cancel">Cancel·la</string>
     <string name="custom_channel_name_taken">Ja hi ha un canal amb aquest nom a %s.</string>
+    <string name="settings_channels">Canals</string>
+    <string name="custom_channels_title">Canals propis</string>
+    <plurals name="custom_channels_count">
+        <item quantity="one">%d canal dins dels grups</item>
+        <item quantity="other">%d canals dins dels grups</item>
+    </plurals>
+    <string name="custom_channels_intro">Canals dins dels cinc grups. Els tries al camp «On» de cada entrada.</string>
+    <plurals name="custom_channel_entries">
+        <item quantity="one">%d entrada</item>
+        <item quantity="other">%d entrades</item>
+    </plurals>
+    <string name="custom_channel_options">Opcions de %s</string>
+    <string name="custom_channels_footer">Si n\'esborres un, les seves entrades es queden al grup (per exemple, Xat). No es perd cap nota.</string>
+    <string name="custom_channel_rename">Reanomena</string>
+    <string name="custom_channel_change_group">Canvia de grup</string>
+    <string name="custom_channel_delete">Esborra</string>
+    <string name="custom_channel_delete_title">Esborrar «%s»?</string>
+    <string name="custom_channel_delete_body">Les seves entrades es quedaran a %s.</string>
 </resources>

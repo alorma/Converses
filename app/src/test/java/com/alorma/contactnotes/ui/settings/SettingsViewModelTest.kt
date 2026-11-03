@@ -1,6 +1,7 @@
 package com.alorma.contactnotes.ui.settings
 
 import com.alorma.contactnotes.designsystem.theme.ThemeMode
+import com.alorma.contactnotes.testing.FakeDb
 import com.alorma.contactnotes.testing.FakeSettingsRepository
 import com.alorma.contactnotes.testing.MainDispatcherRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -21,7 +22,7 @@ class SettingsViewModelTest {
   fun everyChangeReachesTheRepositoryAndComesBackInTheState() =
     runTest {
       val repository = FakeSettingsRepository()
-      val vm = SettingsViewModel(repository)
+      val vm = SettingsViewModel(repository, FakeDb().repository)
       backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { vm.settings.collect {} }
 
       assertFalse(vm.settings.value.dynamicColor)

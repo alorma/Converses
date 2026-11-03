@@ -57,3 +57,7 @@ data class PersonLockedRoute(
 data class PaywallRoute(
   val highlight: ProBenefit? = null,
 ) : AppRoute
+
+/** Ajustos › Canals propis (7d): només hi arriba qui té Pro; sense, la fila d'Ajustos porta al paywall. */
+@Serializable
+data object CustomChannelsRoute : AppRoute

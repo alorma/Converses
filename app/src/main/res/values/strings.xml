@@ -268,4 +268,22 @@
     <string name="custom_channel_create">Create</string>
     <string name="custom_channel_cancel">Cancel</string>
     <string name="custom_channel_name_taken">There\'s already a channel with this name in %s.</string>
+    <string name="settings_channels">Channels</string>
+    <string name="custom_channels_title">Custom channels</string>
+    <plurals name="custom_channels_count">
+        <item quantity="one">%d channel within groups</item>
+        <item quantity="other">%d channels within groups</item>
+    </plurals>
+    <string name="custom_channels_intro">Channels inside the five groups. Pick them in the “Where” field of each entry.</string>
+    <plurals name="custom_channel_entries">
+        <item quantity="one">%d entry</item>
+        <item quantity="other">%d entries</item>
+    </plurals>
+    <string name="custom_channel_options">Options for %s</string>
+    <string name="custom_channels_footer">If you delete one, its entries stay in the group (for example, Chat). No notes are lost.</string>
+    <string name="custom_channel_rename">Rename</string>
+    <string name="custom_channel_change_group">Change group</string>
+    <string name="custom_channel_delete">Delete</string>
+    <string name="custom_channel_delete_title">Delete “%s”?</string>
+    <string name="custom_channel_delete_body">Its entries will stay in %s.</string>
 </resources>

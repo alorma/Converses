@@ -55,6 +55,8 @@ import com.alorma.contactnotes.ui.person.PersonLockedCanceledPreview
 import com.alorma.contactnotes.ui.person.PersonLockedLockedOutPreview
 import com.alorma.contactnotes.ui.person.PersonLockedNoCredentialsPreview
 import com.alorma.contactnotes.ui.person.PersonLockedWaitingPreview
+import com.alorma.contactnotes.ui.settings.CustomChannelsEmptyPreview
+import com.alorma.contactnotes.ui.settings.CustomChannelsPreview
 import com.alorma.contactnotes.ui.settings.SettingsAppLockPreview
 import com.alorma.contactnotes.ui.settings.SettingsNoLockPreview
 import com.alorma.contactnotes.ui.settings.SettingsProPreview
@@ -376,6 +378,21 @@ class ScreensScreenshotTests {
   @Composable
   fun paywallOwned() {
     PaywallOwnedPreview()
+  }
+
+  @ScreenPreviews
+  @LocalizedScreenPreviews
+  @PreviewTest
+  @Composable
+  fun customChannels() {
+    CustomChannelsPreview()
+  }
+
+  @ScreenPreviews
+  @PreviewTest
+  @Composable
+  fun customChannelsEmpty() {
+    CustomChannelsEmptyPreview()
   }
 
   @ScreenPreviews

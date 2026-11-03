@@ -1,6 +1,10 @@
 package com.alorma.contactnotes.designsystem.components
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.LargeTopAppBar
@@ -12,8 +16,11 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.alorma.contactnotes.designsystem.theme.ScreenTitleStyle
 import com.alorma.contactnotes.designsystem.theme.SectionTitleStyle
 
@@ -32,6 +39,8 @@ fun ConversesTopBar(
   large: Boolean = false,
   navigationIcon: @Composable () -> Unit = {},
   actions: @Composable RowScope.() -> Unit = {},
+  /** Va just després del títol (p. ex. l'etiqueta PRO). */
+  titleTrailing: (@Composable () -> Unit)? = null,
 ) {
   // La mitjana pinta el títol desplegat amb headlineSmall i la gran amb headlineMedium; plegat sempre titleLarge
   MaterialExpressiveTheme(
@@ -50,7 +59,23 @@ fun ConversesTopBar(
         containerColor = MaterialTheme.colorScheme.surface,
         scrolledContainerColor = MaterialTheme.colorScheme.surface,
       )
-    val titleContent: @Composable () -> Unit = { Text(text = title, maxLines = 1, overflow = TextOverflow.Ellipsis) }
+    val titleContent: @Composable () -> Unit = {
+      Row(
+        modifier = if (titleTrailing != null) Modifier.padding(end = 16.dp) else Modifier,
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(10.dp),
+      ) {
+        Text(
+          text = title,
+          maxLines = 1,
+          overflow = TextOverflow.Ellipsis,
+          modifier = Modifier.weight(1f, fill = false),
+          // Amb alguna cosa al costat (l'etiqueta PRO), el títol s'encongeix abans de tallar-se
+          autoSize = if (titleTrailing != null) TextAutoSize.StepBased(minFontSize = 20.sp) else null,
+        )
+        titleTrailing?.invoke()
+      }
+    }
     if (large) {
       LargeTopAppBar(
         title = titleContent,
