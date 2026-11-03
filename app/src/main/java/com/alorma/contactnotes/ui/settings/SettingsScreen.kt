@@ -84,7 +84,6 @@ import com.alorma.contactnotes.data.flags.rememberFeatureState
 import com.alorma.contactnotes.data.pro.ProRepository
 import com.alorma.contactnotes.data.settings.AppLockManager
 import com.alorma.contactnotes.data.settings.AppSettings
-import com.alorma.contactnotes.designsystem.components.ConversesSwitch
 import com.alorma.contactnotes.designsystem.components.ConversesToggleGroup
 import com.alorma.contactnotes.designsystem.components.ConversesTopBar
 import com.alorma.contactnotes.designsystem.components.GroupedListDefaults
@@ -234,25 +233,20 @@ fun SettingsContent(
         )
         when (personColor) {
           FeatureState.Hidden -> Unit
-          // Sense acció fins que hi hagi paywall (`docs/pro/fases.md`, fase 3)
+          // Sense Pro (o després d'una baixada), com «Canals propis»: tota la fila obre la pantalla de Pro (11e)
           FeatureState.Locked ->
             SettingRow(
               title = stringResource(R.string.settings_person_color),
               subtitle = stringResource(R.string.settings_person_color_summary),
               icon = Icons.Rounded.Face,
               onClick = { onOpenPro(ProBenefit.People) },
-              trailing = {
-                Row(
-                  horizontalArrangement = Arrangement.spacedBy(8.dp),
-                  verticalAlignment = Alignment.CenterVertically,
-                ) {
-                  ProBadge(
-                    text = stringResource(R.string.pro_badge),
-                    contentDescription = stringResource(R.string.pro_description),
-                  )
-                  ConversesSwitch(checked = false, onCheckedChange = null, enabled = false)
-                }
+              titleBadge = {
+                ProBadge(
+                  text = stringResource(R.string.pro_badge),
+                  contentDescription = stringResource(R.string.pro_description),
+                )
               },
+              trailing = { Icon(Icons.AutoMirrored.Rounded.KeyboardArrowRight, contentDescription = null) },
               shape = groupedItemShape(2, themeCount),
             )
           FeatureState.Unlocked ->

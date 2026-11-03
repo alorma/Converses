@@ -67,6 +67,7 @@ import com.alorma.contactnotes.ui.settings.CustomChannelsEmptyPreview
 import com.alorma.contactnotes.ui.settings.CustomChannelsPreview
 import com.alorma.contactnotes.ui.settings.SettingsAppLockPreview
 import com.alorma.contactnotes.ui.settings.SettingsNoLockPreview
+import com.alorma.contactnotes.ui.settings.SettingsPersonColorLockedPreview
 import com.alorma.contactnotes.ui.settings.SettingsProPreview
 import com.alorma.contactnotes.ui.task.TaskFormEditPreview
 import com.alorma.contactnotes.ui.task.TaskFormEmptyPreview
@@ -445,6 +446,13 @@ class ScreensScreenshotTests {
   @Composable
   fun settingsNoLock() {
     SettingsNoLockPreview()
+  }
+
+  @ScreenPreviews
+  @PreviewTest
+  @Composable
+  fun settingsPersonColorLocked() {
+    SettingsPersonColorLockedPreview()
   }
 
   @ScreenPreviews

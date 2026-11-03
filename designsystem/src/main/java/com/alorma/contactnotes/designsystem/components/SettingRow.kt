@@ -1,5 +1,7 @@
 package com.alorma.contactnotes.designsystem.components
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.material3.Icon
@@ -8,12 +10,14 @@ import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
 
 /**
  * Fila d'ajustos sobre `surface-card`; la forma ve de la posició dins el grup (24 als extrems, 6 entre files).
@@ -29,11 +33,22 @@ fun SettingRow(
   onClick: (() -> Unit)? = null,
   trailing: (@Composable () -> Unit)? = null,
   contentModifier: Modifier = Modifier,
+  /** Al costat del títol, com l'etiqueta PRO. */
+  titleBadge: (@Composable () -> Unit)? = null,
 ) {
   val content = @Composable {
     ListItem(
       modifier = contentModifier,
-      headlineContent = { Text(title, fontWeight = FontWeight.SemiBold) },
+      headlineContent = {
+        if (titleBadge == null) {
+          Text(title, fontWeight = FontWeight.SemiBold)
+        } else {
+          Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+            Text(title, fontWeight = FontWeight.SemiBold, modifier = Modifier.weight(1f, fill = false))
+            titleBadge()
+          }
+        }
+      },
       supportingContent = subtitle?.let { { Text(it) } },
       leadingContent = icon?.let { { Icon(it, contentDescription = null) } },
       trailingContent = trailing,
