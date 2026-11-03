@@ -135,7 +135,7 @@ Al menú de debug, l'apartat **Pro** té un sol interruptor, «Pro user», que e
 
 ### Tasques
 
-- [ ] Estat i desament: `EntryChannel` (grup + canal propi) a `EntryFormState`; canviar de grup desmarca el canal; el desen el detall i la nota ràpida; tests de JVM
+- [x] Estat i desament: `EntryChannel` (grup + canal propi) a `EntryFormState`; canviar de grup desmarca el canal; el desen el detall i la nota ràpida; tests de JVM — `906ca3f`
 - [ ] Camp «On» (7a, 7c): targeta del grup amb els canals i «+ Nou»; `Locked` amb «Canal propi» i PRO → paywall `Channels`; captures i emulador
 - [ ] Full «Nou canal» / «Edita el canal» (7b); en crear-lo queda triat; tests de JVM, captures i emulador
 - [ ] Cronologia, full d'accions i exportar amb el nom del canal; tests de JVM, captures i emulador

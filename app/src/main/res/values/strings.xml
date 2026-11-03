@@ -251,4 +251,13 @@
     <string name="paywall_nothing_to_restore">There\'s no purchase to restore on this Google account.</string>
     <string name="settings_pro_summary">One payment: custom channels, follow-ups and more</string>
     <string name="settings_pro_owned_summary">Active · thanks for your support</string>
+    <!-- Canals propis (Pro) -->
+    <string name="custom_channel_pick_in_person">WHERE IN PERSON?</string>
+    <string name="custom_channel_pick_phone">WHICH PHONE?</string>
+    <string name="custom_channel_pick_chat">WHICH CHAT?</string>
+    <string name="custom_channel_pick_social">WHICH NETWORK?</string>
+    <string name="custom_channel_pick_other">WHICH CHANNEL?</string>
+    <string name="custom_channel_new_chip">New</string>
+    <string name="custom_channels_overline">CUSTOM CHANNELS</string>
+    <string name="custom_channel_locked_chip">Custom channel</string>
 </resources>

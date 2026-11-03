@@ -17,6 +17,8 @@ import com.alorma.contactnotes.ui.entry.EditEntrySheetPreview
 import com.alorma.contactnotes.ui.entry.NewEntrySheetPreview
 import com.alorma.contactnotes.ui.entry.PersonPickerFewPreview
 import com.alorma.contactnotes.ui.entry.PersonPickerManyPreview
+import com.alorma.contactnotes.ui.entry.QuickNoteCustomChannelsLockedPreview
+import com.alorma.contactnotes.ui.entry.QuickNoteCustomChannelsPreview
 import com.alorma.contactnotes.ui.entry.QuickNoteFilledPreview
 import com.alorma.contactnotes.ui.entry.QuickNoteNoPersonPreview
 import com.alorma.contactnotes.ui.entry.QuickNoteSharedNoPeoplePreview
@@ -189,6 +191,22 @@ class ScreensScreenshotTests {
   @Composable
   fun quickNoteShared() {
     QuickNoteSharedPreview()
+  }
+
+  @ScreenPreviews
+  @LocalizedScreenPreviews
+  @PreviewTest
+  @Composable
+  fun quickNoteCustomChannels() {
+    QuickNoteCustomChannelsPreview()
+  }
+
+  @ScreenPreviews
+  @LocalizedScreenPreviews
+  @PreviewTest
+  @Composable
+  fun quickNoteCustomChannelsLocked() {
+    QuickNoteCustomChannelsLockedPreview()
   }
 
   @ScreenPreviews

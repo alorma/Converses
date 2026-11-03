@@ -87,6 +87,7 @@ import com.alorma.contactnotes.shared.initialsOf
 import com.alorma.contactnotes.ui.edit.EditFocus
 import com.alorma.contactnotes.ui.entry.EntryChannel
 import com.alorma.contactnotes.ui.entry.NewEntrySheet
+import com.alorma.contactnotes.ui.paywall.ProBenefit
 import com.alorma.contactnotes.ui.people.label
 import java.time.LocalDate
 import kotlinx.coroutines.delay
@@ -129,6 +130,7 @@ fun PersonDetailRoute(
   personId: Long,
   onBack: () -> Unit,
   onEdit: (EditFocus?) -> Unit,
+  onOpenPro: (ProBenefit) -> Unit = {},
   openNewEntry: Boolean = false,
   viewModel: PersonDetailViewModel = koinViewModel(parameters = { parametersOf(personId) }),
 ) {
@@ -209,6 +211,7 @@ fun PersonDetailRoute(
         initialKind = newEntryKind,
         focusText = newEntryFocus,
         onDismiss = { showNewEntry = false },
+        onOpenPro = { onOpenPro(ProBenefit.Channels) },
         onSave = { kind, channel, text, at ->
           viewModel.addEntry(kind, channel, text, at)
           showNewEntry = false
@@ -261,6 +264,7 @@ fun PersonDetailRoute(
             defaultChannel = null,
             initial = actionEntry,
             onDismiss = ::closeAction,
+            onOpenPro = { onOpenPro(ProBenefit.Channels) },
             onSave = { kind, channel, text, at ->
               viewModel.updateEntry(actionEntry, kind, channel, text, at)
               closeAction()

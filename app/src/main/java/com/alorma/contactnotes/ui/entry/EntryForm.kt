@@ -128,6 +128,9 @@ fun EntryForm(
   channel: EntryChannel,
   onChannelChange: (EntryChannel) -> Unit,
   modifier: Modifier = Modifier,
+  customChannels: CustomChannelsUi = CustomChannelsUi(),
+  onNewChannel: (ChannelType) -> Unit = {},
+  onOpenPro: () -> Unit = {},
   focusText: Boolean = false,
   onPickPerson: (() -> Unit)? = null,
   header: @Composable () -> Unit = {},
@@ -147,6 +150,13 @@ fun EntryForm(
     )
     FormSection(title = stringResource(R.string.entry_where_title)) {
       ChannelChips(selected = channel.group, onSelected = { onChannelChange(channel.withGroup(it)) })
+      CustomChannelCard(
+        channel = channel,
+        customChannels = customChannels,
+        onChannelChange = onChannelChange,
+        onNewChannel = onNewChannel,
+        onOpenPro = onOpenPro,
+      )
     }
     FormSection(title = stringResource(R.string.entry_when_title)) {
       WhenRow(choice = state.whenChoice, onChoice = { state.whenChoice = it })
@@ -275,7 +285,6 @@ fun ChannelChips(
   onSelected: (ChannelType) -> Unit,
   modifier: Modifier = Modifier,
 ) {
-  val scheme = MaterialTheme.colorScheme
   val haptics = rememberConversesHaptics()
   Row(
     modifier = modifier.horizontalScroll(rememberScrollState()),
@@ -283,35 +292,52 @@ fun ChannelChips(
   ) {
     ChannelType.entries.forEach { channel ->
       val isSelected = channel == selected
-      FilterChip(
+      SelectableChip(
+        label = channelName(channel),
         selected = isSelected,
         onClick = {
           if (!isSelected) haptics.segmentTick()
           onSelected(channel)
         },
-        modifier = Modifier.height(36.dp),
-        label = { Text(channelName(channel)) },
-        leadingIcon =
-          if (isSelected) {
-            {
-              Icon(
-                Icons.Rounded.Check,
-                contentDescription = null,
-                modifier = Modifier.size(FilterChipDefaults.IconSize),
-              )
-            }
-          } else {
-            null
-          },
-        shape = RoundedCornerShape(12.dp),
-        colors =
-          FilterChipDefaults.filterChipColors(
-            selectedContainerColor = scheme.primaryContainer,
-            selectedLabelColor = scheme.onPrimaryContainer,
-            selectedLeadingIconColor = scheme.onPrimaryContainer,
-          ),
-        border = if (isSelected) null else BorderStroke(1.dp, scheme.outlineVariant),
       )
     }
   }
+}
+
+/** Xip de 36 dp del camp «On»: triat amb `check` i `primaryContainer` (grups i canals propis). */
+@Composable
+internal fun SelectableChip(
+  label: String,
+  selected: Boolean,
+  onClick: () -> Unit,
+  modifier: Modifier = Modifier,
+) {
+  val scheme = MaterialTheme.colorScheme
+  val isSelected = selected
+  FilterChip(
+    selected = isSelected,
+    onClick = onClick,
+    modifier = modifier.height(36.dp),
+    label = { Text(label) },
+    leadingIcon =
+      if (isSelected) {
+        {
+          Icon(
+            Icons.Rounded.Check,
+            contentDescription = null,
+            modifier = Modifier.size(FilterChipDefaults.IconSize),
+          )
+        }
+      } else {
+        null
+      },
+    shape = RoundedCornerShape(12.dp),
+    colors =
+      FilterChipDefaults.filterChipColors(
+        selectedContainerColor = scheme.primaryContainer,
+        selectedLabelColor = scheme.onPrimaryContainer,
+        selectedLeadingIconColor = scheme.onPrimaryContainer,
+      ),
+    border = if (isSelected) null else BorderStroke(1.dp, scheme.outlineVariant),
+  )
 }

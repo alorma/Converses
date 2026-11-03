@@ -9,9 +9,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.alorma.contactnotes.data.db.CustomChannelEntity
 import com.alorma.contactnotes.data.db.color
+import com.alorma.contactnotes.data.flags.FeatureState
 import com.alorma.contactnotes.designsystem.preview.ConversesPreviewTheme
 import com.alorma.contactnotes.designsystem.theme.PersonTheme
+import com.alorma.contactnotes.shared.ChannelType
 import com.alorma.contactnotes.shared.EntryKind
 import com.alorma.contactnotes.ui.preview.PreviewData
 
@@ -21,11 +24,13 @@ private val Channels = PreviewData.martaChannels
 private fun QuickNotePreview(
   state: QuickNoteUiState,
   form: EntryFormState,
+  customChannels: CustomChannelsUi = CustomChannelsUi(),
 ) {
   ConversesPreviewTheme {
     QuickNoteContent(
       state = state,
       form = form,
+      customChannels = customChannels,
       onClose = {},
       onSelectPerson = {},
       onNewPerson = {},
@@ -59,6 +64,45 @@ internal fun QuickNoteFilledPreview() {
         text = "She can't come on Saturday.",
         whenChoice = WhenChoice.Custom(PreviewData.formTime),
       ),
+  )
+}
+
+private val PreviewCustomChannels =
+  listOf("WhatsApp", "Telegram", "Discord").mapIndexed { index, name ->
+    CustomChannelEntity(id = index + 1L, channelType = ChannelType.CHAT, name = name, createdAt = 0)
+  }
+
+/** Canals propis amb Pro (7a): el grup Xat, amb WhatsApp triat. */
+@Preview
+@Composable
+internal fun QuickNoteCustomChannelsPreview() {
+  QuickNotePreview(
+    state = QuickNoteUiState(people = listOf(PreviewData.marta), selected = PreviewData.marta),
+    form =
+      EntryFormState(
+        kind = EntryKind.SAID,
+        channel = EntryChannel(ChannelType.CHAT, customChannelId = 1),
+        text = "Told her I can't make it to dinner on Saturday.",
+        whenChoice = WhenChoice.Stored(PreviewData.formTime),
+      ),
+    customChannels = CustomChannelsUi(FeatureState.Unlocked, PreviewCustomChannels),
+  )
+}
+
+/** Canals propis sense Pro (7c): «Canal propi» amb PRO. */
+@Preview
+@Composable
+internal fun QuickNoteCustomChannelsLockedPreview() {
+  QuickNotePreview(
+    state = QuickNoteUiState(people = listOf(PreviewData.marta), selected = PreviewData.marta),
+    form =
+      EntryFormState(
+        kind = EntryKind.SAID,
+        channel = EntryChannel(ChannelType.CHAT),
+        text = "Told her I can't make it to dinner on Saturday.",
+        whenChoice = WhenChoice.Stored(PreviewData.formTime),
+      ),
+    customChannels = CustomChannelsUi(FeatureState.Locked, PreviewCustomChannels),
   )
 }
 

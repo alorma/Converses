@@ -249,4 +249,13 @@
     <string name="paywall_nothing_to_restore">No hi ha cap compra per restaurar en aquest compte de Google.</string>
     <string name="settings_pro_summary">Un sol pagament: canals propis, pendents i més</string>
     <string name="settings_pro_owned_summary">Activat · gràcies pel suport</string>
+    <!-- Canals propis (Pro) -->
+    <string name="custom_channel_pick_in_person">ON EN PERSONA?</string>
+    <string name="custom_channel_pick_phone">QUIN TELÈFON?</string>
+    <string name="custom_channel_pick_chat">QUIN XAT?</string>
+    <string name="custom_channel_pick_social">QUINA XARXA?</string>
+    <string name="custom_channel_pick_other">QUIN CANAL?</string>
+    <string name="custom_channel_new_chip">Nou</string>
+    <string name="custom_channels_overline">CANALS PROPIS</string>
+    <string name="custom_channel_locked_chip">Canal propi</string>
 </resources>

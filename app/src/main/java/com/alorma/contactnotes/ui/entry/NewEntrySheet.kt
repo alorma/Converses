@@ -49,11 +49,13 @@ fun NewEntrySheet(
   onDismiss: () -> Unit,
   initial: EntryEntity? = null,
   initialKind: EntryKind = EntryKind.SAID,
+  onOpenPro: () -> Unit = {},
   focusText: Boolean = false,
   onSave: (kind: EntryKind, channel: EntryChannel, text: String, occurredAt: Long?) -> Unit,
 ) {
   val form = rememberEntryFormState(initial, initialKind)
-  val channel = form.channel ?: defaultChannel ?: EntryChannel(ChannelType.entries.first())
+  val customChannels = rememberCustomChannelsUi()
+  val channel = form.channel ?: customChannels.defaultFor(defaultChannel) ?: EntryChannel(ChannelType.entries.first())
 
   ModalBottomSheet(
     onDismissRequest = onDismiss,
@@ -66,6 +68,8 @@ fun NewEntrySheet(
       channel = channel,
       isNew = initial == null,
       focusText = focusText,
+      customChannels = customChannels,
+      onOpenPro = onOpenPro,
       onDismiss = onDismiss,
       onSave = { onSave(form.kind, channel, form.text.trim(), form.occurredAt) },
     )
@@ -82,6 +86,8 @@ fun NewEntrySheetContent(
   onDismiss: () -> Unit,
   onSave: () -> Unit,
   focusText: Boolean = false,
+  customChannels: CustomChannelsUi = CustomChannelsUi(),
+  onOpenPro: () -> Unit = {},
 ) {
   Column(
     modifier =
@@ -117,6 +123,8 @@ fun NewEntrySheetContent(
         person = person,
         channel = channel,
         onChannelChange = { form.channel = it },
+        customChannels = customChannels,
+        onOpenPro = onOpenPro,
         focusText = focusText,
       )
     }

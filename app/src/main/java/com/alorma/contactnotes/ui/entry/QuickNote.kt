@@ -202,6 +202,7 @@ fun importedKind(
 fun QuickNoteScreen(
   personId: Long,
   onClose: () -> Unit,
+  onOpenPro: () -> Unit = {},
   onNewPerson: () -> Unit,
   sharedText: String? = null,
   viewModel: QuickNoteViewModel = koinViewModel(parameters = { parametersOf(personId) }),
@@ -244,6 +245,8 @@ fun QuickNoteScreen(
     importedText = sharedText,
     onClose = onClose,
     onSelectPerson = viewModel::select,
+    customChannels = rememberCustomChannelsUi(),
+    onOpenPro = onOpenPro,
     onNewPerson = onNewPerson,
     onSave = { person, channel ->
       viewModel.save(person.id, form.kind, channel, form.text.trim(), form.occurredAt, onClose)
@@ -282,9 +285,12 @@ fun QuickNoteContent(
   onNewPerson: () -> Unit,
   onSave: (person: PersonEntity, channel: EntryChannel) -> Unit,
   importedText: String? = null,
+  customChannels: CustomChannelsUi = CustomChannelsUi(),
+  onOpenPro: () -> Unit = {},
 ) {
   val selected = state.selected
-  val channel = form.channel ?: state.lastChannel ?: EntryChannel(ChannelType.entries.first())
+  val channel =
+    form.channel ?: customChannels.defaultFor(state.lastChannel) ?: EntryChannel(ChannelType.entries.first())
   var showSheet by rememberSaveable { mutableStateOf(false) }
   // El xip «Persona» obre el mateix selector; en triar-ne una, el xip queda seleccionat
   var pickedFromChip by rememberSaveable { mutableStateOf(false) }
@@ -355,6 +361,8 @@ fun QuickNoteContent(
           person = selected,
           channel = channel,
           onChannelChange = { form.channel = it },
+          customChannels = customChannels,
+          onOpenPro = onOpenPro,
           onPickPerson = {
             pickedFromChip = true
             openPicker()
