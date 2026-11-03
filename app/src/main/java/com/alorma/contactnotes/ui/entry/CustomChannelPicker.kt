@@ -116,6 +116,8 @@ fun CustomChannelCard(
       FlowRow(
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp),
+        // El xip discontinu té 48 dp d'àrea tàctil i els FilterChip 36: centrats, queden alineats
+        itemVerticalAlignment = Alignment.CenterVertically,
       ) {
         shown.forEach { custom ->
           val isSelected = custom.id == channel.customChannelId
