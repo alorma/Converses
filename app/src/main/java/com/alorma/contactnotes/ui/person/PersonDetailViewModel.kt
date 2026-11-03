@@ -6,6 +6,8 @@ import com.alorma.contactnotes.data.ConversesRepository
 import com.alorma.contactnotes.data.db.EntryEntity
 import com.alorma.contactnotes.data.db.PersonEntity
 import com.alorma.contactnotes.data.db.PinnedFactEntity
+import com.alorma.contactnotes.data.db.isOpenFollowUp
+import com.alorma.contactnotes.data.db.withOpenFollowUp
 import com.alorma.contactnotes.shared.ChannelType
 import com.alorma.contactnotes.shared.EntryKind
 import com.alorma.contactnotes.ui.entry.EntryChannel
@@ -95,6 +97,7 @@ class PersonDetailViewModel(
     channel: EntryChannel,
     text: String,
     occurredAt: Long?,
+    pending: Boolean = false,
   ) {
     viewModelScope.launch {
       repository.addEntry(
@@ -105,6 +108,7 @@ class PersonDetailViewModel(
           customChannelId = channel.customChannelId,
           text = text,
           occurredAt = occurredAt ?: System.currentTimeMillis(),
+          isPending = pending,
         ),
       )
     }
@@ -116,16 +120,18 @@ class PersonDetailViewModel(
     channel: EntryChannel,
     text: String,
     occurredAt: Long?,
+    pending: Boolean = entry.isOpenFollowUp,
   ) {
     viewModelScope.launch {
       repository.updateEntry(
-        entry.copy(
-          kind = kind,
-          channelType = channel.group,
-          customChannelId = channel.customChannelId,
-          text = text,
-          occurredAt = occurredAt ?: entry.occurredAt,
-        ),
+        entry
+          .copy(
+            kind = kind,
+            channelType = channel.group,
+            customChannelId = channel.customChannelId,
+            text = text,
+            occurredAt = occurredAt ?: entry.occurredAt,
+          ).withOpenFollowUp(pending),
       )
     }
   }

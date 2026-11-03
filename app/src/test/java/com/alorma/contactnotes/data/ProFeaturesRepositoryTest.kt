@@ -1,10 +1,12 @@
 package com.alorma.contactnotes.data
 
+import com.alorma.contactnotes.data.db.withOpenFollowUp
 import com.alorma.contactnotes.shared.ChannelType
 import com.alorma.contactnotes.testing.FakeDb
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -237,5 +239,35 @@ class ProFeaturesRepositoryTest {
 
       assertEquals(2, list.getValue(open.id).openFollowUps)
       assertEquals(0, list.getValue(secret.id).openFollowUps)
+    }
+
+  @Test
+  fun settingAFollowUpOpensItAndRemovingItClearsBothFields() =
+    runTest {
+      val person = db.addPerson("Marta")
+      val entry = db.addEntry(person.id)
+
+      repository.setOpenFollowUp(entry, open = true)
+      val opened = db.entries.value.single()
+      assertTrue(opened.isPending)
+      assertNull(opened.doneAt)
+
+      repository.setOpenFollowUp(opened, open = false)
+      val removed = db.entries.value.single()
+      assertFalse(removed.isPending)
+      assertNull(removed.doneAt)
+    }
+
+  @Test
+  fun openingADoneFollowUpReopensItAndClosingItLeavesItDone() =
+    runTest {
+      val person = db.addPerson("Marta")
+      val done = db.addEntry(person.id, isPending = true, doneAt = 5_000)
+
+      assertEquals(done, done.withOpenFollowUp(false))
+
+      repository.setOpenFollowUp(done, open = true)
+
+      assertEquals(listOf(done.id), repository.observeOpenFollowUps(person.id).first().map { it.id })
     }
 }

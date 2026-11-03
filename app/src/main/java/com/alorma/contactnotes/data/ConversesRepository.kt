@@ -11,6 +11,7 @@ import com.alorma.contactnotes.data.db.PersonEntity
 import com.alorma.contactnotes.data.db.PersonListItem
 import com.alorma.contactnotes.data.db.PinnedFactDao
 import com.alorma.contactnotes.data.db.PinnedFactEntity
+import com.alorma.contactnotes.data.db.withOpenFollowUp
 import com.alorma.contactnotes.shared.ChannelType
 import com.alorma.contactnotes.shared.EntryKind
 import kotlinx.coroutines.flow.Flow
@@ -123,6 +124,15 @@ class ConversesRepository(
     entry: EntryEntity,
     at: Long = System.currentTimeMillis(),
   ) = entryDao.setDoneAt(entry.id, at)
+
+  /** Full d'accions: «Marca com a pendent» (`true`) o «Treu de pendents» (`false`). */
+  suspend fun setOpenFollowUp(
+    entry: EntryEntity,
+    open: Boolean,
+  ) {
+    val updated = entry.withOpenFollowUp(open)
+    if (updated != entry) entryDao.update(updated)
+  }
 
   /** «Desfés» del snackbar: torna a ser pendent sense fer. */
   suspend fun undoFollowUpDone(entry: EntryEntity) = entryDao.setDoneAt(entry.id, null)

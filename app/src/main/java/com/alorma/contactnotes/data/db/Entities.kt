@@ -84,6 +84,17 @@ data class EntryEntity(
 /** Pendent i encara no fet: surt a la secció «Pendents» del detall i porta l'etiqueta PENDENT. */
 val EntryEntity.isOpenFollowUp: Boolean get() = isPending && doneAt == null
 
+/**
+ * L'entrada amb el pendent obert ([open]) o no. Si ja ho era, no canvia (un pendent fet continua fet si no
+ * es torna a obrir); obrir-lo esborra [EntryEntity.doneAt] i treure'l deixa l'entrada sense pendent.
+ */
+fun EntryEntity.withOpenFollowUp(open: Boolean): EntryEntity =
+  when {
+    open == isOpenFollowUp -> this
+    open -> copy(isPending = true, doneAt = null)
+    else -> copy(isPending = false, doneAt = null)
+  }
+
 @Entity(
   tableName = "pinned_fact",
   foreignKeys = [

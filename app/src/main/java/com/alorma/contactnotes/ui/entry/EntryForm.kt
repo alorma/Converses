@@ -42,6 +42,7 @@ import androidx.compose.ui.unit.sp
 import com.alorma.contactnotes.R
 import com.alorma.contactnotes.data.db.EntryEntity
 import com.alorma.contactnotes.data.db.PersonEntity
+import com.alorma.contactnotes.data.db.isOpenFollowUp
 import com.alorma.contactnotes.designsystem.components.ConversesToggleGroup
 import com.alorma.contactnotes.designsystem.components.ToggleOption
 import com.alorma.contactnotes.designsystem.components.rememberConversesHaptics
@@ -61,6 +62,7 @@ class EntryFormState(
   text: String = "",
   whenChoice: WhenChoice = WhenChoice.Now,
   kindTouched: Boolean = false,
+  pending: Boolean = false,
 ) {
   var kind by mutableStateOf(kind)
 
@@ -68,6 +70,9 @@ class EntryFormState(
   var channel by mutableStateOf(channel)
   var text by mutableStateOf(text)
   var whenChoice by mutableStateOf(whenChoice)
+
+  /** Fila «Pendent» (Pro): l'entrada queda com a pendent obert en desar-la. */
+  var pending by mutableStateOf(pending)
 
   /** `true` once the user picks «Qui» by hand, so an automatic default never overrides it. */
   var kindTouched by mutableStateOf(kindTouched)
@@ -86,6 +91,7 @@ class EntryFormState(
             it.text,
             WhenChoice.encode(it.whenChoice),
             it.kindTouched,
+            it.pending,
           )
         },
         restore = {
@@ -96,6 +102,7 @@ class EntryFormState(
             text = it[3] as String,
             whenChoice = WhenChoice.decode(it[4] as List<Any?>),
             kindTouched = it[5] as Boolean,
+            pending = it[6] as Boolean,
           )
         },
       )
@@ -114,6 +121,7 @@ fun rememberEntryFormState(
       channel = initial?.let(EntryChannel::of),
       text = initial?.text ?: initialText,
       whenChoice = initial?.let { WhenChoice.Stored(it.occurredAt) } ?: WhenChoice.Now,
+      pending = initial?.isOpenFollowUp ?: false,
     )
   }
 

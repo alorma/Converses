@@ -212,8 +212,8 @@ fun PersonDetailRoute(
         focusText = newEntryFocus,
         onDismiss = { showNewEntry = false },
         onOpenPro = { onOpenPro(ProBenefit.Channels) },
-        onSave = { kind, channel, text, at ->
-          viewModel.addEntry(kind, channel, text, at)
+        onSave = { kind, channel, text, at, pending ->
+          viewModel.addEntry(kind, channel, text, at, pending)
           showNewEntry = false
         },
       )
@@ -266,8 +266,8 @@ fun PersonDetailRoute(
             initial = actionEntry,
             onDismiss = ::closeAction,
             onOpenPro = { onOpenPro(ProBenefit.Channels) },
-            onSave = { kind, channel, text, at ->
-              viewModel.updateEntry(actionEntry, kind, channel, text, at)
+            onSave = { kind, channel, text, at, pending ->
+              viewModel.updateEntry(actionEntry, kind, channel, text, at, pending)
               closeAction()
             },
           )

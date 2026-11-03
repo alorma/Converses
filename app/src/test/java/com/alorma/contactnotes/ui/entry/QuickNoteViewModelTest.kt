@@ -241,4 +241,17 @@ class QuickNoteViewModelTest {
       assertEquals("hola", entry.text)
       assertEquals(4_000, entry.occurredAt)
     }
+
+  @Test
+  fun savingAFollowUpStoresItAsOpen() =
+    runTest {
+      val marta = db.addPerson("Marta")
+      val vm = viewModel(marta.id)
+
+      vm.save(marta.id, EntryKind.SAID, EntryChannel(ChannelType.CHAT), "llibre", occurredAt = null, pending = true) {}
+
+      val entry = db.repository.getEntries(marta.id).single()
+      assertTrue(entry.isPending)
+      assertNull(entry.doneAt)
+    }
 }

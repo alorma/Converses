@@ -166,6 +166,7 @@ class QuickNoteViewModel(
     channel: EntryChannel,
     text: String,
     occurredAt: Long?,
+    pending: Boolean = false,
     onSaved: () -> Unit,
   ) {
     viewModelScope.launch {
@@ -177,6 +178,7 @@ class QuickNoteViewModel(
           customChannelId = channel.customChannelId,
           text = text,
           occurredAt = occurredAt ?: System.currentTimeMillis(),
+          isPending = pending,
         ),
       )
       onSaved()
@@ -249,7 +251,7 @@ fun QuickNoteScreen(
     onOpenPro = onOpenPro,
     onNewPerson = onNewPerson,
     onSave = { person, channel ->
-      viewModel.save(person.id, form.kind, channel, form.text.trim(), form.occurredAt, onClose)
+      viewModel.save(person.id, form.kind, channel, form.text.trim(), form.occurredAt, form.pending, onClose)
     },
   )
 

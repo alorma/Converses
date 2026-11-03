@@ -51,7 +51,7 @@ fun NewEntrySheet(
   initialKind: EntryKind = EntryKind.SAID,
   onOpenPro: () -> Unit = {},
   focusText: Boolean = false,
-  onSave: (kind: EntryKind, channel: EntryChannel, text: String, occurredAt: Long?) -> Unit,
+  onSave: (kind: EntryKind, channel: EntryChannel, text: String, occurredAt: Long?, pending: Boolean) -> Unit,
 ) {
   val form = rememberEntryFormState(initial, initialKind)
   val customChannels = rememberCustomChannelsUi()
@@ -71,7 +71,7 @@ fun NewEntrySheet(
       customChannels = customChannels,
       onOpenPro = onOpenPro,
       onDismiss = onDismiss,
-      onSave = { onSave(form.kind, channel, form.text.trim(), form.occurredAt) },
+      onSave = { onSave(form.kind, channel, form.text.trim(), form.occurredAt, form.pending) },
     )
   }
 }
