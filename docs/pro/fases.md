@@ -128,7 +128,19 @@ Al menú de debug, l'apartat **Pro** té un sol interruptor, «Pro user», que e
 
 ## Fase 6 · Canals propis (Pro)
 
-Tasques per proposar quan es comenci (camp «On» 7a/7c, full 7b, cronologia, exportar, Ajustos › Canals propis 7d, punts d'entrada `Locked` → paywall `Channels`).
+### Decisions (03-11-2026)
+
+- **Canal per defecte:** la nota ràpida i la nova entrada del detall prenen el grup i el canal propi de l'última entrada de la persona (el canal només si està `Unlocked`).
+- **Baixada de Pro a l'editor:** una entrada amb canal propi el mostra triat (es pot desmarcar), sense els altres canals ni «+ Nou», amb PRO → paywall.
+
+### Tasques
+
+- [ ] Estat i desament: `EntryChannel` (grup + canal propi) a `EntryFormState`; canviar de grup desmarca el canal; el desen el detall i la nota ràpida; tests de JVM
+- [ ] Camp «On» (7a, 7c): targeta del grup amb els canals i «+ Nou»; `Locked` amb «Canal propi» i PRO → paywall `Channels`; captures i emulador
+- [ ] Full «Nou canal» / «Edita el canal» (7b); en crear-lo queda triat; tests de JVM, captures i emulador
+- [ ] Cronologia, full d'accions i exportar amb el nom del canal; tests de JVM, captures i emulador
+- [ ] Ajustos › Canals propis (7d): fila i pantalla (llista per grups, reanomena, canvia de grup, esborra, FAB); tests de JVM, captures i emulador
+- [ ] `docs/pro/` i backlog 8 al dia
 
 ## Fase 7 · Pendents (Pro)
 

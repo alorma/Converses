@@ -8,6 +8,7 @@ import com.alorma.contactnotes.data.db.PersonEntity
 import com.alorma.contactnotes.data.db.PinnedFactEntity
 import com.alorma.contactnotes.shared.ChannelType
 import com.alorma.contactnotes.shared.EntryKind
+import com.alorma.contactnotes.ui.entry.EntryChannel
 import java.time.Instant
 import java.time.ZoneId
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -87,7 +88,7 @@ class PersonDetailViewModel(
 
   fun addEntry(
     kind: EntryKind,
-    channel: ChannelType,
+    channel: EntryChannel,
     text: String,
     occurredAt: Long?,
   ) {
@@ -96,7 +97,8 @@ class PersonDetailViewModel(
         EntryEntity(
           personId = personId,
           kind = kind,
-          channelType = channel,
+          channelType = channel.group,
+          customChannelId = channel.customChannelId,
           text = text,
           occurredAt = occurredAt ?: System.currentTimeMillis(),
         ),
@@ -107,13 +109,19 @@ class PersonDetailViewModel(
   fun updateEntry(
     entry: EntryEntity,
     kind: EntryKind,
-    channel: ChannelType,
+    channel: EntryChannel,
     text: String,
     occurredAt: Long?,
   ) {
     viewModelScope.launch {
       repository.updateEntry(
-        entry.copy(kind = kind, channelType = channel, text = text, occurredAt = occurredAt ?: entry.occurredAt),
+        entry.copy(
+          kind = kind,
+          channelType = channel.group,
+          customChannelId = channel.customChannelId,
+          text = text,
+          occurredAt = occurredAt ?: entry.occurredAt,
+        ),
       )
     }
   }

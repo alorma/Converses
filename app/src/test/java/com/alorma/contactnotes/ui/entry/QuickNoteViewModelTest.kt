@@ -50,7 +50,20 @@ class QuickNoteViewModelTest {
 
       val state = vm.uiState.value
       assertEquals(marta.id, state.selected?.id)
-      assertEquals(ChannelType.SOCIAL, state.lastChannel)
+      assertEquals(EntryChannel(ChannelType.SOCIAL), state.lastChannel)
+    }
+
+  @Test
+  fun theLastEntryCustomChannelIsTheDefaultToo() =
+    runTest {
+      val marta = db.addPerson("Marta")
+      val whatsapp = db.addCustomChannel("WhatsApp", ChannelType.CHAT)
+      db.addEntry(marta.id, channel = ChannelType.CHAT, customChannelId = whatsapp.id, occurredAt = 9_000)
+      val vm = viewModel()
+
+      vm.select(marta)
+
+      assertEquals(EntryChannel(ChannelType.CHAT, whatsapp.id), vm.uiState.value.lastChannel)
     }
 
   @Test
@@ -96,7 +109,7 @@ class QuickNoteViewModelTest {
       val state = vm.uiState.value
       assertEquals(luna.id, state.selected?.id)
       assertNull(state.pending)
-      assertEquals(ChannelType.SOCIAL, state.lastChannel)
+      assertEquals(EntryChannel(ChannelType.SOCIAL), state.lastChannel)
     }
 
   @Test
@@ -218,12 +231,13 @@ class QuickNoteViewModelTest {
       val vm = viewModel(marta.id)
       var saved = false
 
-      vm.save(marta.id, EntryKind.HEARD, ChannelType.CHAT, "hola", occurredAt = 4_000) { saved = true }
+      vm.save(marta.id, EntryKind.HEARD, EntryChannel(ChannelType.CHAT), "hola", occurredAt = 4_000) { saved = true }
 
       assertTrue(saved)
       val entry = db.repository.getEntries(marta.id).single()
       assertEquals(EntryKind.HEARD, entry.kind)
       assertEquals(ChannelType.CHAT, entry.channelType)
+      assertNull(entry.customChannelId)
       assertEquals("hola", entry.text)
       assertEquals(4_000, entry.occurredAt)
     }

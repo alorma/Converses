@@ -45,15 +45,15 @@ import com.alorma.contactnotes.shared.initialsOf
 fun NewEntrySheet(
   person: PersonEntity,
   /** Grup preseleccionat en una entrada nova (p. ex. el de l'última entrada). */
-  defaultChannel: ChannelType?,
+  defaultChannel: EntryChannel?,
   onDismiss: () -> Unit,
   initial: EntryEntity? = null,
   initialKind: EntryKind = EntryKind.SAID,
   focusText: Boolean = false,
-  onSave: (kind: EntryKind, channel: ChannelType, text: String, occurredAt: Long?) -> Unit,
+  onSave: (kind: EntryKind, channel: EntryChannel, text: String, occurredAt: Long?) -> Unit,
 ) {
   val form = rememberEntryFormState(initial, initialKind)
-  val channel = form.channel ?: defaultChannel ?: ChannelType.entries.first()
+  val channel = form.channel ?: defaultChannel ?: EntryChannel(ChannelType.entries.first())
 
   ModalBottomSheet(
     onDismissRequest = onDismiss,
@@ -77,7 +77,7 @@ fun NewEntrySheet(
 fun NewEntrySheetContent(
   person: PersonEntity,
   form: EntryFormState,
-  channel: ChannelType,
+  channel: EntryChannel,
   isNew: Boolean,
   onDismiss: () -> Unit,
   onSave: () -> Unit,

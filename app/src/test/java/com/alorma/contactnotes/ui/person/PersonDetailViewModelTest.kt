@@ -5,6 +5,7 @@ import com.alorma.contactnotes.shared.ChannelType
 import com.alorma.contactnotes.shared.EntryKind
 import com.alorma.contactnotes.testing.FakeDb
 import com.alorma.contactnotes.testing.MainDispatcherRule
+import com.alorma.contactnotes.ui.entry.EntryChannel
 import java.time.LocalDate
 import java.time.ZoneId
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -87,7 +88,7 @@ class PersonDetailViewModelTest {
           .isEmpty(),
       )
 
-      vm.addEntry(EntryKind.SAID, ChannelType.PHONE, "call", occurredAt = null)
+      vm.addEntry(EntryKind.SAID, EntryChannel(ChannelType.PHONE), "call", occurredAt = null)
 
       assertEquals(listOf(ChannelType.PHONE), vm.uiState.value.channels)
     }
@@ -135,8 +136,8 @@ class PersonDetailViewModelTest {
       val vm = viewModel()
       val before = System.currentTimeMillis()
 
-      vm.addEntry(EntryKind.HAPPENED, ChannelType.IN_PERSON, "met", occurredAt = null)
-      vm.addEntry(EntryKind.SAID, ChannelType.PHONE, "called", occurredAt = 5_000)
+      vm.addEntry(EntryKind.HAPPENED, EntryChannel(ChannelType.IN_PERSON), "met", occurredAt = null)
+      vm.addEntry(EntryKind.SAID, EntryChannel(ChannelType.PHONE), "called", occurredAt = 5_000)
 
       val entries =
         vm.uiState.value.entries
@@ -151,7 +152,7 @@ class PersonDetailViewModelTest {
       val entry = db.addEntry(person.id, occurredAt = 7_000)
       val vm = viewModel()
 
-      vm.updateEntry(entry, EntryKind.HEARD, ChannelType.SOCIAL, "edited", occurredAt = null)
+      vm.updateEntry(entry, EntryKind.HEARD, EntryChannel(ChannelType.SOCIAL), "edited", occurredAt = null)
 
       val updated =
         vm.uiState.value.entries
@@ -227,5 +228,26 @@ class PersonDetailViewModelTest {
 
       assertTrue(done)
       assertTrue(db.person(person.id)!!.archived)
+    }
+
+  @Test
+  fun addAndUpdateEntryStoreTheCustomChannel() =
+    runTest {
+      val whatsapp = db.addCustomChannel("WhatsApp", ChannelType.CHAT)
+      val vm = viewModel()
+
+      vm.addEntry(EntryKind.SAID, EntryChannel(ChannelType.CHAT, whatsapp.id), "hola", occurredAt = 1_000)
+      val added =
+        vm.uiState.value.entries
+          .single()
+      assertEquals(ChannelType.CHAT, added.channelType)
+      assertEquals(whatsapp.id, added.customChannelId)
+
+      vm.updateEntry(added, EntryKind.SAID, EntryChannel(ChannelType.PHONE), "hola", occurredAt = null)
+      val updated =
+        vm.uiState.value.entries
+          .single()
+      assertEquals(ChannelType.PHONE, updated.channelType)
+      assertEquals(null, updated.customChannelId)
     }
 }

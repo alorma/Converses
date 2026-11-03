@@ -51,7 +51,7 @@ internal fun QuickNoteFilledPreview() {
       QuickNoteUiState(
         people = listOf(PreviewData.marta),
         selected = PreviewData.marta,
-        lastChannel = Channels.first(),
+        lastChannel = EntryChannel(Channels.first()),
       ),
     form =
       EntryFormState(
@@ -105,7 +105,7 @@ internal fun EditEntrySheetPreview() {
               text = "Told her I can't make it to dinner on Saturday.",
               whenChoice = WhenChoice.Stored(PreviewData.formTime),
             ),
-          channel = Channels.first(),
+          channel = EntryChannel(Channels.first()),
           isNew = false,
           onDismiss = {},
           onSave = {},
@@ -129,7 +129,7 @@ internal fun NewEntrySheetPreview() {
               text = "We went to the photography exhibition.",
               whenChoice = WhenChoice.Stored(PreviewData.formTime),
             ),
-          channel = Channels.first(),
+          channel = EntryChannel(Channels.first()),
           isNew = true,
           onDismiss = {},
           onSave = {},

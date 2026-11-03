@@ -88,7 +88,8 @@ data class QuickNoteUiState(
   val selected: PersonEntity? = null,
   /** Persona protegida triada que encara no s'ha autenticat; no es tria fins que es desbloqueja. */
   val pending: PersonEntity? = null,
-  val lastChannel: ChannelType? = null,
+  /** Grup i canal propi de l'última entrada de la persona triada, per defecte a «On». */
+  val lastChannel: EntryChannel? = null,
   /** `false` only before the first emission of [people]; an empty list is not «no people» until then. */
   val loaded: Boolean = true,
 )
@@ -127,7 +128,7 @@ class QuickNoteViewModel(
       if (selected == null) {
         flowOf(QuickNoteUiState(people = people, pending = pending))
       } else {
-        repository.observeTimeline(selected.id).map { it.firstOrNull()?.channelType }.map { last ->
+        repository.observeTimeline(selected.id).map { it.firstOrNull()?.let(EntryChannel::of) }.map { last ->
           QuickNoteUiState(people = people, selected = selected, pending = pending, lastChannel = last)
         }
       }
@@ -162,7 +163,7 @@ class QuickNoteViewModel(
   fun save(
     personId: Long,
     kind: EntryKind,
-    channel: ChannelType,
+    channel: EntryChannel,
     text: String,
     occurredAt: Long?,
     onSaved: () -> Unit,
@@ -172,7 +173,8 @@ class QuickNoteViewModel(
         EntryEntity(
           personId = personId,
           kind = kind,
-          channelType = channel,
+          channelType = channel.group,
+          customChannelId = channel.customChannelId,
           text = text,
           occurredAt = occurredAt ?: System.currentTimeMillis(),
         ),
@@ -278,11 +280,11 @@ fun QuickNoteContent(
   onClose: () -> Unit,
   onSelectPerson: (PersonEntity) -> Unit,
   onNewPerson: () -> Unit,
-  onSave: (person: PersonEntity, channel: ChannelType) -> Unit,
+  onSave: (person: PersonEntity, channel: EntryChannel) -> Unit,
   importedText: String? = null,
 ) {
   val selected = state.selected
-  val channel = form.channel ?: state.lastChannel ?: ChannelType.entries.first()
+  val channel = form.channel ?: state.lastChannel ?: EntryChannel(ChannelType.entries.first())
   var showSheet by rememberSaveable { mutableStateOf(false) }
   // El xip «Persona» obre el mateix selector; en triar-ne una, el xip queda seleccionat
   var pickedFromChip by rememberSaveable { mutableStateOf(false) }

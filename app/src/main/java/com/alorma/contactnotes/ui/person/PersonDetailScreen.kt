@@ -85,6 +85,7 @@ import com.alorma.contactnotes.shared.ChannelType
 import com.alorma.contactnotes.shared.EntryKind
 import com.alorma.contactnotes.shared.initialsOf
 import com.alorma.contactnotes.ui.edit.EditFocus
+import com.alorma.contactnotes.ui.entry.EntryChannel
 import com.alorma.contactnotes.ui.entry.NewEntrySheet
 import com.alorma.contactnotes.ui.people.label
 import java.time.LocalDate
@@ -204,7 +205,7 @@ fun PersonDetailRoute(
     if (showNewEntry) {
       NewEntrySheet(
         person = person,
-        defaultChannel = state.entries.firstOrNull()?.channelType,
+        defaultChannel = state.entries.firstOrNull()?.let(EntryChannel::of),
         initialKind = newEntryKind,
         focusText = newEntryFocus,
         onDismiss = { showNewEntry = false },

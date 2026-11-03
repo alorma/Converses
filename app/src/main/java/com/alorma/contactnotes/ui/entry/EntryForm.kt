@@ -57,12 +57,14 @@ import com.alorma.contactnotes.ui.person.whoLabel
 /** Estat editable d'una entrada. `whenChoice == Now` vol dir «ara» en desar. */
 class EntryFormState(
   kind: EntryKind = EntryKind.SAID,
-  channel: ChannelType? = null,
+  channel: EntryChannel? = null,
   text: String = "",
   whenChoice: WhenChoice = WhenChoice.Now,
   kindTouched: Boolean = false,
 ) {
   var kind by mutableStateOf(kind)
+
+  /** `null` fins que l'usuari toca «On»: mentrestant val el canal per defecte de la pantalla. */
   var channel by mutableStateOf(channel)
   var text by mutableStateOf(text)
   var whenChoice by mutableStateOf(whenChoice)
@@ -76,15 +78,24 @@ class EntryFormState(
   companion object {
     val Saver: Saver<EntryFormState, Any> =
       listSaver(
-        save = { listOf(it.kind.name, it.channel?.name, it.text, WhenChoice.encode(it.whenChoice), it.kindTouched) },
+        save = {
+          listOf(
+            it.kind.name,
+            it.channel?.group?.name,
+            it.channel?.customChannelId,
+            it.text,
+            WhenChoice.encode(it.whenChoice),
+            it.kindTouched,
+          )
+        },
         restore = {
           @Suppress("UNCHECKED_CAST")
           EntryFormState(
             kind = EntryKind.valueOf(it[0] as String),
-            channel = (it[1] as String?)?.let(ChannelType::valueOf),
-            text = it[2] as String,
-            whenChoice = WhenChoice.decode(it[3] as List<Any?>),
-            kindTouched = it[4] as Boolean,
+            channel = (it[1] as String?)?.let { group -> EntryChannel(ChannelType.valueOf(group), it[2] as Long?) },
+            text = it[3] as String,
+            whenChoice = WhenChoice.decode(it[4] as List<Any?>),
+            kindTouched = it[5] as Boolean,
           )
         },
       )
@@ -100,7 +111,7 @@ fun rememberEntryFormState(
   rememberSaveable(initial?.id, saver = EntryFormState.Saver) {
     EntryFormState(
       kind = initial?.kind ?: initialKind,
-      channel = initial?.channelType,
+      channel = initial?.let(EntryChannel::of),
       text = initial?.text ?: initialText,
       whenChoice = initial?.let { WhenChoice.Stored(it.occurredAt) } ?: WhenChoice.Now,
     )
@@ -114,8 +125,8 @@ fun rememberEntryFormState(
 fun EntryForm(
   state: EntryFormState,
   person: PersonEntity?,
-  channel: ChannelType,
-  onChannelChange: (ChannelType) -> Unit,
+  channel: EntryChannel,
+  onChannelChange: (EntryChannel) -> Unit,
   modifier: Modifier = Modifier,
   focusText: Boolean = false,
   onPickPerson: (() -> Unit)? = null,
@@ -135,7 +146,7 @@ fun EntryForm(
       footer = textFooter,
     )
     FormSection(title = stringResource(R.string.entry_where_title)) {
-      ChannelChips(selected = channel, onSelected = onChannelChange)
+      ChannelChips(selected = channel.group, onSelected = { onChannelChange(channel.withGroup(it)) })
     }
     FormSection(title = stringResource(R.string.entry_when_title)) {
       WhenRow(choice = state.whenChoice, onChoice = { state.whenChoice = it })
