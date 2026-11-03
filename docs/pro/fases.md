@@ -8,7 +8,7 @@ Què és gratis i què és Pro, i la regla, són a `docs/pro/README.md`. Disseny
 | 2 | RevenueCat: SDK, entitlement `converses_pro`, preu, compra i restauració | 1 | Feta i validada (26-10-2026) |
 | 3 | Paywall: pantalla «Converses Pro» (8a, 8b, 8c) i punts d'entrada | 2 | Pendent |
 | 4 | Publicació: política de privacitat, seguretat de dades de Play, termes | 3 | Pendent |
-| 5 | Room v5 i flags de Canals propis i Pendents | — | En curs |
+| 5 | Room v5 i flags de Canals propis i Pendents | — | Feta i validada (03-11-2026) |
 | 6 | Canals propis: camp «On» (7a, 7c), full «Nou canal» (7b), cronologia, exportar, Ajustos › Canals propis (7d) | 5 | Pendent |
 | 7 | Pendents: fila «Pendent» (P5, 7e), secció al detall (P6), marcar com a fet (7f), cronologia i comptador al llistat (P7) | 5 | Pendent |
 
@@ -122,8 +122,8 @@ Al menú de debug, l'apartat **Pro** té un sol interruptor, «Pro user», que e
 - [x] Fases 5–7 i disseny a `docs/pro/`; backlog 6 i 8 actualitzats
 - [x] Room v5: `CustomChannelEntity`, `customChannelId`, `isPending` i `doneAt` a `EntryEntity`; `AutoMigration` 4→5 i test (4→5, `SET NULL` i 1→5 sense perdre dades); `connectedAndroidTest` a l'emulador (8/8) — `c726ce9`
 - [x] DAO, `ConversesRepository` i `FakeDb`: canals (crear, reanomenar, canviar de grup amb les entrades, esborrar, llistar amb el nombre d'entrades, nom únic) i pendents (llistar, fet, desfer, `openFollowUps` al llistat, 0 per a les protegides); tests de JVM (`ProFeaturesRepositoryTest`) — `c8e9c29`
-- [x] Test instrumentat dels DAO sobre Room en memòria (`CustomChannelDaoTest` a `androidTest`): l'SQL real de `changeGroup`, `SET NULL`, `NOCASE`, `setDoneAt`, `observeOpenFollowUps` i `openFollowUps` al llistat; emulador (7/7) — `495733c`
-- [x] Flags `CustomChannelsFeature` (`custom_channels_enabled`) i `FollowUpsFeature` (`follow_ups_enabled`), Pro i apagats, al menú de debug i a «Turn on every Pro flag»; tests de JVM (Hidden → Locked → Unlocked) i emulador — `03bf5fe`
+- [x] Test instrumentat dels DAO sobre Room en memòria (`CustomChannelDaoTest` a `androidTest`): l'SQL real de `changeGroup`, `SET NULL`, `NOCASE`, `setDoneAt`, `observeOpenFollowUps` i `openFollowUps` al llistat; emulador (7/7) — `6c829a2`
+- [x] Flags `CustomChannelsFeature` (`custom_channels_enabled`) i `FollowUpsFeature` (`follow_ups_enabled`), Pro i apagats, al menú de debug i a «Turn on every Pro flag»; tests de JVM (Hidden → Locked → Unlocked) i emulador — `3fbee1a`
 
 ## Fase 6 · Canals propis (Pro)
 
