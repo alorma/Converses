@@ -7,9 +7,12 @@ import com.alorma.contactnotes.data.db.EntryEntity
 import com.alorma.contactnotes.data.db.PersonEntity
 import com.alorma.contactnotes.data.db.PinnedFactEntity
 import com.alorma.contactnotes.data.db.TaskEntity
+import com.alorma.contactnotes.data.tracking.EventTracker
 import com.alorma.contactnotes.shared.ChannelType
 import com.alorma.contactnotes.shared.EntryKind
 import com.alorma.contactnotes.ui.entry.EntryChannel
+import com.alorma.contactnotes.ui.tracking.Actions
+import com.alorma.contactnotes.ui.tracking.EntryMode
 import java.time.Instant
 import java.time.ZoneId
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -52,6 +55,7 @@ class PersonDetailViewModel(
   private val personId: Long,
   private val repository: ConversesRepository,
   private val exporter: PersonExporter,
+  private val tracker: EventTracker,
 ) : ViewModel() {
   private val selectedKinds = MutableStateFlow(EntryKind.entries.toSet())
 
@@ -97,14 +101,18 @@ class PersonDetailViewModel(
 
   fun onKindToggled(kind: EntryKind) {
     selectedKinds.value = selectedKinds.value.let { if (kind in it) it - kind else it + kind }
+    tracker.trackAction(Actions.KindFilterToggled(kind))
   }
 
+  /** [mode] diu si el full s'ha obert amb el «Qui» ja triat (entrada fantasma). */
   fun addEntry(
     kind: EntryKind,
     channel: EntryChannel,
     text: String,
     occurredAt: Long?,
+    mode: EntryMode = EntryMode.NEW,
   ) {
+    tracker.trackAction(Actions.EntrySaved(mode, kind, channel))
     viewModelScope.launch {
       repository.addEntry(
         EntryEntity(
@@ -126,6 +134,7 @@ class PersonDetailViewModel(
     text: String,
     occurredAt: Long?,
   ) {
+    tracker.trackAction(Actions.EntrySaved(EntryMode.EDIT, kind, channel))
     viewModelScope.launch {
       repository.updateEntry(
         entry.copy(
@@ -143,14 +152,17 @@ class PersonDetailViewModel(
     entry: EntryEntity,
     toPersonId: Long,
   ) {
+    tracker.trackAction(Actions.EntryMoved())
     viewModelScope.launch { repository.moveEntry(entry, toPersonId) }
   }
 
   fun deleteEntry(entry: EntryEntity) {
+    tracker.trackAction(Actions.EntryDeleted())
     viewModelScope.launch { repository.deleteEntry(entry) }
   }
 
   fun restoreEntry(entry: EntryEntity) {
+    tracker.trackAction(Actions.EntryRestored())
     viewModelScope.launch { repository.addEntry(entry) }
   }
 
@@ -160,6 +172,7 @@ class PersonDetailViewModel(
   }
 
   fun deleteDay(entry: EntryEntity) {
+    tracker.trackAction(Actions.DayDeleted())
     viewModelScope.launch {
       val (from, to) = dayRange(entry)
       repository.deleteEntriesInRange(personId, entry.channelType, from, to)
@@ -167,11 +180,16 @@ class PersonDetailViewModel(
   }
 
   fun markTaskDone(task: TaskEntity) {
+    tracker.trackAction(Actions.TaskDone())
     viewModelScope.launch { repository.markTaskDone(task) }
   }
 
-  /** «Desfés» del snackbar o el check d'una feta. */
-  fun reopenTask(task: TaskEntity) {
+  /** «Desfés» del snackbar ([fromUndo]) o el check d'una feta. */
+  fun reopenTask(
+    task: TaskEntity,
+    fromUndo: Boolean = false,
+  ) {
+    tracker.trackAction(Actions.TaskReopened(fromUndo))
     viewModelScope.launch { repository.reopenTask(task) }
   }
 
@@ -180,6 +198,7 @@ class PersonDetailViewModel(
     onDone: () -> Unit,
   ) {
     val person = uiState.value.person ?: return
+    tracker.trackAction(Actions.PersonArchived(archived))
     viewModelScope.launch {
       repository.setArchived(person, archived)
       onDone()
@@ -187,6 +206,7 @@ class PersonDetailViewModel(
   }
 
   fun export() {
+    tracker.trackAction(Actions.PersonExported())
     viewModelScope.launch {
       val name = uiState.value.person?.name ?: return@launch
       exporter.buildText(personId)?.let { exporter.share(name, it) }

@@ -5,7 +5,9 @@ import com.alorma.contactnotes.shared.ChannelType
 import com.alorma.contactnotes.shared.EntryKind
 import com.alorma.contactnotes.testing.FakeDb
 import com.alorma.contactnotes.testing.MainDispatcherRule
+import com.alorma.contactnotes.testing.RecordingTracker
 import com.alorma.contactnotes.ui.entry.EntryChannel
+import com.alorma.contactnotes.ui.tracking.EntryMode
 import java.time.LocalDate
 import java.time.ZoneId
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -22,6 +24,7 @@ class PersonDetailViewModelTest {
   @get:Rule val main = MainDispatcherRule()
   private val db = FakeDb()
   private val person = db.addPerson("Marta Soler")
+  private val tracker = RecordingTracker()
 
   private fun at(
     day: Int,
@@ -35,10 +38,64 @@ class PersonDetailViewModelTest {
       .toEpochMilli()
 
   private fun kotlinx.coroutines.test.TestScope.viewModel(): PersonDetailViewModel {
-    val vm = PersonDetailViewModel(person.id, db.repository, PersonExporter(ContextWrapper(null), db.repository))
+    val vm =
+      PersonDetailViewModel(
+        person.id,
+        db.repository,
+        PersonExporter(ContextWrapper(null), db.repository),
+        tracker.eventTracker,
+      )
     backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { vm.uiState.collect {} }
     return vm
   }
+
+  @Test
+  fun entryActionsAreTrackedWithoutText() =
+    runTest {
+      val vm = viewModel()
+      vm.addEntry(EntryKind.HEARD, EntryChannel(ChannelType.CHAT, 9L), "secret text", null, EntryMode.NEW_AS)
+      val entry =
+        vm.uiState.value.entries
+          .single()
+      vm.updateEntry(entry, EntryKind.SAID, EntryChannel(ChannelType.PHONE), "other secret", null)
+      vm.deleteEntry(entry)
+      vm.restoreEntry(entry)
+      vm.onKindToggled(EntryKind.SAID)
+
+      assertEquals(
+        listOf(
+          "entry_saved" to
+            mapOf("mode" to "new_as", "kind" to "heard", "channel" to "chat", "custom_channel" to "true"),
+          "entry_saved" to
+            mapOf("mode" to "edit", "kind" to "said", "channel" to "phone", "custom_channel" to "false"),
+          "entry_deleted" to emptyMap(),
+          "entry_restored" to emptyMap(),
+          "kind_filter_toggled" to mapOf("kind" to "said"),
+        ),
+        tracker.recordedActions(),
+      )
+    }
+
+  @Test
+  fun taskReopenSaysWhereItCameFrom() =
+    runTest {
+      val vm = viewModel()
+      val task = db.addTask(person.id)
+      vm.markTaskDone(task)
+      vm.reopenTask(task, fromUndo = true)
+      vm.reopenTask(task)
+      vm.setArchived(true) {}
+
+      assertEquals(
+        listOf(
+          "task_done" to emptyMap(),
+          "task_reopened" to mapOf("source" to "undo"),
+          "task_reopened" to mapOf("source" to "list"),
+          "person_archived" to mapOf("archived" to "true"),
+        ),
+        tracker.recordedActions(),
+      )
+    }
 
   @Test
   fun timelineIsNewestFirstAndCountsAreByKind() =

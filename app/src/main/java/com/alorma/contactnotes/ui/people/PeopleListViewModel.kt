@@ -4,7 +4,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.alorma.contactnotes.data.ConversesRepository
 import com.alorma.contactnotes.data.db.PersonListItem
+import com.alorma.contactnotes.data.tracking.EventTracker
 import com.alorma.contactnotes.shared.ChannelType
+import com.alorma.contactnotes.ui.tracking.Actions
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -28,6 +30,7 @@ data class PeopleListUiState(
 class PeopleListViewModel(
   private val archived: Boolean,
   repository: ConversesRepository,
+  private val tracker: EventTracker,
 ) : ViewModel() {
   private val filter = MutableStateFlow(emptySet<ChannelType>())
 
@@ -42,6 +45,8 @@ class PeopleListViewModel(
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), PeopleListUiState())
 
   fun onFilterToggled(type: ChannelType) {
-    filter.update { if (type in it) it - type else it + type }
+    val selected = type !in filter.value
+    filter.update { if (selected) it + type else it - type }
+    tracker.trackAction(Actions.FilterToggled(type, selected))
   }
 }

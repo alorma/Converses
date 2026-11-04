@@ -4,6 +4,7 @@ import com.alorma.contactnotes.shared.ChannelType
 import com.alorma.contactnotes.shared.EntryKind
 import com.alorma.contactnotes.testing.FakeDb
 import com.alorma.contactnotes.testing.MainDispatcherRule
+import com.alorma.contactnotes.testing.RecordingTracker
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.TestScope
@@ -20,12 +21,28 @@ class QuickNoteViewModelTest {
   @get:Rule val main = MainDispatcherRule()
   private val db = FakeDb()
   private val bridge = PersonSelectionBridge()
+  private val tracker = RecordingTracker()
 
   private fun TestScope.viewModel(initialPersonId: Long = 0L): QuickNoteViewModel {
-    val vm = QuickNoteViewModel(initialPersonId, db.repository, bridge)
+    val vm = QuickNoteViewModel(initialPersonId, db.repository, bridge, tracker.eventTracker)
     backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { vm.uiState.collect {} }
     return vm
   }
+
+  @Test
+  fun savingIsTrackedAsAQuickEntryWithoutText() =
+    runTest {
+      val marta = db.addPerson("Marta")
+      viewModel().save(marta.id, EntryKind.SAID, EntryChannel(ChannelType.SOCIAL), "secret", null) {}
+
+      assertEquals(
+        listOf(
+          "entry_saved" to
+            mapOf("mode" to "quick", "kind" to "said", "channel" to "social", "custom_channel" to "false"),
+        ),
+        tracker.recordedActions(),
+      )
+    }
 
   @Test
   fun startsWithoutAPersonSelected() =

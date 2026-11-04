@@ -94,6 +94,9 @@ import com.alorma.contactnotes.ui.entry.NewEntrySheet
 import com.alorma.contactnotes.ui.paywall.ProBenefit
 import com.alorma.contactnotes.ui.people.label
 import com.alorma.contactnotes.ui.task.TasksSection
+import com.alorma.contactnotes.ui.tracking.Actions
+import com.alorma.contactnotes.ui.tracking.EntryMode
+import com.alorma.contactnotes.ui.tracking.rememberActionTracker
 import java.time.LocalDate
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -143,6 +146,7 @@ fun PersonDetailRoute(
 ) {
   val state by viewModel.uiState.collectAsStateWithLifecycle()
   val otherPeople by viewModel.otherPeople.collectAsStateWithLifecycle()
+  val trackAction = rememberActionTracker()
 
   val secureWindow: SecureWindow = koinInject()
   val secure = state.person?.isProtected == true
@@ -212,16 +216,19 @@ fun PersonDetailRoute(
         newEntryKind = EntryKind.SAID
         newEntryFocus = false
         showNewEntry = true
+        trackAction(Actions.EntrySheetOpened(EntryMode.NEW))
       },
       onNewEntryAs = { kind ->
         newEntryKind = kind
         newEntryFocus = true
         showNewEntry = true
+        trackAction(Actions.EntrySheetOpened(EntryMode.NEW_AS))
       },
       onEditFocus = { onEdit(it) },
       onEntryMenu = { entry ->
         actionEntryId = entry.id
         action = EntryAction.Menu
+        trackAction(Actions.EntryMenuOpened())
       },
       onEditPerson = { onEdit(null) },
       onExport = {
@@ -242,9 +249,9 @@ fun PersonDetailRoute(
       onTaskDone = { task ->
         haptics.confirm()
         viewModel.markTaskDone(task)
-        showUndo(taskDoneMessage) { viewModel.reopenTask(task) }
+        showUndo(taskDoneMessage) { viewModel.reopenTask(task, fromUndo = true) }
       },
-      onTaskReopen = viewModel::reopenTask,
+      onTaskReopen = { viewModel.reopenTask(it) },
       snackbarHostState = snackbarHostState,
     )
 
@@ -257,7 +264,7 @@ fun PersonDetailRoute(
         onDismiss = { showNewEntry = false },
         onOpenPro = { onOpenPro(ProBenefit.Channels) },
         onSave = { kind, channel, text, at ->
-          viewModel.addEntry(kind, channel, text, at)
+          viewModel.addEntry(kind, channel, text, at, if (newEntryFocus) EntryMode.NEW_AS else EntryMode.NEW)
           showNewEntry = false
         },
       )
@@ -272,9 +279,13 @@ fun PersonDetailRoute(
             channel = entryChannelName(actionEntry, state.customChannelNames),
             dayCount = dayCount,
             onDismiss = ::closeAction,
-            onEdit = { action = EntryAction.Edit },
+            onEdit = {
+              action = EntryAction.Edit
+              trackAction(Actions.EntrySheetOpened(EntryMode.EDIT))
+            },
             onCopy = {
               haptics.confirm()
+              trackAction(Actions.EntryCopied())
               scope.launch { clipboard.setClipEntry(ClipEntry(ClipData.newPlainText(person.name, actionEntry.text))) }
               closeAction()
             },

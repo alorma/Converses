@@ -91,14 +91,14 @@ val settingsModule =
 
 val viewModelModule =
   module {
-    viewModel { (archived: Boolean) -> PeopleListViewModel(archived, get()) }
+    viewModel { (archived: Boolean) -> PeopleListViewModel(archived, get(), get()) }
     viewModelOf(::SettingsViewModel)
     viewModelOf(::CustomChannelsViewModel)
     viewModelOf(::PaywallViewModel)
     viewModel { (personId: Long) -> PersonViewModel(personId, get()) }
     viewModel { PersonLockViewModel() }
-    viewModel { (personId: Long) -> PersonDetailViewModel(personId, get(), get()) }
-    viewModel { (personId: Long) -> QuickNoteViewModel(personId, get(), get()) }
+    viewModel { (personId: Long) -> PersonDetailViewModel(personId, get(), get(), get()) }
+    viewModel { (personId: Long) -> QuickNoteViewModel(personId, get(), get(), get()) }
     viewModel { (personId: Long, taskId: Long) -> TaskFormViewModel(personId, taskId, get(), get()) }
     viewModel { (personId: Long) -> EditPersonViewModel(personId, get(), get()) }
   }

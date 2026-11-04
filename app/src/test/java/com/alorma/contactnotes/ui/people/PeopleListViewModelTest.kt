@@ -3,6 +3,7 @@ package com.alorma.contactnotes.ui.people
 import com.alorma.contactnotes.shared.ChannelType
 import com.alorma.contactnotes.testing.FakeDb
 import com.alorma.contactnotes.testing.MainDispatcherRule
+import com.alorma.contactnotes.testing.RecordingTracker
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -16,6 +17,21 @@ import org.junit.Test
 class PeopleListViewModelTest {
   @get:Rule val main = MainDispatcherRule()
   private val db = FakeDb()
+  private val tracker = RecordingTracker()
+
+  @Test
+  fun filterToggleIsTrackedWithTheNewState() {
+    val vm = PeopleListViewModel(archived = false, repository = db.repository, tracker = tracker.eventTracker)
+    vm.onFilterToggled(ChannelType.CHAT)
+    vm.onFilterToggled(ChannelType.CHAT)
+    assertEquals(
+      listOf(
+        "filter_toggled" to mapOf("channel" to "chat", "selected" to "true"),
+        "filter_toggled" to mapOf("channel" to "chat", "selected" to "false"),
+      ),
+      tracker.recordedActions(),
+    )
+  }
 
   private fun names(vm: PeopleListViewModel) =
     vm.uiState.value.people
@@ -30,7 +46,7 @@ class PeopleListViewModelTest {
       db.addEntry(chat.id, channel = ChannelType.CHAT)
       db.addEntry(social.id, channel = ChannelType.SOCIAL)
       db.addEntry(inPerson.id, channel = ChannelType.IN_PERSON)
-      val vm = PeopleListViewModel(archived = false, repository = db.repository)
+      val vm = PeopleListViewModel(archived = false, repository = db.repository, tracker = tracker.eventTracker)
       backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { vm.uiState.collect {} }
 
       assertEquals(listOf("Chat", "Social", "InPerson"), names(vm))
@@ -53,7 +69,7 @@ class PeopleListViewModelTest {
       val onInstagram = db.addPerson("OnOther", createdAt = 1)
       db.addEntry(onX.id, channel = ChannelType.SOCIAL)
       db.addEntry(onInstagram.id, channel = ChannelType.OTHER)
-      val vm = PeopleListViewModel(archived = false, repository = db.repository)
+      val vm = PeopleListViewModel(archived = false, repository = db.repository, tracker = tracker.eventTracker)
       backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { vm.uiState.collect {} }
 
       vm.onFilterToggled(ChannelType.SOCIAL)
@@ -65,7 +81,7 @@ class PeopleListViewModelTest {
     runTest {
       val secret = db.addPerson("Luna", isProtected = true)
       db.addEntry(secret.id, channel = ChannelType.CHAT)
-      val vm = PeopleListViewModel(archived = false, repository = db.repository)
+      val vm = PeopleListViewModel(archived = false, repository = db.repository, tracker = tracker.eventTracker)
       backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { vm.uiState.collect {} }
 
       assertEquals(listOf("Luna"), names(vm))
@@ -78,7 +94,7 @@ class PeopleListViewModelTest {
     runTest {
       db.addPerson("Active")
       db.addPerson("Archived", archived = true)
-      val vm = PeopleListViewModel(archived = true, repository = db.repository)
+      val vm = PeopleListViewModel(archived = true, repository = db.repository, tracker = tracker.eventTracker)
       backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { vm.uiState.collect {} }
 
       vm.onFilterToggled(ChannelType.PHONE)

@@ -47,6 +47,7 @@ import com.alorma.contactnotes.data.db.EntryEntity
 import com.alorma.contactnotes.data.db.PersonEntity
 import com.alorma.contactnotes.data.db.color
 import com.alorma.contactnotes.data.db.shape
+import com.alorma.contactnotes.data.tracking.EventTracker
 import com.alorma.contactnotes.designsystem.components.Avatar
 import com.alorma.contactnotes.designsystem.components.ConversesSaveButton
 import com.alorma.contactnotes.designsystem.components.ConversesTopBar
@@ -57,6 +58,9 @@ import com.alorma.contactnotes.shared.ChannelType
 import com.alorma.contactnotes.shared.EntryKind
 import com.alorma.contactnotes.shared.initialsOf
 import com.alorma.contactnotes.ui.navigation.isOnlyUrl
+import com.alorma.contactnotes.ui.tracking.Actions
+import com.alorma.contactnotes.ui.tracking.EntryMode
+import com.alorma.contactnotes.ui.tracking.rememberActionTracker
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -88,6 +92,7 @@ class QuickNoteViewModel(
   initialPersonId: Long,
   private val repository: ConversesRepository,
   private val selectionBridge: PersonSelectionBridge,
+  private val tracker: EventTracker,
 ) : ViewModel() {
   private val selectedId = MutableStateFlow<Long?>(null)
   private val pendingId = MutableStateFlow<Long?>(null)
@@ -168,6 +173,7 @@ class QuickNoteViewModel(
           occurredAt = occurredAt ?: System.currentTimeMillis(),
         ),
       )
+      tracker.trackAction(Actions.EntrySaved(EntryMode.QUICK, kind, channel))
       onSaved()
     }
   }
@@ -197,6 +203,7 @@ fun QuickNoteScreen(
   viewModel: QuickNoteViewModel = koinViewModel(parameters = { parametersOf(personId) }),
 ) {
   val state by viewModel.uiState.collectAsStateWithLifecycle()
+  val trackAction = rememberActionTracker()
   val form =
     rememberEntryFormState(
       initialKind = sharedText?.let { importedKind(it, hasPerson = false) } ?: EntryKind.SAID,
@@ -214,6 +221,7 @@ fun QuickNoteScreen(
     customChannels = rememberCustomChannelsUi(),
     onOpenPro = onOpenPro,
     onNewPerson = onNewPerson,
+    onPickerOpened = { trackAction(Actions.PersonPickerOpened()) },
     onSave = { person, channel ->
       viewModel.save(person.id, form.kind, channel, form.text.trim(), form.occurredAt, onClose)
     },
@@ -231,6 +239,7 @@ fun QuickNoteContent(
   importedText: String? = null,
   customChannels: CustomChannelsUi = CustomChannelsUi(),
   onOpenPro: () -> Unit = {},
+  onPickerOpened: () -> Unit = {},
 ) {
   val selected = state.selected
   val channel =
@@ -246,6 +255,7 @@ fun QuickNoteContent(
       onNewPerson()
     } else if (state.loaded) {
       showSheet = true
+      onPickerOpened()
     }
   }
 
