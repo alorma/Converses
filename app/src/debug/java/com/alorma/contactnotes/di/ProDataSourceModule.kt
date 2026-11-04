@@ -7,6 +7,8 @@ import com.alorma.contactnotes.data.pro.ProDataSource
 import com.alorma.contactnotes.data.pro.ProStore
 import com.alorma.contactnotes.data.pro.RevenueCatGateway
 import com.alorma.contactnotes.data.pro.RevenueCatProDataSource
+import com.alorma.contactnotes.data.tracking.EventTracker
+import com.alorma.contactnotes.data.tracking.Events
 import com.alorma.contactnotes.debug.DebugProStore
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -30,6 +32,7 @@ val proDataSourceModule =
             gateway = RevenueCatGateway(androidContext(), BuildConfig.REVENUECAT_API_KEY, debugLogs = true),
             initial = cache.load(),
             persist = cache::save,
+            onExternalChange = { get<EventTracker>().trackEvent(Events.ProChanged(it)) },
           )
         }
       OverridableProDataSource(

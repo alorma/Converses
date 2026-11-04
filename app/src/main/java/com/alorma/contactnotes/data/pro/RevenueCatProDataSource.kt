@@ -29,13 +29,18 @@ class RevenueCatProDataSource(
   private val gateway: PurchasesGateway,
   initial: Boolean = false,
   private val persist: (Boolean) -> Unit = {},
+  /**
+   * Pro canvia pel listener de RevenueCat i no per una compra o restauració d'aquesta pantalla: un pagament pendent
+   * que es confirma, un reemborsament o una compra feta en un altre mòbil.
+   */
+  private val onExternalChange: (Boolean) -> Unit = {},
 ) : ProDataSource {
   private val state = MutableStateFlow(initial)
 
   override val isPro: StateFlow<Boolean> = state.asStateFlow()
 
   override fun start() {
-    gateway.start(::update)
+    gateway.start { active -> if (update(active)) onExternalChange(active) }
   }
 
   override suspend fun price(): String? = gateway.price()
@@ -47,10 +52,11 @@ class RevenueCatProDataSource(
   override suspend fun restore(): RestoreResult =
     gateway.restore().also { if (it == RestoreResult.Restored) update(true) }
 
-  private fun update(active: Boolean) {
-    if (state.value != active) {
-      state.value = active
-      persist(active)
-    }
+  /** Si ha canviat res. */
+  private fun update(active: Boolean): Boolean {
+    if (state.value == active) return false
+    state.value = active
+    persist(active)
+    return true
   }
 }

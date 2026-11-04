@@ -6,6 +6,8 @@ import com.alorma.contactnotes.data.pro.ProDataSource
 import com.alorma.contactnotes.data.pro.ProStore
 import com.alorma.contactnotes.data.pro.RevenueCatGateway
 import com.alorma.contactnotes.data.pro.RevenueCatProDataSource
+import com.alorma.contactnotes.data.tracking.EventTracker
+import com.alorma.contactnotes.data.tracking.Events
 import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
 
@@ -21,6 +23,7 @@ val proDataSourceModule =
           gateway = RevenueCatGateway(androidContext(), BuildConfig.REVENUECAT_API_KEY, debugLogs = false),
           initial = store.load(),
           persist = store::save,
+          onExternalChange = { get<EventTracker>().trackEvent(Events.ProChanged(it)) },
         )
       }
     }

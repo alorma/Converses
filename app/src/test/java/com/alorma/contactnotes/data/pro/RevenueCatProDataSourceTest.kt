@@ -69,6 +69,37 @@ class RevenueCatProDataSourceTest {
   }
 
   @Test
+  fun onlyListenerChangesAreExternal() =
+    runTest {
+      val gateway = FakeGateway(purchaseResult = PurchaseResult.Pending)
+      val external = mutableListOf<Boolean>()
+      val source = RevenueCatProDataSource(gateway, onExternalChange = { external += it })
+      source.start()
+
+      gateway.send(false)
+      source.purchase(activity)
+      gateway.send(true)
+      gateway.send(true)
+      gateway.send(false)
+
+      assertEquals(listOf(true, false), external)
+    }
+
+  @Test
+  fun aPurchaseOrRestoreIsNotAnExternalChangeEvenWhenTheListenerConfirmsIt() =
+    runTest {
+      val gateway = FakeGateway()
+      val external = mutableListOf<Boolean>()
+      val source = RevenueCatProDataSource(gateway, onExternalChange = { external += it })
+      source.start()
+
+      source.purchase(activity)
+      gateway.send(true)
+
+      assertEquals(emptyList<Boolean>(), external)
+    }
+
+  @Test
   fun doesNotTouchRevenueCatUntilStarted() {
     val gateway = FakeGateway()
     RevenueCatProDataSource(gateway)
