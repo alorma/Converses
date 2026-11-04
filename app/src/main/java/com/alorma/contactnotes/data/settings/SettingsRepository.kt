@@ -7,6 +7,8 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
+import com.alorma.contactnotes.data.tracking.ErrorSites
+import com.alorma.contactnotes.data.tracking.resetOnCorruption
 import com.alorma.contactnotes.designsystem.theme.ThemeMode
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -43,7 +45,10 @@ interface SettingsRepository {
   suspend fun setAnalyticsConsent(granted: Boolean)
 }
 
-private val Context.settingsDataStore by preferencesDataStore(name = "settings")
+private val Context.settingsDataStore by preferencesDataStore(
+  name = "settings",
+  corruptionHandler = resetOnCorruption(ErrorSites.DATASTORE_SETTINGS),
+)
 
 class DataStoreSettingsRepository(
   context: Context,

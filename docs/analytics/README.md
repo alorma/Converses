@@ -100,12 +100,12 @@ Ordre decidit el 04-11-2026: tot el tracking es fa i es valida amb el `TimberTra
    - [x] Importació buida — `19dc853`
    - [x] Validació a l'emulador amb logcat (compra, restauració, bloquejos, importacions)
 5. Errors (`trackError`).
-   - Criteri (decidit el 04-11-2026): la fase no canvia cap comportament. Només s'informa dels errors que l'app ja s'empassa; el que fa petar l'app (migracions, DataStore corrupte, exportar) ho recollirà Crashlytics a la fase 8.
+   - Criteri (decidit el 04-11-2026): la fase no canvia cap comportament, llevat del DataStore corrupte (més avall). Només s'informa dels errors que l'app ja s'empassa; el que fa petar l'app (migracions, exportar) ho recollirà Crashlytics a la fase 8.
    - `object ErrorSites` (`data/tracking/ErrorSites.kt`): noms tancats per al `where`, mai dades.
    - Catàleg:
      - Pro: `pro_price`, `pro_customer_info`, `pro_purchase`, `pro_restore`. Només quan el resultat és `Failed`: sense xarxa, cancel·lat o pendent no són errors (ja surten com a esdeveniments).
      - Obrir fora de l'app: `open_link` (Ajustos i política del paywall), `open_feedback`, `open_security_setup` (fallback a la configuració de seguretat).
-   - El DataStore no té `ReplaceFileCorruptionHandler`: afegir-lo buidaria els ajustos (bloqueig de l'app inclòs), així que queda fora i, si cal, es farà a part.
+   - DataStore corrupte (decidit el 04-11-2026): es buida i l'app arrenca amb els valors per defecte en comptes de petar cada cop. A `settings` vol dir onboarding i full de consentiment de nou i el bloqueig de l'app apagat (les persones protegides continuen demanant l'empremta). S'informa `datastore_settings`, `datastore_pro` i `datastore_flags` a través de `StartupErrors`, una cua que es buida cap a l'`EventTracker` en arrencar, perquè el handler salta mentre Koin encara crea el `ConsentManager`. A `settings` el consentiment també s'ha esborrat, així que aquest error no surt mai del mòbil.
    - `open_security_setup` només s'informa des d'Ajustos: des d'una persona protegida, la traça diria que n'hi ha.
    - [x] `ErrorSites.kt` i aquest catàleg — `ebe2e94`
    - [x] Pro (`RevenueCatGateway`) — `568912a`

@@ -4,6 +4,8 @@ import android.content.Context
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.preferencesDataStore
+import com.alorma.contactnotes.data.tracking.ErrorSites
+import com.alorma.contactnotes.data.tracking.resetOnCorruption
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -12,7 +14,10 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
-private val Context.featureFlagsDataStore by preferencesDataStore(name = "feature_flags")
+private val Context.featureFlagsDataStore by preferencesDataStore(
+  name = "feature_flags",
+  corruptionHandler = resetOnCorruption(ErrorSites.DATASTORE_FLAGS),
+)
 
 /** Desa els overrides dels flags. Viu a `files/datastore`, que ja està exclòs del backup. */
 @OptIn(ExperimentalCoroutinesApi::class)

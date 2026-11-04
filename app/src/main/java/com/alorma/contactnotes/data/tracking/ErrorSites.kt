@@ -27,4 +27,13 @@ object ErrorSites {
 
   /** El sistema no té l'alta de biometria i s'obre la configuració de seguretat. */
   const val OPEN_SECURITY_SETUP = "open_security_setup"
+
+  // DataStore corrupte: s'ha buidat i l'app ha arrencat amb els valors per defecte. Si és `settings`, el
+  // consentiment també s'ha esborrat i l'error no surt del mòbil.
+
+  const val DATASTORE_SETTINGS = "datastore_settings"
+
+  const val DATASTORE_PRO = "datastore_pro"
+
+  const val DATASTORE_FLAGS = "datastore_flags"
 }

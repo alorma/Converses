@@ -1,8 +1,10 @@
 package com.alorma.contactnotes.debug
 
 import android.content.Context
+import androidx.datastore.core.handlers.ReplaceFileCorruptionHandler
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.preferencesDataStore
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -12,7 +14,10 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
-private val Context.debugProDataStore by preferencesDataStore(name = "debug_pro")
+private val Context.debugProDataStore by preferencesDataStore(
+  name = "debug_pro",
+  corruptionHandler = ReplaceFileCorruptionHandler { emptyPreferences() },
+)
 
 private val OverrideKey = booleanPreferencesKey("override")
 
