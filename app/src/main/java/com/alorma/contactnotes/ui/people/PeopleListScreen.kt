@@ -63,9 +63,6 @@ import com.alorma.contactnotes.data.db.PersonEntity
 import com.alorma.contactnotes.data.db.PersonListItem
 import com.alorma.contactnotes.data.db.color
 import com.alorma.contactnotes.data.db.shape
-import com.alorma.contactnotes.data.flags.FeatureState
-import com.alorma.contactnotes.data.flags.FollowUpsFeature
-import com.alorma.contactnotes.data.flags.rememberFeatureState
 import com.alorma.contactnotes.designsystem.components.Avatar
 import com.alorma.contactnotes.designsystem.components.BetaBadge
 import com.alorma.contactnotes.designsystem.components.DashedActionRow
@@ -94,7 +91,6 @@ fun PeopleListRoute(
   PeopleListScreen(
     state = state,
     archived = archived,
-    showTasks = rememberFeatureState<FollowUpsFeature>() != FeatureState.Hidden,
     onFilterToggled = viewModel::onFilterToggled,
     onPersonClick = onPersonClick,
     onNewPerson = onNewPerson,
@@ -108,8 +104,6 @@ fun PeopleListScreen(
   onFilterToggled: (ChannelType) -> Unit,
   onPersonClick: (PersonEntity) -> Unit,
   onNewPerson: () -> Unit,
-  /** El comptador de tasques pendents (9g); amagat si el flag està apagat. */
-  showTasks: Boolean = false,
 ) {
   val listState = rememberLazyListState()
   // Drawn once the rows are laid out (or there is nothing to show), not just when the data arrives
@@ -186,7 +180,7 @@ fun PeopleListScreen(
         }
       }
       groupedItems(state.people, key = { it.person.id }) { item ->
-        PersonRow(item, showTasks = showTasks, onClick = { onPersonClick(item.person) })
+        PersonRow(item, onClick = { onPersonClick(item.person) })
       }
       if (!state.isLoading && !archived && state.people.isNotEmpty()) {
         item(key = "add_person") {
@@ -321,7 +315,6 @@ private fun FilterRow(
 @Composable
 private fun PersonRow(
   item: PersonListItem,
-  showTasks: Boolean,
   onClick: () -> Unit,
 ) {
   val person = item.person
@@ -379,7 +372,7 @@ private fun PersonRow(
         )
       } else {
         val channels = item.channels.distinct().sorted()
-        val tasks = if (showTasks) item.openTasks else 0
+        val tasks = item.openTasks
         if (channels.isNotEmpty() || tasks > 0) {
           Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
             Text(

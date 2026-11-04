@@ -2,7 +2,6 @@ package com.alorma.contactnotes.ui.edit
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
-import com.alorma.contactnotes.data.flags.FeatureState
 import com.alorma.contactnotes.designsystem.preview.ConversesPreviewTheme
 import com.alorma.contactnotes.designsystem.theme.PersonTheme
 import com.alorma.contactnotes.shared.AvatarColor
@@ -58,7 +57,7 @@ private object NoOpEditPersonActions : EditPersonActions {
 private fun EditPersonPreview(
   state: EditPersonUiState,
   canAuthenticate: Boolean = true,
-  customAvatar: FeatureState = FeatureState.Hidden,
+  isPro: Boolean = true,
 ) {
   ConversesPreviewTheme {
     EditPersonContent(
@@ -69,7 +68,7 @@ private fun EditPersonPreview(
       onSaved = {},
       onDeleted = {},
       onProtectedChange = {},
-      customAvatar = customAvatar,
+      isPro = isPro,
     )
   }
 }
@@ -147,7 +146,7 @@ internal fun DeletePersonDialogPreview() {
   }
 }
 
-/** Amb `CustomAvatarFeature` encesa: l'avatar és un botó amb la insígnia d'edició. */
+/** Amb Pro: l'avatar és un botó amb la insígnia d'edició. */
 @Preview
 @Composable
 internal fun EditPersonCustomAvatarPreview() {
@@ -161,7 +160,7 @@ internal fun EditPersonCustomAvatarPreview() {
       facts = Facts.take(1),
       entryCount = 3,
     ),
-    customAvatar = FeatureState.Unlocked,
+    isPro = true,
   )
 }
 
@@ -234,6 +233,6 @@ internal fun EditPersonLockedAvatarPreview() {
       alias = "Dax",
       entryCount = 3,
     ),
-    customAvatar = FeatureState.Locked,
+    isPro = false,
   )
 }

@@ -122,7 +122,6 @@ internal fun NameAvatar(
   name: String,
   shape: AvatarShape,
   color: AvatarColor,
-  editable: Boolean,
   onClick: () -> Unit,
   badgeBorder: Color,
   locked: Boolean = false,
@@ -135,26 +134,19 @@ internal fun NameAvatar(
       modifier =
         Modifier
           .fillMaxSize()
-          .then(
-            if (editable) {
-              Modifier
-                .clip(avatarShape)
-                .selectable(selected = false, role = Role.Button, onClick = onClick)
-                .semantics { contentDescription = description }
-            } else {
-              Modifier
-            },
-          ),
+          .clip(avatarShape)
+          .selectable(selected = false, role = Role.Button, onClick = onClick)
+          .semantics { contentDescription = description },
     ) {
       EditorAvatar(name = name, shape = shape, color = color, size = 56.dp, initialsSize = 20)
     }
-    if (editable && locked) {
+    if (locked) {
       ProPill(
         text = stringResource(R.string.pro_badge),
         borderColor = badgeBorder,
         modifier = Modifier.align(Alignment.BottomEnd).offset(x = 10.dp, y = 6.dp),
       )
-    } else if (editable) {
+    } else {
       Box(
         modifier =
           Modifier

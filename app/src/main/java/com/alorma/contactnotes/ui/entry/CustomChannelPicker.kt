@@ -37,9 +37,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.alorma.contactnotes.R
 import com.alorma.contactnotes.data.ConversesRepository
 import com.alorma.contactnotes.data.db.CustomChannelEntity
-import com.alorma.contactnotes.data.flags.CustomChannelsFeature
-import com.alorma.contactnotes.data.flags.FeatureState
-import com.alorma.contactnotes.data.flags.rememberFeatureState
+import com.alorma.contactnotes.data.pro.rememberIsPro
 import com.alorma.contactnotes.designsystem.components.GroupedListDefaults
 import com.alorma.contactnotes.designsystem.components.ProBadge
 import com.alorma.contactnotes.designsystem.components.dashedBorder
@@ -48,30 +46,29 @@ import com.alorma.contactnotes.shared.ChannelType
 import kotlinx.coroutines.flow.map
 import org.koin.compose.koinInject
 
-/** Canals propis per al camp «On»: l'estat del flag Pro i tots els canals, que són globals. */
+/** Canals propis per al camp «On»: si és Pro i tots els canals, que són globals. */
 @Immutable
 data class CustomChannelsUi(
-  val state: FeatureState = FeatureState.Hidden,
+  val isPro: Boolean = false,
   val channels: List<CustomChannelEntity> = emptyList(),
 ) {
   /** El canal per defecte (el de l'última entrada) només porta el canal propi si encara es pot triar. */
-  fun defaultFor(channel: EntryChannel?): EntryChannel? =
-    if (state == FeatureState.Unlocked) channel else channel?.copy(customChannelId = null)
+  fun defaultFor(channel: EntryChannel?): EntryChannel? = if (isPro) channel else channel?.copy(customChannelId = null)
 }
 
 /** Els canals propis no són dades de cap persona: es poden carregar abans de desbloquejar una protegida. */
 @Composable
 fun rememberCustomChannelsUi(): CustomChannelsUi {
-  val state = rememberFeatureState<CustomChannelsFeature>()
+  val isPro = rememberIsPro()
   val repository: ConversesRepository = koinInject()
   val flow = remember(repository) { repository.observeCustomChannels().map { list -> list.map { it.channel } } }
   val channels by flow.collectAsStateWithLifecycle(emptyList())
-  return CustomChannelsUi(state, channels)
+  return CustomChannelsUi(isPro, channels)
 }
 
 /**
- * Targeta sota els grups del camp «On» (7a, 7c). `Unlocked`: els canals del grup i «+ Nou».
- * `Locked`: «Canal propi» amb PRO; si l'entrada ja en tenia un, es continua veient triat i es pot desmarcar.
+ * Targeta sota els grups del camp «On» (7a, 7c). Amb Pro: els canals del grup i «+ Nou».
+ * Sense Pro: «Canal propi» amb PRO; si l'entrada ja en tenia un, es continua veient triat i es pot desmarcar.
  */
 @Composable
 fun CustomChannelCard(
@@ -81,9 +78,7 @@ fun CustomChannelCard(
   onOpenPro: () -> Unit,
   modifier: Modifier = Modifier,
 ) {
-  val state = customChannels.state
-  if (state == FeatureState.Hidden) return
-  val unlocked = state == FeatureState.Unlocked
+  val unlocked = customChannels.isPro
   val haptics = rememberConversesHaptics()
   val inGroup = customChannels.channels.filter { it.channelType == channel.group }
   val shown = if (unlocked) inGroup else inGroup.filter { it.id == channel.customChannelId }

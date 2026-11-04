@@ -2,7 +2,6 @@ package com.alorma.contactnotes.ui.settings
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
-import com.alorma.contactnotes.data.flags.FeatureState
 import com.alorma.contactnotes.data.settings.AppSettings
 import com.alorma.contactnotes.designsystem.preview.ConversesPreviewTheme
 
@@ -11,7 +10,6 @@ private fun SettingsPreview(
   settings: AppSettings,
   canUnlock: Boolean,
   isPro: Boolean = false,
-  personColor: FeatureState = FeatureState.Unlocked,
 ) {
   ConversesPreviewTheme {
     SettingsContent(
@@ -31,7 +29,6 @@ private fun SettingsPreview(
       onOpenPrivacyPolicy = {},
       onOpenFeedback = {},
       isPro = isPro,
-      personColor = personColor,
     )
   }
 }
@@ -64,5 +61,5 @@ internal fun SettingsNoLockPreview() {
 @Preview
 @Composable
 internal fun SettingsPersonColorLockedPreview() {
-  SettingsPreview(settings = AppSettings(), canUnlock = true, personColor = FeatureState.Locked)
+  SettingsPreview(settings = AppSettings(), canUnlock = true)
 }

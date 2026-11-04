@@ -88,9 +88,7 @@ import androidx.compose.ui.zIndex
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.alorma.contactnotes.R
-import com.alorma.contactnotes.data.flags.CustomAvatarFeature
-import com.alorma.contactnotes.data.flags.FeatureState
-import com.alorma.contactnotes.data.flags.rememberFeatureState
+import com.alorma.contactnotes.data.pro.rememberIsPro
 import com.alorma.contactnotes.data.settings.SecureWindow
 import com.alorma.contactnotes.designsystem.components.ConversesSaveButton
 import com.alorma.contactnotes.designsystem.components.ConversesSwitch
@@ -148,7 +146,7 @@ fun EditPersonScreen(
         haptics.toggle(value)
       }
     },
-    customAvatar = rememberFeatureState<CustomAvatarFeature>(),
+    isPro = rememberIsPro(),
     focus = focus,
     onOpenPro = onOpenPro,
   )
@@ -163,7 +161,7 @@ fun EditPersonContent(
   onSaved: (Long) -> Unit,
   onDeleted: () -> Unit,
   onProtectedChange: (Boolean) -> Unit,
-  customAvatar: FeatureState = FeatureState.Unlocked,
+  isPro: Boolean = true,
   focus: EditFocus? = null,
   /** Des d'una funció `Locked` (full «Avatar»): obre la pantalla de Pro. */
   onOpenPro: (ProBenefit) -> Unit = {},
@@ -178,8 +176,8 @@ fun EditPersonContent(
     }
   }
   // Si ha comprat, la prova passa a l'editor i ja es pot desar
-  LaunchedEffect(customAvatar, state.hasTrial) {
-    if (customAvatar == FeatureState.Unlocked && state.hasTrial) actions.onApplyTrial()
+  LaunchedEffect(isPro, state.hasTrial) {
+    if (isPro && state.hasTrial) actions.onApplyTrial()
   }
 
   PersonTheme(state.color ?: AvatarColor.forName(state.name)) {
@@ -242,10 +240,9 @@ fun EditPersonContent(
                 name = state.name,
                 shape = state.shape ?: AvatarShape.Standard,
                 color = state.color ?: AvatarColor.forName(state.name),
-                editable = customAvatar != FeatureState.Hidden,
                 onClick = { showAvatarSheet = true },
                 badgeBorder = GroupedListDefaults.containerColor,
-                locked = customAvatar == FeatureState.Locked,
+                locked = !isPro,
               )
               LabeledField(
                 label = stringResource(R.string.field_name),
@@ -338,7 +335,7 @@ fun EditPersonContent(
       )
     }
 
-    if (showAvatarSheet && customAvatar != FeatureState.Hidden) {
+    if (showAvatarSheet) {
       AvatarSheet(
         name = state.name,
         shape = state.shape,
@@ -351,7 +348,7 @@ fun EditPersonContent(
           actions.onDiscardTrial()
         },
         lock =
-          if (customAvatar == FeatureState.Locked) {
+          if (!isPro) {
             AvatarSheetLock(
               savedShape = state.baseline.shape,
               savedColor = state.baseline.color,

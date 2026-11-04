@@ -77,10 +77,6 @@ import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.alorma.compose.settings.ui.expressive.SettingsGroup
 import com.alorma.contactnotes.R
-import com.alorma.contactnotes.data.flags.CustomChannelsFeature
-import com.alorma.contactnotes.data.flags.FeatureState
-import com.alorma.contactnotes.data.flags.PersonColorFeature
-import com.alorma.contactnotes.data.flags.rememberFeatureState
 import com.alorma.contactnotes.data.pro.ProRepository
 import com.alorma.contactnotes.data.settings.AppLockManager
 import com.alorma.contactnotes.data.settings.AppSettings
@@ -132,8 +128,6 @@ fun SettingsScreen(
     settings = settings,
     isPro = isPro,
     onOpenPro = onOpenPro,
-    personColor = rememberFeatureState<PersonColorFeature>(),
-    customChannels = rememberFeatureState<CustomChannelsFeature>(),
     customChannelCount = customChannelCount,
     onOpenCustomChannels = onOpenCustomChannels,
     canUnlock = canUnlock,
@@ -176,12 +170,10 @@ fun SettingsContent(
   onOpenSecuritySetup: () -> Unit,
   onOpenPrivacyPolicy: () -> Unit,
   onOpenFeedback: () -> Unit,
-  personColor: FeatureState = FeatureState.Unlocked,
-  /** `null`: sense la targeta de Pro (previews antigues). */
-  isPro: Boolean? = null,
+  /** Sense Pro, «Color de la persona» i «Canals propis» porten PRO i obren la pantalla de Pro. */
+  isPro: Boolean = false,
   /** Obre la pantalla de Pro; el benefici és l'origen (8b), `null` des de la targeta. */
   onOpenPro: (ProBenefit?) -> Unit = {},
-  customChannels: FeatureState = FeatureState.Hidden,
   customChannelCount: Int = 0,
   onOpenCustomChannels: () -> Unit = {},
 ) {
@@ -212,12 +204,12 @@ fun SettingsContent(
           .padding(horizontal = 16.dp),
       verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-      isPro?.let { ProCard(isPro = it, onClick = { onOpenPro(null) }) }
+      ProCard(isPro = isPro, onClick = { onOpenPro(null) })
       SettingsGroup(
         title = { SectionTitle(stringResource(R.string.settings_appearance)) },
         verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap),
       ) {
-        val themeCount = if (personColor != FeatureState.Hidden) 3 else 2
+        val themeCount = 3
         ThemeModeRow(
           selected = settings.themeMode,
           onSelected = onThemeMode,
@@ -231,33 +223,31 @@ fun SettingsContent(
           onCheckedChange = onDynamicColor,
           shape = groupedItemShape(1, themeCount),
         )
-        when (personColor) {
-          FeatureState.Hidden -> Unit
+        if (!isPro) {
           // Sense Pro (o després d'una baixada), com «Canals propis»: tota la fila obre la pantalla de Pro (11e)
-          FeatureState.Locked ->
-            SettingRow(
-              title = stringResource(R.string.settings_person_color),
-              subtitle = stringResource(R.string.settings_person_color_summary),
-              icon = Icons.Rounded.Face,
-              onClick = { onOpenPro(ProBenefit.People) },
-              titleBadge = {
-                ProBadge(
-                  text = stringResource(R.string.pro_badge),
-                  contentDescription = stringResource(R.string.pro_description),
-                )
-              },
-              trailing = { Icon(Icons.AutoMirrored.Rounded.KeyboardArrowRight, contentDescription = null) },
-              shape = groupedItemShape(2, themeCount),
-            )
-          FeatureState.Unlocked ->
-            SettingSwitchRow(
-              title = stringResource(R.string.settings_person_color),
-              subtitle = stringResource(R.string.settings_person_color_summary),
-              icon = Icons.Rounded.Face,
-              checked = settings.personColorTheme,
-              onCheckedChange = onPersonColorTheme,
-              shape = groupedItemShape(2, themeCount),
-            )
+          SettingRow(
+            title = stringResource(R.string.settings_person_color),
+            subtitle = stringResource(R.string.settings_person_color_summary),
+            icon = Icons.Rounded.Face,
+            onClick = { onOpenPro(ProBenefit.People) },
+            titleBadge = {
+              ProBadge(
+                text = stringResource(R.string.pro_badge),
+                contentDescription = stringResource(R.string.pro_description),
+              )
+            },
+            trailing = { Icon(Icons.AutoMirrored.Rounded.KeyboardArrowRight, contentDescription = null) },
+            shape = groupedItemShape(2, themeCount),
+          )
+        } else {
+          SettingSwitchRow(
+            title = stringResource(R.string.settings_person_color),
+            subtitle = stringResource(R.string.settings_person_color_summary),
+            icon = Icons.Rounded.Face,
+            checked = settings.personColorTheme,
+            onCheckedChange = onPersonColorTheme,
+            shape = groupedItemShape(2, themeCount),
+          )
         }
       }
 
@@ -329,30 +319,28 @@ fun SettingsContent(
         modifier = Modifier.padding(horizontal = 4.dp),
       )
 
-      if (customChannels != FeatureState.Hidden) {
-        SettingsGroup(
-          title = {
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
-              SectionTitle(stringResource(R.string.settings_channels))
-              ProBadge(
-                text = stringResource(R.string.pro_badge),
-                contentDescription = stringResource(R.string.pro_description),
-              )
-            }
+      SettingsGroup(
+        title = {
+          Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+            SectionTitle(stringResource(R.string.settings_channels))
+            ProBadge(
+              text = stringResource(R.string.pro_badge),
+              contentDescription = stringResource(R.string.pro_description),
+            )
+          }
+        },
+        verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap),
+      ) {
+        SettingRow(
+          title = stringResource(R.string.custom_channels_title),
+          subtitle = pluralStringResource(R.plurals.custom_channels_count, customChannelCount, customChannelCount),
+          icon = Icons.Rounded.Forum,
+          trailing = { Icon(Icons.AutoMirrored.Rounded.KeyboardArrowRight, contentDescription = null) },
+          shape = groupedItemShape(0, 1),
+          onClick = {
+            if (isPro) onOpenCustomChannels() else onOpenPro(ProBenefit.Channels)
           },
-          verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap),
-        ) {
-          SettingRow(
-            title = stringResource(R.string.custom_channels_title),
-            subtitle = pluralStringResource(R.plurals.custom_channels_count, customChannelCount, customChannelCount),
-            icon = Icons.Rounded.Forum,
-            trailing = { Icon(Icons.AutoMirrored.Rounded.KeyboardArrowRight, contentDescription = null) },
-            shape = groupedItemShape(0, 1),
-            onClick = {
-              if (customChannels == FeatureState.Unlocked) onOpenCustomChannels() else onOpenPro(ProBenefit.Channels)
-            },
-          )
-        }
+        )
       }
 
       val aboutCount = 3

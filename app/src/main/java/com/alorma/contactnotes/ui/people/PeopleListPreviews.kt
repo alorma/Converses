@@ -9,7 +9,6 @@ import com.alorma.contactnotes.ui.preview.PreviewData
 private fun PeopleListScreenPreview(
   state: PeopleListUiState,
   archived: Boolean = false,
-  showTasks: Boolean = false,
 ) {
   ConversesPreviewTheme {
     PeopleListScreen(
@@ -18,7 +17,6 @@ private fun PeopleListScreenPreview(
       onFilterToggled = {},
       onPersonClick = {},
       onNewPerson = {},
-      showTasks = showTasks,
     )
   }
 }
@@ -54,6 +52,5 @@ internal fun PeopleListScreenTasksPreview() {
   val people = PreviewData.people.mapIndexed { index, item -> item.copy(openTasks = counts.getOrElse(index) { 0 }) }
   PeopleListScreenPreview(
     PeopleListUiState(people = people, total = people.size, isLoading = false),
-    showTasks = true,
   )
 }

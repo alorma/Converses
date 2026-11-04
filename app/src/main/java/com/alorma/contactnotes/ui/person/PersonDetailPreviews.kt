@@ -12,7 +12,6 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import com.alorma.contactnotes.data.db.color
-import com.alorma.contactnotes.data.flags.FeatureState
 import com.alorma.contactnotes.designsystem.preview.ConversesPreviewTheme
 import com.alorma.contactnotes.designsystem.theme.PersonTheme
 import com.alorma.contactnotes.shared.AvatarColor
@@ -23,7 +22,7 @@ import com.alorma.contactnotes.ui.task.TasksSection
 @Composable
 private fun PersonDetailScreenPreview(
   state: PersonDetailUiState,
-  tasksState: FeatureState = FeatureState.Hidden,
+  isPro: Boolean = false,
 ) {
   ConversesPreviewTheme {
     PersonTheme(state.person?.color) {
@@ -41,7 +40,7 @@ private fun PersonDetailScreenPreview(
         onExport = {},
         onToggleArchived = {},
         snackbarHostState = remember { SnackbarHostState() },
-        tasksState = tasksState,
+        isPro = isPro,
         today = PreviewData.taskToday,
       )
     }
@@ -190,7 +189,7 @@ private val martaTasksState =
 @Preview
 @Composable
 internal fun PersonDetailTasksPreview() {
-  PersonDetailScreenPreview(martaTasksState, tasksState = FeatureState.Unlocked)
+  PersonDetailScreenPreview(martaTasksState, isPro = true)
 }
 
 /** 9h: amb Pro i sense cap tasca, la targeta buida. */
@@ -199,7 +198,7 @@ internal fun PersonDetailTasksPreview() {
 internal fun PersonDetailTasksEmptyPreview() {
   PersonDetailScreenPreview(
     martaTasksState.copy(openTasks = emptyList(), doneTasks = emptyList()),
-    tasksState = FeatureState.Unlocked,
+    isPro = true,
   )
 }
 
@@ -207,7 +206,7 @@ internal fun PersonDetailTasksEmptyPreview() {
 @Preview
 @Composable
 internal fun PersonDetailTasksLockedPreview() {
-  PersonDetailScreenPreview(martaTasksState, tasksState = FeatureState.Locked)
+  PersonDetailScreenPreview(martaTasksState, isPro = false)
 }
 
 /** 9f: «Fets» desplegat (text ratllat, «FET AHIR», «FET EL …»). */

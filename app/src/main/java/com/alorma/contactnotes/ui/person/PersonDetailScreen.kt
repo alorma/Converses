@@ -67,9 +67,7 @@ import com.alorma.contactnotes.data.db.PinnedFactEntity
 import com.alorma.contactnotes.data.db.TaskEntity
 import com.alorma.contactnotes.data.db.color
 import com.alorma.contactnotes.data.db.shape
-import com.alorma.contactnotes.data.flags.FeatureState
-import com.alorma.contactnotes.data.flags.FollowUpsFeature
-import com.alorma.contactnotes.data.flags.rememberFeatureState
+import com.alorma.contactnotes.data.pro.rememberIsPro
 import com.alorma.contactnotes.data.settings.SecureWindow
 import com.alorma.contactnotes.designsystem.components.Avatar
 import com.alorma.contactnotes.designsystem.components.CollapsibleFacts
@@ -171,7 +169,7 @@ fun PersonDetailRoute(
   val deletedMessage = stringResource(R.string.entry_deleted)
   val undoLabel = stringResource(R.string.undo)
   val taskDoneMessage = stringResource(R.string.task_marked_done)
-  val tasksState = rememberFeatureState<FollowUpsFeature>()
+  val isPro = rememberIsPro()
   var dayCount by remember { mutableIntStateOf(0) }
   LaunchedEffect(actionEntry?.id) { actionEntry?.let { dayCount = viewModel.countDay(it) } }
 
@@ -235,10 +233,10 @@ fun PersonDetailRoute(
         haptics.confirm()
         viewModel.setArchived(!person.archived) { if (!person.archived) onBack() }
       },
-      tasksState = tasksState,
+      isPro = isPro,
       onNewTask = {
         menuExpanded = false
-        if (tasksState == FeatureState.Unlocked) onNewTask() else onOpenPro(ProBenefit.FollowUps)
+        if (isPro) onNewTask() else onOpenPro(ProBenefit.FollowUps)
       },
       onOpenTask = onOpenTask,
       onTaskDone = { task ->
@@ -349,7 +347,7 @@ fun PersonDetailScreen(
   onExport: () -> Unit,
   onToggleArchived: () -> Unit,
   snackbarHostState: SnackbarHostState,
-  tasksState: FeatureState = FeatureState.Hidden,
+  isPro: Boolean = false,
   onNewTask: () -> Unit = {},
   onOpenTask: (TaskEntity) -> Unit = {},
   onTaskDone: (TaskEntity) -> Unit = {},
@@ -393,24 +391,22 @@ fun PersonDetailScreen(
           onMenuExpandedChange = onMenuExpandedChange,
           menuContentDescription = stringResource(R.string.more_options),
         ) {
-          if (tasksState != FeatureState.Hidden) {
-            ConversesMenuItem(
-              text = stringResource(R.string.task_new),
-              icon = Icons.Rounded.Flag,
-              onClick = onNewTask,
-              trailing =
-                if (tasksState == FeatureState.Locked) {
-                  {
-                    ProBadge(
-                      text = stringResource(R.string.pro_badge),
-                      contentDescription = stringResource(R.string.pro_description),
-                    )
-                  }
-                } else {
-                  null
-                },
-            )
-          }
+          ConversesMenuItem(
+            text = stringResource(R.string.task_new),
+            icon = Icons.Rounded.Flag,
+            onClick = onNewTask,
+            trailing =
+              if (!isPro) {
+                {
+                  ProBadge(
+                    text = stringResource(R.string.pro_badge),
+                    contentDescription = stringResource(R.string.pro_description),
+                  )
+                }
+              } else {
+                null
+              },
+          )
           ConversesMenuItem(
             text = stringResource(R.string.menu_export),
             icon = Icons.Rounded.IosShare,
@@ -457,12 +453,12 @@ fun PersonDetailScreen(
         }
         // Amb Pro, sempre; sense, només si ja té tasques (es continuen veient i marcant)
         val hasTasks = state.openTasks.isNotEmpty() || state.doneTasks.isNotEmpty()
-        if (tasksState == FeatureState.Unlocked || (tasksState == FeatureState.Locked && hasTasks)) {
+        if (isPro || hasTasks) {
           item(key = "tasks") {
             TasksSection(
               open = state.openTasks,
               done = state.doneTasks,
-              canCreate = tasksState == FeatureState.Unlocked,
+              canCreate = isPro,
               today = today,
               onNewTask = onNewTask,
               onOpen = onOpenTask,

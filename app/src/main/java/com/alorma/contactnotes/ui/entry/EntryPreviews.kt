@@ -11,7 +11,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.alorma.contactnotes.data.db.CustomChannelEntity
 import com.alorma.contactnotes.data.db.color
-import com.alorma.contactnotes.data.flags.FeatureState
 import com.alorma.contactnotes.designsystem.preview.ConversesPreviewTheme
 import com.alorma.contactnotes.designsystem.theme.PersonTheme
 import com.alorma.contactnotes.shared.ChannelType
@@ -85,7 +84,7 @@ internal fun QuickNoteCustomChannelsPreview() {
         text = "Told her I can't make it to dinner on Saturday.",
         whenChoice = WhenChoice.Stored(PreviewData.formTime),
       ),
-    customChannels = CustomChannelsUi(FeatureState.Unlocked, PreviewCustomChannels),
+    customChannels = CustomChannelsUi(isPro = true, channels = PreviewCustomChannels),
   )
 }
 
@@ -102,7 +101,7 @@ internal fun QuickNoteCustomChannelsLockedPreview() {
         text = "Told her I can't make it to dinner on Saturday.",
         whenChoice = WhenChoice.Stored(PreviewData.formTime),
       ),
-    customChannels = CustomChannelsUi(FeatureState.Locked, PreviewCustomChannels),
+    customChannels = CustomChannelsUi(isPro = false, channels = PreviewCustomChannels),
   )
 }
 
