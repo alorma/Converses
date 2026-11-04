@@ -1,2 +1,4 @@
-Versión 1.7.10:
-• Unas cuantas correcciones pequeñas y mucho trabajo interno que no notarás, que es justo la gracia.
+Versión 1.8.3:
+• Llega Converses Pro: canales propios, pendientes y personas a tu manera. Un solo pago, sin suscripción, y lo que era gratis sigue siéndolo.
+• Estadísticas de uso anónimas y opcionales, apagadas hasta que digas que sí (Ajustes › Privacidad). Preferimos encontrar nuestros fallos antes que tú.
+• Unas cuantas correcciones pequeñas que no notarás, que es justo la gracia.

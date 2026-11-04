@@ -1,2 +1,4 @@
-Versió 1.7.10:
-• Unes quantes correccions petites i molta feina interna que no notaràs, que és justament la gràcia.
+Versió 1.8.3:
+• Arriba Converses Pro: canals propis, pendents i persones a la teva manera. Un sol pagament, sense subscripció, i el que era gratis continua sent-ho.
+• Estadístiques d'ús anònimes i opcionals, apagades fins que hi dius que sí (Ajustos › Privacitat). Preferim trobar els nostres errors abans que tu.
+• Unes quantes correccions petites que no notaràs, que és justament la gràcia.

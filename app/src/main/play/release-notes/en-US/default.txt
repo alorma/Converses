@@ -1,2 +1,4 @@
-Version 1.7.10:
-• A few small fixes and a lot of internal work you won't notice, which is exactly the point.
+Version 1.8.3:
+• Converses Pro is here: custom channels, follow-ups and people your way. One payment, no subscription, and everything that was free stays free.
+• Optional, anonymous usage statistics, off until you say yes (Settings › Privacy). We'd rather find our bugs before you do.
+• A few small fixes you won't notice, which is exactly the point.
