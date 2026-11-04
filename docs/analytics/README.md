@@ -106,9 +106,10 @@ Ordre decidit el 04-11-2026: tot el tracking es fa i es valida amb el `TimberTra
      - Pro: `pro_price`, `pro_customer_info`, `pro_purchase`, `pro_restore`. Només quan el resultat és `Failed`: sense xarxa, cancel·lat o pendent no són errors (ja surten com a esdeveniments).
      - Obrir fora de l'app: `open_link` (Ajustos i política del paywall), `open_feedback`, `open_security_setup` (fallback a la configuració de seguretat).
    - El DataStore no té `ReplaceFileCorruptionHandler`: afegir-lo buidaria els ajustos (bloqueig de l'app inclòs), així que queda fora i, si cal, es farà a part.
-   - [ ] `ErrorSites.kt` i aquest catàleg
-   - [ ] Pro (`RevenueCatGateway`)
-   - [ ] Obrir fora de l'app
+   - `open_security_setup` només s'informa des d'Ajustos: des d'una persona protegida, la traça diria que n'hi ha.
+   - [x] `ErrorSites.kt` i aquest catàleg — `ebe2e94`
+   - [x] Pro (`RevenueCatGateway`) — `568912a`
+   - [x] Obrir fora de l'app — `450eb57`
 6. Configuració de l'`EventTracker`: propietats comunes a tots els esdeveniments, començant per `isPro`.
 7. Full d'una sola vegada (10a, 10b) després de l'onboarding, amb un FireAndForget, i Ajustos › Privacitat (1c), amb els textos en ca/en/es. Captures i emulador.
 8. Implementació Firebase amb la inicialització manual, i l'activació i desactivació en calent. Cal el `google-services.json`. Validació a l'emulador amb logcat (`adb shell setprop log.tag.FA VERBOSE`): sense consentiment, cap tràfic de Firebase.
