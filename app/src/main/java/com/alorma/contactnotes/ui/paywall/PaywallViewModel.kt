@@ -8,6 +8,7 @@ import com.alorma.contactnotes.data.pro.ProRepository
 import com.alorma.contactnotes.data.pro.PurchaseResult
 import com.alorma.contactnotes.data.pro.RestoreResult
 import com.alorma.contactnotes.data.tracking.EventTracker
+import com.alorma.contactnotes.data.tracking.Events
 import com.alorma.contactnotes.ui.tracking.Actions
 import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.Job
@@ -112,6 +113,7 @@ class PaywallViewModel(
       val result = pro.purchase(activity)
       attempt.timer?.cancel()
       if (this@PaywallViewModel.attempt === attempt) this@PaywallViewModel.attempt = null
+      tracker.trackEvent(Events.PurchaseFinished(result, late = attempt.timedOut))
       if (attempt.timedOut) onLatePurchase(result) else onPurchase(result)
     }
   }
@@ -128,6 +130,7 @@ class PaywallViewModel(
         delay(PURCHASE_TIMEOUT)
         attempt.timedOut = true
         this@PaywallViewModel.attempt = null
+        tracker.trackEvent(Events.PurchaseTimedOut())
         local.update { it.copy(busy = false) }
         // Si Pro ja ha arribat pel listener, la pantalla ja diu «Ja tens Pro»
         if (!current().isPro) messages.send(PaywallMessage.Pending)
@@ -163,6 +166,7 @@ class PaywallViewModel(
     viewModelScope.launch {
       local.update { it.copy(busy = true) }
       val result = pro.restore()
+      tracker.trackEvent(Events.RestoreFinished(result))
       local.update {
         when (result) {
           RestoreResult.Restored -> it.copy(busy = false, isPro = true)

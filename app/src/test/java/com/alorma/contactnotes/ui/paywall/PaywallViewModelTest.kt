@@ -213,6 +213,73 @@ class PaywallViewModelTest {
       }
     }
 
+  @Test
+  fun eachPurchaseOutcomeIsTracked() =
+    runTest {
+      val expected =
+        mapOf(
+          PurchaseResult.Purchased to "purchased",
+          PurchaseResult.Pending to "pending",
+          PurchaseResult.Failed to "failed",
+          PurchaseResult.Offline to "offline",
+          PurchaseResult.Cancelled to "cancelled",
+        )
+      expected.forEach { (result, name) ->
+        val tracker = RecordingTracker()
+        source.purchaseResult = result
+
+        PaywallViewModel(ProRepository(source), network, tracker.eventTracker).onBuy(Activity())
+
+        assertEquals(
+          "$result",
+          listOf("purchase_finished" to mapOf("result" to name, "late" to "false")),
+          tracker.recordedEvents(),
+        )
+      }
+    }
+
+  @Test
+  fun eachRestoreOutcomeIsTracked() =
+    runTest {
+      val expected =
+        mapOf(
+          RestoreResult.Restored to "restored",
+          RestoreResult.NothingToRestore to "nothing",
+          RestoreResult.Pending to "pending",
+          RestoreResult.Failed to "failed",
+          RestoreResult.Offline to "offline",
+        )
+      expected.forEach { (result, name) ->
+        val tracker = RecordingTracker()
+        source.restoreResult = result
+
+        PaywallViewModel(ProRepository(source), network, tracker.eventTracker).onRestore()
+
+        assertEquals("$result", listOf("restore_finished" to mapOf("result" to name)), tracker.recordedEvents())
+      }
+    }
+
+  @Test
+  fun aTimeoutAndTheLateResultAreTracked() =
+    runTest {
+      val gate = CompletableDeferred<Unit>()
+      source.purchaseGate = gate
+      val viewModel = viewModel()
+
+      viewModel.onBuy(Activity())
+      viewModel.onResumed()
+      advanceTimeBy(PURCHASE_TIMEOUT + 1.seconds)
+      gate.complete(Unit)
+
+      assertEquals(
+        listOf(
+          "purchase_timed_out" to emptyMap(),
+          "purchase_finished" to mapOf("result" to "purchased", "late" to "true"),
+        ),
+        tracker.recordedEvents(),
+      )
+    }
+
   private fun TestScope.messagesOf(viewModel: PaywallViewModel): Pair<MutableList<PaywallMessage>, Job> {
     val received = mutableListOf<PaywallMessage>()
     return received to launch(UnconfinedTestDispatcher(testScheduler)) { viewModel.events.toList(received) }

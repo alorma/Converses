@@ -18,6 +18,9 @@ class RecordingTracker : Tracker {
   /** Nom i propietats de cada acció, en ordre. */
   fun recordedActions(): List<Pair<String, Map<String, String>>> = actions.map { it.eventName to it.eventProperties }
 
+  /** Nom i propietats de cada esdeveniment, en ordre. */
+  fun recordedEvents(): List<Pair<String, Map<String, String>>> = events.map { it.eventName to it.eventProperties }
+
   override fun trackScreen(screen: Screen) = Unit
 
   override fun trackEvent(event: Event) {
