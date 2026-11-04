@@ -111,7 +111,7 @@ Ordre decidit el 04-11-2026: tot el tracking es fa i es valida amb el `TimberTra
    - [x] Pro (`RevenueCatGateway`) — `568912a`
    - [x] Obrir fora de l'app — `450eb57`
    - [x] DataStore corrupte — `3565ae7`
-6. Configuració de l'`EventTracker`: propietats comunes a tots els esdeveniments, començant per `isPro`.
+6. Configuració de l'`EventTracker`: propietats comunes a tots els esdeveniments, començant per `isPro` — validada el 04-11-2026.
    - Decidit el 04-11-2026: els ViewModels i la interfície `Tracker` no canvien. `EventTracker` guarda les propietats comunes (`setCommonProperty`, `removeCommonProperty`) i, a cada `trackScreen`, `trackEvent` i `trackAction`, passa als trackers el mateix esdeveniment (nom i versió) amb `comunes + pròpies`; si una clau coincideix, guanya la de l'esdeveniment.
    - `trackError` rep les comunes en un paràmetre `properties` amb valor per defecte, que només omple `EventTracker` (a la fase 8, *custom keys* de Crashlytics).
    - Catàleg: `is_pro` (`true`/`false`). El posa `ProTrackingProperty`, engegada a `ConversesApp`, a partir de `ProRepository.isPro`; així `EventTracker` no depèn de `ProRepository`.
