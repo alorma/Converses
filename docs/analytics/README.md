@@ -131,7 +131,7 @@ Ordre decidit el 04-11-2026: tot el tracking es fa i es valida amb el `TimberTra
    - [x] `ConsentSheetContent` (`ui/consent`), textos, previews i captures — `f8b60ea`
    - [x] Mostrar el full a People, validat a l'emulador — `07c75f2`
    - [x] Ajustos › Privacitat, amb tests del ViewModel, captures i emulador — `e10ef5e`
-8. Implementació Firebase amb la inicialització manual, i l'activació i desactivació en calent. Validació a l'emulador amb logcat (`adb shell setprop log.tag.FA VERBOSE`): sense consentiment, cap tràfic de Firebase.
+8. Implementació Firebase amb la inicialització manual, i l'activació i desactivació en calent. Validació a l'emulador amb logcat (`adb shell setprop log.tag.FA VERBOSE`): sense consentiment, cap tràfic de Firebase. Validada el 04-11-2026.
    - Projecte de Firebase `converses-72251`, amb les apps `com.alorma.contactnotes` i `com.alorma.contactnotes.dev`. El `google-services.json` és fora del repo (`.gitignore`); a la CI es crea del secret `GOOGLE_SERVICES_JSON_BASE64`.
    - Firebase també a debug (decidit el 04-11-2026): el `trackersModule` de debug té el `TimberTracker` i el `FirebaseTracker`, que envia a l'app `.dev` (es veu a DebugView). El consentiment el protegeix igual que a release.
    - Crashes fatals (decidit el 04-11-2026): Crashlytics els envia tal qual, amb el missatge de l'excepció. Només els errors controlats (`trackError`) en treuen el `message`.
