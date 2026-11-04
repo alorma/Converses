@@ -50,7 +50,7 @@ Com es treballa cada fase: `.claude/rules/phased-work.md`.
 
 ## Fases
 
-1. Infraestructura agnòstica (pendent de la validació de Bernat):
+1. Infraestructura agnòstica — validada el 04-11-2026:
    - [x] `Tracker`, `Screen`/`Event`/`Action` abstractes i `EventTracker` que filtra els remots pel consentiment — `06f24c2`
    - [x] `TimberTracker` a debug, `FirebaseTracker` buit a release — `1f8bb5a`
    - [x] Consentiment al DataStore i `ConsentManager` — `88685b3`
