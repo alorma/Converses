@@ -119,7 +119,7 @@ Ordre decidit el 04-11-2026: tot el tracking es fa i es valida amb el `TimberTra
    - [x] Aquest pla — `5665ff7`
    - [x] Propietats comunes a `EventTracker` — `e518612`
    - [x] `is_pro` (`ProTrackingProperty`), validat a l'emulador — `2617f86`
-7. Full d'una sola vegada (10a, 10b) després de l'onboarding i Ajustos › Privacitat (1c), amb els textos en ca/en/es. Captures i emulador.
+7. Full d'una sola vegada (10a, 10b) després de l'onboarding i Ajustos › Privacitat (1c), amb els textos en ca/en/es. Captures i emulador — validada el 04-11-2026.
    - Decidit el 04-11-2026: sense FireAndForget. El full surt mentre `analyticsConsent` és `null`, i això inclou els usuaris que ja tenien l'app: en actualitzar, el veuen la primera vegada que són a People.
    - Quan surt: a People (la pila és només `PeopleRoute`), amb l'onboarding fet i el consentiment `null`. Mai amb un intent de compartir, ni sobre el paywall, ni sobre el bloqueig de l'app. Tancar-lo sense «D'acord» desa «No», encara que hi hagués «Sí» marcat: el consentiment només es dona confirmant-lo.
    - Cua de pendents (decidit el 04-11-2026): mentre el consentiment és `null`, `EventTracker` guarda en memòria el que hauria d'anar als trackers remots (pantalles, esdeveniments, accions i errors, amb les propietats comunes del moment). Amb «Sí» s'envia en ordre; amb «No» es buida. Mai es desa al disc: si l'app es tanca, es perd. Límit de 100; en passar-lo es descarten els més antics. Els trackers locals reben sempre a l'instant. Així l'onboarding i els errors de l'arrencada d'un usuari nou compten si després diu «Sí».
