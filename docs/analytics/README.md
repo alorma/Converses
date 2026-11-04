@@ -100,6 +100,15 @@ Ordre decidit el 04-11-2026: tot el tracking es fa i es valida amb el `TimberTra
    - [x] Importació buida — `19dc853`
    - [x] Validació a l'emulador amb logcat (compra, restauració, bloquejos, importacions)
 5. Errors (`trackError`).
+   - Criteri (decidit el 04-11-2026): la fase no canvia cap comportament. Només s'informa dels errors que l'app ja s'empassa; el que fa petar l'app (migracions, DataStore corrupte, exportar) ho recollirà Crashlytics a la fase 8.
+   - `object ErrorSites` (`data/tracking/ErrorSites.kt`): noms tancats per al `where`, mai dades.
+   - Catàleg:
+     - Pro: `pro_price`, `pro_customer_info`, `pro_purchase`, `pro_restore`. Només quan el resultat és `Failed`: sense xarxa, cancel·lat o pendent no són errors (ja surten com a esdeveniments).
+     - Obrir fora de l'app: `open_link` (Ajustos i política del paywall), `open_feedback`, `open_security_setup` (fallback a la configuració de seguretat).
+   - El DataStore no té `ReplaceFileCorruptionHandler`: afegir-lo buidaria els ajustos (bloqueig de l'app inclòs), així que queda fora i, si cal, es farà a part.
+   - [ ] `ErrorSites.kt` i aquest catàleg
+   - [ ] Pro (`RevenueCatGateway`)
+   - [ ] Obrir fora de l'app
 6. Configuració de l'`EventTracker`: propietats comunes a tots els esdeveniments, començant per `isPro`.
 7. Full d'una sola vegada (10a, 10b) després de l'onboarding, amb un FireAndForget, i Ajustos › Privacitat (1c), amb els textos en ca/en/es. Captures i emulador.
 8. Implementació Firebase amb la inicialització manual, i l'activació i desactivació en calent. Cal el `google-services.json`. Validació a l'emulador amb logcat (`adb shell setprop log.tag.FA VERBOSE`): sense consentiment, cap tràfic de Firebase.

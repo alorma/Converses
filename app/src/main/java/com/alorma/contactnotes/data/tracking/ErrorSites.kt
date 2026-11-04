@@ -1,0 +1,30 @@
+package com.alorma.contactnotes.data.tracking
+
+/**
+ * Els noms tancats del `where` de [Tracker.trackError]: diuen on ha passat l'error, mai amb quines dades. Només hi ha
+ * errors que l'app s'empassa; el que fa petar l'app no passa per aquí (Crashlytics, fase 8).
+ */
+object ErrorSites {
+  // Pro (RevenueCat). Sense xarxa, cancel·lat o pendent no són errors: ja surten com a esdeveniments.
+
+  /** No s'ha pogut llegir el preu del paquet Pro. */
+  const val PRO_PRICE = "pro_price"
+
+  /** No s'ha pogut llegir el `CustomerInfo` en arrencar; es manté l'últim valor conegut. */
+  const val PRO_CUSTOMER_INFO = "pro_customer_info"
+
+  const val PRO_PURCHASE = "pro_purchase"
+
+  const val PRO_RESTORE = "pro_restore"
+
+  // Obrir fora de l'app
+
+  /** Sense navegador per obrir un enllaç (Ajustos o la política de privacitat del paywall). */
+  const val OPEN_LINK = "open_link"
+
+  /** Sense app de correu per enviar comentaris. */
+  const val OPEN_FEEDBACK = "open_feedback"
+
+  /** El sistema no té l'alta de biometria i s'obre la configuració de seguretat. */
+  const val OPEN_SECURITY_SETUP = "open_security_setup"
+}
