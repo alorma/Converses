@@ -50,11 +50,11 @@ class ConsentManagerTest {
     }
 
   @Test
-  fun eventTrackerStopsRemoteTrackersWhenConsentIsWithdrawn() =
+  fun eventTrackerQueuesUntilYesAndStopsWhenConsentIsWithdrawn() =
     scope.runTest {
       val manager = ConsentManager(settings, backgroundScope)
       val remote = CountingRemoteTracker()
-      val tracker = EventTracker(listOf(remote), manager::hasConsent)
+      val tracker = EventTracker(listOf(remote), manager.consent, backgroundScope)
 
       tracker.trackEvent(object : Event("e", 1) {})
       manager.setConsent(true)
@@ -62,7 +62,7 @@ class ConsentManagerTest {
       manager.setConsent(false)
       tracker.trackEvent(object : Event("e", 1) {})
 
-      assertEquals(1, remote.events)
+      assertEquals(2, remote.events)
     }
 
   private class CountingRemoteTracker : Tracker {

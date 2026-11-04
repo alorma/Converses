@@ -5,6 +5,9 @@ import com.alorma.contactnotes.data.tracking.Event
 import com.alorma.contactnotes.data.tracking.EventTracker
 import com.alorma.contactnotes.data.tracking.Screen
 import com.alorma.contactnotes.data.tracking.Tracker
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
 
 /** Guarda tot el que rep. [eventTracker] és el que es passa als ViewModels, com fa Koin. */
 class RecordingTracker : Tracker {
@@ -13,7 +16,7 @@ class RecordingTracker : Tracker {
   val actions = mutableListOf<Action>()
   val events = mutableListOf<Event>()
 
-  val eventTracker = EventTracker(listOf(this)) { false }
+  val eventTracker = EventTracker(listOf(this), MutableStateFlow(false), CoroutineScope(Dispatchers.Unconfined))
 
   /** Nom i propietats de cada acció, en ordre. */
   fun recordedActions(): List<Pair<String, Map<String, String>>> = actions.map { it.eventName to it.eventProperties }

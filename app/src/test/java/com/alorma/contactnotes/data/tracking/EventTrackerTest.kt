@@ -1,9 +1,15 @@
 package com.alorma.contactnotes.data.tracking
 
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class EventTrackerTest {
   private class TestScreen : Screen("test_screen", 1)
 
@@ -50,8 +56,8 @@ class EventTrackerTest {
 
   private val local = RecordingTracker(isRemote = false)
   private val remote = RecordingTracker(isRemote = true)
-  private var consent = false
-  private val tracker = EventTracker(listOf(local, remote)) { consent }
+  private val consent = MutableStateFlow<Boolean?>(false)
+  private val tracker = EventTracker(listOf(local, remote), consent, CoroutineScope(UnconfinedTestDispatcher()))
 
   private fun trackAll() {
     tracker.trackScreen(TestScreen())
@@ -64,7 +70,7 @@ class EventTrackerTest {
 
   @Test
   fun withoutConsentOnlyLocalTrackersReceive() {
-    consent = false
+    consent.value = false
 
     trackAll()
 
@@ -74,7 +80,7 @@ class EventTrackerTest {
 
   @Test
   fun withConsentAllTrackersReceive() {
-    consent = true
+    consent.value = true
 
     trackAll()
 
@@ -84,9 +90,9 @@ class EventTrackerTest {
 
   @Test
   fun consentIsCheckedOnEveryCall() {
-    consent = true
+    consent.value = true
     tracker.trackScreen(TestScreen())
-    consent = false
+    consent.value = false
     tracker.trackScreen(TestScreen())
 
     assertEquals(listOf("screen:test_screen"), remote.calls)
@@ -112,7 +118,7 @@ class EventTrackerTest {
 
   @Test
   fun commonPropertiesReachEveryCallAndKeepNameAndVersion() {
-    consent = true
+    consent.value = true
     tracker.setCommonProperty("is_pro", "true")
 
     trackAll()
@@ -158,12 +164,91 @@ class EventTrackerTest {
 
   @Test
   fun commonPropertiesDoNotBypassConsent() {
-    consent = false
+    consent.value = false
     tracker.setCommonProperty("is_pro", "true")
 
     trackAll()
 
     assertTrue(remote.calls.isEmpty())
     assertEquals(4, local.properties.size)
+  }
+
+  @Test
+  fun undecidedConsentQueuesRemoteCallsButLocalOnesGoAtOnce() {
+    consent.value = null
+
+    trackAll()
+
+    assertEquals(all, local.calls)
+    assertTrue(remote.calls.isEmpty())
+  }
+
+  @Test
+  fun yesSendsTheQueueInOrder() {
+    consent.value = null
+    trackAll()
+
+    consent.value = true
+
+    assertEquals(all, remote.calls)
+  }
+
+  @Test
+  fun noDropsTheQueue() {
+    consent.value = null
+    trackAll()
+
+    consent.value = false
+    consent.value = true
+
+    assertTrue(remote.calls.isEmpty())
+  }
+
+  @Test
+  fun queuedCallsKeepTheCommonPropertiesTheyHadWhenTracked() {
+    consent.value = null
+    tracker.setCommonProperty("is_pro", "false")
+    tracker.trackScreen(TestScreen())
+    tracker.setCommonProperty("is_pro", "true")
+
+    consent.value = true
+
+    assertEquals(listOf(mapOf("is_pro" to "false")), remote.properties)
+  }
+
+  @Test
+  fun queueIsSentBeforeANewCallEvenIfConsentChangedWithoutBeingCollected() {
+    val unsettled = MutableStateFlow<Boolean?>(null)
+    val remoteOnly = RecordingTracker(isRemote = true)
+    // Un scope cancel·lat no executa mai el collect: només la crida següent pot enviar la cua
+    val lazyTracker = EventTracker(listOf(remoteOnly), unsettled, CoroutineScope(Job().apply { cancel() }))
+
+    lazyTracker.trackScreen(TestScreen())
+    unsettled.value = true
+    lazyTracker.trackEvent(TestEvent())
+
+    assertEquals(listOf("screen:test_screen", "event:test_event"), remoteOnly.calls)
+  }
+
+  @Test
+  fun queueKeepsOnlyTheNewestCallsOverTheLimit() {
+    consent.value = null
+    repeat(EventTracker.MAX_PENDING) { tracker.trackScreen(TestScreen()) }
+    tracker.trackEvent(TestEvent())
+
+    consent.value = true
+
+    assertEquals(EventTracker.MAX_PENDING, remote.calls.size)
+    assertEquals("event:test_event", remote.calls.last())
+  }
+
+  @Test
+  fun aDecisionAlreadyTakenQueuesNothing() {
+    consent.value = false
+    trackAll()
+
+    consent.value = true
+
+    assertTrue(remote.calls.isEmpty())
   }
 }

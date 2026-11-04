@@ -87,7 +87,13 @@ val settingsModule =
     single { PersonSelectionBridge() }
     // No es lliga a Tracker: si ho fes, getAll<Tracker>() el trobaria a ell mateix
     single { ConsentManager(get(), CoroutineScope(SupervisorJob() + Dispatchers.Default)) }
-    single { EventTracker(trackers = getAll(), hasConsent = get<ConsentManager>()::hasConsent) }
+    single {
+      EventTracker(
+        trackers = getAll(),
+        consent = get<ConsentManager>().consent,
+        scope = CoroutineScope(SupervisorJob() + Dispatchers.Default),
+      )
+    }
     single { ProTrackingProperty(get(), get(), CoroutineScope(SupervisorJob() + Dispatchers.Default)) }
   }
 
