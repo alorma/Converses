@@ -39,6 +39,10 @@
         <meta-data
             android:name="firebase_crashlytics_collection_enabled"
             android:value="false" />
+        <!-- Les pantalles les envia FirebaseTracker (screen_view); sense això Analytics hi afegiria MainActivity -->
+        <meta-data
+            android:name="google_analytics_automatic_screen_reporting_enabled"
+            android:value="false" />
         <!-- Cap identificador publicitari: Analytics no el llegeix ni el fa servir per personalitzar anuncis -->
         <meta-data
             android:name="google_analytics_adid_collection_enabled"

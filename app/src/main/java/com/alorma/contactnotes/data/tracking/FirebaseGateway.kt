@@ -1,8 +1,10 @@
 package com.alorma.contactnotes.data.tracking
 
 import android.content.Context
+import android.os.Bundle
 import com.google.firebase.FirebaseApp
 import com.google.firebase.analytics.FirebaseAnalytics
+import com.google.firebase.crashlytics.CustomKeysAndValues
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 
 /**
@@ -47,5 +49,25 @@ class AndroidFirebaseGateway(
       isCrashlyticsCollectionEnabled = false
       deleteUnsentReports()
     }
+  }
+}
+
+class AndroidFirebaseSink(
+  private val context: Context,
+) : FirebaseSink {
+  override fun logEvent(
+    name: String,
+    params: Map<String, String>,
+  ) {
+    val bundle = Bundle().apply { params.forEach { (key, value) -> putString(key, value) } }
+    FirebaseAnalytics.getInstance(context).logEvent(name, bundle)
+  }
+
+  override fun recordError(
+    error: Throwable,
+    keys: Map<String, String>,
+  ) {
+    val customKeys = CustomKeysAndValues.Builder().apply { keys.forEach { (key, value) -> putString(key, value) } }
+    FirebaseCrashlytics.getInstance().recordException(error, customKeys.build())
   }
 }
