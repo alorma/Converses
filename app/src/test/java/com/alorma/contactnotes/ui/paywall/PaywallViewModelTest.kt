@@ -7,6 +7,7 @@ import com.alorma.contactnotes.data.pro.ProRepository
 import com.alorma.contactnotes.data.pro.PurchaseResult
 import com.alorma.contactnotes.data.pro.RestoreResult
 import com.alorma.contactnotes.testing.MainDispatcherRule
+import com.alorma.contactnotes.testing.RecordingTracker
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
@@ -66,7 +67,9 @@ class PaywallViewModelTest {
   private val source = FakeProDataSource()
   private val network = FakeNetwork()
 
-  private fun viewModel() = PaywallViewModel(ProRepository(source), network)
+  private val tracker = RecordingTracker()
+
+  private fun viewModel() = PaywallViewModel(ProRepository(source), network, tracker.eventTracker)
 
   private suspend fun PaywallViewModel.current(): PaywallState = state.first()
 
@@ -136,8 +139,13 @@ class PaywallViewModelTest {
       val viewModel = viewModel()
 
       viewModel.onBuy(Activity())
+      viewModel.onRestore()
 
       assertTrue(viewModel.current().isPro)
+      assertEquals(
+        listOf("purchase_started" to emptyMap<String, String>(), "restore_tapped" to emptyMap()),
+        tracker.recordedActions(),
+      )
     }
 
   @Test

@@ -4,6 +4,7 @@ import com.alorma.contactnotes.designsystem.theme.ThemeMode
 import com.alorma.contactnotes.testing.FakeDb
 import com.alorma.contactnotes.testing.FakeSettingsRepository
 import com.alorma.contactnotes.testing.MainDispatcherRule
+import com.alorma.contactnotes.testing.RecordingTracker
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -22,7 +23,8 @@ class SettingsViewModelTest {
   fun everyChangeReachesTheRepositoryAndComesBackInTheState() =
     runTest {
       val repository = FakeSettingsRepository()
-      val vm = SettingsViewModel(repository, FakeDb().repository)
+      val tracker = RecordingTracker()
+      val vm = SettingsViewModel(repository, FakeDb().repository, tracker.eventTracker)
       backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { vm.settings.collect {} }
 
       assertFalse(vm.settings.value.dynamicColor)
@@ -41,5 +43,19 @@ class SettingsViewModelTest {
       assertFalse(settings.hapticFeedback)
       assertTrue(settings.appLock)
       assertEquals(300, settings.relockAfterSeconds)
+      assertEquals(
+        listOf(
+          "theme" to "dark",
+          "dynamic_color" to "true",
+          "person_color" to "false",
+          "haptics" to "false",
+          "app_lock" to "true",
+          "relock_after" to "300",
+        ),
+        tracker.recordedActions().map { (name, props) ->
+          assertEquals("setting_changed", name)
+          props.getValue("setting") to props.getValue("value")
+        },
+      )
     }
 }

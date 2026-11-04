@@ -63,7 +63,7 @@ class CustomChannelsViewModelTest {
     runTest {
       db.addCustomChannel("WhatsApp", ChannelType.CHAT)
       db.addCustomChannel("Instagram", ChannelType.SOCIAL)
-      val vm = SettingsViewModel(FakeSettingsRepository(), db.repository)
+      val vm = SettingsViewModel(FakeSettingsRepository(), db.repository, RecordingTracker().eventTracker)
       backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { vm.customChannelCount.collect {} }
 
       assertEquals(2, vm.customChannelCount.value)

@@ -55,6 +55,8 @@ import androidx.compose.ui.unit.sp
 import com.alorma.contactnotes.R
 import com.alorma.contactnotes.data.settings.OnboardingFlag
 import com.alorma.contactnotes.designsystem.theme.OnboardingTitleStyle
+import com.alorma.contactnotes.ui.tracking.Actions
+import com.alorma.contactnotes.ui.tracking.rememberActionTracker
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 
@@ -85,8 +87,10 @@ private val Pages =
 @Composable
 fun OnboardingScreen(onFinished: () -> Unit) {
   val flag: OnboardingFlag = koinInject()
+  val trackAction = rememberActionTracker()
   OnboardingContent(
-    onFinish = {
+    onFinish = { skipped ->
+      trackAction(Actions.OnboardingFinished(skipped))
       flag.disable()
       onFinished()
     },
@@ -95,7 +99,8 @@ fun OnboardingScreen(onFinished: () -> Unit) {
 
 @Composable
 fun OnboardingContent(
-  onFinish: () -> Unit,
+  /** [skipped] si s'ha tocat «Omet» abans de l'última pàgina. */
+  onFinish: (skipped: Boolean) -> Unit,
   initialPage: Int = 0,
   forceReducedMotion: Boolean = false,
 ) {
@@ -121,7 +126,7 @@ fun OnboardingContent(
         contentAlignment = Alignment.CenterEnd,
       ) {
         if (!isLast) {
-          TextButton(onClick = onFinish, modifier = Modifier.padding(end = 12.dp)) {
+          TextButton(onClick = { onFinish(true) }, modifier = Modifier.padding(end = 12.dp)) {
             Text(
               text = stringResource(R.string.onb_skip),
               color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -144,7 +149,7 @@ fun OnboardingContent(
         PageIndicator(pagerState = pagerState)
         Button(
           onClick = {
-            if (isLast) onFinish() else scope.launch { pagerState.animateScrollToPage(pagerState.currentPage + 1) }
+            if (isLast) onFinish(false) else scope.launch { pagerState.animateScrollToPage(pagerState.currentPage + 1) }
           },
           modifier = Modifier.height(56.dp),
           shape = CircleShape,

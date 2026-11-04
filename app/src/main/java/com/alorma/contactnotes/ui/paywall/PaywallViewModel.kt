@@ -7,6 +7,8 @@ import com.alorma.contactnotes.data.pro.NetworkMonitor
 import com.alorma.contactnotes.data.pro.ProRepository
 import com.alorma.contactnotes.data.pro.PurchaseResult
 import com.alorma.contactnotes.data.pro.RestoreResult
+import com.alorma.contactnotes.data.tracking.EventTracker
+import com.alorma.contactnotes.ui.tracking.Actions
 import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
@@ -65,6 +67,7 @@ enum class PaywallMessage { Pending, Failed, NothingToRestore }
 class PaywallViewModel(
   private val pro: ProRepository,
   network: NetworkMonitor,
+  private val tracker: EventTracker,
 ) : ViewModel() {
   private val local = MutableStateFlow(PaywallState(isPro = pro.isPro.value))
   private val messages = Channel<PaywallMessage>(Channel.BUFFERED)
@@ -101,6 +104,7 @@ class PaywallViewModel(
 
   fun onBuy(activity: Activity) {
     if (!current().canBuy) return
+    tracker.trackAction(Actions.PurchaseStarted())
     val attempt = Attempt().also { this.attempt = it }
     local.update { it.copy(busy = true) }
     // No es cancel·la mai: si RevenueCat respon tard, el resultat encara compta
@@ -155,6 +159,7 @@ class PaywallViewModel(
 
   fun onRestore() {
     if (!current().canRestore) return
+    tracker.trackAction(Actions.RestoreTapped())
     viewModelScope.launch {
       local.update { it.copy(busy = true) }
       val result = pro.restore()

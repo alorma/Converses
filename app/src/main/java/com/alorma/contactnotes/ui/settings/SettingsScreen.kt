@@ -95,6 +95,9 @@ import com.alorma.contactnotes.ui.paywall.ProBenefit
 import com.alorma.contactnotes.ui.person.canUnlockWithDevice
 import com.alorma.contactnotes.ui.person.openSecuritySetup
 import com.alorma.contactnotes.ui.person.promptUnlock
+import com.alorma.contactnotes.ui.tracking.Actions
+import com.alorma.contactnotes.ui.tracking.LinkTarget
+import com.alorma.contactnotes.ui.tracking.rememberActionTracker
 import java.util.Locale
 import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
@@ -123,6 +126,7 @@ fun SettingsScreen(
   val feedbackSubject = stringResource(R.string.settings_feedback_subject)
   val feedbackBody = stringResource(R.string.settings_feedback_body, remember { versionLabel(context) })
   val haptics = rememberConversesHaptics()
+  val trackAction = rememberActionTracker()
 
   SettingsContent(
     settings = settings,
@@ -146,10 +150,22 @@ fun SettingsScreen(
       }
     },
     onRelockAfter = viewModel::onRelockAfter,
-    onOpenLanguage = { context.openLanguageSettings() },
-    onOpenSecuritySetup = { context.openSecuritySetup() },
-    onOpenPrivacyPolicy = { context.openPrivacyPolicy() },
-    onOpenFeedback = { context.openFeedback(feedbackSubject, feedbackBody) },
+    onOpenLanguage = {
+      trackAction(Actions.LinkOpened(LinkTarget.LANGUAGE))
+      context.openLanguageSettings()
+    },
+    onOpenSecuritySetup = {
+      trackAction(Actions.LinkOpened(LinkTarget.SECURITY))
+      context.openSecuritySetup()
+    },
+    onOpenPrivacyPolicy = {
+      trackAction(Actions.LinkOpened(LinkTarget.PRIVACY))
+      context.openPrivacyPolicy()
+    },
+    onOpenFeedback = {
+      trackAction(Actions.LinkOpened(LinkTarget.FEEDBACK))
+      context.openFeedback(feedbackSubject, feedbackBody)
+    },
   )
 }
 
