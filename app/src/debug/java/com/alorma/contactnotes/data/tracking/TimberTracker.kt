@@ -19,8 +19,9 @@ class TimberTracker : Tracker {
   override fun trackError(
     error: Throwable,
     where: String,
+    properties: Map<String, String>,
   ) {
-    Timber.tag(TAG).e(error, "error where=%s", where)
+    Timber.tag(TAG).e(error, "error where=%s %s", where, properties)
   }
 
   private fun log(

@@ -17,24 +17,34 @@ class EventTrackerTest {
     override val isRemote: Boolean,
   ) : Tracker {
     val calls = mutableListOf<String>()
+    val properties = mutableListOf<Map<String, String>>()
+    val versions = mutableListOf<Int>()
 
     override fun trackScreen(screen: Screen) {
       calls += "screen:${screen.eventName}"
+      properties += screen.eventProperties
+      versions += screen.eventVersion
     }
 
     override fun trackEvent(event: Event) {
       calls += "event:${event.eventName}"
+      properties += event.eventProperties
+      versions += event.eventVersion
     }
 
     override fun trackAction(action: Action) {
       calls += "action:${action.eventName}"
+      properties += action.eventProperties
+      versions += action.eventVersion
     }
 
     override fun trackError(
       error: Throwable,
       where: String,
+      properties: Map<String, String>,
     ) {
       calls += "error:$where"
+      this.properties += properties
     }
   }
 
@@ -91,5 +101,69 @@ class EventTrackerTest {
     assertEquals(1, action.eventVersion)
     assertEquals(mapOf("source" to "fab"), action.eventProperties)
     assertEquals(2, TestEvent().eventVersion)
+  }
+
+  @Test
+  fun withoutCommonPropertiesEventsAreUntouched() {
+    trackAll()
+
+    assertEquals(listOf(emptyMap(), emptyMap(), mapOf("source" to "fab"), emptyMap()), local.properties)
+  }
+
+  @Test
+  fun commonPropertiesReachEveryCallAndKeepNameAndVersion() {
+    consent = true
+    tracker.setCommonProperty("is_pro", "true")
+
+    trackAll()
+
+    val expected =
+      listOf(
+        mapOf("is_pro" to "true"),
+        mapOf("is_pro" to "true"),
+        mapOf("is_pro" to "true", "source" to "fab"),
+        mapOf("is_pro" to "true"),
+      )
+    assertEquals(expected, local.properties)
+    assertEquals(expected, remote.properties)
+    assertEquals(all, local.calls)
+    assertEquals(listOf(1, 2, 1), local.versions)
+  }
+
+  @Test
+  fun commonPropertiesAreReadOnEveryCall() {
+    tracker.trackScreen(TestScreen())
+    tracker.setCommonProperty("is_pro", "false")
+    tracker.trackScreen(TestScreen())
+    tracker.setCommonProperty("is_pro", "true")
+    tracker.trackScreen(TestScreen())
+    tracker.removeCommonProperty("is_pro")
+    tracker.trackScreen(TestScreen())
+
+    assertEquals(
+      listOf(emptyMap(), mapOf("is_pro" to "false"), mapOf("is_pro" to "true"), emptyMap()),
+      local.properties,
+    )
+  }
+
+  @Test
+  fun eventPropertiesWinOverCommonOnes() {
+    tracker.setCommonProperty("source", "common")
+
+    tracker.trackAction(TestAction("fab"))
+    tracker.trackError(IllegalStateException(), "export_person", mapOf("source" to "call"))
+
+    assertEquals(listOf(mapOf("source" to "fab"), mapOf("source" to "call")), local.properties)
+  }
+
+  @Test
+  fun commonPropertiesDoNotBypassConsent() {
+    consent = false
+    tracker.setCommonProperty("is_pro", "true")
+
+    trackAll()
+
+    assertTrue(remote.calls.isEmpty())
+    assertEquals(4, local.properties.size)
   }
 }

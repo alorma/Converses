@@ -116,7 +116,7 @@ Ordre decidit el 04-11-2026: tot el tracking es fa i es valida amb el `TimberTra
    - `trackError` rep les comunes en un paràmetre `properties` amb valor per defecte, que només omple `EventTracker` (a la fase 8, *custom keys* de Crashlytics).
    - Catàleg: `is_pro` (`true`/`false`). El posa `ProTrackingProperty`, engegada a `ConversesApp`, a partir de `ProRepository.isPro`; així `EventTracker` no depèn de `ProRepository`.
    - Els errors de `StartupErrors` poden sortir abans que hi hagi `is_pro`.
-   - [ ] Aquest pla
+   - [x] Aquest pla — `5665ff7`
    - [ ] Propietats comunes a `EventTracker`
    - [ ] `is_pro` (`ProTrackingProperty`), validat a l'emulador
 7. Full d'una sola vegada (10a, 10b) després de l'onboarding, amb un FireAndForget, i Ajustos › Privacitat (1c), amb els textos en ca/en/es. Captures i emulador.

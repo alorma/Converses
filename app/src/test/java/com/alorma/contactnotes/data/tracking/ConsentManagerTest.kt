@@ -80,6 +80,7 @@ class ConsentManagerTest {
     override fun trackError(
       error: Throwable,
       where: String,
+      properties: Map<String, String>,
     ) = Unit
   }
 }

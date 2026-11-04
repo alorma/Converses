@@ -19,10 +19,12 @@ interface Tracker {
 
   /**
    * Un error que no ha petat l'app. [where] és un nom tancat del lloc (`"export_person"`), mai una dada.
+   * [properties] són les propietats comunes que hi afegeix [EventTracker] (`is_pro`...).
    * Les implementacions remotes no han d'enviar el `message` de l'excepció: pot portar dades de l'usuari.
    */
   fun trackError(
     error: Throwable,
     where: String,
+    properties: Map<String, String> = emptyMap(),
   )
 }
