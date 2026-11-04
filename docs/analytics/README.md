@@ -99,7 +99,7 @@ Ordre decidit el 04-11-2026: tot el tracking es fa i es valida amb el `TimberTra
    - [x] Bloqueig de l'app — `914d7e1`
    - [x] Importació buida — `19dc853`
    - [x] Validació a l'emulador amb logcat (compra, restauració, bloquejos, importacions)
-5. Errors (`trackError`).
+5. Errors (`trackError`) — validada el 04-11-2026.
    - Criteri (decidit el 04-11-2026): la fase no canvia cap comportament, llevat del DataStore corrupte (més avall). Només s'informa dels errors que l'app ja s'empassa; el que fa petar l'app (migracions, exportar) ho recollirà Crashlytics a la fase 8.
    - `object ErrorSites` (`data/tracking/ErrorSites.kt`): noms tancats per al `where`, mai dades.
    - Catàleg:
