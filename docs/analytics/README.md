@@ -110,6 +110,7 @@ Ordre decidit el 04-11-2026: tot el tracking es fa i es valida amb el `TimberTra
    - [x] `ErrorSites.kt` i aquest catàleg — `ebe2e94`
    - [x] Pro (`RevenueCatGateway`) — `568912a`
    - [x] Obrir fora de l'app — `450eb57`
+   - [x] DataStore corrupte — `3565ae7`
 6. Configuració de l'`EventTracker`: propietats comunes a tots els esdeveniments, començant per `isPro`.
 7. Full d'una sola vegada (10a, 10b) després de l'onboarding, amb un FireAndForget, i Ajustos › Privacitat (1c), amb els textos en ca/en/es. Captures i emulador.
 8. Implementació Firebase amb la inicialització manual, i l'activació i desactivació en calent. Cal el `google-services.json`. Validació a l'emulador amb logcat (`adb shell setprop log.tag.FA VERBOSE`): sense consentiment, cap tràfic de Firebase.
