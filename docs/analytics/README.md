@@ -84,6 +84,18 @@ Ordre decidit el 04-11-2026: tot el tracking es fa i es valida amb el `TimberTra
    - [x] Editor, tasca i canals propis — `b9d545f`
    - [x] Ajustos, paywall i onboarding — `c876e99`
 4. Esdeveniments (`trackEvent`): coses que passen sense que l'usuari les demani.
+   - `object Events` (`data/tracking/Events.kt`, a `data/` perquè els emeten capes de dades). Valors tancats, com les accions.
+   - Catàleg (decidit el 04-11-2026):
+     - Paywall: `purchase_finished` (`result` purchased/pending/cancelled/offline/failed, `late`), `purchase_timed_out`, `restore_finished` (`result` restored/nothing/pending/offline/failed).
+     - Pro: `pro_changed` (`active`), només quan arriba pel listener de RevenueCat, no per una compra o restauració del paywall.
+     - Bloqueig de l'app: `app_locked` (`reason` cold_start/relock), `app_lock_disabled` (`reason` device_unprotected).
+     - Importar: `text_import_empty` (`source` share/process_text).
+   - No es registra: el desbloqueig d'una persona protegida, l'èxit o error del desbloqueig de l'app, ni les migracions (si fallen, fase 5).
+   - [ ] `Events.kt` i aquest catàleg
+   - [ ] Paywall
+   - [ ] Pro pel listener
+   - [ ] Bloqueig de l'app
+   - [ ] Importació buida
 5. Errors (`trackError`).
 6. Configuració de l'`EventTracker`: propietats comunes a tots els esdeveniments, començant per `isPro`.
 7. Full d'una sola vegada (10a, 10b) després de l'onboarding, amb un FireAndForget, i Ajustos › Privacitat (1c), amb els textos en ca/en/es. Captures i emulador.
