@@ -22,9 +22,18 @@ class RevenueCatProDataSourceTest {
 
     override suspend fun price(): String? = price
 
-    override suspend fun purchase(activity: Activity): PurchaseResult = purchaseResult
+    /** El que fa RevenueCat abans de tornar (sovint, enviar el `CustomerInfo` nou al listener). */
+    var whilePurchasing: () -> Unit = {}
 
-    override suspend fun restore(): RestoreResult = restoreResult
+    override suspend fun purchase(activity: Activity): PurchaseResult {
+      whilePurchasing()
+      return purchaseResult
+    }
+
+    override suspend fun restore(): RestoreResult {
+      whilePurchasing()
+      return restoreResult
+    }
 
     fun send(active: Boolean) = onEntitlement!!(active)
   }
@@ -97,6 +106,23 @@ class RevenueCatProDataSourceTest {
       gateway.send(true)
 
       assertEquals(emptyList<Boolean>(), external)
+    }
+
+  @Test
+  fun theListenerArrivingBeforeThePurchaseOrRestoreReturnsIsNotExternal() =
+    runTest {
+      val gateway = FakeGateway()
+      gateway.whilePurchasing = { gateway.send(true) }
+      val external = mutableListOf<Boolean>()
+      val source = RevenueCatProDataSource(gateway, onExternalChange = { external += it })
+      source.start()
+
+      source.purchase(activity)
+      gateway.send(false)
+      source.restore()
+
+      assertTrue(source.isPro.value)
+      assertEquals(listOf(false), external)
     }
 
   @Test

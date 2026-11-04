@@ -1,6 +1,7 @@
 package com.alorma.contactnotes.data.pro
 
 import android.app.Activity
+import java.util.concurrent.atomic.AtomicInteger
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -39,18 +40,33 @@ class RevenueCatProDataSource(
 
   override val isPro: StateFlow<Boolean> = state.asStateFlow()
 
+  /**
+   * Compres i restauracions en curs. El listener sovint arriba abans que `purchase` torni: aquest canvi és de la
+   * compra, no extern.
+   */
+  private val inFlight = AtomicInteger(0)
+
   override fun start() {
-    gateway.start { active -> if (update(active)) onExternalChange(active) }
+    gateway.start { active -> if (update(active) && inFlight.get() == 0) onExternalChange(active) }
   }
 
   override suspend fun price(): String? = gateway.price()
 
   // Pro s'encén de seguida, sense esperar el listener de `CustomerInfo`
   override suspend fun purchase(activity: Activity): PurchaseResult =
-    gateway.purchase(activity).also { if (it == PurchaseResult.Purchased) update(true) }
+    whileInFlight { gateway.purchase(activity) }.also { if (it == PurchaseResult.Purchased) update(true) }
 
   override suspend fun restore(): RestoreResult =
-    gateway.restore().also { if (it == RestoreResult.Restored) update(true) }
+    whileInFlight { gateway.restore() }.also { if (it == RestoreResult.Restored) update(true) }
+
+  private suspend fun <T> whileInFlight(block: suspend () -> T): T {
+    inFlight.incrementAndGet()
+    try {
+      return block()
+    } finally {
+      inFlight.decrementAndGet()
+    }
+  }
 
   /** Si ha canviat res. */
   private fun update(active: Boolean): Boolean {
