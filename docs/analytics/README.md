@@ -31,7 +31,7 @@ Com es treballa cada fase: `.claude/rules/phased-work.md`.
 
 - **Full d'una sola vegada (10a, 10b):**
   - Surt just després de l'onboarding (decidit el 04-11-2026), un sol cop, amb un FireAndForget. Mai sobre el paywall o el desbloqueig. Sense comptador d'obertures.
-  - No es pot descartar: si l'app es tanca sense triar, torna a sortir.
+  - Es pot tancar (lliscant, tocant fora o enrere) i compta com a «No» (decidit el 04-11-2026, en lloc del «no es pot descartar» del disseny). Si l'app es tanca amb el full obert, torna a sortir.
   - Capçalera: galeta de 56 dp (`primaryContainer`) amb `insights`, «Ajuda a millorar Converses» i el text.
   - Dues files agrupades: `check` amb «S'envia…» i `block` amb «No s'envia mai…».
   - `radiogroup` de dues opcions de 60 dp, sense cap opció triada al principi.
@@ -121,7 +121,7 @@ Ordre decidit el 04-11-2026: tot el tracking es fa i es valida amb el `TimberTra
    - [x] `is_pro` (`ProTrackingProperty`), validat a l'emulador — `2617f86`
 7. Full d'una sola vegada (10a, 10b) després de l'onboarding i Ajustos › Privacitat (1c), amb els textos en ca/en/es. Captures i emulador.
    - Decidit el 04-11-2026: sense FireAndForget. El full surt mentre `analyticsConsent` és `null`, i això inclou els usuaris que ja tenien l'app: en actualitzar, el veuen la primera vegada que són a People.
-   - Quan surt: a People (la pila és només `PeopleRoute`), amb l'onboarding fet i el consentiment `null`. Mai amb un intent de compartir, ni sobre el paywall, ni sobre el bloqueig de l'app. No es pot descartar (ni gest, ni tocar fora, ni enrere).
+   - Quan surt: a People (la pila és només `PeopleRoute`), amb l'onboarding fet i el consentiment `null`. Mai amb un intent de compartir, ni sobre el paywall, ni sobre el bloqueig de l'app. Tancar-lo sense «D'acord» desa «No», encara que hi hagués «Sí» marcat: el consentiment només es dona confirmant-lo.
    - Cua de pendents (decidit el 04-11-2026): mentre el consentiment és `null`, `EventTracker` guarda en memòria el que hauria d'anar als trackers remots (pantalles, esdeveniments, accions i errors, amb les propietats comunes del moment). Amb «Sí» s'envia en ordre; amb «No» es buida. Mai es desa al disc: si l'app es tanca, es perd. Límit de 100; en passar-lo es descarten els més antics. Els trackers locals reben sempre a l'instant. Així l'onboarding i els errors de l'arrencada d'un usuari nou compten si després diu «Sí».
    - Textos (decidit el 04-11-2026): les files del full són genèriques en comptes de les del disseny. «S'envia: informació de funcionament de l'app, només per al desenvolupador.» i «No s'envia mai: informació personal ni res del que escrius.». La llista concreta va a la política de privacitat.
    - Ajustos › Privacitat: l'interruptor registra `setting_changed` (`setting=analytics`, `value`). Amb «No» no surt del mòbil, i amb «Sí» surt.

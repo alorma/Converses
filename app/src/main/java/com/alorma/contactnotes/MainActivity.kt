@@ -22,6 +22,7 @@ import com.alorma.contactnotes.data.settings.AppLockManager
 import com.alorma.contactnotes.data.settings.OnboardingFlag
 import com.alorma.contactnotes.data.settings.SecureWindow
 import com.alorma.contactnotes.data.settings.SettingsRepository
+import com.alorma.contactnotes.data.tracking.ConsentManager
 import com.alorma.contactnotes.data.tracking.EventTracker
 import com.alorma.contactnotes.data.tracking.Events
 import com.alorma.contactnotes.debug.DebugMenuHost
@@ -45,6 +46,7 @@ class MainActivity : FragmentActivity() {
   private val secureWindow: SecureWindow by inject()
   private val onboardingFlag: OnboardingFlag by inject()
   private val tracker: EventTracker by inject()
+  private val consentManager: ConsentManager by inject()
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -67,6 +69,7 @@ class MainActivity : FragmentActivity() {
     setContent {
       val settings by settingsRepository.settings.collectAsStateWithLifecycle(initialSettings)
       val showLock by appLock.showLock.collectAsStateWithLifecycle()
+      val consent by consentManager.consent.collectAsStateWithLifecycle()
       val secure by secureFlow.collectAsStateWithLifecycle(initialSettings.appLock)
 
       val isPro = rememberIsPro()
@@ -103,7 +106,11 @@ class MainActivity : FragmentActivity() {
         ) {
           DebugMenuHost {
             Box {
-              AppNavigation(startOnboarding = showOnboarding, initialBackStack = importStack)
+              AppNavigation(
+                startOnboarding = showOnboarding,
+                initialBackStack = importStack,
+                askConsent = consent == null && !showLock,
+              )
               if (showLock) {
                 AppLockScreen(
                   onUnlocked = appLock::unlock,

@@ -28,6 +28,8 @@ import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import com.alorma.contactnotes.data.db.PersonEntity
+import com.alorma.contactnotes.data.tracking.ConsentManager
+import com.alorma.contactnotes.ui.consent.ConsentSheet
 import com.alorma.contactnotes.ui.edit.EditPersonScreen
 import com.alorma.contactnotes.ui.entry.PersonSelectionBridge
 import com.alorma.contactnotes.ui.entry.QuickNoteScreen
@@ -64,6 +66,11 @@ fun AppNavigation(
   startOnboarding: Boolean = false,
   /** Back stack built from a share / select-text intent; wins over [startOnboarding]. */
   initialBackStack: List<NavKey>? = null,
+  /**
+   * L'usuari encara no ha triat les estadístiques d'ús i no hi ha res a sobre (bloqueig de l'app). El full només
+   * surt quan la pila és només People: mai a l'onboarding, ni sobre el paywall o una altra pantalla, ni en un import.
+   */
+  askConsent: Boolean = false,
 ) {
   val backStack =
     rememberNavBackStack(
@@ -77,6 +84,11 @@ fun AppNavigation(
   // Un sol lloc per a totes les pantalles: cada canvi de ruta (també tornant enrere) envia la seva
   val current = navigation.current
   key(current) { (current as? AppRoute)?.toScreen()?.let { TrackScreen(it) } }
+
+  if (askConsent && !imported && navigation.backStack.singleOrNull() == PeopleRoute) {
+    val consentManager: ConsentManager = koinInject()
+    ConsentSheet(onChoice = consentManager::setConsent)
+  }
 
   AppShell(
     currentTab = navigation.currentTab,

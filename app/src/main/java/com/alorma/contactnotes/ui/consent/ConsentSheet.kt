@@ -25,10 +25,8 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.ModalBottomSheetProperties
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.RadioButtonDefaults
-import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -58,22 +56,17 @@ import com.alorma.contactnotes.designsystem.theme.SheetTitleStyle
 import com.alorma.contactnotes.shared.AvatarShape
 
 /**
- * Full d'una sola vegada de les estadístiques d'ús (10a, 10b). No es pot descartar: ni lliscant, ni tocant fora, ni
- * amb enrere. Només es tanca amb «D'acord», que crida [onChoice] amb la tria.
+ * Full d'una sola vegada de les estadístiques d'ús (10a, 10b). «D'acord» crida [onChoice] amb la tria. Tancar-lo d'una
+ * altra manera (lliscant, tocant fora o enrere) compta com a «No», encara que hi hagués «Sí» marcat: el consentiment
+ * només es dona confirmant-lo.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ConsentSheet(onChoice: (Boolean) -> Unit) {
   var choice by rememberSaveable { mutableStateOf<Boolean?>(null) }
   ModalBottomSheet(
-    onDismissRequest = {},
-    sheetState =
-      rememberModalBottomSheetState(
-        skipPartiallyExpanded = true,
-        confirmValueChange = { it != SheetValue.Hidden },
-      ),
-    sheetGesturesEnabled = false,
-    properties = ModalBottomSheetProperties(shouldDismissOnBackPress = false),
+    onDismissRequest = { onChoice(false) },
+    sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
     containerColor = MaterialTheme.colorScheme.surface,
     dragHandle = null,
   ) {
