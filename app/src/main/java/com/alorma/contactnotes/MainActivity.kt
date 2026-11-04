@@ -1,5 +1,6 @@
 package com.alorma.contactnotes
 
+import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.view.WindowManager
@@ -21,6 +22,8 @@ import com.alorma.contactnotes.data.settings.AppLockManager
 import com.alorma.contactnotes.data.settings.OnboardingFlag
 import com.alorma.contactnotes.data.settings.SecureWindow
 import com.alorma.contactnotes.data.settings.SettingsRepository
+import com.alorma.contactnotes.data.tracking.EventTracker
+import com.alorma.contactnotes.data.tracking.Events
 import com.alorma.contactnotes.debug.DebugMenuHost
 import com.alorma.contactnotes.designsystem.components.LocalHapticsEnabled
 import com.alorma.contactnotes.designsystem.theme.ConversesTheme
@@ -41,6 +44,7 @@ class MainActivity : FragmentActivity() {
   private val appLock: AppLockManager by inject()
   private val secureWindow: SecureWindow by inject()
   private val onboardingFlag: OnboardingFlag by inject()
+  private val tracker: EventTracker by inject()
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -49,6 +53,7 @@ class MainActivity : FragmentActivity() {
     // Share / select-text: directe a la nota ràpida. Sense onboarding (no es marca com a vist)
     val importStack = intent.toBackStack()
     if (importStack == null && intent.isTextImport) {
+      tracker.trackEvent(Events.TextImportEmpty(processText = intent.action == Intent.ACTION_PROCESS_TEXT))
       Toast.makeText(this, R.string.import_nothing, Toast.LENGTH_SHORT).show()
       finish()
       return
