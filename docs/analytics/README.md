@@ -124,8 +124,8 @@ Ordre decidit el 04-11-2026: tot el tracking es fa i es valida amb el `TimberTra
    - Quan surt: a People (la pila és només `PeopleRoute`), amb l'onboarding fet i el consentiment `null`. Mai amb un intent de compartir, ni sobre el paywall, ni sobre el bloqueig de l'app. No es pot descartar (ni gest, ni tocar fora, ni enrere).
    - Cua de pendents (decidit el 04-11-2026): mentre el consentiment és `null`, `EventTracker` guarda en memòria el que hauria d'anar als trackers remots (pantalles, esdeveniments, accions i errors, amb les propietats comunes del moment). Amb «Sí» s'envia en ordre; amb «No» es buida. Mai es desa al disc: si l'app es tanca, es perd. Límit de 100; en passar-lo es descarten els més antics. Els trackers locals reben sempre a l'instant. Així l'onboarding i els errors de l'arrencada d'un usuari nou compten si després diu «Sí».
    - Ajustos › Privacitat: l'interruptor registra `setting_changed` (`setting=analytics`, `value`). Amb «No» no surt del mòbil, i amb «Sí» surt.
-   - [x] Aquest pla
-   - [ ] Cua de pendents a `EventTracker`, amb tests de JVM
+   - [x] Aquest pla — `9563eed`
+   - [x] Cua de pendents a `EventTracker`, amb tests de JVM — `a69c732`
    - [ ] `ConsentSheetContent` (`ui/consent`), textos, previews i captures
    - [ ] Mostrar el full a People, validat a l'emulador
    - [ ] Ajustos › Privacitat, amb tests del ViewModel, captures i emulador
