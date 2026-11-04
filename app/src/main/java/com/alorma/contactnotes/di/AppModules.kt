@@ -20,8 +20,11 @@ import com.alorma.contactnotes.data.settings.DataStoreSettingsRepository
 import com.alorma.contactnotes.data.settings.OnboardingFlag
 import com.alorma.contactnotes.data.settings.SecureWindow
 import com.alorma.contactnotes.data.settings.SettingsRepository
+import com.alorma.contactnotes.data.tracking.AndroidFirebaseGateway
 import com.alorma.contactnotes.data.tracking.ConsentManager
 import com.alorma.contactnotes.data.tracking.EventTracker
+import com.alorma.contactnotes.data.tracking.FirebaseController
+import com.alorma.contactnotes.data.tracking.FirebaseGateway
 import com.alorma.contactnotes.data.tracking.ProTrackingProperty
 import com.alorma.contactnotes.ui.edit.EditPersonViewModel
 import com.alorma.contactnotes.ui.entry.PersonSelectionBridge
@@ -95,6 +98,14 @@ val settingsModule =
       )
     }
     single { ProTrackingProperty(get(), get(), CoroutineScope(SupervisorJob() + Dispatchers.Default)) }
+    single<FirebaseGateway> { AndroidFirebaseGateway(androidContext()) }
+    single {
+      FirebaseController(
+        gateway = get(),
+        consent = get<ConsentManager>().consent,
+        scope = CoroutineScope(SupervisorJob() + Dispatchers.Default),
+      )
+    }
   }
 
 val viewModelModule =

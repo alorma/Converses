@@ -138,7 +138,7 @@ Ordre decidit el 04-11-2026: tot el tracking es fa i es valida amb el `TimberTra
    - `FirebaseController` escolta el consentiment: amb «Sí» inicialitza Firebase i activa la recollida; amb «No», si ja estava inicialitzat, l'apaga i descarta els pendents. El `FirebaseTracker` s'assegura que Firebase estigui inicialitzat abans d'enviar res, perquè la cua de pendents pot buidar-se abans que el controller reaccioni.
    - `FirebaseTracker`: pantalles com a `screen_view` (`screen_name` i les propietats), esdeveniments i accions com a `logEvent` amb les propietats i `event_version`, errors amb `recordException` d'una còpia sense `message` (mateixa classe i *stack trace*) i *custom keys* (`where` i les comunes).
    - [x] Aquest pla — `a5d6d3a`
-   - [ ] Gradle i manifest: BoM, Analytics, Crashlytics, plugins i inicialització automàtica treta
+   - [x] Gradle i manifest: BoM, Analytics, Crashlytics, plugins i inicialització automàtica treta — `21a4c85`
    - [ ] `FirebaseController`, amb tests de JVM
    - [ ] `FirebaseTracker`, amb tests de JVM
    - [ ] CI: `google-services.json` a partir del secret

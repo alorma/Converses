@@ -7,6 +7,7 @@ import androidx.lifecycle.ProcessLifecycleOwner
 import com.alorma.contactnotes.data.pro.ProDataSource
 import com.alorma.contactnotes.data.settings.AppLockManager
 import com.alorma.contactnotes.data.tracking.EventTracker
+import com.alorma.contactnotes.data.tracking.FirebaseController
 import com.alorma.contactnotes.data.tracking.ProTrackingProperty
 import com.alorma.contactnotes.data.tracking.StartupErrors
 import com.alorma.contactnotes.di.appModules
@@ -22,6 +23,8 @@ class ConversesApp : Application() {
       androidContext(this@ConversesApp)
       modules(appModules)
     }
+    // Primer de tot: amb el consentiment ja donat, Firebase s'inicialitza aquí i Crashlytics ja recull la resta
+    get<FirebaseController>().start()
     // Abans de buidar StartupErrors, perquè els errors de l'arrencada també portin is_pro
     get<ProTrackingProperty>().start()
     StartupErrors.attach(get<EventTracker>())
