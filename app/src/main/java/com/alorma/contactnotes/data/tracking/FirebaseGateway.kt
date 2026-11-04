@@ -2,6 +2,7 @@ package com.alorma.contactnotes.data.tracking
 
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import com.google.firebase.FirebaseApp
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.crashlytics.CustomKeysAndValues
@@ -31,10 +32,29 @@ class AndroidFirebaseGateway(
   @Synchronized
   override fun enable() {
     if (enabled) return
-    if (FirebaseApp.getApps(context).isEmpty()) FirebaseApp.initializeApp(context)
+    if (FirebaseApp.getApps(context).isEmpty()) {
+      FirebaseApp.initializeApp(context)
+      sanitizeFatalCrashes()
+    }
     FirebaseAnalytics.getInstance(context).setAnalyticsCollectionEnabled(true)
     FirebaseCrashlytics.getInstance().isCrashlyticsCollectionEnabled = true
     enabled = true
+  }
+
+  /**
+   * Crashlytics instal·la el seu handler en inicialitzar-se (el `getInstance` ho garanteix); el nostre va al damunt,
+   * un sol cop per procés, perquè els crashes fatals també surtin sense `message`.
+   */
+  private fun sanitizeFatalCrashes() {
+    FirebaseCrashlytics.getInstance()
+    val crashlytics = Thread.getDefaultUncaughtExceptionHandler()
+    Thread.setDefaultUncaughtExceptionHandler(
+      SanitizingExceptionHandler(crashlytics) { Log.e(TAG, "Uncaught exception", it) },
+    )
+  }
+
+  private companion object {
+    const val TAG = "Converses"
   }
 
   @Synchronized
