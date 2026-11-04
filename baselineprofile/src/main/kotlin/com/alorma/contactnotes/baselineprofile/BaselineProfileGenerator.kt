@@ -11,7 +11,8 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 /**
- * Generates the app's Baseline Profile: startup, onboarding, adding a person and an entry, the people list,
+ * Generates the app's Baseline Profile: startup, onboarding, the usage statistics sheet, adding a person and an
+ * entry, the people list,
  * the person detail, Archived, the quick note and Settings.
  *
  * It starts from a clean install: the release app has no sample data, so the test creates its own person through
@@ -32,6 +33,12 @@ class BaselineProfileGenerator {
       // First launch: onboarding
       if (device.wait(Until.hasObject(By.text("Skip")), UI_TIMEOUT)) {
         device.findObject(By.text("Skip")).click()
+      }
+      // First launch: usage statistics sheet. "No" so Firebase is never initialised while generating
+      if (device.wait(Until.hasObject(By.text("No, thanks")), UI_TIMEOUT)) {
+        device.findObject(By.text("No, thanks")).click()
+        device.expectObject(By.text("OK").enabled(true), "Consent sheet OK not enabled").click()
+        device.wait(Until.gone(By.text("No, thanks")), UI_TIMEOUT)
       }
       device.expectObject(By.desc("Quick note"), "People list not shown after onboarding")
 
