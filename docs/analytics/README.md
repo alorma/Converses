@@ -115,9 +115,9 @@ Ordre decidit el 04-11-2026: tot el tracking es fa i es valida amb el `TimberTra
    - Decidit el 04-11-2026: els ViewModels i la interfície `Tracker` no canvien. `EventTracker` guarda les propietats comunes (`setCommonProperty`, `removeCommonProperty`) i, a cada `trackScreen`, `trackEvent` i `trackAction`, passa als trackers el mateix esdeveniment (nom i versió) amb `comunes + pròpies`; si una clau coincideix, guanya la de l'esdeveniment.
    - `trackError` rep les comunes en un paràmetre `properties` amb valor per defecte, que només omple `EventTracker` (a la fase 8, *custom keys* de Crashlytics).
    - Catàleg: `is_pro` (`true`/`false`). El posa `ProTrackingProperty`, engegada a `ConversesApp`, a partir de `ProRepository.isPro`; així `EventTracker` no depèn de `ProRepository`.
-   - Els errors de `StartupErrors` poden sortir abans que hi hagi `is_pro`.
+   - `ProTrackingProperty` s'engega abans de buidar `StartupErrors`, així que els errors de l'arrencada també porten `is_pro`.
    - [x] Aquest pla — `5665ff7`
    - [x] Propietats comunes a `EventTracker` — `e518612`
-   - [ ] `is_pro` (`ProTrackingProperty`), validat a l'emulador
+   - [x] `is_pro` (`ProTrackingProperty`), validat a l'emulador — `2617f86`
 7. Full d'una sola vegada (10a, 10b) després de l'onboarding, amb un FireAndForget, i Ajustos › Privacitat (1c), amb els textos en ca/en/es. Captures i emulador.
 8. Implementació Firebase amb la inicialització manual, i l'activació i desactivació en calent. Cal el `google-services.json`. Validació a l'emulador amb logcat (`adb shell setprop log.tag.FA VERBOSE`): sense consentiment, cap tràfic de Firebase.
