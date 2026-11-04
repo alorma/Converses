@@ -66,6 +66,23 @@ Ordre decidit el 04-11-2026: tot el tracking es fa i es valida amb el `TimberTra
    - [x] `Screens.kt` (`object Screens`) i `toScreen()` amb tests de JVM — `d9656c3`
    - [x] `TrackScreen` a `AppNavigation`, validat a l'emulador — `12e0214`
 3. Accions de l'usuari (`trackAction`), incloent obrir fulls i diàlegs, revisades una a una perquè no portin cap dada.
+   - `object Actions` (`ui/tracking/Actions.kt`): els paràmetres són enums i booleans, mai text. Un canal propi només diu `custom_channel=true`, mai quin.
+   - No es registra el que ja és una pantalla (obrir una persona, el paywall, l'editor).
+   - Es criden des del ViewModel si n'hi ha (tests de JVM amb un tracker de prova); obrir fulls i diàlegs, des de la pantalla amb estat amb `rememberActionTracker()`.
+   - Catàleg (decidit el 04-11-2026):
+     - Persones: `filter_toggled` (`channel`, `selected`).
+     - Detall: `kind_filter_toggled` (`kind`), `entry_sheet_opened` (`mode`), `entry_saved` (`mode` new/new_as/edit/quick, `kind`, `channel`, `custom_channel`), `entry_menu_opened`, `entry_copied`, `entry_moved`, `entry_deleted`, `entry_restored`, `day_deleted`, `person_exported`, `person_archived` (`archived`), `task_done`, `task_reopened` (`source` undo/list).
+     - Nota ràpida: `entry_saved` (`mode=quick`), `person_picker_opened`.
+     - Editor: `person_saved` (`mode`), `person_protection_changed` (`enabled`, només si canvia en desar, sense dir de qui), `person_deleted`, `avatar_sheet_opened`, `avatar_applied` (sense forma ni color).
+     - Tasca: `task_saved` (`mode`, `has_due`), `task_deleted`.
+     - Canals propis: `custom_channel_saved` (`mode`, `channel`), `custom_channel_deleted`.
+     - Ajustos: `setting_changed` (`setting` theme/dynamic_color/person_color/haptics/app_lock/relock_after, `value`), `link_opened` (`target` language/security/privacy/feedback).
+     - Paywall: `purchase_started`, `restore_tapped` (el resultat, a la fase 4).
+     - Onboarding: `onboarding_finished` (`skipped`).
+   - [ ] `Actions.kt`, `rememberActionTracker()` i aquest catàleg
+   - [ ] Llista, detall i nota ràpida
+   - [ ] Editor, tasca i canals propis
+   - [ ] Ajustos, paywall i onboarding
 4. Esdeveniments (`trackEvent`): coses que passen sense que l'usuari les demani.
 5. Errors (`trackError`).
 6. Configuració de l'`EventTracker`: propietats comunes a tots els esdeveniments, començant per `isPro`.
