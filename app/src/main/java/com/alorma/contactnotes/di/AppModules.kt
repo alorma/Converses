@@ -20,6 +20,7 @@ import com.alorma.contactnotes.data.settings.DataStoreSettingsRepository
 import com.alorma.contactnotes.data.settings.OnboardingFlag
 import com.alorma.contactnotes.data.settings.SecureWindow
 import com.alorma.contactnotes.data.settings.SettingsRepository
+import com.alorma.contactnotes.data.tracking.EventTracker
 import com.alorma.contactnotes.ui.edit.EditPersonViewModel
 import com.alorma.contactnotes.ui.entry.PersonSelectionBridge
 import com.alorma.contactnotes.ui.entry.QuickNoteViewModel
@@ -82,6 +83,8 @@ val settingsModule =
     }
     single { PersonExporter(androidContext(), get()) }
     single { PersonSelectionBridge() }
+    // No es lliga a Tracker: si ho fes, getAll<Tracker>() el trobaria a ell mateix
+    single { EventTracker(trackers = getAll(), hasConsent = { false }) }
   }
 
 val viewModelModule =
@@ -102,6 +105,7 @@ val appModules =
   listOf(
     databaseModule,
     proDataSourceModule,
+    trackersModule,
     settingsModule,
     viewModelModule,
   )
