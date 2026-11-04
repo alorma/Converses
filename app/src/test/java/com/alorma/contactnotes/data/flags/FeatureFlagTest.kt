@@ -5,44 +5,46 @@ import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
+/** Ara mateix l'app no té cap flag: els tests fan servir els seus. */
 class FeatureFlagTest {
+  private class TestFlag(
+    runner: FeatureFlagRunner,
+    key: String,
+    defaultValue: Boolean = false,
+    pro: Boolean = false,
+  ) : FeatureFlag(runner, key, defaultValue, pro)
+
   private val runner = LocalFeatureFlagRunner()
-  private val avatar = CustomAvatarFeature(runner)
-  private val personColor = PersonColorFeature(runner)
-  private val channels = CustomChannelsFeature(runner)
-  private val followUps = FollowUpsFeature(runner)
-  private val all = listOf(avatar, personColor, channels, followUps)
+  private val finished = TestFlag(runner, key = "finished", defaultValue = true)
+  private val unfinished = TestFlag(runner, key = "unfinished")
+  private val proA = TestFlag(runner, key = "pro_a", pro = true)
+  private val proB = TestFlag(runner, key = "pro_b", pro = true)
 
   @Test
-  fun everyFinishedFeatureIsOnByDefault() {
-    all.forEach { assertTrue(it.key, it.isEnabled()) }
-  }
-
-  @Test
-  fun keysAreUnique() {
-    val keys = all.map { it.key }
-    assertTrue(keys.size == keys.toSet().size)
+  fun aFlagStartsAtItsDefault() {
+    assertTrue(finished.isEnabled())
+    assertFalse(unfinished.isEnabled())
   }
 
   @Test
   fun eachFlagIsOverriddenIndependently() {
-    runner.setOverride(avatar.key, false)
-    runner.setOverride(personColor.key, false)
-    assertFalse(avatar.isEnabled())
-    assertFalse(personColor.isEnabled())
+    runner.setOverride(finished.key, false)
+    runner.setOverride(unfinished.key, true)
+    assertFalse(finished.isEnabled())
+    assertTrue(unfinished.isEnabled())
 
-    runner.clearOverride(avatar.key)
-    assertTrue(avatar.isEnabled())
-    assertFalse(personColor.isEnabled())
+    runner.clearOverride(finished.key)
+    assertTrue(finished.isEnabled())
+    assertTrue(unfinished.isEnabled())
 
     runner.clearAllOverrides()
-    assertTrue(personColor.isEnabled())
+    assertFalse(unfinished.isEnabled())
   }
 
   @Test
   fun changesEmitWhenAnOverrideChanges() {
     val before = runner.changes.value
-    runner.setOverride(personColor.key, false)
+    runner.setOverride(finished.key, false)
     assertNotEquals(before, runner.changes.value)
   }
 
@@ -50,24 +52,24 @@ class FeatureFlagTest {
   fun overridesArePersistedAndRestored() {
     var saved: Map<String, Boolean> = emptyMap()
     val first = LocalFeatureFlagRunner(persist = { saved = it })
-    first.setOverride(avatar.key, false)
-    first.setOverride(personColor.key, false)
-    first.clearOverride(personColor.key)
+    first.setOverride(finished.key, false)
+    first.setOverride(unfinished.key, true)
+    first.clearOverride(unfinished.key)
 
     val restored = LocalFeatureFlagRunner(initial = saved)
-    assertFalse(CustomAvatarFeature(restored).isEnabled())
-    assertFalse(restored.hasOverride(personColor.key))
+    assertFalse(TestFlag(restored, key = finished.key, defaultValue = true).isEnabled())
+    assertFalse(restored.hasOverride(unfinished.key))
   }
 
   @Test
   fun proModeSwitchesEveryProFlagAtOnce() {
-    val flags = all
-    assertTrue(flags.all { it.pro })
+    val flags = listOf(finished, unfinished, proA, proB)
 
     flags.filter { it.pro }.forEach { runner.setOverride(it.key, true) }
-    assertTrue(flags.all { it.isEnabled() })
+    assertTrue(proA.isEnabled() && proB.isEnabled())
 
     flags.filter { it.pro }.forEach { runner.setOverride(it.key, false) }
-    assertTrue(flags.none { it.isEnabled() })
+    assertFalse(proA.isEnabled() || proB.isEnabled())
+    assertTrue(finished.isEnabled())
   }
 }

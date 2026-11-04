@@ -7,14 +7,9 @@ import com.alorma.contactnotes.data.ConversesRepository
 import com.alorma.contactnotes.data.db.ConversesDatabase
 import com.alorma.contactnotes.data.db.Migration1To2
 import com.alorma.contactnotes.data.db.Migration2To3
-import com.alorma.contactnotes.data.flags.CustomAvatarFeature
-import com.alorma.contactnotes.data.flags.CustomChannelsFeature
-import com.alorma.contactnotes.data.flags.FeatureFlag
 import com.alorma.contactnotes.data.flags.FeatureFlagRunner
 import com.alorma.contactnotes.data.flags.FeatureFlagStore
-import com.alorma.contactnotes.data.flags.FollowUpsFeature
 import com.alorma.contactnotes.data.flags.LocalFeatureFlagRunner
-import com.alorma.contactnotes.data.flags.PersonColorFeature
 import com.alorma.contactnotes.data.flags.ProFeatureFlagRunner
 import com.alorma.contactnotes.data.pro.AndroidNetworkMonitor
 import com.alorma.contactnotes.data.pro.NetworkMonitor
@@ -44,7 +39,6 @@ import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.dsl.singleOf
 import org.koin.core.module.dsl.viewModel
 import org.koin.core.module.dsl.viewModelOf
-import org.koin.dsl.bind
 import org.koin.dsl.module
 
 val databaseModule =
@@ -86,10 +80,6 @@ val settingsModule =
         scope = CoroutineScope(SupervisorJob() + Dispatchers.Default),
       )
     }
-    singleOf(::CustomAvatarFeature) bind FeatureFlag::class
-    singleOf(::PersonColorFeature) bind FeatureFlag::class
-    singleOf(::CustomChannelsFeature) bind FeatureFlag::class
-    singleOf(::FollowUpsFeature) bind FeatureFlag::class
     single { PersonExporter(androidContext(), get()) }
     single { PersonSelectionBridge() }
   }

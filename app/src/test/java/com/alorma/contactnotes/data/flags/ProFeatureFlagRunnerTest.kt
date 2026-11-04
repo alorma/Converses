@@ -16,37 +16,37 @@ class ProFeatureFlagRunnerTest {
   private val local = LocalFeatureFlagRunner()
   private val pro = LocalProDataSource()
   private val runner = ProFeatureFlagRunner(local, ProRepository(pro), CoroutineScope(UnconfinedTestDispatcher()))
-  private val personColor = PersonColorFeature(runner)
+  private val proFeature = object : FeatureFlag(runner, key = "pro_feature", defaultValue = true, pro = true) {}
   private val free = object : FeatureFlag(runner, key = "free_feature") {}
 
   @Test
   fun flagOffIsHiddenWithoutPro() {
-    local.setOverride(personColor.key, false)
-    assertEquals(FeatureState.Hidden, personColor.state())
-    assertFalse(personColor.isEnabled())
+    local.setOverride(proFeature.key, false)
+    assertEquals(FeatureState.Hidden, proFeature.state())
+    assertFalse(proFeature.isEnabled())
   }
 
   @Test
   fun flagOffIsHiddenWithPro() {
-    local.setOverride(personColor.key, false)
+    local.setOverride(proFeature.key, false)
     pro.setPro(true)
-    assertEquals(FeatureState.Hidden, personColor.state())
-    assertFalse(personColor.isEnabled())
+    assertEquals(FeatureState.Hidden, proFeature.state())
+    assertFalse(proFeature.isEnabled())
   }
 
   @Test
   fun flagOnIsLockedWithoutPro() {
-    local.setOverride(personColor.key, true)
-    assertEquals(FeatureState.Locked, personColor.state())
-    assertFalse(personColor.isEnabled())
+    local.setOverride(proFeature.key, true)
+    assertEquals(FeatureState.Locked, proFeature.state())
+    assertFalse(proFeature.isEnabled())
   }
 
   @Test
   fun flagOnIsUnlockedWithPro() {
-    local.setOverride(personColor.key, true)
+    local.setOverride(proFeature.key, true)
     pro.setPro(true)
-    assertEquals(FeatureState.Unlocked, personColor.state())
-    assertTrue(personColor.isEnabled())
+    assertEquals(FeatureState.Unlocked, proFeature.state())
+    assertTrue(proFeature.isEnabled())
   }
 
   @Test
@@ -58,37 +58,26 @@ class ProFeatureFlagRunnerTest {
 
   @Test
   fun losingProLocksAgain() {
-    local.setOverride(personColor.key, true)
+    local.setOverride(proFeature.key, true)
     pro.setPro(true)
     pro.setPro(false)
-    assertEquals(FeatureState.Locked, personColor.state())
+    assertEquals(FeatureState.Locked, proFeature.state())
   }
 
   @Test
   fun changesEmitWhenTheFlagChanges() {
     val before = runner.changes.value
-    local.setOverride(personColor.key, false)
+    local.setOverride(proFeature.key, false)
     assertNotEquals(before, runner.changes.value)
   }
 
   @Test
-  fun finishedProFeaturesAreLockedByDefaultUnlockedWithProAndHiddenWhenTurnedOff() {
-    val flags =
-      listOf(
-        CustomAvatarFeature(runner),
-        PersonColorFeature(runner),
-        CustomChannelsFeature(runner),
-        FollowUpsFeature(runner),
-      )
-    flags.forEach { flag ->
-      assertEquals(flag.key, FeatureState.Locked, flag.state())
-      pro.setPro(true)
-      assertEquals(flag.key, FeatureState.Unlocked, flag.state())
-      local.setOverride(flag.key, false)
-      assertEquals(flag.key, FeatureState.Hidden, flag.state())
-      local.clearOverride(flag.key)
-      pro.setPro(false)
-    }
+  fun aFinishedProFeatureIsLockedByDefaultUnlockedWithProAndHiddenWhenTurnedOff() {
+    assertEquals(FeatureState.Locked, proFeature.state())
+    pro.setPro(true)
+    assertEquals(FeatureState.Unlocked, proFeature.state())
+    local.setOverride(proFeature.key, false)
+    assertEquals(FeatureState.Hidden, proFeature.state())
   }
 
   @Test
