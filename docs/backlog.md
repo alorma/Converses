@@ -28,3 +28,9 @@ Vist el 04-11-2026 amb la compra real de la 1.8.2 (track intern, Pixel 8a). Play
 - Cal que el paywall no es quedi esperant per sempre: per exemple, un temps màxim que passi a «Compra pendent» (es pot tancar) i que Pro s'encengui sol quan arribi el `CustomerInfo`.
 - S'ha d'arreglar abans de la release de producció que obri Pro.
 
+**Estat (04-11-2026): fet, pendent de la validació de Bernat.**
+
+- [x] `OperationAlreadyInProgressError` és «pendent» (compra i restauració), no «error» — `a5f7213`
+- [x] El paywall espera com a molt 15 s des que torna a primer pla (en sortir del full de Play): després reactiva els botons i diu «La compra està pendent…»; si Pro ja ha arribat pel listener, no diu res. La compra no es cancel·la: si RevenueCat respon tard, Pro s'encén o surt l'error — `6a9a4cb`
+- Validat amb tests de JVM (temps virtual) i a l'emulador amb el Test Store: restaurar sense compra, cancel·lació, compra fallida, compra vàlida, i el temporitzador (sortir i tornar amb el full obert). El full del Test Store és un diàleg dins l'activitat i no la pausa; el de Play sí, i és el cas real. El penjament real no s'ha pogut reproduir (sense xarxa, RevenueCat falla de seguida amb `NetworkError`).
+

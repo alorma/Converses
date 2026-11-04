@@ -99,7 +99,7 @@ Al menú de debug, l'apartat **Pro** té un sol interruptor, «Pro user», que e
 - **Compra real validada amb la 1.8.2** (track intern, Pixel 8a): preu de Play (3,59 €), compra rebutjada (error i sense Pro), compra acceptada (Pro activat) i, després d'esborrar les dades, Pro restaurat sol en arrencar (RevenueCat troba la compra a Play amb un usuari anònim nou). El botó «Restaura la compra» no s'ha provat: amb Pro, el paywall surt en l'estat «Ja tens Pro».
 - **La 1.8.0 i la 1.8.1 arribaven a Play sense la clau de RevenueCat:** `publishReleaseBundle` tornava a compilar l'AAB en una altra invocació de Gradle sense `REVENUECAT_GOOGLE_API_KEY`, i la release feia servir `NoProDataSource` (paywall sense preu). L'artefacte de GitHub sí que tenia la clau, perquè és el del pas anterior. Arreglat a `4765c9f` (secrets a nivell de job i el workflow falla si la clau és buida). Per comprovar-ho: App bundle explorer › Download, i buscar `goog_` al `classes.dex`.
 - **La protecció automàtica de Play (`pairip`) no hi tenia res a veure:** es va desactivar per descartar-la i Bernat l'ha tornat a activar. Amb ella, els APK de Play copiats a un emulador es tanquen en la comprovació de llicència.
-- **Pendent:** el paywall es penja si RevenueCat no pot enviar la compra (backlog 18), abans de producció.
+- **Pendent:** el paywall es penja si RevenueCat no pot enviar la compra (backlog 18), abans de producció. Arreglat a `a5f7213` i `6a9a4cb` (temps màxim de 15 s des que el paywall torna del full de Play; `OperationAlreadyInProgressError` és «pendent»); falta la validació de Bernat.
 
 ## Fase 4 · Publicació
 
