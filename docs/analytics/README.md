@@ -65,7 +65,7 @@ Ordre decidit el 04-11-2026: tot el tracking es fa i es valida amb el `TimberTra
    - [x] Aquest pla — `57e0926`
    - [x] `Screens.kt` (`object Screens`) i `toScreen()` amb tests de JVM — `d9656c3`
    - [x] `TrackScreen` a `AppNavigation`, validat a l'emulador — `12e0214`
-3. Accions de l'usuari (`trackAction`), incloent obrir fulls i diàlegs, revisades una a una perquè no portin cap dada.
+3. Accions de l'usuari (`trackAction`), incloent obrir fulls i diàlegs, revisades una a una perquè no portin cap dada — validada el 04-11-2026.
    - `object Actions` (`ui/tracking/Actions.kt`): els paràmetres són enums i booleans, mai text. Un canal propi només diu `custom_channel=true`, mai quin.
    - No es registra el que ja és una pantalla (obrir una persona, el paywall, l'editor).
    - Es criden des del ViewModel si n'hi ha (tests de JVM amb un tracker de prova); obrir fulls i diàlegs, des de la pantalla amb estat amb `rememberActionTracker()`.
