@@ -91,11 +91,14 @@ Ordre decidit el 04-11-2026: tot el tracking es fa i es valida amb el `TimberTra
      - Bloqueig de l'app: `app_locked` (`reason` cold_start/relock), `app_lock_disabled` (`reason` device_unprotected).
      - Importar: `text_import_empty` (`source` share/process_text).
    - No es registra: el desbloqueig d'una persona protegida, l'èxit o error del desbloqueig de l'app, ni les migracions (si fallen, fase 5).
-   - [ ] `Events.kt` i aquest catàleg
-   - [ ] Paywall
-   - [ ] Pro pel listener
-   - [ ] Bloqueig de l'app
-   - [ ] Importació buida
+   - `pro_changed` no compta el que arriba pel listener mentre hi ha una compra o restauració en curs: RevenueCat sovint envia el `CustomerInfo` abans que `purchase` torni.
+   - Sense bloqueig de pantalla al mòbil, l'arrencada registra `app_locked` (cold_start) i just després `app_lock_disabled`: el bloqueig surt un instant.
+   - [x] `Events.kt` i aquest catàleg — `af156fe`
+   - [x] Paywall — `91bdbce`
+   - [x] Pro pel listener — `b813b5d`, `1a5ddac`
+   - [x] Bloqueig de l'app — `914d7e1`
+   - [x] Importació buida — `19dc853`
+   - [x] Validació a l'emulador amb logcat (compra, restauració, bloquejos, importacions)
 5. Errors (`trackError`).
 6. Configuració de l'`EventTracker`: propietats comunes a tots els esdeveniments, començant per `isPro`.
 7. Full d'una sola vegada (10a, 10b) després de l'onboarding, amb un FireAndForget, i Ajustos › Privacitat (1c), amb els textos en ca/en/es. Captures i emulador.
