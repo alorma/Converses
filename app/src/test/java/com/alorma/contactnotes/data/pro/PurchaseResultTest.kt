@@ -3,6 +3,8 @@ package com.alorma.contactnotes.data.pro
 import com.revenuecat.purchases.PurchasesError
 import com.revenuecat.purchases.PurchasesErrorCode
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class PurchaseResultTest {
@@ -54,5 +56,21 @@ class PurchaseResultTest {
       error(PurchasesErrorCode.StoreProblemError).toPurchaseResult(userCancelled = false),
     )
     assertEquals(RestoreResult.Failed, error(PurchasesErrorCode.StoreProblemError).toRestoreResult())
+  }
+
+  @Test
+  fun expectedErrorsAreNotReported() {
+    listOf(
+      PurchasesErrorCode.NetworkError,
+      PurchasesErrorCode.PurchaseCancelledError,
+      PurchasesErrorCode.PaymentPendingError,
+      PurchasesErrorCode.OperationAlreadyInProgressError,
+    ).forEach { assertFalse(it.name, error(it).isUnexpected()) }
+  }
+
+  @Test
+  fun otherErrorsAreReported() {
+    assertTrue(error(PurchasesErrorCode.StoreProblemError).isUnexpected())
+    assertTrue(error(PurchasesErrorCode.UnknownError).isUnexpected())
   }
 }

@@ -29,7 +29,13 @@ val proDataSourceModule =
         } else {
           val cache = ProStore(androidContext())
           RevenueCatProDataSource(
-            gateway = RevenueCatGateway(androidContext(), BuildConfig.REVENUECAT_API_KEY, debugLogs = true),
+            gateway =
+              RevenueCatGateway(
+                androidContext(),
+                BuildConfig.REVENUECAT_API_KEY,
+                debugLogs = true,
+                tracker = get<EventTracker>(),
+              ),
             initial = cache.load(),
             persist = cache::save,
             onExternalChange = { get<EventTracker>().trackEvent(Events.ProChanged(it)) },

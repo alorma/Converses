@@ -20,7 +20,13 @@ val proDataSourceModule =
       } else {
         val store = ProStore(androidContext())
         RevenueCatProDataSource(
-          gateway = RevenueCatGateway(androidContext(), BuildConfig.REVENUECAT_API_KEY, debugLogs = false),
+          gateway =
+            RevenueCatGateway(
+              androidContext(),
+              BuildConfig.REVENUECAT_API_KEY,
+              debugLogs = false,
+              tracker = get<EventTracker>(),
+            ),
           initial = store.load(),
           persist = store::save,
           onExternalChange = { get<EventTracker>().trackEvent(Events.ProChanged(it)) },

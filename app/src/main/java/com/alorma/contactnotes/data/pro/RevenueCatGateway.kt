@@ -3,6 +3,8 @@ package com.alorma.contactnotes.data.pro
 import android.app.Activity
 import android.content.Context
 import android.os.Looper
+import com.alorma.contactnotes.data.tracking.ErrorSites
+import com.alorma.contactnotes.data.tracking.Tracker
 import com.revenuecat.purchases.CustomerInfo
 import com.revenuecat.purchases.LogLevel
 import com.revenuecat.purchases.PurchaseParams
@@ -23,14 +25,18 @@ class RevenueCatGateway(
   private val context: Context,
   private val apiKey: String,
   private val debugLogs: Boolean,
+  private val tracker: Tracker,
 ) : PurchasesGateway {
   override fun start(onEntitlement: (Boolean) -> Unit) {
     Looper.getMainLooper().queue.addIdleHandler {
       if (debugLogs) Purchases.logLevel = LogLevel.DEBUG
       val purchases = Purchases.configure(PurchasesConfiguration.Builder(context, apiKey).build())
       purchases.updatedCustomerInfoListener = { info -> onEntitlement(info.isPro()) }
-      // Si falla (sense connexió), no es diu res: es manté l'últim valor conegut
-      purchases.getCustomerInfoWith(onSuccess = { info -> onEntitlement(info.isPro()) })
+      // Si falla es manté l'últim valor conegut; sense connexió no és cap error
+      purchases.getCustomerInfoWith(
+        onError = { error -> report(PurchasesException(error), ErrorSites.PRO_CUSTOMER_INFO) },
+        onSuccess = { info -> onEntitlement(info.isPro()) },
+      )
       false
     }
   }
@@ -38,7 +44,8 @@ class RevenueCatGateway(
   override suspend fun price(): String? =
     try {
       proPackage()?.product?.price?.formatted
-    } catch (_: PurchasesException) {
+    } catch (e: PurchasesException) {
+      report(e, ErrorSites.PRO_PRICE)
       null
     }
 
@@ -48,13 +55,16 @@ class RevenueCatGateway(
       try {
         proPackage()
       } catch (e: PurchasesException) {
+        report(e, ErrorSites.PRO_PURCHASE)
         return e.error.toPurchaseResult(userCancelled = false)
       } ?: return PurchaseResult.Failed
     return try {
       val result = Purchases.sharedInstance.awaitPurchase(PurchaseParams.Builder(activity, pack).build())
       if (result.customerInfo.isPro()) PurchaseResult.Purchased else PurchaseResult.Pending
     } catch (e: PurchasesTransactionException) {
-      e.error.toPurchaseResult(e.userCancelled)
+      e.error.toPurchaseResult(e.userCancelled).also {
+        if (it == PurchaseResult.Failed) tracker.trackError(e, ErrorSites.PRO_PURCHASE)
+      }
     }
   }
 
@@ -63,8 +73,17 @@ class RevenueCatGateway(
     return try {
       if (Purchases.sharedInstance.awaitRestore().isPro()) RestoreResult.Restored else RestoreResult.NothingToRestore
     } catch (e: PurchasesTransactionException) {
+      report(e, ErrorSites.PRO_RESTORE)
       e.error.toRestoreResult()
     }
+  }
+
+  /** Només els errors de debò: sense xarxa, cancel·lat o pendent ja surten com a esdeveniments. */
+  private fun report(
+    e: PurchasesException,
+    where: String,
+  ) {
+    if (e.error.isUnexpected()) tracker.trackError(e, where)
   }
 
   /** L'únic paquet de l'offering actual; `null` si l'SDK encara no està configurat o no hi ha offering. */

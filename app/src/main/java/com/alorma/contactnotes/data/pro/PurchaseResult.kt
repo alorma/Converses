@@ -48,3 +48,6 @@ internal fun PurchasesError.toRestoreResult(): RestoreResult =
     PurchasesErrorCode.NetworkError -> RestoreResult.Offline
     else -> RestoreResult.Failed
   }
+
+/** Si és un error de debò: sense xarxa, cancel·lat o pendent són casos normals i no s'informen amb `trackError`. */
+internal fun PurchasesError.isUnexpected(): Boolean = toPurchaseResult(userCancelled = false) == PurchaseResult.Failed
