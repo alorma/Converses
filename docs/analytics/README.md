@@ -22,7 +22,7 @@ Com es treballa cada fase: `.claude/rules/phased-work.md`.
   - Sense consentiment, `EventTracker` no crida cap implementació remota. A debug hi ha un tracker de logcat, que no surt del mòbil.
   - **No** es fa servir el *consent mode* de Google com a Caducity, perquè amb tot denegat continua enviant pings sense galetes.
 - **Eina:** Firebase Analytics + Crashlytics (decidit el 03-11-2026). Abans d'afegir-les cal comprovar-ne la versió estable a la documentació oficial.
-- **Què s'envia:** noms d'esdeveniment de pantalles i funcions, errors, el model de mòbil, la versió d'Android i la de l'app.
+- **Què s'envia:** noms d'esdeveniment de pantalles i funcions, errors, si l'usuari és Pro (`is_pro`), el model de mòbil, la versió d'Android i la de l'app.
 - **No s'envia mai:** text, noms de persones, ids, dades ni canals propis. Obrir una persona protegida compta igual que obrir-ne qualsevol altra.
 - **Sense flag** (04-11-2026): sense consentiment no surt res, i fins a la fase 8 el tracker de release és buit.
 - El consentiment es desa al DataStore (`analyticsConsent`, `null` = no ha triat).
@@ -112,5 +112,12 @@ Ordre decidit el 04-11-2026: tot el tracking es fa i es valida amb el `TimberTra
    - [x] Obrir fora de l'app — `450eb57`
    - [x] DataStore corrupte — `3565ae7`
 6. Configuració de l'`EventTracker`: propietats comunes a tots els esdeveniments, començant per `isPro`.
+   - Decidit el 04-11-2026: els ViewModels i la interfície `Tracker` no canvien. `EventTracker` guarda les propietats comunes (`setCommonProperty`, `removeCommonProperty`) i, a cada `trackScreen`, `trackEvent` i `trackAction`, passa als trackers el mateix esdeveniment (nom i versió) amb `comunes + pròpies`; si una clau coincideix, guanya la de l'esdeveniment.
+   - `trackError` rep les comunes en un paràmetre `properties` amb valor per defecte, que només omple `EventTracker` (a la fase 8, *custom keys* de Crashlytics).
+   - Catàleg: `is_pro` (`true`/`false`). El posa `ProTrackingProperty`, engegada a `ConversesApp`, a partir de `ProRepository.isPro`; així `EventTracker` no depèn de `ProRepository`.
+   - Els errors de `StartupErrors` poden sortir abans que hi hagi `is_pro`.
+   - [ ] Aquest pla
+   - [ ] Propietats comunes a `EventTracker`
+   - [ ] `is_pro` (`ProTrackingProperty`), validat a l'emulador
 7. Full d'una sola vegada (10a, 10b) després de l'onboarding, amb un FireAndForget, i Ajustos › Privacitat (1c), amb els textos en ca/en/es. Captures i emulador.
 8. Implementació Firebase amb la inicialització manual, i l'activació i desactivació en calent. Cal el `google-services.json`. Validació a l'emulador amb logcat (`adb shell setprop log.tag.FA VERBOSE`): sense consentiment, cap tràfic de Firebase.
