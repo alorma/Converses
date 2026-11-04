@@ -187,6 +187,8 @@ fun CustomChannelsContent(
         onClick = onNew,
         icon = { Icon(Icons.Rounded.Add, contentDescription = null) },
         text = { Text(stringResource(R.string.custom_channel_new_title)) },
+        containerColor = MaterialTheme.colorScheme.primary,
+        contentColor = MaterialTheme.colorScheme.onPrimary,
       )
     },
   ) { padding ->

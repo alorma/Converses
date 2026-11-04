@@ -101,10 +101,10 @@ fun ConsentSheetContent(
           .padding(horizontal = 4.dp)
           .size(56.dp)
           .clip(AvatarShape.Cookie9Sided.asShape())
-          .background(scheme.primaryContainer),
+          .background(scheme.primary),
       contentAlignment = Alignment.Center,
     ) {
-      Icon(Icons.Rounded.Insights, contentDescription = null, tint = scheme.onPrimaryContainer)
+      Icon(Icons.Rounded.Insights, contentDescription = null, tint = scheme.onPrimary)
     }
     Column(modifier = Modifier.padding(horizontal = 4.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
       Text(stringResource(R.string.consent_title), style = SheetTitleStyle)
