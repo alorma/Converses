@@ -140,6 +140,6 @@ Ordre decidit el 04-11-2026: tot el tracking es fa i es valida amb el `TimberTra
    - [x] Aquest pla — `a5d6d3a`
    - [x] Gradle i manifest: BoM, Analytics, Crashlytics, plugins i inicialització automàtica treta — `21a4c85`
    - [x] `FirebaseController`, amb tests de JVM — `5530f19`
-   - [ ] `FirebaseTracker`, amb tests de JVM
+   - [x] `FirebaseTracker`, amb tests de JVM — `45d0cd1`
    - [ ] CI: `google-services.json` a partir del secret
    - [ ] Validació a l'emulador amb logcat

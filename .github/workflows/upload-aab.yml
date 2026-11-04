@@ -36,6 +36,10 @@ jobs:
 
       - uses: gradle/actions/setup-gradle@v6
 
+      # Fora del repo (.gitignore): el plugin google-services el necessita per compilar
+      - name: Create google-services.json
+        run: echo "${{ secrets.GOOGLE_SERVICES_JSON_BASE64 }}" | base64 -d > app/google-services.json
+
       - name: Disable snapshot
         run: sed -i "s/^snapshot=.*/snapshot=false/" version.properties
 
