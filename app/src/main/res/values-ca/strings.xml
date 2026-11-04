@@ -336,4 +336,11 @@
     <string name="consent_no">No, gràcies</string>
     <string name="consent_no_summary">No s\'envia res</string>
     <string name="consent_ok">D\'acord</string>
+
+    <!-- Ajustos › Privacitat -->
+    <string name="settings_privacy">Privacitat</string>
+    <string name="settings_analytics">Estadístiques d\'ús</string>
+    <string name="settings_analytics_on">Activades · anònimes</string>
+    <string name="settings_analytics_off">Desactivades · no s\'envia res</string>
+    <string name="settings_analytics_note">Mai s\'envia informació personal ni res del que escrius. Detalls a la %1$s.</string>
 </resources>

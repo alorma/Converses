@@ -30,6 +30,20 @@ class ConsentManager(
   fun hasConsent(): Boolean = consent.value == true
 
   fun setConsent(granted: Boolean) {
-    scope.launch { settings.setAnalyticsConsent(granted) }
+    scope.launch { saveConsent(granted) }
+  }
+
+  /** Torna a deixar el consentiment sense triar, perquè el full torni a sortir. Només des del menú de debug. */
+  fun clearConsent() {
+    scope.launch { saveConsent(null) }
+  }
+
+  /**
+   * Desa la tria i no torna fins que [consent] ja la té, perquè el que es registri just després (per exemple, el
+   * canvi d'Ajustos) ja vagi amb el consentiment nou. `null` l'esborra (només des del menú de debug).
+   */
+  suspend fun saveConsent(granted: Boolean?) {
+    settings.setAnalyticsConsent(granted)
+    consent.first { it == granted }
   }
 }

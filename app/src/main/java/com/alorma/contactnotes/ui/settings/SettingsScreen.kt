@@ -34,6 +34,7 @@ import androidx.compose.material.icons.rounded.DarkMode
 import androidx.compose.material.icons.rounded.Face
 import androidx.compose.material.icons.rounded.Fingerprint
 import androidx.compose.material.icons.rounded.Forum
+import androidx.compose.material.icons.rounded.Insights
 import androidx.compose.material.icons.rounded.Language
 import androidx.compose.material.icons.rounded.LightMode
 import androidx.compose.material.icons.rounded.Palette
@@ -153,6 +154,7 @@ fun SettingsScreen(
       }
     },
     onRelockAfter = viewModel::onRelockAfter,
+    onAnalyticsChange = viewModel::onAnalytics,
     onOpenLanguage = {
       trackAction(Actions.LinkOpened(LinkTarget.LANGUAGE))
       context.openLanguageSettings()
@@ -185,6 +187,7 @@ fun SettingsContent(
   onHapticFeedback: (Boolean) -> Unit,
   onAppLockChange: (Boolean) -> Unit,
   onRelockAfter: (Int) -> Unit,
+  onAnalyticsChange: (Boolean) -> Unit,
   onOpenLanguage: () -> Unit,
   onOpenSecuritySetup: () -> Unit,
   onOpenPrivacyPolicy: () -> Unit,
@@ -337,6 +340,22 @@ fun SettingsContent(
         color = MaterialTheme.colorScheme.onSurfaceVariant,
         modifier = Modifier.padding(horizontal = 4.dp),
       )
+
+      SettingsGroup(
+        title = { SectionTitle(stringResource(R.string.settings_privacy)) },
+        verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap),
+      ) {
+        val analytics = settings.analyticsConsent == true
+        SettingSwitchRow(
+          title = stringResource(R.string.settings_analytics),
+          subtitle = stringResource(if (analytics) R.string.settings_analytics_on else R.string.settings_analytics_off),
+          icon = Icons.Rounded.Insights,
+          checked = analytics,
+          shape = groupedItemShape(0, 1),
+          onCheckedChange = onAnalyticsChange,
+        )
+      }
+      AnalyticsNote(onOpenPrivacyPolicy = onOpenPrivacyPolicy, modifier = Modifier.padding(horizontal = 4.dp))
 
       SettingsGroup(
         title = {
@@ -539,6 +558,40 @@ private fun ExternalLinkRow(
     },
     shape = shape,
     onClick = onClick,
+  )
+}
+
+/** Nota d'Ajustos › Privacitat (1c); «Política de privacitat» obre la mateixa pàgina que la fila de «Quant a». */
+@Composable
+private fun AnalyticsNote(
+  onOpenPrivacyPolicy: () -> Unit,
+  modifier: Modifier = Modifier,
+) {
+  val link = stringResource(R.string.settings_privacy_policy)
+  val text = stringResource(R.string.settings_analytics_note, link)
+  val start = text.indexOf(link)
+  val linkStyles =
+    TextLinkStyles(
+      SpanStyle(
+        color = MaterialTheme.colorScheme.onSurface,
+        fontWeight = FontWeight.Bold,
+        textDecoration = TextDecoration.Underline,
+      ),
+    )
+  Text(
+    text =
+      buildAnnotatedString {
+        if (start < 0) {
+          append(text)
+        } else {
+          append(text.substring(0, start))
+          withLink(LinkAnnotation.Clickable("privacy_policy", linkStyles) { onOpenPrivacyPolicy() }) { append(link) }
+          append(text.substring(start + link.length))
+        }
+      },
+    style = MaterialTheme.typography.bodySmall,
+    color = MaterialTheme.colorScheme.onSurfaceVariant,
+    modifier = modifier,
   )
 }
 

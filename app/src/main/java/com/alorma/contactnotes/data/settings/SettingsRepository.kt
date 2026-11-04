@@ -42,7 +42,8 @@ interface SettingsRepository {
 
   suspend fun setOnboardingDone(done: Boolean)
 
-  suspend fun setAnalyticsConsent(granted: Boolean)
+  /** `null` esborra la tria (només des del menú de debug): el full de consentiment torna a sortir. */
+  suspend fun setAnalyticsConsent(granted: Boolean?)
 }
 
 private val Context.settingsDataStore by preferencesDataStore(
@@ -71,7 +72,8 @@ class DataStoreSettingsRepository(
 
   override suspend fun setOnboardingDone(done: Boolean) = write { it[OnboardingDoneKey] = done }
 
-  override suspend fun setAnalyticsConsent(granted: Boolean) = write { it[AnalyticsConsentKey] = granted }
+  override suspend fun setAnalyticsConsent(granted: Boolean?) =
+    write { if (granted == null) it.remove(AnalyticsConsentKey) else it[AnalyticsConsentKey] = granted }
 
   private suspend fun write(block: (androidx.datastore.preferences.core.MutablePreferences) -> Unit) {
     dataStore.edit { block(it) }

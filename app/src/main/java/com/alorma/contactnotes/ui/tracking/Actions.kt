@@ -151,7 +151,7 @@ object Actions {
 /** Com s'escriu una entrada: nova, nova amb el tipus ja triat (entrada fantasma), editada o des de la nota ràpida. */
 enum class EntryMode { NEW, NEW_AS, EDIT, QUICK }
 
-enum class ToggleSetting { DYNAMIC_COLOR, PERSON_COLOR, HAPTICS, APP_LOCK }
+enum class ToggleSetting { DYNAMIC_COLOR, PERSON_COLOR, HAPTICS, APP_LOCK, ANALYTICS }
 
 enum class LinkTarget { LANGUAGE, SECURITY, PRIVACY, FEEDBACK }
 

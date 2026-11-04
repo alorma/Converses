@@ -24,6 +24,7 @@ private fun SettingsPreview(
       onHapticFeedback = {},
       onAppLockChange = {},
       onRelockAfter = {},
+      onAnalyticsChange = {},
       onOpenLanguage = {},
       onOpenSecuritySetup = {},
       onOpenPrivacyPolicy = {},
@@ -62,4 +63,11 @@ internal fun SettingsNoLockPreview() {
 @Composable
 internal fun SettingsPersonColorLockedPreview() {
   SettingsPreview(settings = AppSettings(), canUnlock = true)
+}
+
+/** Ajustos › Privacitat amb les estadístiques activades (1c). */
+@Preview(heightDp = 2000)
+@Composable
+internal fun SettingsAnalyticsOnPreview() {
+  SettingsPreview(settings = AppSettings(analyticsConsent = true), canUnlock = true, isPro = true)
 }

@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.alorma.contactnotes.data.ConversesRepository
 import com.alorma.contactnotes.data.settings.AppSettings
 import com.alorma.contactnotes.data.settings.SettingsRepository
+import com.alorma.contactnotes.data.tracking.ConsentManager
 import com.alorma.contactnotes.data.tracking.EventTracker
 import com.alorma.contactnotes.designsystem.theme.ThemeMode
 import com.alorma.contactnotes.ui.tracking.Actions
@@ -19,6 +20,7 @@ class SettingsViewModel(
   private val repository: SettingsRepository,
   conversesRepository: ConversesRepository,
   private val tracker: EventTracker,
+  private val consent: ConsentManager,
 ) : ViewModel() {
   val settings: StateFlow<AppSettings> =
     repository.settings
@@ -60,6 +62,16 @@ class SettingsViewModel(
     viewModelScope.launch {
       toggled(ToggleSetting.APP_LOCK, enabled)
       repository.setAppLock(enabled)
+    }
+
+  /**
+   * Estadístiques d'ús. Es registra després de desar-ho: activant-les, el canvi ja surt; desactivant-les, es queda
+   * al mòbil.
+   */
+  fun onAnalytics(enabled: Boolean) =
+    viewModelScope.launch {
+      consent.saveConsent(enabled)
+      toggled(ToggleSetting.ANALYTICS, enabled)
     }
 
   fun onRelockAfter(seconds: Int) =

@@ -1,5 +1,11 @@
 package com.alorma.contactnotes.ui.settings
 
+import com.alorma.contactnotes.data.tracking.Action
+import com.alorma.contactnotes.data.tracking.ConsentManager
+import com.alorma.contactnotes.data.tracking.Event
+import com.alorma.contactnotes.data.tracking.EventTracker
+import com.alorma.contactnotes.data.tracking.Screen
+import com.alorma.contactnotes.data.tracking.Tracker
 import com.alorma.contactnotes.designsystem.theme.ThemeMode
 import com.alorma.contactnotes.testing.FakeDb
 import com.alorma.contactnotes.testing.FakeSettingsRepository
@@ -24,7 +30,13 @@ class SettingsViewModelTest {
     runTest {
       val repository = FakeSettingsRepository()
       val tracker = RecordingTracker()
-      val vm = SettingsViewModel(repository, FakeDb().repository, tracker.eventTracker)
+      val vm =
+        SettingsViewModel(
+          repository,
+          FakeDb().repository,
+          tracker.eventTracker,
+          ConsentManager(repository, backgroundScope),
+        )
       backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { vm.settings.collect {} }
 
       assertFalse(vm.settings.value.dynamicColor)
@@ -58,4 +70,63 @@ class SettingsViewModelTest {
         },
       )
     }
+
+  @Test
+  fun analyticsSwitchSavesTheConsentAndTracksTheChange() =
+    runTest(UnconfinedTestDispatcher()) {
+      val repository = FakeSettingsRepository()
+      val tracker = RecordingTracker()
+      val vm =
+        SettingsViewModel(
+          repository,
+          FakeDb().repository,
+          tracker.eventTracker,
+          ConsentManager(repository, backgroundScope),
+        )
+
+      vm.onAnalytics(true)
+      assertEquals(true, repository.state.value.analyticsConsent)
+      vm.onAnalytics(false)
+      assertEquals(false, repository.state.value.analyticsConsent)
+
+      assertEquals(
+        listOf(mapOf("setting" to "analytics", "value" to "true"), mapOf("setting" to "analytics", "value" to "false")),
+        tracker.recordedActions().map { it.second },
+      )
+    }
+
+  @Test
+  fun turningAnalyticsOffStaysOnThePhoneAndTurningThemOnIsSent() =
+    runTest(UnconfinedTestDispatcher()) {
+      val repository = FakeSettingsRepository()
+      repository.setAnalyticsConsent(false)
+      val consent = ConsentManager(repository, backgroundScope)
+      val remote = RemoteActions()
+      val eventTracker = EventTracker(listOf(remote), consent.consent, backgroundScope)
+      val vm = SettingsViewModel(repository, FakeDb().repository, eventTracker, consent)
+
+      vm.onAnalytics(true)
+      vm.onAnalytics(false)
+
+      assertEquals(listOf("true"), remote.values)
+    }
+
+  private class RemoteActions : Tracker {
+    override val isRemote = true
+    val values = mutableListOf<String>()
+
+    override fun trackScreen(screen: Screen) = Unit
+
+    override fun trackEvent(event: Event) = Unit
+
+    override fun trackAction(action: Action) {
+      values += action.eventProperties.getValue("value")
+    }
+
+    override fun trackError(
+      error: Throwable,
+      where: String,
+      properties: Map<String, String>,
+    ) = Unit
+  }
 }

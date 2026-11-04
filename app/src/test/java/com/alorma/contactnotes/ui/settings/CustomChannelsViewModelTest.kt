@@ -1,5 +1,6 @@
 package com.alorma.contactnotes.ui.settings
 
+import com.alorma.contactnotes.data.tracking.ConsentManager
 import com.alorma.contactnotes.shared.ChannelType
 import com.alorma.contactnotes.testing.FakeDb
 import com.alorma.contactnotes.testing.FakeSettingsRepository
@@ -63,7 +64,14 @@ class CustomChannelsViewModelTest {
     runTest {
       db.addCustomChannel("WhatsApp", ChannelType.CHAT)
       db.addCustomChannel("Instagram", ChannelType.SOCIAL)
-      val vm = SettingsViewModel(FakeSettingsRepository(), db.repository, RecordingTracker().eventTracker)
+      val settings = FakeSettingsRepository()
+      val vm =
+        SettingsViewModel(
+          settings,
+          db.repository,
+          RecordingTracker().eventTracker,
+          ConsentManager(settings, backgroundScope),
+        )
       backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { vm.customChannelCount.collect {} }
 
       assertEquals(2, vm.customChannelCount.value)

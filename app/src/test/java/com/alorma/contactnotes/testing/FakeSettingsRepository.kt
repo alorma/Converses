@@ -25,5 +25,5 @@ class FakeSettingsRepository : SettingsRepository {
 
   override suspend fun setOnboardingDone(done: Boolean) = state.update { it.copy(onboardingDone = done) }
 
-  override suspend fun setAnalyticsConsent(granted: Boolean) = state.update { it.copy(analyticsConsent = granted) }
+  override suspend fun setAnalyticsConsent(granted: Boolean?) = state.update { it.copy(analyticsConsent = granted) }
 }

@@ -67,6 +67,7 @@ import com.alorma.contactnotes.ui.person.PersonLockedWaitingPreview
 import com.alorma.contactnotes.ui.person.TasksSectionDonePreview
 import com.alorma.contactnotes.ui.settings.CustomChannelsEmptyPreview
 import com.alorma.contactnotes.ui.settings.CustomChannelsPreview
+import com.alorma.contactnotes.ui.settings.SettingsAnalyticsOnPreview
 import com.alorma.contactnotes.ui.settings.SettingsAppLockPreview
 import com.alorma.contactnotes.ui.settings.SettingsNoLockPreview
 import com.alorma.contactnotes.ui.settings.SettingsPersonColorLockedPreview
@@ -86,6 +87,17 @@ import com.android.tools.screenshot.PreviewTest
   uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_NORMAL,
 )
 annotation class ScreenPreviews
+
+/** Pantalla allargada, per a seccions que queden per sota del primer cop d'ull (Ajustos › Privacitat). */
+@Preview(name = "Light", locale = "en", widthDp = 411, heightDp = 2000)
+@Preview(
+  name = "Dark",
+  locale = "en",
+  widthDp = 411,
+  heightDp = 2000,
+  uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_NORMAL,
+)
+annotation class TallScreenPreviews
 
 /** Font gran, per veure que els textos no es tallen. Només en clar i en anglès. */
 @Preview(name = "FontScale2", locale = "en", widthDp = 411, heightDp = 891, fontScale = 2f)
@@ -456,6 +468,13 @@ class ScreensScreenshotTests {
   @Composable
   fun settingsAppLock() {
     SettingsAppLockPreview()
+  }
+
+  @TallScreenPreviews
+  @PreviewTest
+  @Composable
+  fun settingsAnalyticsOn() {
+    SettingsAnalyticsOnPreview()
   }
 
   @ScreenPreviews

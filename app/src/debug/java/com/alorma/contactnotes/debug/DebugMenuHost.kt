@@ -69,7 +69,7 @@ fun DebugMenuHost(content: @Composable () -> Unit) {
             style = MaterialTheme.typography.headlineSmall,
             modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp),
           )
-          ConversesDebugMenu()
+          ConversesDebugMenu(onClose = { showSheet = false })
         }
       }
     }

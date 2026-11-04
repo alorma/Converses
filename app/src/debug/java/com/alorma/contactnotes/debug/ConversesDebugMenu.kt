@@ -16,6 +16,7 @@ import com.alorma.contactnotes.data.flags.LocalFeatureFlagRunner
 import com.alorma.contactnotes.data.insertSampleData
 import com.alorma.contactnotes.data.pro.OverridableProDataSource
 import com.alorma.contactnotes.data.settings.OnboardingFlag
+import com.alorma.contactnotes.data.tracking.ConsentManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -24,11 +25,12 @@ import org.koin.compose.koinInject
 
 // No module may show names or entry text: protected people must not leak through the menu
 @Composable
-fun ConversesDebugMenu() {
+fun ConversesDebugMenu(onClose: () -> Unit) {
   ProModule()
   FeatureFlagsModule()
   DataModule()
   OnboardingModule()
+  AnalyticsModule(onClose)
 }
 
 @Composable
@@ -65,6 +67,26 @@ private fun OnboardingModule() {
       onClick = {
         flag.reset()
         activity?.recreate()
+      },
+    )
+  }
+}
+
+/**
+ * Clears the usage statistics choice, so the consent sheet shows again on People. Closes this menu first: otherwise the
+ * consent sheet opens under it and closing the menu dismisses the consent sheet as «No».
+ */
+@Composable
+private fun AnalyticsModule(onClose: () -> Unit) {
+  val consent: ConsentManager = koinInject()
+  val current = consent.consent.collectAsState().value
+  DebugModule(stringResource(R.string.debug_analytics_title)) {
+    DebugCell(
+      title = stringResource(R.string.debug_analytics_reset),
+      subtitle = stringResource(R.string.debug_analytics_reset_summary, current.toString()),
+      onClick = {
+        onClose()
+        consent.clearConsent()
       },
     )
   }

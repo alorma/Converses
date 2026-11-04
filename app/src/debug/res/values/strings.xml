@@ -10,6 +10,9 @@
   <string name="debug_onboarding_title">Onboarding</string>
   <string name="debug_onboarding_show">Show onboarding again</string>
   <string name="debug_onboarding_show_summary">Clears the flag and restarts the screen</string>
+  <string name="debug_analytics_title">Usage statistics</string>
+  <string name="debug_analytics_reset">Ask for consent again</string>
+  <string name="debug_analytics_reset_summary">Now: %1$s. Clears the choice; the sheet shows on People</string>
   <string name="debug_flags_title">Feature flags</string>
   <string name="debug_pro_title">Pro</string>
   <string name="debug_pro_user">Pro user</string>

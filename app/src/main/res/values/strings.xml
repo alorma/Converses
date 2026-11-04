@@ -338,4 +338,11 @@
     <string name="consent_no">No, thanks</string>
     <string name="consent_no_summary">Nothing is sent</string>
     <string name="consent_ok">OK</string>
+
+    <!-- Ajustos › Privacitat -->
+    <string name="settings_privacy">Privacy</string>
+    <string name="settings_analytics">Usage statistics</string>
+    <string name="settings_analytics_on">On · anonymous</string>
+    <string name="settings_analytics_off">Off · nothing is sent</string>
+    <string name="settings_analytics_note">Personal information and anything you write are never sent. Details in the %1$s.</string>
 </resources>
