@@ -1,6 +1,6 @@
 # Phased work: phases → tasks → commits → validation
 
-No `paths` on purpose: this is how every piece of work is done, not only a numbered plan such as `docs/auto/fases.md`. For work outside a numbered plan (a backlog item, a bugfix), apply the same loop at small scale: short task list, approval, validated commits, then ask for validation.
+No `paths` on purpose: this is how every piece of work is done, not only a numbered plan with phases. For work outside a numbered plan (a backlog item, a bugfix), apply the same loop at small scale: short task list, approval, validated commits, then ask for validation.
 
 ## Rules
 
@@ -24,6 +24,7 @@ No `paths` on purpose: this is how every piece of work is done, not only a numbe
 9. **Push only with the phase validated**, never mid-task on your own unless Bernat asks explicitly (e.g. to test on a real device). No Google Play change without permission.
 10. **Open decisions are asked, not invented.** If a phase depends on a decision or a missing design, ask before starting.
 11. **Design is requested, not improvised.** When a phase needs it, ask for it from Claude Design.
+12. **Condense the plan when it is finished.** Phases, task lists, hashes and handoffs live in the plan only while the work is in progress. When the last phase is approved, rewrite the doc as a summary of what exists and why (behaviour, decisions, known limitations, what is pending) and delete the phases; the step-by-step history stays in git.
 
 ## Proposal template
 

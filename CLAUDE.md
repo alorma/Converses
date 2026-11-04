@@ -8,11 +8,11 @@ Android app to remember what I said, what people said to me and what happened wi
 
 ## References (source of truth)
 
-- `docs/backlog.md`: pending bugs and features (Iteration 2). It is written in Catalan.
-- `docs/auto/`: plan for Android Auto (`README.md` with scope and decisions, `fases.md` with the phases).
-- `docs/navigation/README.md`: plan to make navigation behave like Caducity (single back stack, fixed floating toolbar).
-- `docs/pro/`: what is free forever and what will be Pro (behind feature flags); future paid-tier notes go here.
-- `docs/analytics/README.md`: opt-in usage statistics (not Pro); agnostic `Tracker`, Firebase is never initialized without consent.
+The docs are written in Catalan and describe what exists and why, not how it was built (that is in git history).
+
+- `docs/backlog.md`: pending bugs and features.
+- `docs/pro/README.md`: what is free forever and what is Pro, how Pro works (RevenueCat, `ProRepository`, downgrade).
+- `docs/analytics/README.md`: opt-in usage statistics (not Pro): privacy rules, consent, the agnostic `Tracker`, the event catalogs and Firebase; Firebase is never initialized without consent.
 
 ## Stack
 
