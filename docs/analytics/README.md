@@ -83,7 +83,7 @@ Ordre decidit el 04-11-2026: tot el tracking es fa i es valida amb el `TimberTra
    - [x] Llista, detall i nota ràpida — `709343c`
    - [x] Editor, tasca i canals propis — `b9d545f`
    - [x] Ajustos, paywall i onboarding — `c876e99`
-4. Esdeveniments (`trackEvent`): coses que passen sense que l'usuari les demani.
+4. Esdeveniments (`trackEvent`): coses que passen sense que l'usuari les demani — validada el 04-11-2026.
    - `object Events` (`data/tracking/Events.kt`, a `data/` perquè els emeten capes de dades). Valors tancats, com les accions.
    - Catàleg (decidit el 04-11-2026):
      - Paywall: `purchase_finished` (`result` purchased/pending/cancelled/offline/failed, `late`), `purchase_timed_out`, `restore_finished` (`result` restored/nothing/pending/offline/failed).
