@@ -2,6 +2,7 @@ package com.alorma.contactnotes.ui.task
 
 import com.alorma.contactnotes.testing.FakeDb
 import com.alorma.contactnotes.testing.MainDispatcherRule
+import com.alorma.contactnotes.testing.RecordingTracker
 import com.alorma.contactnotes.ui.entry.PersonSelectionBridge
 import java.time.LocalDate
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -21,12 +22,26 @@ class TaskFormViewModelTest {
   @get:Rule val main = MainDispatcherRule()
   private val db = FakeDb()
   private val bridge = PersonSelectionBridge()
+  private val tracker = RecordingTracker()
+
+  @Test
+  fun savingIsTrackedWithModeAndDueButNoText() =
+    runTest {
+      val marta = db.addPerson("Marta")
+      val vm = viewModel(marta.id)
+      vm.save(marta.id, "secret", LocalDate.of(2026, 11, 5)) {}
+
+      assertEquals(
+        listOf("task_saved" to mapOf("mode" to "create", "has_due" to "true")),
+        tracker.recordedActions(),
+      )
+    }
 
   private fun TestScope.viewModel(
     personId: Long = 0L,
     taskId: Long = 0L,
   ): TaskFormViewModel {
-    val vm = TaskFormViewModel(personId, taskId, db.repository, bridge, clock = { 5_000L })
+    val vm = TaskFormViewModel(personId, taskId, db.repository, bridge, tracker.eventTracker, clock = { 5_000L })
     backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { vm.uiState.collect {} }
     return vm
   }
@@ -167,6 +182,7 @@ class TaskFormViewModelTest {
 
       assertTrue(deleted)
       assertTrue(db.tasks.value.isEmpty())
+      assertEquals("task_deleted", tracker.recordedActions().last().first)
     }
 
   @Test

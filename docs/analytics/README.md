@@ -73,7 +73,7 @@ Ordre decidit el 04-11-2026: tot el tracking es fa i es valida amb el `TimberTra
      - Persones: `filter_toggled` (`channel`, `selected`).
      - Detall: `kind_filter_toggled` (`kind`), `entry_sheet_opened` (`mode`), `entry_saved` (`mode` new/new_as/edit/quick, `kind`, `channel`, `custom_channel`), `entry_menu_opened`, `entry_copied`, `entry_moved`, `entry_deleted`, `entry_restored`, `day_deleted`, `person_exported`, `person_archived` (`archived`), `task_done`, `task_reopened` (`source` undo/list).
      - Nota ràpida: `entry_saved` (`mode=quick`), `person_picker_opened`.
-     - Editor: `person_saved` (`mode`), `person_protection_changed` (`enabled`, només si canvia en desar, sense dir de qui), `person_deleted`, `avatar_sheet_opened`, `avatar_applied` (sense forma ni color).
+     - Editor: `person_saved` (`mode`), `person_protection_changed` (`enabled`, sense dir de qui: en una persona existent, quan l'interruptor es desa després de l'autenticació; en una de nova, en desar-la protegida), `person_deleted`, `avatar_sheet_opened`, `avatar_applied` (sense forma ni color).
      - Tasca: `task_saved` (`mode`, `has_due`), `task_deleted`.
      - Canals propis: `custom_channel_saved` (`mode`, `channel`), `custom_channel_deleted`.
      - Ajustos: `setting_changed` (`setting` theme/dynamic_color/person_color/haptics/app_lock/relock_after, `value`), `link_opened` (`target` language/security/privacy/feedback).

@@ -45,6 +45,7 @@ import com.alorma.contactnotes.R
 import com.alorma.contactnotes.data.ConversesRepository
 import com.alorma.contactnotes.data.db.CustomChannelEntity
 import com.alorma.contactnotes.data.db.CustomChannelWithCount
+import com.alorma.contactnotes.data.tracking.EventTracker
 import com.alorma.contactnotes.designsystem.components.ConversesTopBar
 import com.alorma.contactnotes.designsystem.components.ProBadge
 import com.alorma.contactnotes.designsystem.components.SettingRow
@@ -55,6 +56,7 @@ import com.alorma.contactnotes.shared.ChannelType
 import com.alorma.contactnotes.ui.entry.CustomChannelSheet
 import com.alorma.contactnotes.ui.person.channelName
 import com.alorma.contactnotes.ui.person.icon
+import com.alorma.contactnotes.ui.tracking.Actions
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
@@ -70,6 +72,7 @@ data class CustomChannelGroup(
 
 class CustomChannelsViewModel(
   private val repository: ConversesRepository,
+  private val tracker: EventTracker,
 ) : ViewModel() {
   /** `null` mentre es carrega. El repositori ja els dona en l'ordre dels grups i, dins de cada grup, per nom. */
   val groups: StateFlow<List<CustomChannelGroup>?> =
@@ -83,6 +86,7 @@ class CustomChannelsViewModel(
 
   /** Les seves entrades es queden al grup. */
   fun delete(channel: CustomChannelEntity) {
+    tracker.trackAction(Actions.CustomChannelDeleted())
     viewModelScope.launch { repository.deleteCustomChannel(channel) }
   }
 }

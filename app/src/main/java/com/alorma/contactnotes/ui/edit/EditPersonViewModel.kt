@@ -5,9 +5,11 @@ import androidx.lifecycle.viewModelScope
 import com.alorma.contactnotes.data.ConversesRepository
 import com.alorma.contactnotes.data.db.PersonEntity
 import com.alorma.contactnotes.data.db.PinnedFactEntity
+import com.alorma.contactnotes.data.tracking.EventTracker
 import com.alorma.contactnotes.shared.AvatarColor
 import com.alorma.contactnotes.shared.AvatarShape
 import com.alorma.contactnotes.ui.person.PersonExporter
+import com.alorma.contactnotes.ui.tracking.Actions
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
@@ -79,6 +81,9 @@ interface EditPersonActions {
 
   fun onAvatarSheetReopened()
 
+  /** L'usuari ha obert el full «Avatar» (no quan es reobre sol en tornar de Pro). */
+  fun onAvatarSheetOpened() = Unit
+
   /** Ara és Pro: la prova passa a ser la forma i el color de l'editor, i es poden desar. */
   fun onApplyTrial()
 
@@ -111,6 +116,7 @@ class EditPersonViewModel(
   private val personId: Long,
   private val repository: ConversesRepository,
   private val exporter: PersonExporter,
+  private val tracker: EventTracker,
 ) : ViewModel(),
   EditPersonActions {
   private var original: PersonEntity? = null
@@ -182,6 +188,8 @@ class EditPersonViewModel(
 
   override fun onAvatarSheetReopened() = _state.update { it.copy(reopenAvatarSheet = false) }
 
+  override fun onAvatarSheetOpened() = tracker.trackAction(Actions.AvatarSheetOpened())
+
   override fun onApplyTrial() =
     _state.update {
       it.copy(
@@ -199,6 +207,7 @@ class EditPersonViewModel(
       _state.update { it.copy(isProtected = value) }
       return
     }
+    if (value != person.isProtected) tracker.trackAction(Actions.PersonProtectionChanged(value))
     _state.update { it.copy(isProtected = value, baseline = it.baseline.copy(isProtected = value)) }
     val updated = person.copy(isProtected = value)
     original = updated
@@ -242,6 +251,8 @@ class EditPersonViewModel(
     onDeleted: () -> Unit,
   ) {
     val person = original ?: return
+    tracker.trackAction(Actions.PersonDeleted())
+    if (exportFirst) tracker.trackAction(Actions.PersonExported())
     viewModelScope.launch {
       if (exportFirst) exporter.buildText(personId)?.let { exporter.share(person.name, it) }
       repository.deletePerson(person)
@@ -277,7 +288,14 @@ class EditPersonViewModel(
         current.facts
           .filter { it.label.isNotBlank() || it.value.isNotBlank() }
           .map { PinnedFactEntity(personId = 0, label = it.label.trim(), value = it.value.trim(), position = 0) }
-      onSaved(repository.savePerson(person, facts))
+      val saved = repository.savePerson(person, facts)
+      tracker.trackAction(Actions.PersonSaved(creating = current.isNew))
+      // En una persona existent, la protecció ja s'ha registrat en canviar-la (es desa a l'acte)
+      if (current.isNew && current.isProtected) tracker.trackAction(Actions.PersonProtectionChanged(true))
+      if (current.shape != current.baseline.shape || current.color != current.baseline.color) {
+        tracker.trackAction(Actions.AvatarApplied())
+      }
+      onSaved(saved)
     }
   }
 }

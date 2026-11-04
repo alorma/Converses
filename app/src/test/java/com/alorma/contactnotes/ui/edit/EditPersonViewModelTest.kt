@@ -5,6 +5,7 @@ import com.alorma.contactnotes.shared.AvatarColor
 import com.alorma.contactnotes.shared.AvatarShape
 import com.alorma.contactnotes.testing.FakeDb
 import com.alorma.contactnotes.testing.MainDispatcherRule
+import com.alorma.contactnotes.testing.RecordingTracker
 import com.alorma.contactnotes.ui.person.PersonExporter
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
@@ -22,12 +23,14 @@ import org.junit.Test
 class EditPersonViewModelTest {
   @get:Rule val main = MainDispatcherRule()
   private val db = FakeDb()
+  private val tracker = RecordingTracker()
 
   private fun viewModel(personId: Long = 0L) =
     EditPersonViewModel(
       personId,
       db.repository,
       PersonExporter(ContextWrapper(null), db.repository),
+      tracker.eventTracker,
     )
 
   @Test
@@ -153,6 +156,13 @@ class EditPersonViewModelTest {
 
     vm.onProtected(false)
     assertFalse(db.person(marta.id)!!.isProtected)
+    assertEquals(
+      listOf(
+        "person_protection_changed" to mapOf("enabled" to "true"),
+        "person_protection_changed" to mapOf("enabled" to "false"),
+      ),
+      tracker.recordedActions(),
+    )
   }
 
   @Test
@@ -168,6 +178,32 @@ class EditPersonViewModelTest {
     var id = 0L
     vm.save { id = it }
     assertTrue(db.person(id)!!.isProtected)
+    assertEquals(
+      listOf(
+        "person_saved" to mapOf("mode" to "create"),
+        "person_protection_changed" to mapOf("enabled" to "true"),
+      ),
+      tracker.recordedActions(),
+    )
+  }
+
+  @Test
+  fun changingTheAvatarIsTrackedOnSaveWithoutShapeNorColor() {
+    val marta = db.addPerson("Marta")
+    val vm = viewModel(marta.id)
+    vm.onAvatarSheetOpened()
+    vm.onColor(AvatarColor.entries.first { it != marta.avatarColor })
+
+    vm.save {}
+
+    assertEquals(
+      listOf(
+        "avatar_sheet_opened" to emptyMap(),
+        "person_saved" to mapOf("mode" to "edit"),
+        "avatar_applied" to emptyMap<String, String>(),
+      ),
+      tracker.recordedActions(),
+    )
   }
 
   @Test

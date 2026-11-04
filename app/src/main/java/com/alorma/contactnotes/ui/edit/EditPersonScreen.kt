@@ -240,7 +240,10 @@ fun EditPersonContent(
                 name = state.name,
                 shape = state.shape ?: AvatarShape.Standard,
                 color = state.color ?: AvatarColor.forName(state.name),
-                onClick = { showAvatarSheet = true },
+                onClick = {
+                  showAvatarSheet = true
+                  actions.onAvatarSheetOpened()
+                },
                 badgeBorder = GroupedListDefaults.containerColor,
                 locked = !isPro,
               )

@@ -99,8 +99,8 @@ val viewModelModule =
     viewModel { PersonLockViewModel() }
     viewModel { (personId: Long) -> PersonDetailViewModel(personId, get(), get(), get()) }
     viewModel { (personId: Long) -> QuickNoteViewModel(personId, get(), get(), get()) }
-    viewModel { (personId: Long, taskId: Long) -> TaskFormViewModel(personId, taskId, get(), get()) }
-    viewModel { (personId: Long) -> EditPersonViewModel(personId, get(), get()) }
+    viewModel { (personId: Long, taskId: Long) -> TaskFormViewModel(personId, taskId, get(), get(), get()) }
+    viewModel { (personId: Long) -> EditPersonViewModel(personId, get(), get(), get()) }
   }
 
 val appModules =

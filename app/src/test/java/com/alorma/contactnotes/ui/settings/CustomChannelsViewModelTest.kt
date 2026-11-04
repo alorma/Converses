@@ -4,6 +4,7 @@ import com.alorma.contactnotes.shared.ChannelType
 import com.alorma.contactnotes.testing.FakeDb
 import com.alorma.contactnotes.testing.FakeSettingsRepository
 import com.alorma.contactnotes.testing.MainDispatcherRule
+import com.alorma.contactnotes.testing.RecordingTracker
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -19,7 +20,7 @@ class CustomChannelsViewModelTest {
   private val db = FakeDb()
 
   private fun kotlinx.coroutines.test.TestScope.viewModel(): CustomChannelsViewModel {
-    val vm = CustomChannelsViewModel(db.repository)
+    val vm = CustomChannelsViewModel(db.repository, RecordingTracker().eventTracker)
     backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { vm.groups.collect {} }
     return vm
   }

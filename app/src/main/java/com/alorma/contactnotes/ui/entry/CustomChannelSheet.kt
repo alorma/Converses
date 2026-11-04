@@ -46,6 +46,8 @@ import com.alorma.contactnotes.designsystem.components.ConversesSaveButton
 import com.alorma.contactnotes.designsystem.theme.SheetTitleStyle
 import com.alorma.contactnotes.shared.ChannelType
 import com.alorma.contactnotes.ui.person.channelName
+import com.alorma.contactnotes.ui.tracking.Actions
+import com.alorma.contactnotes.ui.tracking.rememberActionTracker
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 
@@ -62,6 +64,7 @@ fun CustomChannelSheet(
   editing: CustomChannelEntity? = null,
 ) {
   val repository: ConversesRepository = koinInject()
+  val trackAction = rememberActionTracker()
   val scope = rememberCoroutineScope()
   var name by rememberSaveable { mutableStateOf(editing?.name.orEmpty()) }
   var group by rememberSaveable { mutableStateOf(editing?.channelType ?: initialGroup) }
@@ -90,7 +93,10 @@ fun CustomChannelSheet(
       onSave = {
         scope.launch {
           when (val result = repository.saveCustomChannel(editing, group, name)) {
-            is CustomChannelResult.Saved -> repository.getCustomChannel(result.id)?.let(onSaved)
+            is CustomChannelResult.Saved -> {
+              trackAction(Actions.CustomChannelSaved(creating = editing == null, group = group))
+              repository.getCustomChannel(result.id)?.let(onSaved)
+            }
             CustomChannelResult.NameTaken -> takenIn = group
             CustomChannelResult.NameBlank -> Unit
           }

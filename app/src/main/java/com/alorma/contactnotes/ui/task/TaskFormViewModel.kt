@@ -5,7 +5,9 @@ import androidx.lifecycle.viewModelScope
 import com.alorma.contactnotes.data.ConversesRepository
 import com.alorma.contactnotes.data.db.PersonEntity
 import com.alorma.contactnotes.data.db.TaskEntity
+import com.alorma.contactnotes.data.tracking.EventTracker
 import com.alorma.contactnotes.ui.entry.PersonSelectionBridge
+import com.alorma.contactnotes.ui.tracking.Actions
 import java.time.LocalDate
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -39,6 +41,7 @@ class TaskFormViewModel(
   private val taskId: Long,
   private val repository: ConversesRepository,
   private val selectionBridge: PersonSelectionBridge,
+  private val tracker: EventTracker,
   private val clock: () -> Long = System::currentTimeMillis,
 ) : ViewModel() {
   private val selectedId = MutableStateFlow<Long?>(initialPersonId.takeIf { it > 0 })
@@ -120,6 +123,7 @@ class TaskFormViewModel(
     onSaved: () -> Unit,
   ) {
     if (text.isBlank()) return
+    tracker.trackAction(Actions.TaskSaved(creating = task.value == null, hasDue = dueDate != null))
     viewModelScope.launch {
       val due = dueDate?.toEpochDay()
       val existing = task.value
@@ -133,6 +137,7 @@ class TaskFormViewModel(
 
   fun delete(onDeleted: () -> Unit) {
     val existing = task.value ?: return
+    tracker.trackAction(Actions.TaskDeleted())
     viewModelScope.launch {
       repository.deleteTask(existing)
       onDeleted()
