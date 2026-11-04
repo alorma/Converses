@@ -6,7 +6,7 @@ Què és gratis i què és Pro, i la regla, són a `docs/pro/README.md`. Disseny
 | --- | --- | --- | --- |
 | 1 | Infraestructura: datasource, `ProRepository`, runner de flags Pro, debug drawer i etiqueta PRO | — | Feta i validada (26-10-2026) |
 | 2 | RevenueCat: SDK, entitlement `converses_pro`, preu, compra i restauració | 1 | Feta i validada (26-10-2026) |
-| 3 | Paywall: pantalla «Converses Pro» (8a, 8b, 8c) i punts d'entrada | 2 | Pendent |
+| 3 | Paywall: pantalla «Converses Pro» (8a, 8b, 8c) i punts d'entrada | 2 | Feta i validada (04-11-2026) |
 | 4 | Publicació: política de privacitat, seguretat de dades de Play, termes | 3 | Pendent |
 | 5 | Room v5 i flags de Canals propis i Pendents | — | Feta i validada (03-11-2026) |
 | 6 | Canals propis: camp «On» (7a, 7c), full «Nou canal» (7b), cronologia, exportar, Ajustos › Canals propis (7d) | 5 | Feta i validada (03-11-2026) |
@@ -92,7 +92,14 @@ Al menú de debug, l'apartat **Pro** té un sol interruptor, «Pro user», que e
 - [x] Pantalla «Converses Pro» (8a), des d'una funció (8b) i «Ja tens Pro» (8c), amb els textos ca, en i es del tauler 8d; captures — `5406eaa`
 - [x] Targeta d'Ajustos (destacada sense Pro, «Activat» amb Pro); captures i emulador amb el Test Store (restaurar sense compra, cancel·lació, error, sense connexió, compra vàlida i «Som-hi») — `f1e2686`
 - [x] Punts d'entrada `Locked`: Ajustos › Contactes i la fila de Contactes de l'editor (`Contacts`), Ajustos › «Color de la persona» i el full «Avatar» (`People`); captures i emulador — `c5bd808`
-- [ ] Compra real a Play des del track intern amb un *license tester* (Play Console › Settings › License testing; el compte de Bernat ja hi és des del 26-10-2026): a la fase 2 la release no tenia cap botó per comprar; el Test Store sí que es va validar
+- [x] Compra real a Play des del track intern amb un *license tester* (Play Console › Settings › License testing; el compte de Bernat ja hi és des del 26-10-2026): a la fase 2 la release no tenia cap botó per comprar; el Test Store sí que es va validar — `4765c9f` (1.8.2, 04-11-2026)
+
+### Handoff (04-11-2026)
+
+- **Compra real validada amb la 1.8.2** (track intern, Pixel 8a): preu de Play (3,59 €), compra rebutjada (error i sense Pro), compra acceptada (Pro activat) i, després d'esborrar les dades, Pro restaurat sol en arrencar (RevenueCat troba la compra a Play amb un usuari anònim nou). El botó «Restaura la compra» no s'ha provat: amb Pro, el paywall surt en l'estat «Ja tens Pro».
+- **La 1.8.0 i la 1.8.1 arribaven a Play sense la clau de RevenueCat:** `publishReleaseBundle` tornava a compilar l'AAB en una altra invocació de Gradle sense `REVENUECAT_GOOGLE_API_KEY`, i la release feia servir `NoProDataSource` (paywall sense preu). L'artefacte de GitHub sí que tenia la clau, perquè és el del pas anterior. Arreglat a `4765c9f` (secrets a nivell de job i el workflow falla si la clau és buida). Per comprovar-ho: App bundle explorer › Download, i buscar `goog_` al `classes.dex`.
+- **La protecció automàtica de Play (`pairip`) no hi tenia res a veure:** es va desactivar per descartar-la i Bernat l'ha tornat a activar. Amb ella, els APK de Play copiats a un emulador es tanquen en la comprovació de llicència.
+- **Pendent:** el paywall es penja si RevenueCat no pot enviar la compra (backlog 18), abans de producció.
 
 ## Fase 4 · Publicació
 
