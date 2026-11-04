@@ -55,6 +55,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.alorma.contactnotes.R
 import com.alorma.contactnotes.designsystem.components.GroupedListDefaults
@@ -76,6 +77,10 @@ fun PaywallScreen(
   val context = LocalContext.current
   val uriHandler = LocalUriHandler.current
   val snackbarHostState = remember { SnackbarHostState() }
+  LifecycleResumeEffect(viewModel) {
+    viewModel.onResumed()
+    onPauseOrDispose {}
+  }
   LaunchedEffect(viewModel) {
     viewModel.events.collect { message ->
       val text =

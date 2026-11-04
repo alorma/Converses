@@ -7,7 +7,10 @@ import com.alorma.contactnotes.data.pro.NetworkMonitor
 import com.alorma.contactnotes.data.pro.ProRepository
 import com.alorma.contactnotes.data.pro.PurchaseResult
 import com.alorma.contactnotes.data.pro.RestoreResult
+import kotlin.time.Duration.Companion.seconds
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -53,6 +56,9 @@ data class PaywallState(
   val canRestore: Boolean get() = isOnline && !busy
 }
 
+/** Quant s'espera RevenueCat després de tornar del full de Play abans de dir que la compra està pendent. */
+val PURCHASE_TIMEOUT = 15.seconds
+
 /** Snackbars de la pantalla de Pro. La cancel·lació no en porta cap. */
 enum class PaywallMessage { Pending, Failed, NothingToRestore }
 
@@ -85,22 +91,65 @@ class PaywallViewModel(
     local.update { it.copy(price = price) }
   }
 
+  /** Una compra que la pantalla encara espera; [timer] compta des que l'app torna del full de Play. */
+  private class Attempt {
+    var timer: Job? = null
+    var timedOut = false
+  }
+
+  private var attempt: Attempt? = null
+
   fun onBuy(activity: Activity) {
     if (!current().canBuy) return
+    val attempt = Attempt().also { this.attempt = it }
+    local.update { it.copy(busy = true) }
+    // No es cancel·la mai: si RevenueCat respon tard, el resultat encara compta
     viewModelScope.launch {
-      local.update { it.copy(busy = true) }
       val result = pro.purchase(activity)
-      local.update {
-        when (result) {
-          PurchaseResult.Purchased -> it.copy(busy = false, isPro = true)
-          else -> it.copy(busy = false)
-        }
+      attempt.timer?.cancel()
+      if (this@PaywallViewModel.attempt === attempt) this@PaywallViewModel.attempt = null
+      if (attempt.timedOut) onLatePurchase(result) else onPurchase(result)
+    }
+  }
+
+  /**
+   * La pantalla torna a primer pla (també en tornar del full de Play). Si hi ha una compra en curs, només s'espera
+   * [PURCHASE_TIMEOUT]: si RevenueCat no pot enviar la compra, `awaitPurchase` no torna mai (backlog 18).
+   */
+  fun onResumed() {
+    val attempt = attempt ?: return
+    if (attempt.timer != null) return
+    attempt.timer =
+      viewModelScope.launch {
+        delay(PURCHASE_TIMEOUT)
+        attempt.timedOut = true
+        this@PaywallViewModel.attempt = null
+        local.update { it.copy(busy = false) }
+        // Si Pro ja ha arribat pel listener, la pantalla ja diu «Ja tens Pro»
+        if (!current().isPro) messages.send(PaywallMessage.Pending)
       }
+  }
+
+  private suspend fun onPurchase(result: PurchaseResult) {
+    local.update {
       when (result) {
-        PurchaseResult.Pending -> messages.send(PaywallMessage.Pending)
-        PurchaseResult.Failed, PurchaseResult.Offline -> messages.send(PaywallMessage.Failed)
-        PurchaseResult.Purchased, PurchaseResult.Cancelled -> Unit
+        PurchaseResult.Purchased -> it.copy(busy = false, isPro = true)
+        else -> it.copy(busy = false)
       }
+    }
+    when (result) {
+      PurchaseResult.Pending -> messages.send(PaywallMessage.Pending)
+      PurchaseResult.Failed, PurchaseResult.Offline -> messages.send(PaywallMessage.Failed)
+      PurchaseResult.Purchased, PurchaseResult.Cancelled -> Unit
+    }
+  }
+
+  /** Ja s'ha dit «pendent» i els botons tornen a funcionar: no es toca `busy` (pot haver-hi un altre intent). */
+  private suspend fun onLatePurchase(result: PurchaseResult) {
+    when (result) {
+      PurchaseResult.Purchased -> local.update { it.copy(isPro = true) }
+      PurchaseResult.Failed, PurchaseResult.Offline -> messages.send(PaywallMessage.Failed)
+      PurchaseResult.Pending, PurchaseResult.Cancelled -> Unit
     }
   }
 

@@ -7,7 +7,11 @@ import com.alorma.contactnotes.data.pro.ProRepository
 import com.alorma.contactnotes.data.pro.PurchaseResult
 import com.alorma.contactnotes.data.pro.RestoreResult
 import com.alorma.contactnotes.testing.MainDispatcherRule
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
@@ -15,7 +19,9 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
+import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -197,6 +203,143 @@ class PaywallViewModelTest {
         assertFalse("$result", viewModel.current().isPro)
         job.cancel()
       }
+    }
+
+  private fun TestScope.messagesOf(viewModel: PaywallViewModel): Pair<MutableList<PaywallMessage>, Job> {
+    val received = mutableListOf<PaywallMessage>()
+    return received to launch(UnconfinedTestDispatcher(testScheduler)) { viewModel.events.toList(received) }
+  }
+
+  /** Backlog 18: RevenueCat no pot enviar la compra i `awaitPurchase` no torna mai. */
+  @Test
+  fun aPurchaseThatNeverReturnsIsPendingAfterTheTimeoutOnceBack() =
+    runTest {
+      source.purchaseGate = CompletableDeferred()
+      val viewModel = viewModel()
+      val (received, job) = messagesOf(viewModel)
+
+      viewModel.onBuy(Activity())
+      viewModel.onResumed()
+      advanceTimeBy(PURCHASE_TIMEOUT - 1.milliseconds)
+      assertTrue(viewModel.current().busy)
+      assertEquals(emptyList<PaywallMessage>(), received)
+
+      advanceTimeBy(2.milliseconds)
+      val state = viewModel.current()
+      assertFalse(state.busy)
+      assertTrue(state.canBuy)
+      assertTrue(state.canRestore)
+      assertFalse(state.isPro)
+      assertEquals(listOf(PaywallMessage.Pending), received)
+      job.cancel()
+    }
+
+  @Test
+  fun noPendingMessageIfProArrivedFromTheListenerMeanwhile() =
+    runTest {
+      source.purchaseGate = CompletableDeferred()
+      val viewModel = viewModel()
+      val (received, job) = messagesOf(viewModel)
+
+      viewModel.onBuy(Activity())
+      viewModel.onResumed()
+      source.pro.value = true
+      advanceTimeBy(PURCHASE_TIMEOUT + 1.seconds)
+
+      assertTrue(viewModel.current().isPro)
+      assertFalse(viewModel.current().busy)
+      assertEquals(emptyList<PaywallMessage>(), received)
+      job.cancel()
+    }
+
+  @Test
+  fun noTimeoutWhileThePlaySheetIsOnTop() =
+    runTest {
+      source.purchaseGate = CompletableDeferred()
+      val viewModel = viewModel()
+
+      viewModel.onBuy(Activity())
+      advanceTimeBy(10.minutes)
+
+      assertTrue(viewModel.current().busy)
+    }
+
+  @Test
+  fun aPurchaseBeforeTheTimeoutShowsYouHaveProAndNothingElse() =
+    runTest {
+      val gate = CompletableDeferred<Unit>()
+      source.purchaseGate = gate
+      val viewModel = viewModel()
+      val (received, job) = messagesOf(viewModel)
+
+      viewModel.onBuy(Activity())
+      viewModel.onResumed()
+      advanceTimeBy(5.seconds)
+      gate.complete(Unit)
+      advanceTimeBy(PURCHASE_TIMEOUT)
+
+      assertTrue(viewModel.current().isPro)
+      assertFalse(viewModel.current().busy)
+      assertEquals(emptyList<PaywallMessage>(), received)
+      job.cancel()
+    }
+
+  @Test
+  fun aLatePurchaseStillShowsYouHavePro() =
+    runTest {
+      val gate = CompletableDeferred<Unit>()
+      source.purchaseGate = gate
+      val viewModel = viewModel()
+      val (received, job) = messagesOf(viewModel)
+
+      viewModel.onBuy(Activity())
+      viewModel.onResumed()
+      advanceTimeBy(PURCHASE_TIMEOUT + 1.seconds)
+      gate.complete(Unit)
+
+      assertTrue(viewModel.current().isPro)
+      assertEquals(listOf(PaywallMessage.Pending), received)
+      job.cancel()
+    }
+
+  @Test
+  fun aLateFailureSaysSo() =
+    runTest {
+      val gate = CompletableDeferred<Unit>()
+      source.purchaseGate = gate
+      source.purchaseResult = PurchaseResult.Failed
+      val viewModel = viewModel()
+      val (received, job) = messagesOf(viewModel)
+
+      viewModel.onBuy(Activity())
+      viewModel.onResumed()
+      advanceTimeBy(PURCHASE_TIMEOUT + 1.seconds)
+      gate.complete(Unit)
+
+      assertFalse(viewModel.current().isPro)
+      assertFalse(viewModel.current().busy)
+      assertEquals(listOf(PaywallMessage.Pending, PaywallMessage.Failed), received)
+      job.cancel()
+    }
+
+  @Test
+  fun buyingAgainWhileTheFirstIsStuckIsPending() =
+    runTest {
+      source.purchaseGate = CompletableDeferred()
+      val viewModel = viewModel()
+      val (received, job) = messagesOf(viewModel)
+      viewModel.onBuy(Activity())
+      viewModel.onResumed()
+      advanceTimeBy(PURCHASE_TIMEOUT + 1.seconds)
+
+      // RevenueCat respon `OperationAlreadyInProgressError`
+      source.purchaseGate = null
+      source.purchaseResult = PurchaseResult.Pending
+      viewModel.onBuy(Activity())
+
+      assertFalse(viewModel.current().busy)
+      assertEquals(listOf(PaywallMessage.Pending, PaywallMessage.Pending), received)
+      job.cancel()
     }
 
   @Test
