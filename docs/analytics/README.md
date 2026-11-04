@@ -79,10 +79,10 @@ Ordre decidit el 04-11-2026: tot el tracking es fa i es valida amb el `TimberTra
      - Ajustos: `setting_changed` (`setting` theme/dynamic_color/person_color/haptics/app_lock/relock_after, `value`), `link_opened` (`target` language/security/privacy/feedback).
      - Paywall: `purchase_started`, `restore_tapped` (el resultat, a la fase 4).
      - Onboarding: `onboarding_finished` (`skipped`).
-   - [ ] `Actions.kt`, `rememberActionTracker()` i aquest catàleg
-   - [ ] Llista, detall i nota ràpida
-   - [ ] Editor, tasca i canals propis
-   - [ ] Ajustos, paywall i onboarding
+   - [x] `Actions.kt`, `rememberActionTracker()` i aquest catàleg — `812c33a`
+   - [x] Llista, detall i nota ràpida — `709343c`
+   - [x] Editor, tasca i canals propis — `b9d545f`
+   - [x] Ajustos, paywall i onboarding — `c876e99`
 4. Esdeveniments (`trackEvent`): coses que passen sense que l'usuari les demani.
 5. Errors (`trackError`).
 6. Configuració de l'`EventTracker`: propietats comunes a tots els esdeveniments, començant per `isPro`.
