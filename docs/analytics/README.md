@@ -125,9 +125,10 @@ Ordre decidit el 04-11-2026: tot el tracking es fa i es valida amb el `TimberTra
    - Cua de pendents (decidit el 04-11-2026): mentre el consentiment és `null`, `EventTracker` guarda en memòria el que hauria d'anar als trackers remots (pantalles, esdeveniments, accions i errors, amb les propietats comunes del moment). Amb «Sí» s'envia en ordre; amb «No» es buida. Mai es desa al disc: si l'app es tanca, es perd. Límit de 100; en passar-lo es descarten els més antics. Els trackers locals reben sempre a l'instant. Així l'onboarding i els errors de l'arrencada d'un usuari nou compten si després diu «Sí».
    - Textos (decidit el 04-11-2026): les files del full són genèriques en comptes de les del disseny. «S'envia: informació de funcionament de l'app, només per al desenvolupador.» i «No s'envia mai: informació personal ni res del que escrius.». La llista concreta va a la política de privacitat.
    - Ajustos › Privacitat: l'interruptor registra `setting_changed` (`setting=analytics`, `value`). Amb «No» no surt del mòbil, i amb «Sí» surt.
+   - Menú de debug › Usage statistics › «Ask for consent again»: torna el consentiment a `null` i tanca el menú, perquè el full torni a sortir a People.
    - [x] Aquest pla — `9563eed`
    - [x] Cua de pendents a `EventTracker`, amb tests de JVM — `a69c732`
    - [x] `ConsentSheetContent` (`ui/consent`), textos, previews i captures — `f8b60ea`
    - [x] Mostrar el full a People, validat a l'emulador — `07c75f2`
-   - [ ] Ajustos › Privacitat, amb tests del ViewModel, captures i emulador
+   - [x] Ajustos › Privacitat, amb tests del ViewModel, captures i emulador — `e10ef5e`
 8. Implementació Firebase amb la inicialització manual, i l'activació i desactivació en calent. Cal el `google-services.json`. Validació a l'emulador amb logcat (`adb shell setprop log.tag.FA VERBOSE`): sense consentiment, cap tràfic de Firebase.
