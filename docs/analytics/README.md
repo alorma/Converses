@@ -137,9 +137,11 @@ Ordre decidit el 04-11-2026: tot el tracking es fa i es valida amb el `TimberTra
    - Crashes fatals (decidit el 04-11-2026): Crashlytics els envia tal qual, amb el missatge de l'excepció. Només els errors controlats (`trackError`) en treuen el `message`.
    - `FirebaseController` escolta el consentiment: amb «Sí» inicialitza Firebase i activa la recollida; amb «No», si ja estava inicialitzat, l'apaga i descarta els pendents. El `FirebaseTracker` s'assegura que Firebase estigui inicialitzat abans d'enviar res, perquè la cua de pendents pot buidar-se abans que el controller reaccioni.
    - `FirebaseTracker`: pantalles com a `screen_view` (`screen_name` i les propietats), esdeveniments i accions com a `logEvent` amb les propietats i `event_version`, errors amb `recordException` d'una còpia sense `message` (mateixa classe i *stack trace*) i *custom keys* (`where` i les comunes).
+   - Privacitat a Analytics: sense identificador publicitari (els permisos `AD_ID`, `ACCESS_ADSERVICES_*` i d'*install referrer* es treuen del manifest), sense senyals de personalització d'anuncis i sense pantalles automàtiques (només les de `FirebaseTracker`).
+   - `screen_view` perdut en calent (acceptat el 04-11-2026): si Firebase s'inicialitza amb l'app ja oberta (el «Sí» del full o d'Ajustos), Analytics es pensa que és en segon pla i rebutja els `screen_view` («Cannot log screen view event when the app is in the background») fins que l'app torna a primer pla. Es perden les pantalles d'aquella sessió, incloses les de la cua (l'`onboarding` d'un usuari nou). Els esdeveniments, les accions i els errors sí que arriben. No hi ha cap API pública per evitar-ho sense inicialitzar Firebase abans del consentiment.
    - [x] Aquest pla — `a5d6d3a`
    - [x] Gradle i manifest: BoM, Analytics, Crashlytics, plugins i inicialització automàtica treta — `21a4c85`
    - [x] `FirebaseController`, amb tests de JVM — `5530f19`
    - [x] `FirebaseTracker`, amb tests de JVM — `45d0cd1`
-   - [ ] CI: `google-services.json` a partir del secret
-   - [ ] Validació a l'emulador amb logcat
+   - [x] CI: `google-services.json` a partir del secret — `604fe3e`
+   - [x] Validació a l'emulador amb logcat: amb «No», l'arrencada no deixa rastre de Firebase; el «Sí» en calent (Ajustos i full) l'inicialitza i envia; el «Sí» en fred l'inicialitza abans de la UI; el «No» en calent apaga Crashlytics i Analytics i en buida les dades, i després no surt res; sense triar, res fins al «Sí»
