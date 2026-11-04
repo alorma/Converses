@@ -58,11 +58,13 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.alorma.contactnotes.R
+import com.alorma.contactnotes.data.tracking.ErrorSites
 import com.alorma.contactnotes.designsystem.components.GroupedListDefaults
 import com.alorma.contactnotes.designsystem.components.asShape
 import com.alorma.contactnotes.designsystem.components.groupedItemShape
 import com.alorma.contactnotes.designsystem.theme.ScreenTitleStyle
 import com.alorma.contactnotes.shared.AvatarShape
+import com.alorma.contactnotes.ui.tracking.rememberErrorTracker
 import org.koin.compose.viewmodel.koinViewModel
 
 /** Pantalla «Converses Pro» (8a, 8b des d'una funció) i «Ja tens Pro» (8c). No s'obre mai sola. */
@@ -76,6 +78,7 @@ fun PaywallScreen(
   val activity = LocalActivity.current
   val context = LocalContext.current
   val uriHandler = LocalUriHandler.current
+  val trackError = rememberErrorTracker()
   val snackbarHostState = remember { SnackbarHostState() }
   LifecycleResumeEffect(viewModel) {
     viewModel.onResumed()
@@ -102,6 +105,7 @@ fun PaywallScreen(
     onPrivacy = {
       // Sense navegador no hi ha res a obrir
       runCatching { uriHandler.openUri(context.getString(R.string.settings_privacy_policy_url)) }
+        .onFailure { trackError(it, ErrorSites.OPEN_LINK) }
     },
   )
 }

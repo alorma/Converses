@@ -48,15 +48,19 @@ fun FragmentActivity.promptUnlock(
   return BiometricPrompt(this, ContextCompat.getMainExecutor(this), callback).also { it.authenticate(info) }
 }
 
-/** Obre l'alta d'empremta o bloqueig de pantalla; si el sistema no la té, la configuració de seguretat. */
-fun Context.openSecuritySetup() {
+/**
+ * Obre l'alta d'empremta o bloqueig de pantalla; si el sistema no la té, la configuració de seguretat i avisa
+ * [onFallback]. Només Ajustos l'informa: la traça d'una persona protegida diria que n'hi ha.
+ */
+fun Context.openSecuritySetup(onFallback: (ActivityNotFoundException) -> Unit = {}) {
   val enroll =
     Intent(
       Settings.ACTION_BIOMETRIC_ENROLL,
     ).putExtra(Settings.EXTRA_BIOMETRIC_AUTHENTICATORS_ALLOWED, Authenticators)
   try {
     startActivity(enroll)
-  } catch (_: ActivityNotFoundException) {
+  } catch (e: ActivityNotFoundException) {
+    onFallback(e)
     startActivity(Intent(Settings.ACTION_SECURITY_SETTINGS))
   }
 }

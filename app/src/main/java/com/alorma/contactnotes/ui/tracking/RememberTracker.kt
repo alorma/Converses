@@ -16,3 +16,14 @@ fun rememberActionTracker(): (Action) -> Unit {
   val tracker: EventTracker = koinInject()
   return tracker::trackAction
 }
+
+/**
+ * Per als errors que la pantalla s'empassa (obrir un enllaç sense navegador). `where` surt d'`ErrorSites`. Com
+ * [rememberActionTracker], a les previews i les captures no fa res.
+ */
+@Composable
+fun rememberErrorTracker(): (Throwable, String) -> Unit {
+  if (LocalInspectionMode.current) return { _, _ -> }
+  val tracker: EventTracker = koinInject()
+  return tracker::trackError
+}

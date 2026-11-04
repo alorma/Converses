@@ -80,6 +80,7 @@ import com.alorma.contactnotes.R
 import com.alorma.contactnotes.data.pro.ProRepository
 import com.alorma.contactnotes.data.settings.AppLockManager
 import com.alorma.contactnotes.data.settings.AppSettings
+import com.alorma.contactnotes.data.tracking.ErrorSites
 import com.alorma.contactnotes.designsystem.components.ConversesToggleGroup
 import com.alorma.contactnotes.designsystem.components.ConversesTopBar
 import com.alorma.contactnotes.designsystem.components.GroupedListDefaults
@@ -98,6 +99,7 @@ import com.alorma.contactnotes.ui.person.promptUnlock
 import com.alorma.contactnotes.ui.tracking.Actions
 import com.alorma.contactnotes.ui.tracking.LinkTarget
 import com.alorma.contactnotes.ui.tracking.rememberActionTracker
+import com.alorma.contactnotes.ui.tracking.rememberErrorTracker
 import java.util.Locale
 import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
@@ -127,6 +129,7 @@ fun SettingsScreen(
   val feedbackBody = stringResource(R.string.settings_feedback_body, remember { versionLabel(context) })
   val haptics = rememberConversesHaptics()
   val trackAction = rememberActionTracker()
+  val trackError = rememberErrorTracker()
 
   SettingsContent(
     settings = settings,
@@ -156,15 +159,15 @@ fun SettingsScreen(
     },
     onOpenSecuritySetup = {
       trackAction(Actions.LinkOpened(LinkTarget.SECURITY))
-      context.openSecuritySetup()
+      context.openSecuritySetup { trackError(it, ErrorSites.OPEN_SECURITY_SETUP) }
     },
     onOpenPrivacyPolicy = {
       trackAction(Actions.LinkOpened(LinkTarget.PRIVACY))
-      context.openPrivacyPolicy()
+      context.openPrivacyPolicy { trackError(it, ErrorSites.OPEN_LINK) }
     },
     onOpenFeedback = {
       trackAction(Actions.LinkOpened(LinkTarget.FEEDBACK))
-      context.openFeedback(feedbackSubject, feedbackBody)
+      context.openFeedback(feedbackSubject, feedbackBody) { trackError(it, ErrorSites.OPEN_FEEDBACK) }
     },
   )
 }
@@ -476,27 +479,34 @@ private fun Context.openLanguageSettings() {
   startActivity(intent)
 }
 
-private fun Context.openPrivacyPolicy() = openUrl(getString(R.string.settings_privacy_policy_url))
+private fun Context.openPrivacyPolicy(onError: (ActivityNotFoundException) -> Unit) =
+  openUrl(getString(R.string.settings_privacy_policy_url), onError)
 
-private fun Context.openUrl(url: String) {
+private fun Context.openUrl(
+  url: String,
+  onError: (ActivityNotFoundException) -> Unit,
+) {
   try {
     startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
-  } catch (_: ActivityNotFoundException) {
+  } catch (e: ActivityNotFoundException) {
     // Sense navegador: no hi ha res a obrir.
+    onError(e)
   }
 }
 
 private fun Context.openFeedback(
   subject: String,
   body: String,
+  onError: (ActivityNotFoundException) -> Unit,
 ) {
   // Assumpte i cos van dins l'URI: Gmail ignora `EXTRA_SUBJECT` i `EXTRA_TEXT` amb `ACTION_SENDTO`.
   val uri = Uri.parse("mailto:${AboutLinks.FeedbackEmail}?subject=${Uri.encode(subject)}&body=${Uri.encode(body)}")
   val intent = Intent(Intent.ACTION_SENDTO, uri)
   try {
     startActivity(intent)
-  } catch (_: ActivityNotFoundException) {
+  } catch (e: ActivityNotFoundException) {
     // Sense app de correu: no hi ha res a obrir.
+    onError(e)
   }
 }
 
