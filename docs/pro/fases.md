@@ -11,7 +11,7 @@ Què és gratis i què és Pro, i la regla, són a `docs/pro/README.md`. Disseny
 | 5 | Room v5 i flags de Canals propis i Pendents | — | Feta i validada (03-11-2026) |
 | 6 | Canals propis: camp «On» (7a, 7c), full «Nou canal» (7b), cronologia, exportar, Ajustos › Canals propis (7d) | 5 | Feta i validada (03-11-2026) |
 | 7 | Pendents com a tasques: formulari «Nova tasca» (9b, 9c), menú i secció al detall (9a, 9d–9h), marcar com a fet i comptador al llistat (9g) | 5 | Feta i validada (03-11-2026) |
-| 8 | Personalització sense Pro: píndola PRO a l'editor (11a), full «Avatar» amb prova (11b, 11c), baixada de Pro (11d), fila del color de la persona (11e) | — | Pendent |
+| 8 | Personalització sense Pro: píndola PRO a l'editor (11a), full «Avatar» amb prova (11b, 11c), baixada de Pro (11d), fila del color de la persona (11e) | — | Feta i validada (04-11-2026) |
 
 Canals propis i Pendents: lliurament de Claude Design del 02-11-2026 (`converses-canals-pendents.zip`, resumit a «Disseny · Canals propis i Pendents» del `README.md`). La personalització de l'avatar tindrà el seu lliurament i la seva fase.
 
@@ -203,7 +203,7 @@ Fora de la llista, aprovat per Bernat: `cb7c231` treu les captures en català i 
 ### Handoff (04-11-2026)
 
 - **Emulador fet:** l'11e (amb Pro i sense) i l'11b (persona nova). Per tornar a gratuït amb Pro comprat al Test Store, es copien i s'esborren els `shared_prefs/*revenuecat*` de `com.alorma.contactnotes.dev` (nou usuari anònim) i després es restauren; l'emulador ha quedat amb Pro.
-- **Pendent:** que Bernat validi la fase; després, la release 1.8.0 a internal (vegeu el handoff anterior).
+- **Estat:** fase validada per Bernat el 04-11-2026. Següent: la release 1.8.0 a internal (vegeu el handoff anterior).
 
 ### Handoff (03-11-2026, segona sessió)
 
