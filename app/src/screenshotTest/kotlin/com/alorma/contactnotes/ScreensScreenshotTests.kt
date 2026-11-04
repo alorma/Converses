@@ -5,6 +5,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import com.alorma.contactnotes.shared.AvatarColor
+import com.alorma.contactnotes.ui.consent.ConsentSheetUnchosenPreview
+import com.alorma.contactnotes.ui.consent.ConsentSheetYesPreview
 import com.alorma.contactnotes.ui.edit.AvatarSheetAutoPreview
 import com.alorma.contactnotes.ui.edit.AvatarSheetCustomPreview
 import com.alorma.contactnotes.ui.edit.AvatarSheetDowngradePreview
@@ -244,6 +246,21 @@ class ScreensScreenshotTests {
   @Composable
   fun newEntrySheet() {
     NewEntrySheetPreview()
+  }
+
+  @ScreenPreviews
+  @LargeFontScreenPreviews
+  @PreviewTest
+  @Composable
+  fun consentSheetUnchosen() {
+    ConsentSheetUnchosenPreview()
+  }
+
+  @ScreenPreviews
+  @PreviewTest
+  @Composable
+  fun consentSheetYes() {
+    ConsentSheetYesPreview()
   }
 
   @ScreenPreviews

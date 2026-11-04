@@ -323,4 +323,17 @@
         <item quantity="one">%1$d pendent</item>
         <item quantity="other">%1$d pendents</item>
     </plurals>
+
+    <!-- Estadístiques d'ús: full de consentiment -->
+    <string name="consent_title">Ajuda a millorar Converses</string>
+    <string name="consent_body">Pots compartir estadístiques d\'ús anònimes. Ens ajuden a saber què funciona i què falla.</string>
+    <string name="consent_sent_label">S\'envia:</string>
+    <string name="consent_sent">informació de funcionament de l\'app, només per al desenvolupador.</string>
+    <string name="consent_never_label">No s\'envia mai:</string>
+    <string name="consent_never">informació personal ni res del que escrius.</string>
+    <string name="consent_yes">Sí, comparteix</string>
+    <string name="consent_yes_summary">Ho pots canviar a Ajustos › Privacitat</string>
+    <string name="consent_no">No, gràcies</string>
+    <string name="consent_no_summary">No s\'envia res</string>
+    <string name="consent_ok">D\'acord</string>
 </resources>

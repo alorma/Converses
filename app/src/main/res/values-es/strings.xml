@@ -325,4 +325,17 @@
         <item quantity="one">%1$d pendiente</item>
         <item quantity="other">%1$d pendientes</item>
     </plurals>
+
+    <!-- Estadístiques d'ús: full de consentiment -->
+    <string name="consent_title">Ayuda a mejorar Converses</string>
+    <string name="consent_body">Puedes compartir estadísticas de uso anónimas. Nos ayudan a saber qué funciona y qué falla.</string>
+    <string name="consent_sent_label">Se envía:</string>
+    <string name="consent_sent">información de funcionamiento de la app, solo para el desarrollador.</string>
+    <string name="consent_never_label">Nunca se envía:</string>
+    <string name="consent_never">información personal ni nada de lo que escribes.</string>
+    <string name="consent_yes">Sí, compartir</string>
+    <string name="consent_yes_summary">Puedes cambiarlo en Ajustes › Privacidad</string>
+    <string name="consent_no">No, gracias</string>
+    <string name="consent_no_summary">No se envía nada</string>
+    <string name="consent_ok">De acuerdo</string>
 </resources>

@@ -325,4 +325,17 @@
         <item quantity="one">%1$d follow-up</item>
         <item quantity="other">%1$d follow-ups</item>
     </plurals>
+
+    <!-- Estadístiques d'ús: full de consentiment -->
+    <string name="consent_title">Help improve Converses</string>
+    <string name="consent_body">You can share anonymous usage statistics. They help us learn what works and what breaks.</string>
+    <string name="consent_sent_label">Sent:</string>
+    <string name="consent_sent">information about how the app works, only for the developer.</string>
+    <string name="consent_never_label">Never sent:</string>
+    <string name="consent_never">personal information or anything you write.</string>
+    <string name="consent_yes">Yes, share</string>
+    <string name="consent_yes_summary">You can change it in Settings › Privacy</string>
+    <string name="consent_no">No, thanks</string>
+    <string name="consent_no_summary">Nothing is sent</string>
+    <string name="consent_ok">OK</string>
 </resources>
