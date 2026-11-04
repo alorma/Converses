@@ -128,6 +128,6 @@ Ordre decidit el 04-11-2026: tot el tracking es fa i es valida amb el `TimberTra
    - [x] Aquest pla — `9563eed`
    - [x] Cua de pendents a `EventTracker`, amb tests de JVM — `a69c732`
    - [x] `ConsentSheetContent` (`ui/consent`), textos, previews i captures — `f8b60ea`
-   - [ ] Mostrar el full a People, validat a l'emulador
+   - [x] Mostrar el full a People, validat a l'emulador — `07c75f2`
    - [ ] Ajustos › Privacitat, amb tests del ViewModel, captures i emulador
 8. Implementació Firebase amb la inicialització manual, i l'activació i desactivació en calent. Cal el `google-services.json`. Validació a l'emulador amb logcat (`adb shell setprop log.tag.FA VERBOSE`): sense consentiment, cap tràfic de Firebase.
