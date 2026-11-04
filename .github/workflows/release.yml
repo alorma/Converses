@@ -24,6 +24,13 @@ jobs:
   release:
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    # A nivell de job: publishReleaseBundle torna a compilar l'AAB en una altra invocació de Gradle, i si li falta
+    # alguna d'aquestes variables el compila diferent (la 1.8.0 i la 1.8.1 van arribar a Play sense la clau de RevenueCat)
+    env:
+      KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+      KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+      KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+      REVENUECAT_GOOGLE_API_KEY: ${{ secrets.REVENUECAT_GOOGLE_API_KEY }}
 
     steps:
       - uses: actions/checkout@v7
@@ -64,13 +71,16 @@ jobs:
           mkdir -p certs
           echo "$RELEASE_KEYSTORE_BASE64" | base64 -d > certs/release.keystore
 
+      # Sense clau, l'app no configura RevenueCat i ningú no pot comprar Pro
+      - name: Fail without the RevenueCat key
+        run: |
+          if [ -z "$REVENUECAT_GOOGLE_API_KEY" ]; then
+            echo "REVENUECAT_GOOGLE_API_KEY is empty" >&2
+            exit 1
+          fi
+
       - name: Build signed release APK and AAB
         run: ./gradlew :app:assembleRelease :app:bundleRelease
-        env:
-          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
-          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
-          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
-          REVENUECAT_GOOGLE_API_KEY: ${{ secrets.REVENUECAT_GOOGLE_API_KEY }}
 
       - name: Upload AAB and mapping
         # Una quota d'emmagatzematge plena no ha de bloquejar la publicació a Play (el mapping de R8 va dins l'AAB)
@@ -92,9 +102,6 @@ jobs:
           :app:publishReleaseBundle --track "${{ inputs.track }}" --release-name "${{ steps.version.outputs.version }}"
         env:
           ANDROID_PUBLISHER_CREDENTIALS: ${{ secrets.SERVICE_ACCOUNT_JSON }}
-          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
-          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
-          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
 
       - name: Create tag and GitHub release
         env:
@@ -127,6 +134,3 @@ jobs:
         run: ./gradlew :app:publishReleaseListing
         env:
           ANDROID_PUBLISHER_CREDENTIALS: ${{ secrets.SERVICE_ACCOUNT_JSON }}
-          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
-          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
-          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
