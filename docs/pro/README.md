@@ -25,10 +25,10 @@ Mai es cobra per **accedir, protegir o treure** les dades pròpies. Al Pro hi va
 
 | Funció | A la v1 gratuïta | Amb Pro |
 | --- | --- | --- |
-| **Avatar personalitzat** (color i forma) | Forma fixa **Galeta** (`Cookie9Sided`) i color automàtic a partir del nom; no es poden canviar | Selector de color i forma a Editar persona / Nova persona |
+| **Avatar personalitzat** (color i forma, `CustomAvatarFeature`) | Galeta (`Cookie9Sided`) i color automàtic a partir del nom. La píndola PRO a l'avatar de l'editor obre el full «Avatar», on les opcions Pro porten cadenat i es poden **provar** abans de comprar (11a–11c) | Selector de color i forma a Editar persona / Nova persona |
 | **Canals propis** (backlog 8, `CustomChannelsFeature`) | Només els 5 grups; el camp «On» mostra «Canal propi» amb PRO | Canals globals dins de qualsevol grup, amb nom (únic dins del grup) i sense valor; es trien a l'entrada i es gestionen a Ajustos › Canals propis |
 | **Pendents** (backlog 6, `FollowUpsFeature`) | «Nova tasca» al menú del detall mostra PRO | Tasques per persona (formulari propi), secció «Pendents» al detall, marcar com a fet i comptador al llistat |
-| **Color de la persona** (tema del detall, `PersonColorFeature`) | No hi és: les pantalles de la persona usen el tema de l'app i l'avatar només té el color automàtic pel nom | Activar el tema que pren el color de l'avatar (i l'ajust «Color de la persona» a Ajustos) |
+| **Color de la persona** (tema del detall, `PersonColorFeature`) | Les pantalles de la persona usen el tema de l'app. A Ajustos, la fila «Color de la persona» porta PRO i un `chevron_right` en lloc de l'interruptor, i obre el paywall (11e) | L'interruptor «Color de la persona» a Ajustos (apagat per defecte) activa el tema que pren el color de l'avatar |
 | ~~**Contact integration**~~ | Retirada el novembre de 2026 (canvien els permisos de Contactes): s'ha tret tot el codi (vincle, compte local, sync adapter, files a Contactes) i les columnes de Room (v4) | — |
 
 ## Fet a la v1 gratuïta
@@ -36,6 +36,7 @@ Mai es cobra per **accedir, protegir o treure** les dades pròpies. Al Pro hi va
 - **Feature flags** (`data/flags/`): `CustomAvatarFeature`, `PersonColorFeature`, `CustomChannelsFeature` i `FollowUpsFeature`, tots quatre Pro i **encesos per defecte** des del 3 de novembre de 2026: són funcions acabades i a release només depenen del Pro (`Locked` sense Pro, `Unlocked` amb Pro). El sistema de flags es manté per encendre i apagar funcions des del menú de debug; una funció nova o a mitges neix amb el flag apagat. Cada flag Pro és `Hidden`, `Locked` o `Unlocked` segons el flag i el `ProRepository` (`docs/pro/fases.md`, «Model»); al menú de debug, l'apartat Pro ensenya l'estat de RevenueCat (Test Store) i permet fer override, i «Turn on every Pro flag» obre tots els flags. A release, Pro surt de RevenueCat (fase 2).
 - **Avatar estàndard:** Galeta i color automàtic pel nom (`AvatarColor.forName`); `avatarShape` i `avatarColor` nul·lables (`null` = estàndard).
 - **Editor:** sense targeta d'avatar; l'avatar és a la fila del nom i, amb `CustomAvatarFeature`, obre el full «Avatar».
+- **Personalització sense Pro (fase 8):** píndola PRO a l'editor, full «Avatar» amb prova i baixada de Pro, i fila «Color de la persona» amb PRO a Ajustos. Resum a «Disseny · Personalització sense Pro».
 - **Canals propis (fase 6, darrere de `CustomChannelsFeature`):** targeta sota «On» (7a, 7c) amb el full «Nou canal» / «Edita el canal» (7b), nom del canal a la cronologia, al full d'accions i a l'exportació, i Ajustos › Canals propis (7d). La nota ràpida i la nova entrada prenen per defecte el canal de l'última entrada (només amb Pro).
 
 ## Pendent per al Pro
@@ -63,7 +64,7 @@ Lliurament de Claude Design del 26-10-2026 (pantalla de Pro i punts d'entrada). 
 - **Pantalla «Converses Pro» (8a):** pantalla completa amb tancar; capçalera (galeta de 64 dp en `primary` amb `workspace_premium`, «Converses Pro», «Un sol pagament. Per sempre.»), tres beneficis en llista agrupada (`palette` Persones a la teva manera, `forum` Canals propis, `flag` Pendents; el quart, `contacts` Vincle amb Contactes, es va treure amb la funció), nota amb `lock` i peu fix amb «Aconsegueix Pro · {preu}», «Restaura la compra» i «Termes · Privacitat».
 - **Des d'una funció (8b):** paràmetre d'origen (`ajustos`, `canals`, `pendents`, `avatar`); el benefici d'origen va primer amb una vora de 2 dp.
 - **Ja tens Pro (8c):** `check`, «Ja tens Pro», beneficis amb `check_circle` i «Som-hi», que torna on era l'usuari.
-- **Punts d'entrada:** mai s'obre sola. Targeta a dalt d'Ajustos, Ajustos › Canals, xip «Canal propi» al camp «On», fila «Pendent» de la nota ràpida i, quan es llanci, l'editor d'avatar.
+- **Punts d'entrada:** mai s'obre sola. Targeta a dalt d'Ajustos, Ajustos › Canals propis, Ajustos › Color de la persona, xip «Canal propi» al camp «On», «Nova tasca» al detall i «Desbloqueja amb Pro» del full «Avatar».
 - **Etiqueta PRO:** 20 dp d'alçada, radi 7, fons `primaryContainer`, text de 10,5 sp en pes 800.
 - **Estats de la compra:** pendent, error, cancel·lació (sense missatge), restaurar amb i sense compra, sense connexió (botó desactivat), reemborsament (es perd Pro, no s'esborren dades). Textos ca, en i es al tauler 8d.
 - **Sincronització:** per definir; no surt a la pantalla de Pro.
@@ -92,3 +93,13 @@ Lliurament de Claude Design del 02-11-2026 (`converses-canals-pendents.zip`: `pa
 - **Baixada de Pro:** les tasques es veuen i es marquen com a fetes; no se'n creen de noves (sense botó ni targeta buida).
 
 Textos ca, en i es al tauler 7g, més els del menú i el diàleg d'esborrar a `INSTRUCCIONS.md`.
+
+## Disseny · Personalització sense Pro
+
+Lliurament de Claude Design del 03-11-2026 (`converses-analitica-avatar.zip`, `INSTRUCCIONS.md` §2, taulers 11a–11f). Decisions completes a la fase 8 de `docs/pro/fases.md`. Resum:
+
+- **Editor (11a):** sense Pro, la píndola PRO (`ProPill`, al designsystem) substitueix el llapis de l'avatar i obre el full. Val per a persona nova i existent.
+- **Full «Avatar» (11b):** PRO al títol, targeta «Formes i colors amb Pro»; les formes Pro porten `lock` de 16 dp i els colors Pro un `lock` en un cercle de 18 dp. Galeta i Automàtic són lliures (`AvatarSheetLock`).
+- **Prova (11c):** tocar una opció Pro la previsualitza al full, sense obrir el paywall. «Fet» passa a «Desbloqueja amb Pro» (paywall `ProBenefit.People`) i «Descarta la prova». Tancar el full descarta; si compra, torna al full amb la prova aplicada i la pot desar. L'avatar de l'editor no canvia mentre es prova.
+- **Baixada de Pro (11d):** la tria desada surt triada i sense cadenat, amb la targeta «Triat amb Pro». Triar Galeta o Automàtic i desar-ho la fa perdre; no s'esborra res més.
+- **Color de la persona (11e):** sense Pro, PRO al títol i `chevron_right`; tota la fila obre el paywall. A la baixada, el tema de la persona s'apaga però la preferència queda desada.

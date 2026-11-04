@@ -195,10 +195,15 @@ El primer plantejament (estat `isPending` d'una entrada, amb la fila «Pendent»
 
 - [x] Editor: píndola PRO en lloc del llapis i contentDescription (11a); captures — `b9fc04c`
 - [x] Full «Avatar» sense Pro i en prova (11b, 11c) i baixada de Pro (11d): cadenats, targeta, prova, «Desbloqueja amb Pro», «Descarta la prova», tornada de la compra; tests de JVM de l'estat de prova, captures i emulador (gratuït, Pro, baixada) — `0f15bdf`
-- [x] Ajustos: fila «Color de la persona» amb PRO i `chevron_right` sense Pro (11e); captures — `130cc02` (falta l'emulador, vegeu el handoff)
-- [ ] ~~Textos de l'11f en en/ca/es~~ (fets dins de cada tasca); `docs/pro/` al dia
+- [x] Ajustos: fila «Color de la persona» amb PRO i `chevron_right` sense Pro (11e); captures i emulador (04-11-2026: amb Pro, interruptor; sense Pro, PRO i chevron, la fila obre el paywall amb «Persones a la teva manera» marcat, i el detall de Marta surt amb el tema de l'app) — `130cc02`
+- [x] ~~Textos de l'11f en en/ca/es~~ (fets dins de cada tasca); `docs/pro/README.md` al dia (taula Pro, punts d'entrada, «Disseny · Personalització sense Pro»); emulador del full 11b amb una persona nova sense Pro
 
 Fora de la llista, aprovat per Bernat: `cb7c231` treu les captures en català i castellà (`LocalizedScreenPreviews` → `LargeFontScreenPreviews`, només font 2×). Amb elles, `validateDebugScreenshotTest` es quedava sense memòria (Java heap space al procés de tests).
+
+### Handoff (04-11-2026)
+
+- **Emulador fet:** l'11e (amb Pro i sense) i l'11b (persona nova). Per tornar a gratuït amb Pro comprat al Test Store, es copien i s'esborren els `shared_prefs/*revenuecat*` de `com.alorma.contactnotes.dev` (nou usuari anònim) i després es restauren; l'emulador ha quedat amb Pro.
+- **Pendent:** que Bernat validi la fase; després, la release 1.8.0 a internal (vegeu el handoff anterior).
 
 ### Handoff (03-11-2026, segona sessió)
 
