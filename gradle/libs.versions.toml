@@ -36,6 +36,9 @@ baselineprofile = "1.5.0"
 profileinstaller = "1.4.1"
 revenuecat = "11.0.1"
 timber = "5.0.1"
+firebaseBom = "35.1.0"
+googleServices = "4.5.0"
+firebaseCrashlyticsPlugin = "3.0.8"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -79,6 +82,9 @@ androidx-profileinstaller = { group = "androidx.profileinstaller", name = "profi
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
 revenuecat-purchases = { group = "com.revenuecat.purchases", name = "purchases", version.ref = "revenuecat" }
 timber = { group = "com.jakewharton.timber", name = "timber", version.ref = "timber" }
+firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebaseBom" }
+firebase-analytics = { group = "com.google.firebase", name = "firebase-analytics" }
+firebase-crashlytics = { group = "com.google.firebase", name = "firebase-crashlytics" }
 compose-screenshot-validation = { group = "com.android.tools.screenshot", name = "screenshot-validation-api", version.ref = "composeScreenshot" }
 
 [plugins]
@@ -95,3 +101,5 @@ compose-screenshot = { id = "com.android.compose.screenshot", version.ref = "com
 version = { id = "io.github.alorma.version", version.ref = "versionPlugin" }
 play-publisher = { id = "com.github.triplet.play", version.ref = "playPublisher" }
 ktlint = { id = "org.jlleitschuh.gradle.ktlint", version.ref = "ktlint" }
+google-services = { id = "com.google.gms.google-services", version.ref = "googleServices" }
+firebase-crashlytics = { id = "com.google.firebase.crashlytics", version.ref = "firebaseCrashlyticsPlugin" }

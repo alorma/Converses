@@ -11,6 +11,8 @@ plugins {
   alias(libs.plugins.version)
   alias(libs.plugins.play.publisher)
   alias(libs.plugins.androidx.baselineprofile)
+  alias(libs.plugins.google.services)
+  alias(libs.plugins.firebase.crashlytics)
 }
 
 room {
@@ -154,6 +156,9 @@ dependencies {
   implementation(libs.kotlinx.serialization.json)
   implementation(libs.kotlinx.coroutines.android)
   implementation(libs.revenuecat.purchases)
+  implementation(platform(libs.firebase.bom))
+  implementation(libs.firebase.analytics)
+  implementation(libs.firebase.crashlytics)
   implementation(libs.androidx.lifecycle.runtime.compose)
   implementation(libs.androidx.lifecycle.viewmodel.compose)
   debugImplementation(libs.androidx.compose.ui.tooling)
