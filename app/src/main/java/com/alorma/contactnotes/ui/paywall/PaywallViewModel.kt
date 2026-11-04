@@ -117,6 +117,7 @@ class PaywallViewModel(
       }
       when (result) {
         RestoreResult.NothingToRestore -> messages.send(PaywallMessage.NothingToRestore)
+        RestoreResult.Pending -> messages.send(PaywallMessage.Pending)
         RestoreResult.Failed, RestoreResult.Offline -> messages.send(PaywallMessage.Failed)
         RestoreResult.Restored -> Unit
       }

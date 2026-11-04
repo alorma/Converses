@@ -33,6 +33,15 @@ class PurchaseResultTest {
   }
 
   @Test
+  fun operationInProgressIsPending() {
+    assertEquals(
+      PurchaseResult.Pending,
+      error(PurchasesErrorCode.OperationAlreadyInProgressError).toPurchaseResult(userCancelled = false),
+    )
+    assertEquals(RestoreResult.Pending, error(PurchasesErrorCode.OperationAlreadyInProgressError).toRestoreResult())
+  }
+
+  @Test
   fun networkErrorIsOffline() {
     assertEquals(PurchaseResult.Offline, error(PurchasesErrorCode.NetworkError).toPurchaseResult(userCancelled = false))
     assertEquals(RestoreResult.Offline, error(PurchasesErrorCode.NetworkError).toRestoreResult())

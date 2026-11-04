@@ -181,6 +181,7 @@ class PaywallViewModelTest {
       val expected =
         mapOf(
           RestoreResult.NothingToRestore to listOf(PaywallMessage.NothingToRestore),
+          RestoreResult.Pending to listOf(PaywallMessage.Pending),
           RestoreResult.Failed to listOf(PaywallMessage.Failed),
           RestoreResult.Offline to listOf(PaywallMessage.Failed),
         )
