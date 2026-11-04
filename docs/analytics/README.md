@@ -62,9 +62,9 @@ Ordre decidit el 04-11-2026: tot el tracking es fa i es valida amb el `TimberTra
    - Pantalles: `onboarding`, `people`, `archived`, `person`, `edit_person` (`mode` create/edit), `quick_note` (`with_person`, `source` app/share), `task` (`mode`), `paywall` (`highlight` benefici o `none`), `settings`, `custom_channels`.
    - `PersonLockedRoute` no es registra: diria que l'usuari té persones protegides. Després de desbloquejar compta com a `person`.
    - Els fulls i diàlegs dins d'una pantalla no són pantalles: van com a accions (fase 3).
-   - [x] Aquest pla
-   - [ ] `Screens.kt` i `toScreen()` amb tests de JVM
-   - [ ] `TrackScreen` a `AppNavigation`, validat a l'emulador
+   - [x] Aquest pla — `57e0926`
+   - [x] `Screens.kt` (`object Screens`) i `toScreen()` amb tests de JVM — `d9656c3`
+   - [x] `TrackScreen` a `AppNavigation`, validat a l'emulador — `12e0214`
 3. Accions de l'usuari (`trackAction`), incloent obrir fulls i diàlegs, revisades una a una perquè no portin cap dada.
 4. Esdeveniments (`trackEvent`): coses que passen sense que l'usuari les demani.
 5. Errors (`trackError`).
