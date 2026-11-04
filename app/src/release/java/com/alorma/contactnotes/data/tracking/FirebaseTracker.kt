@@ -1,7 +1,7 @@
 package com.alorma.contactnotes.data.tracking
 
 /**
- * Release: Firebase Analytics i Crashlytics. De moment no fa res; Firebase arriba a la fase 2 de
+ * Release: Firebase Analytics i Crashlytics. De moment no fa res; Firebase arriba a la fase 8 de
  * `docs/analytics/README.md`. És remot, així que [EventTracker] només el crida amb consentiment.
  */
 class FirebaseTracker : Tracker {

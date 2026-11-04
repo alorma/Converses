@@ -14,7 +14,7 @@ Com es treballa cada fase: `.claude/rules/phased-work.md`.
   - `trackError(Throwable, where)`: errors que no peten l'app; els trackers remots no envien el `message` de l'excepció.
   - `Screen`, `Event` i `Action` són abstractes i porten `eventName`, `eventVersion` i `eventProperties` (`Map<String, String>`). Cada esdeveniment concret és una subclasse que fa el seu mapping a partir dels seus paràmetres.
   - Cada `Tracker` diu si és remot (`isRemote`). `EventTracker` només crida els remots si `ConsentManager.hasConsent()`; els locals reben sempre.
-  - Debug: `TimberTracker` (logcat, etiqueta `Tracking`). Release: `FirebaseTracker`, buit fins a la fase 2. Cada *build type* té el seu `trackersModule`.
+  - Debug: `TimberTracker` (logcat, etiqueta `Tracking`). Release: `FirebaseTracker`, buit fins a la fase 8. Cada *build type* té el seu `trackersModule`.
 - Firebase és només una implementació més, i ni tan sols s'**inicialitza** si no hi ha consentiment:
   - Es treu la inicialització automàtica de Firebase (`FirebaseInitProvider` amb `tools:node="remove"` al manifest), i a més `firebase_analytics_collection_enabled` i `firebase_crashlytics_collection_enabled` queden a `false`.
   - `FirebaseApp.initializeApp` es crida només quan el consentiment és «Sí», a l'arrencada o en el moment d'activar-lo.
@@ -24,7 +24,7 @@ Com es treballa cada fase: `.claude/rules/phased-work.md`.
 - **Eina:** Firebase Analytics + Crashlytics (decidit el 03-11-2026). Abans d'afegir-les cal comprovar-ne la versió estable a la documentació oficial.
 - **Què s'envia:** noms d'esdeveniment de pantalles i funcions, errors, el model de mòbil, la versió d'Android i la de l'app.
 - **No s'envia mai:** text, noms de persones, ids, dades ni canals propis. Obrir una persona protegida compta igual que obrir-ne qualsevol altra.
-- **Sense flag** (04-11-2026): sense consentiment no surt res, i fins a la fase 2 el tracker de release és buit.
+- **Sense flag** (04-11-2026): sense consentiment no surt res, i fins a la fase 8 el tracker de release és buit.
 - El consentiment es desa al DataStore (`analyticsConsent`, `null` = no ha triat).
 
 ## Disseny
@@ -56,6 +56,18 @@ Com es treballa cada fase: `.claude/rules/phased-work.md`.
    - [x] Consentiment al DataStore i `ConsentManager` — `88685b3`
    - [x] `TrackScreen` — `c3d7499`
    - [x] Aquest README
-2. Implementació Firebase amb la inicialització manual, i l'activació i desactivació en calent. Cal el `google-services.json`. Validació a l'emulador amb logcat (`adb shell setprop log.tag.FA VERBOSE`): sense consentiment, cap tràfic de Firebase.
-3. Full d'una sola vegada (10a, 10b) després de l'onboarding, amb un FireAndForget, i Ajustos › Privacitat (1c), amb els textos en ca/en/es. Captures i emulador.
-4. Esdeveniments de pantalles i accions principals, revisats un a un perquè no portin cap dada. Actualitzar la documentació.
+Ordre decidit el 04-11-2026: tot el tracking es fa i es valida amb el `TimberTracker`; Firebase va al final.
+
+2. Pantalles. `route.toScreen()` (`ui/tracking/Screens.kt`) i un sol `TrackScreen` a `AppNavigation`, no a cada pantalla.
+   - Pantalles: `onboarding`, `people`, `archived`, `person`, `edit_person` (`mode` create/edit), `quick_note` (`with_person`, `source` app/share), `task` (`mode`), `paywall` (`highlight` benefici o `none`), `settings`, `custom_channels`.
+   - `PersonLockedRoute` no es registra: diria que l'usuari té persones protegides. Després de desbloquejar compta com a `person`.
+   - Els fulls i diàlegs dins d'una pantalla no són pantalles: van com a accions (fase 3).
+   - [x] Aquest pla
+   - [ ] `Screens.kt` i `toScreen()` amb tests de JVM
+   - [ ] `TrackScreen` a `AppNavigation`, validat a l'emulador
+3. Accions de l'usuari (`trackAction`), incloent obrir fulls i diàlegs, revisades una a una perquè no portin cap dada.
+4. Esdeveniments (`trackEvent`): coses que passen sense que l'usuari les demani.
+5. Errors (`trackError`).
+6. Configuració de l'`EventTracker`: propietats comunes a tots els esdeveniments, començant per `isPro`.
+7. Full d'una sola vegada (10a, 10b) després de l'onboarding, amb un FireAndForget, i Ajustos › Privacitat (1c), amb els textos en ca/en/es. Captures i emulador.
+8. Implementació Firebase amb la inicialització manual, i l'activació i desactivació en calent. Cal el `google-services.json`. Validació a l'emulador amb logcat (`adb shell setprop log.tag.FA VERBOSE`): sense consentiment, cap tràfic de Firebase.
