@@ -25,19 +25,20 @@ Mai es cobra per **accedir, protegir o treure** les dades pròpies. Al Pro hi va
 
 | Funció | A la v1 gratuïta | Amb Pro |
 | --- | --- | --- |
-| **Avatar personalitzat** (color i forma, `CustomAvatarFeature`) | Galeta (`Cookie9Sided`) i color automàtic a partir del nom. La píndola PRO a l'avatar de l'editor obre el full «Avatar», on les opcions Pro porten cadenat i es poden **provar** abans de comprar (11a–11c) | Selector de color i forma a Editar persona / Nova persona |
-| **Canals propis** (backlog 8, `CustomChannelsFeature`) | Només els 5 grups; el camp «On» mostra «Canal propi» amb PRO | Canals globals dins de qualsevol grup, amb nom (únic dins del grup) i sense valor; es trien a l'entrada i es gestionen a Ajustos › Canals propis |
-| **Pendents** (backlog 6, `FollowUpsFeature`) | «Nova tasca» al menú del detall mostra PRO | Tasques per persona (formulari propi), secció «Pendents» al detall, marcar com a fet i comptador al llistat |
-| **Color de la persona** (tema del detall, `PersonColorFeature`) | Les pantalles de la persona usen el tema de l'app. A Ajustos, la fila «Color de la persona» porta PRO i un `chevron_right` en lloc de l'interruptor, i obre el paywall (11e) | L'interruptor «Color de la persona» a Ajustos (apagat per defecte) activa el tema que pren el color de l'avatar |
+| **Avatar personalitzat** (color i forma) | Galeta (`Cookie9Sided`) i color automàtic a partir del nom. La píndola PRO a l'avatar de l'editor obre el full «Avatar», on les opcions Pro porten cadenat i es poden **provar** abans de comprar (11a–11c) | Selector de color i forma a Editar persona / Nova persona |
+| **Canals propis** (backlog 8) | Només els 5 grups; el camp «On» mostra «Canal propi» amb PRO | Canals globals dins de qualsevol grup, amb nom (únic dins del grup) i sense valor; es trien a l'entrada i es gestionen a Ajustos › Canals propis |
+| **Pendents** (backlog 6) | «Nova tasca» al menú del detall mostra PRO | Tasques per persona (formulari propi), secció «Pendents» al detall, marcar com a fet i comptador al llistat |
+| **Color de la persona** (tema del detall) | Les pantalles de la persona usen el tema de l'app. A Ajustos, la fila «Color de la persona» porta PRO i un `chevron_right` en lloc de l'interruptor, i obre el paywall (11e) | L'interruptor «Color de la persona» a Ajustos (apagat per defecte) activa el tema que pren el color de l'avatar |
 | ~~**Contact integration**~~ | Retirada el novembre de 2026 (canvien els permisos de Contactes): s'ha tret tot el codi (vincle, compte local, sync adapter, files a Contactes) i les columnes de Room (v4) | — |
 
 ## Fet a la v1 gratuïta
 
-- **Feature flags** (`data/flags/`): `CustomAvatarFeature`, `PersonColorFeature`, `CustomChannelsFeature` i `FollowUpsFeature`, tots quatre Pro i **encesos per defecte** des del 3 de novembre de 2026: són funcions acabades i a release només depenen del Pro (`Locked` sense Pro, `Unlocked` amb Pro). El sistema de flags es manté per encendre i apagar funcions des del menú de debug; una funció nova o a mitges neix amb el flag apagat. Cada flag Pro és `Hidden`, `Locked` o `Unlocked` segons el flag i el `ProRepository` (`docs/pro/fases.md`, «Model»); al menú de debug, l'apartat Pro ensenya l'estat de RevenueCat (Test Store) i permet fer override, i «Turn on every Pro flag» obre tots els flags. A release, Pro surt de RevenueCat (fase 2).
+- **Les funcions Pro només depenen del Pro:** la UI llegeix `ProRepository.isPro` (`rememberIsPro()`); sense Pro surten amb PRO i porten al paywall, amb Pro funcionen. Els quatre flags Pro (`custom_avatar`, `person_color`, `custom_channels`, `follow_ups`) es van treure el 4 de novembre de 2026, perquè eren funcions acabades i encesos per defecte.
+- **Feature flags** (`data/flags/`): la infraestructura es manté, buida, per a funcions noves o a mitges (neixen amb el flag apagat i s'encenen des del menú de debug). Un flag Pro és `Hidden`, `Locked` o `Unlocked` segons el flag i el `ProRepository` (`docs/pro/fases.md`, «Model»). Al menú de debug, l'apartat Pro ensenya l'estat de RevenueCat (Test Store) i permet fer override. A release, Pro surt de RevenueCat (fase 2).
 - **Avatar estàndard:** Galeta i color automàtic pel nom (`AvatarColor.forName`); `avatarShape` i `avatarColor` nul·lables (`null` = estàndard).
-- **Editor:** sense targeta d'avatar; l'avatar és a la fila del nom i, amb `CustomAvatarFeature`, obre el full «Avatar».
+- **Editor:** sense targeta d'avatar; l'avatar és a la fila del nom i obre el full «Avatar» (amb PRO si no és Pro).
 - **Personalització sense Pro (fase 8):** píndola PRO a l'editor, full «Avatar» amb prova i baixada de Pro, i fila «Color de la persona» amb PRO a Ajustos. Resum a «Disseny · Personalització sense Pro».
-- **Canals propis (fase 6, darrere de `CustomChannelsFeature`):** targeta sota «On» (7a, 7c) amb el full «Nou canal» / «Edita el canal» (7b), nom del canal a la cronologia, al full d'accions i a l'exportació, i Ajustos › Canals propis (7d). La nota ràpida i la nova entrada prenen per defecte el canal de l'última entrada (només amb Pro).
+- **Canals propis (fase 6):** targeta sota «On» (7a, 7c) amb el full «Nou canal» / «Edita el canal» (7b), nom del canal a la cronologia, al full d'accions i a l'exportació, i Ajustos › Canals propis (7d). La nota ràpida i la nova entrada prenen per defecte el canal de l'última entrada (només amb Pro).
 
 ## Pendent per al Pro
 
@@ -53,9 +54,9 @@ Mai es cobra per **accedir, protegir o treure** les dades pròpies. Al Pro hi va
 
 ## Proves
 
-- [ ] Amb totes les funcions apagades: no hi ha selector d'avatar, tots els avatars són Galeta, i el mateix nom dona sempre el mateix color.
+- [ ] Sense Pro: els avatars nous són Galeta amb el color automàtic, i el mateix nom dona sempre el mateix color.
 - [x] Els 7 colors surten repartits amb noms diferents (`AvatarColorTest`, 20 noms).
-- [x] Amb `CustomAvatarFeature` activada (debug): el selector torna a sortir i desa els valors.
+- [x] Amb Pro: el selector surt i desa els valors.
 
 ## Disseny
 

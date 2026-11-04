@@ -81,6 +81,7 @@ Al menú de debug, l'apartat **Pro** té un sol interruptor, «Pro user», que e
 ### Decisions (26-10-2026)
 
 - **Visible a la release:** la targeta d'Ajustos i el paywall no van darrere de cap flag. Quan es prepari la release que obri Pro, es trauran els flags Pro i només quedarà la comprovació del Pro; fins aleshores no es publica cap release amb el paywall.
+  - **Fet (04-11-2026):** els quatre flags Pro (encesos per defecte des de `0a7c1a9`) s'han tret i la UI només mira el Pro (`rememberIsPro()`), a `d4f9d97` i `b6bc6b3`. La infraestructura de flags es manté buida per a funcions futures.
 - **Els quatre beneficis**, com el disseny, encara que Canals propis i Pendents no existeixin.
 - **Peu sense «Termes»:** només «Privacitat» (la política actual). «Termes» s'afegeix a la fase 4, quan hi hagi la pàgina.
 - **Origen:** `PaywallRoute(highlight: ProBenefit?)`; `People` cobreix `avatar` i «Color de la persona», `null` és la targeta d'Ajustos. `Channels` i `FollowUps` esperen les seves funcions.
