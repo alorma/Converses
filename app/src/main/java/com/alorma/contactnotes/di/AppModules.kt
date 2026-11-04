@@ -66,7 +66,7 @@ val settingsModule =
   module {
     single<SettingsRepository> { DataStoreSettingsRepository(androidContext()) }
     single { OnboardingFlag(DataStoreFireAndForgetRunner(get())) }
-    single { AppLockManager(get()) }
+    single { AppLockManager(get(), get()) }
     single { SecureWindow() }
     single { FeatureFlagStore(androidContext()) }
     single {

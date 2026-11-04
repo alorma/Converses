@@ -104,7 +104,7 @@ class MainActivity : FragmentActivity() {
                   onUnlocked = appLock::unlock,
                   onDeviceUnprotected = {
                     lifecycleScope.launch { settingsRepository.setAppLock(false) }
-                    appLock.unlock()
+                    appLock.onDeviceUnprotected()
                   },
                 )
               }
