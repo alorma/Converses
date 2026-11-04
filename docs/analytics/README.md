@@ -117,7 +117,7 @@ Ordre decidit el 04-11-2026: tot el tracking es fa i es valida amb el `TimberTra
    - Catàleg: `is_pro` (`true`/`false`). El posa `ProTrackingProperty`, engegada a `ConversesApp`, a partir de `ProRepository.isPro`; així `EventTracker` no depèn de `ProRepository`.
    - Els errors de `StartupErrors` poden sortir abans que hi hagi `is_pro`.
    - [x] Aquest pla — `5665ff7`
-   - [ ] Propietats comunes a `EventTracker`
+   - [x] Propietats comunes a `EventTracker` — `e518612`
    - [ ] `is_pro` (`ProTrackingProperty`), validat a l'emulador
 7. Full d'una sola vegada (10a, 10b) després de l'onboarding, amb un FireAndForget, i Ajustos › Privacitat (1c), amb els textos en ca/en/es. Captures i emulador.
 8. Implementació Firebase amb la inicialització manual, i l'activació i desactivació en calent. Cal el `google-services.json`. Validació a l'emulador amb logcat (`adb shell setprop log.tag.FA VERBOSE`): sense consentiment, cap tràfic de Firebase.

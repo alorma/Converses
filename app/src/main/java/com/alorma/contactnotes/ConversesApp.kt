@@ -7,6 +7,7 @@ import androidx.lifecycle.ProcessLifecycleOwner
 import com.alorma.contactnotes.data.pro.ProDataSource
 import com.alorma.contactnotes.data.settings.AppLockManager
 import com.alorma.contactnotes.data.tracking.EventTracker
+import com.alorma.contactnotes.data.tracking.ProTrackingProperty
 import com.alorma.contactnotes.data.tracking.StartupErrors
 import com.alorma.contactnotes.di.appModules
 import org.koin.android.ext.android.get
@@ -21,6 +22,8 @@ class ConversesApp : Application() {
       androidContext(this@ConversesApp)
       modules(appModules)
     }
+    // Abans de buidar StartupErrors, perquè els errors de l'arrencada també portin is_pro
+    get<ProTrackingProperty>().start()
     StartupErrors.attach(get<EventTracker>())
     val pro: ProDataSource by inject()
     pro.start()
