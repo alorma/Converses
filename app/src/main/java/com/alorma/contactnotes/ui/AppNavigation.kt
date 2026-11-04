@@ -18,6 +18,7 @@ import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
 import androidx.compose.ui.unit.IntOffset
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
@@ -54,6 +55,8 @@ import com.alorma.contactnotes.ui.person.PersonLockedScreen
 import com.alorma.contactnotes.ui.settings.CustomChannelsScreen
 import com.alorma.contactnotes.ui.settings.SettingsScreen
 import com.alorma.contactnotes.ui.task.TaskFormScreen
+import com.alorma.contactnotes.ui.tracking.TrackScreen
+import com.alorma.contactnotes.ui.tracking.toScreen
 import org.koin.compose.koinInject
 
 @Composable
@@ -70,6 +73,10 @@ fun AppNavigation(
   val navigation = remember(backStack) { TopLevelBackStack(backStack) }
   val activity = LocalActivity.current
   val selectionBridge: PersonSelectionBridge = koinInject()
+
+  // Un sol lloc per a totes les pantalles: cada canvi de ruta (també tornant enrere) envia la seva
+  val current = navigation.current
+  key(current) { (current as? AppRoute)?.toScreen()?.let { TrackScreen(it) } }
 
   AppShell(
     currentTab = navigation.currentTab,
