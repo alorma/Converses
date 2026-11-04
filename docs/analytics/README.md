@@ -14,7 +14,7 @@ Com es treballa cada fase: `.claude/rules/phased-work.md`.
   - `trackError(Throwable, where)`: errors que no peten l'app; els trackers remots no envien el `message` de l'excepció.
   - `Screen`, `Event` i `Action` són abstractes i porten `eventName`, `eventVersion` i `eventProperties` (`Map<String, String>`). Cada esdeveniment concret és una subclasse que fa el seu mapping a partir dels seus paràmetres.
   - Cada `Tracker` diu si és remot (`isRemote`). `EventTracker` només crida els remots si `ConsentManager.hasConsent()`; els locals reben sempre.
-  - Debug: `TimberTracker` (logcat, etiqueta `Tracking`). Release: `FirebaseTracker`, buit fins a la fase 8. Cada *build type* té el seu `trackersModule`.
+  - Debug: `TimberTracker` (logcat, etiqueta `Tracking`). Release: `FirebaseTracker`. Des de la fase 8, debug també té el `FirebaseTracker` (app `.dev`). Cada *build type* té el seu `trackersModule`.
 - Firebase és només una implementació més, i ni tan sols s'**inicialitza** si no hi ha consentiment:
   - Es treu la inicialització automàtica de Firebase (`FirebaseInitProvider` amb `tools:node="remove"` al manifest), i a més `firebase_analytics_collection_enabled` i `firebase_crashlytics_collection_enabled` queden a `false`.
   - `FirebaseApp.initializeApp` es crida només quan el consentiment és «Sí», a l'arrencada o en el moment d'activar-lo.
@@ -45,7 +45,7 @@ Com es treballa cada fase: `.claude/rules/phased-work.md`.
 
 ## Pendent abans de publicar
 
-- **Projecte de Firebase:** apps `com.alorma.contactnotes` i `com.alorma.contactnotes.dev`, el `google-services.json` (fora del repo, com a Caducity) i el secret `GOOGLE_SERVICES_JSON_BASE64` als workflows que compilen.
+- **Projecte de Firebase:** creat (`converses-72251`, fase 8), amb el secret `GOOGLE_SERVICES_JSON_BASE64` a GitHub.
 - La política de privacitat (`converses.app/privacy`, repo ConversesLanding) i el formulari de seguretat de dades de Play.
 
 ## Fases
@@ -131,4 +131,15 @@ Ordre decidit el 04-11-2026: tot el tracking es fa i es valida amb el `TimberTra
    - [x] `ConsentSheetContent` (`ui/consent`), textos, previews i captures — `f8b60ea`
    - [x] Mostrar el full a People, validat a l'emulador — `07c75f2`
    - [x] Ajustos › Privacitat, amb tests del ViewModel, captures i emulador — `e10ef5e`
-8. Implementació Firebase amb la inicialització manual, i l'activació i desactivació en calent. Cal el `google-services.json`. Validació a l'emulador amb logcat (`adb shell setprop log.tag.FA VERBOSE`): sense consentiment, cap tràfic de Firebase.
+8. Implementació Firebase amb la inicialització manual, i l'activació i desactivació en calent. Validació a l'emulador amb logcat (`adb shell setprop log.tag.FA VERBOSE`): sense consentiment, cap tràfic de Firebase.
+   - Projecte de Firebase `converses-72251`, amb les apps `com.alorma.contactnotes` i `com.alorma.contactnotes.dev`. El `google-services.json` és fora del repo (`.gitignore`); a la CI es crea del secret `GOOGLE_SERVICES_JSON_BASE64`.
+   - Firebase també a debug (decidit el 04-11-2026): el `trackersModule` de debug té el `TimberTracker` i el `FirebaseTracker`, que envia a l'app `.dev` (es veu a DebugView). El consentiment el protegeix igual que a release.
+   - Crashes fatals (decidit el 04-11-2026): Crashlytics els envia tal qual, amb el missatge de l'excepció. Només els errors controlats (`trackError`) en treuen el `message`.
+   - `FirebaseController` escolta el consentiment: amb «Sí» inicialitza Firebase i activa la recollida; amb «No», si ja estava inicialitzat, l'apaga i descarta els pendents. El `FirebaseTracker` s'assegura que Firebase estigui inicialitzat abans d'enviar res, perquè la cua de pendents pot buidar-se abans que el controller reaccioni.
+   - `FirebaseTracker`: pantalles com a `screen_view` (`screen_name` i les propietats), esdeveniments i accions com a `logEvent` amb les propietats i `event_version`, errors amb `recordException` d'una còpia sense `message` (mateixa classe i *stack trace*) i *custom keys* (`where` i les comunes).
+   - [ ] Aquest pla
+   - [ ] Gradle i manifest: BoM, Analytics, Crashlytics, plugins i inicialització automàtica treta
+   - [ ] `FirebaseController`, amb tests de JVM
+   - [ ] `FirebaseTracker`, amb tests de JVM
+   - [ ] CI: `google-services.json` a partir del secret
+   - [ ] Validació a l'emulador amb logcat
