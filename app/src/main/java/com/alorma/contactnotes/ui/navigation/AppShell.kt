@@ -13,7 +13,9 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Archive
 import androidx.compose.material.icons.outlined.Groups
@@ -28,8 +30,10 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.compositionLocalOf
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.alorma.contactnotes.R
 import com.alorma.contactnotes.designsystem.components.ConversesFloatingToolbar
@@ -71,46 +75,52 @@ fun AppShell(
   modifier: Modifier = Modifier,
   /** Settings (or a screen inside it) is open: the rail marks it instead of [currentTab]. */
   settingsSelected: Boolean = false,
+  /**
+   * Open foldable: width of the list pane (up to the hinge). The toolbar and its FAB stay inside it, at the bottom,
+   * instead of spanning the window across the hinge. `null` everywhere else.
+   */
+  floatingBarWidth: Dp? = null,
   content: @Composable () -> Unit,
 ) {
+  val floatingBar: @Composable () -> Unit = {
+    AnimatedVisibility(
+      visible = navigation == ShellNavigation.FloatingBar,
+      enter = slideInVertically { it } + fadeIn(),
+      exit = slideOutVertically { it } + fadeOut(),
+    ) {
+      ConversesFloatingToolbar(
+        fabIcon = Icons.Rounded.EditNote,
+        fabContentDescription = stringResource(R.string.quick_note),
+        onFabClick = onQuickNote,
+        modifier = Modifier.padding(horizontal = ScreenMargin),
+      ) {
+        ToolbarDestination(
+          icon = Icons.Rounded.Groups,
+          contentDescription = stringResource(R.string.people_title),
+          selected = currentTab == PeopleRoute,
+          onClick = { onTabSelected(PeopleRoute) },
+        )
+        ToolbarDestination(
+          icon = Icons.Rounded.Archive,
+          contentDescription = stringResource(R.string.filter_archived),
+          selected = currentTab == ArchivedRoute,
+          onClick = { onTabSelected(ArchivedRoute) },
+        )
+        ToolbarDestination(
+          icon = Icons.Rounded.Settings,
+          contentDescription = stringResource(R.string.settings_title),
+          selected = false,
+          onClick = onOpenSettings,
+        )
+      }
+    }
+  }
   Scaffold(
     modifier = modifier,
     containerColor = MaterialTheme.colorScheme.surface,
     contentWindowInsets = WindowInsets.navigationBars,
     floatingActionButtonPosition = FabPosition.Center,
-    floatingActionButton = {
-      AnimatedVisibility(
-        visible = navigation == ShellNavigation.FloatingBar,
-        enter = slideInVertically { it } + fadeIn(),
-        exit = slideOutVertically { it } + fadeOut(),
-      ) {
-        ConversesFloatingToolbar(
-          fabIcon = Icons.Rounded.EditNote,
-          fabContentDescription = stringResource(R.string.quick_note),
-          onFabClick = onQuickNote,
-          modifier = Modifier.padding(horizontal = ScreenMargin),
-        ) {
-          ToolbarDestination(
-            icon = Icons.Rounded.Groups,
-            contentDescription = stringResource(R.string.people_title),
-            selected = currentTab == PeopleRoute,
-            onClick = { onTabSelected(PeopleRoute) },
-          )
-          ToolbarDestination(
-            icon = Icons.Rounded.Archive,
-            contentDescription = stringResource(R.string.filter_archived),
-            selected = currentTab == ArchivedRoute,
-            onClick = { onTabSelected(ArchivedRoute) },
-          )
-          ToolbarDestination(
-            icon = Icons.Rounded.Settings,
-            contentDescription = stringResource(R.string.settings_title),
-            selected = false,
-            onClick = onOpenSettings,
-          )
-        }
-      }
-    },
+    floatingActionButton = { if (floatingBarWidth == null) floatingBar() },
   ) {
     // The scaffold padding is ignored on purpose: the toolbar overlays the content.
     Row(modifier = Modifier.fillMaxSize()) {
@@ -151,6 +161,18 @@ fun AppShell(
         val barPadding = if (navigation == ShellNavigation.Rail) PaddingValues() else FloatingBarContentPadding
         CompositionLocalProvider(LocalFloatingBarPadding provides barPadding) {
           content()
+        }
+        if (floatingBarWidth != null) {
+          Box(
+            modifier =
+              Modifier
+                .align(Alignment.BottomStart)
+                .width(floatingBarWidth)
+                .navigationBarsPadding()
+                .padding(bottom = ScreenMargin),
+          ) {
+            floatingBar()
+          }
         }
       }
     }

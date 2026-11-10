@@ -56,6 +56,20 @@ class ScreenWidthTest {
   }
 
   @Test
+  fun `an open foldable shows the floating bar while the list is visible, never the rail`() {
+    fun book(vararg stack: NavKey) = shellNavigationFor(stack.toList(), ScreenWidth.Expanded, book = true)
+
+    assertEquals(ShellNavigation.FloatingBar, book(PeopleRoute))
+    assertEquals(ShellNavigation.FloatingBar, book(PeopleRoute, ArchivedRoute))
+    assertEquals(ShellNavigation.FloatingBar, book(PeopleRoute, PersonRoute(1)))
+    assertEquals(ShellNavigation.FloatingBar, book(PeopleRoute, PersonLockedRoute(1)))
+    assertEquals(ShellNavigation.FloatingBar, book(PeopleRoute, PersonRoute(1), QuickNoteRoute(1)))
+    assertEquals(ShellNavigation.None, book(PeopleRoute, SettingsRoute))
+    assertEquals(ShellNavigation.None, book(OnboardingRoute))
+    assertEquals(ShellNavigation.None, book(QuickNoteRoute(sharedText = "hi")))
+  }
+
+  @Test
   fun `a large screen hides the rail on onboarding and on an import`() {
     for (width in large) {
       assertEquals(ShellNavigation.None, shell(width, OnboardingRoute))

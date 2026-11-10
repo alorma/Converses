@@ -27,6 +27,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -103,19 +104,28 @@ fun AppNavigation(
   // A partir de 600 dp, llistat i detall de costat. La directiva és l'única que ho decideix (també separa els panells
   // per la frontissa d'un plegable), i `twoPane` en surt perquè les pantalles i l'escena no es puguin contradir
   val windowInfo = currentWindowAdaptiveInfoV2()
+  val density = LocalDensity.current
+  // Plegable obert: la frontissa vertical, encara que sigui plana i no separi res (Pixel Fold). El llistat ocupa fins
+  // a la frontissa i el detall, la resta; a cada costat queden `HingeMargin` sense res interactiu
+  val hingeLeft =
+    windowInfo.windowPosture.hingeList
+      .firstOrNull { it.isVertical }
+      ?.let { with(density) { it.bounds.left.toDp() } }
   val paneDirective =
-    remember(windowInfo) {
-      val listWidth =
-        if (screenWidthOf(windowInfo.windowSizeClass.minWidthDp) ==
-          ScreenWidth.Expanded
-        ) {
-          380.dp
-        } else {
-          300.dp
-        }
-      calculatePaneScaffoldDirectiveWithTwoPanesOnMediumWidth(windowInfo).copy(defaultPanePreferredWidth = listWidth)
+    remember(windowInfo, hingeLeft) {
+      val base = calculatePaneScaffoldDirectiveWithTwoPanesOnMediumWidth(windowInfo)
+      if (hingeLeft != null) {
+        base.copy(
+          horizontalPartitionSpacerSize = HingeMargin * 2,
+          defaultPanePreferredWidth = hingeLeft - HingeMargin,
+        )
+      } else {
+        val expanded = screenWidthOf(windowInfo.windowSizeClass.minWidthDp) == ScreenWidth.Expanded
+        base.copy(defaultPanePreferredWidth = if (expanded) 380.dp else 300.dp)
+      }
     }
   val twoPane = paneDirective.maxHorizontalPartitions > 1
+  val book = twoPane && hingeLeft != null
   // PopLatest: enrere treu sempre una sola ruta, com `TopLevelBackStack.pop`. Amb el valor per defecte, tancar la
   // persona amb dos panells no compta com un canvi i enrere tancaria l'app amb la persona encara oberta
   val listDetailStrategy =
@@ -145,7 +155,8 @@ fun AppNavigation(
 
   AppShell(
     currentTab = navigation.currentTab,
-    navigation = shellNavigationFor(navigation.backStack, currentScreenWidth()),
+    navigation = shellNavigationFor(navigation.backStack, currentScreenWidth(), book = book),
+    floatingBarWidth = if (book) hingeLeft?.minus(HingeMargin) else null,
     onTabSelected = navigation::switchTab,
     onQuickNote = {
       // Amb una persona oberta al costat, la nota ràpida ja ve amb ella triada (una protegida torna a demanar empremta)
@@ -285,6 +296,9 @@ fun AppNavigation(
     )
   }
 }
+
+/** Espai sense res interactiu a cada costat de la frontissa d'un plegable obert. */
+private val HingeMargin = 24.dp
 
 private fun personRoute(person: PersonEntity): AppRoute =
   if (person.isProtected) PersonLockedRoute(person.id) else PersonRoute(person.id)

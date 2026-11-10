@@ -34,6 +34,7 @@ import com.alorma.contactnotes.ui.entry.WhenSheetCustomPreview
 import com.alorma.contactnotes.ui.entry.WhenSheetNowPreview
 import com.alorma.contactnotes.ui.lock.AppLockPreview
 import com.alorma.contactnotes.ui.navigation.AppShellArchivedPreview
+import com.alorma.contactnotes.ui.navigation.AppShellBookPreview
 import com.alorma.contactnotes.ui.navigation.AppShellPeoplePreview
 import com.alorma.contactnotes.ui.navigation.AppShellRailPeoplePreview
 import com.alorma.contactnotes.ui.navigation.AppShellRailSettingsPreview
@@ -140,6 +141,16 @@ annotation class TabletLandscapePreviews
 )
 annotation class DetailPanePreviews
 
+/** Plegable obert (la pantalla interior d'un Pixel 9 Pro Fold), a 160 dpi. */
+@Preview(name = "Light", locale = "en", device = "spec:width=852dp,height=883dp,dpi=160")
+@Preview(
+  name = "Dark",
+  locale = "en",
+  device = "spec:width=852dp,height=883dp,dpi=160",
+  uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_NORMAL,
+)
+annotation class FoldablePreviews
+
 class ScreensScreenshotTests {
   @ScreenPreviews
   @PreviewTest
@@ -160,6 +171,13 @@ class ScreensScreenshotTests {
   @Composable
   fun appShellTwoPaneEmpty() {
     AppShellTwoPaneEmptyPreview()
+  }
+
+  @FoldablePreviews
+  @PreviewTest
+  @Composable
+  fun appShellBook() {
+    AppShellBookPreview()
   }
 
   @DetailPanePreviews

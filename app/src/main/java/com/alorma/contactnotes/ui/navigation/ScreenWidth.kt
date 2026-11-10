@@ -56,10 +56,19 @@ fun NavKey.isFormRoute(): Boolean =
 fun shellNavigationFor(
   backStack: List<NavKey>,
   width: ScreenWidth,
+  /**
+   * Plegable obert amb el llistat i el detall partits per la frontissa: no hi ha rail. La barra flotant va dins del
+   * panell del llistat i es veu mentre es veu el llistat, també amb una persona oberta o un diàleg a sobre.
+   */
+  book: Boolean = false,
 ): ShellNavigation {
   if (width == ScreenWidth.Compact) {
     return if (backStack.lastOrNull() is TopLevelRoute) ShellNavigation.FloatingBar else ShellNavigation.None
   }
   val screen = backStack.lastOrNull { !it.isFormRoute() }
+  if (book) {
+    val listVisible = screen is TopLevelRoute || screen is PersonRoute || screen is PersonLockedRoute
+    return if (listVisible) ShellNavigation.FloatingBar else ShellNavigation.None
+  }
   return if (screen == null || screen is OnboardingRoute) ShellNavigation.None else ShellNavigation.Rail
 }

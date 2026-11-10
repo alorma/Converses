@@ -83,6 +83,28 @@ internal fun AppShellTwoPaneEmptyPreview() {
   }
 }
 
+/** Plegable obert (12d): sense rail, el llistat fins a la frontissa i la barra flotant dins del llistat. */
+@Preview(widthDp = 852, heightDp = 883)
+@Composable
+internal fun AppShellBookPreview() {
+  ConversesPreviewTheme {
+    AppShell(
+      currentTab = PeopleRoute,
+      navigation = ShellNavigation.FloatingBar,
+      onTabSelected = {},
+      onQuickNote = {},
+      onOpenSettings = {},
+      floatingBarWidth = 402.dp,
+    ) {
+      Row {
+        Box(modifier = Modifier.width(402.dp)) { PeopleListScreenPanePreview() }
+        Spacer(Modifier.width(48.dp))
+        EmptyDetailPane()
+      }
+    }
+  }
+}
+
 /** Tauleta horitzontal a Ajustos: el rail el marca i el contingut queda en una columna centrada. */
 @Preview(widthDp = 1280, heightDp = 800)
 @Composable

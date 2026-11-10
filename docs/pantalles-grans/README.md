@@ -90,7 +90,7 @@ d'en Bernat.
 - [x] **4. Diàlegs.** A partir de 600 dp, Nova/Editar persona, Nota ràpida (12b), Nova tasca i Pro són diàlegs de
   560 dp (radi 28, scrim, Esc tanca). La Nota ràpida ve amb la persona oberta ja triada. El text escrit sobreviu a
   girar i redimensionar.
-- [ ] **5. Plegable** (12d). Amb un `FoldingFeature` vertical que separa, la divisió s'alinea amb la frontissa: llistat
+- [x] **5. Plegable** (12d). Amb un `FoldingFeature` vertical que separa, la divisió s'alinea amb la frontissa: llistat
   a l'esquerra, detall a la dreta, sense rail, barra flotant i FAB dins del llistat, res interactiu a menys de 24 dp
   de la frontissa. Plegar i desplegar conserva persona, scroll i text. Sense `FoldingFeature`, disposició de tauleta
   vertical.
@@ -101,6 +101,22 @@ d'en Bernat.
   navegació haurà canviat). Condensar aquest document.
 
 ## Notes entre sessions
+
+**Després del pas 5**
+
+- «Llibre» (`book` a `AppNavigation`): hi ha dos panells i la finestra té una frontissa vertical
+  (`windowPosture.hingeList`), encara que sigui plana i no separi res, com al Pixel 9 Pro Fold (amplada 0). Per
+  amplada (852 dp) seria una tauleta horitzontal; la frontissa és el que la fa plegable.
+- En llibre el llistat fa fins a la frontissa menys 24 dp i l'espai entre panells és de 48 dp (24 dp sense res
+  interactiu a cada costat). No hi ha rail: `shellNavigationFor(..., book = true)` torna la barra flotant mentre es
+  veu el llistat, també amb una persona oberta o un diàleg a sobre.
+- La barra flotant continua vivint només a `AppShell`: amb `floatingBarWidth` la dibuixa a baix a l'esquerra amb
+  l'amplada del llistat, en lloc del FAB slot centrat a tota la finestra.
+- Ajustos en llibre és a pantalla completa amb fletxa enrere, com al mòbil.
+- Provat a l'emulador `37_Pixel_Fold` (creat en aquesta sessió): obert, mig obert (`adb emu sensor set hinge-angle0
+  100`), i plegar i desplegar (`adb emu fold` / `unfold`) amb la nota ràpida oberta sense perdre la persona ni el
+  text. Té dues pantalles: `screencap` necessita `-d <id>` (`dumpsys SurfaceFlinger --display-id`).
+- Els diàlegs de formulari surten centrats a la finestra i travessen la frontissa.
 
 **Després del pas 4**
 
