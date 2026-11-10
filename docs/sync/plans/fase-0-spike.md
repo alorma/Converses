@@ -17,11 +17,11 @@ Un spike: codi que **es llença**. No porta tests, ni revisió, ni textos tradu�
 
 Res d'això es pot fer des del codi, i el segon punt no es pot desfer.
 
-- [ ] **Authentication:** activar el proveïdor de Google.
-- [ ] **Firestore:** crear la base de dades i **triar-ne la regió** (no es pot canviar). El disseny proposa una regió europea; cal mirar si el projecte en té una per defecte.
-- [ ] **App Check:** registrar l'app amb Play Integrity i afegir un token de debug per a l'emulador. Sense forçar-lo encara a Firestore; es força durant el pas 4.
-- [ ] **Empremtes SHA-1 i SHA-256** de la clau de debug i de la clau de signatura de Play a la configuració de l'app, i baixar el `google-services.json` nou.
-- [ ] **Regles de Firestore** mínimes per al spike: només `request.auth.uid == uid` llegeix i escriu sota `users/{uid}`.
+- [x] **Authentication:** proveïdor de Google activat (10 de novembre de 2026).
+- [x] **Firestore:** base de dades creada a `eur3`, en mode de prova. **El mode de prova deixa llegir i escriure a tothom** fins que caduca: cal desplegar `firestore.rules` abans de posar-hi res.
+- [x] **App Check:** activat. Falta confirmar que hi ha un token de debug per a l'emulador i que encara no es força a Firestore (es força durant el pas 4).
+- [x] **Empremtes SHA** de la clau de debug registrades, i `google-services.json` nou al projecte i als secrets de GitHub (Actions i dependabot). Falta confirmar que l'empremta de l'app de producció és la de la clau de signatura de Play i no la de pujada.
+- [ ] **Regles de Firestore:** són a `firestore.rules`. Falta desplegar-les: `firebase login --reauth` (la sessió de la CLI ha caducat) i `firebase deploy --only firestore:rules`.
 
 ## Passos
 

@@ -144,6 +144,8 @@ users/{uid}/records/{recordId}
 
 ### Regles de Firestore
 
+Les regles viuen al repositori, a `firestore.rules` (amb `firebase.json` i `.firebaserc`), i es despleguen amb la CLI de Firebase: `firebase deploy --only firestore:rules`. No s'editen a la consola: el fitxer és la font de veritat i els canvis passen per git. Ara hi ha només la regla del spike (cadascú, el que hi ha sota el seu usuari); el que segueix és el que hi ha d'arribar amb les fases 4 i 5.
+
 - Només `request.auth.uid == uid` llegeix i escriu sota `users/{uid}`.
 - `devices` no pot **créixer** per sobre de 2 entrades amb `plan == "free"` ni de 5 amb `"pro"`. El límit només es comprova quan s'afegeix un dispositiu: un compte que baixa de Pro amb 5 dispositius ha de poder continuar actualitzant el document.
 - Qualsevol sessió del propietari pot editar `devices`, encara que el seu dispositiu no hi sigui: és el que permet al que entra treure'n un altre.
@@ -256,4 +258,4 @@ Cada fase es valida abans de la següent. De la 1 a la 6 van darrere d'un featur
 
 ## Queda per a Bernat
 
-- **Regió de Firestore:** el projecte `converses-72251` encara no té Firestore activat, o sigui que no hi ha cap regió heretada: es tria en crear la base de dades a la consola i no es pot canviar. Proposta: una regió europea (**B:** «la del projecte»; cal mirar a la consola si el projecte en té una per defecte).
+- Res pendent. **(B)** Firestore està creat a la regió `eur3` (multiregió europea), que ja no es pot canviar, amb Authentication (Google) i App Check activats.

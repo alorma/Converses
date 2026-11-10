@@ -16,3 +16,9 @@ local.properties
 
 # Firebase configuration (contains API keys)
 app/google-services.json
+
+# Firebase CLI: logs and local emulator data
+firebase-debug.log
+firestore-debug.log
+ui-debug.log
+.firebase/

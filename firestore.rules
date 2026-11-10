@@ -1,0 +1,18 @@
+rules_version = '2';
+
+// Regles de Firestore de Converses (projecte converses-72251, base de dades per defecte, regió eur3).
+// Aquest fitxer és la font de veritat: es desplega amb `firebase deploy --only firestore:rules` i no s'edita a la
+// consola. El disseny és a docs/sync/disseny.md, secció «Regles de Firestore».
+//
+// Ara mateix només hi ha la regla del spike (fase 0): cadascú llegeix i escriu el que hi ha sota el seu usuari, i
+// ningú més. Els límits de dispositius, la forma dels documents i la mida màxima dels registres arriben amb les
+// fases 4 i 5, amb els seus tests a l'emulador.
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /users/{uid}/{document=**} {
+      allow read, write: if request.auth != null && request.auth.uid == uid;
+    }
+
+    // Tota la resta queda tancada: una ruta que no surt aquí no es pot llegir ni escriure.
+  }
+}
