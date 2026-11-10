@@ -84,7 +84,7 @@ d'en Bernat.
   Estat buit «Tria una persona» (textos nous en en/ca/es, secció 8). Detall sense fletxa enrere. Triar una altra
   persona substitueix el detall, no l'apila. Persones protegides. Passar de dos panells a un (i al revés) conserva la
   selecció: amb persona oberta es veu el detall amb fletxa enrere; sense, el llistat.
-- [ ] **3. Detall a dues columnes** (expandida, 12a). Capçalera amb avatar de 96 dp, `edit` i el split button
+- [x] **3. Detall a dues columnes** (expandida, 12a). Capçalera amb avatar de 96 dp, `edit` i el split button
   «Nota ▾» a la dreta (ja no flota). Dades i Pendents en 280 dp a l'esquerra, Cronologia a la dreta. En amplada
   mitjana (12c): una columna, avatar de 80 dp i el split button flotant dins del panell.
 - [ ] **4. Diàlegs.** A partir de 600 dp, Nova/Editar persona, Nota ràpida (12b), Nova tasca i Pro són diàlegs de
@@ -101,6 +101,17 @@ d'en Bernat.
   navegació haurà canviat). Condensar aquest document.
 
 ## Notes entre sessions
+
+**Després del pas 3**
+
+- `PersonDetailScreen` tria les dues columnes per l'amplada del **panell** (`BoxWithConstraints`, 600 dp o més), no de
+  la finestra: a 840 dp de finestra el panell fa uns 320 dp i no hi caben. En una tauleta de 1280 dp sí.
+- Amb dues columnes la capçalera (`WideHeader`) és fixa al `topBar`: avatar de 96 dp a l'esquerra, nom, àlies i
+  antiguitat, el recompte per «Qui» i, a la dreta, editar i el botó «Nota ▾», que deixa de flotar. A sota, «Dades» i
+  «Pendents» en 280 dp i la cronologia a la resta; cada columna fa scroll pel seu compte.
+- El contingut del detall està partit en `sideItems` (dades i pendents) i `timelineItems`, que comparteixen la
+  disposició d'una columna i la de dues. El botó és `NoteSplitButton`.
+- El botó «Nota ▾» manté l'alçada del mòbil; el disseny el vol de 48 dp a la capçalera.
 
 **Després del pas 2**
 

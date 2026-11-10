@@ -74,6 +74,8 @@ fun TasksSection(
   modifier: Modifier = Modifier,
   /** Només per a les previews (9f): «Fets» desplegat. */
   initialDoneExpanded: Boolean = false,
+  /** Columna estreta del detall a dues columnes: «Nova tasca» es queda en la icona, perquè no trepitgi el títol. */
+  compact: Boolean = false,
 ) {
   val locale = LocalConfiguration.current.locales[0]
   var doneExpanded by rememberSaveable { mutableStateOf(initialDoneExpanded) }
@@ -100,20 +102,27 @@ fun TasksSection(
       if (canCreate) {
         FilledTonalButton(
           onClick = onNewTask,
-          modifier = Modifier.height(36.dp),
-          contentPadding = PaddingValues(start = 10.dp, end = 14.dp),
+          modifier = if (compact) Modifier.size(36.dp) else Modifier.height(36.dp),
+          contentPadding =
+            if (compact) PaddingValues(horizontal = 9.dp) else PaddingValues(start = 10.dp, end = 14.dp),
           colors =
             ButtonDefaults.filledTonalButtonColors(
               containerColor = MaterialTheme.colorScheme.primaryContainer,
               contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
             ),
         ) {
-          Icon(Icons.Rounded.Add, contentDescription = null, modifier = Modifier.size(18.dp))
-          Text(
-            text = stringResource(R.string.task_new),
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(start = 4.dp),
+          Icon(
+            Icons.Rounded.Add,
+            contentDescription = if (compact) stringResource(R.string.task_new) else null,
+            modifier = Modifier.size(18.dp),
           )
+          if (!compact) {
+            Text(
+              text = stringResource(R.string.task_new),
+              fontWeight = FontWeight.Bold,
+              modifier = Modifier.padding(start = 4.dp),
+            )
+          }
         }
       }
     }

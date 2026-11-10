@@ -3,20 +3,23 @@ package com.alorma.contactnotes.ui.person
 import android.content.ClipData
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -57,6 +60,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -373,95 +377,82 @@ fun PersonDetailScreen(
   val person = state.person
   var factsExpanded by rememberSaveable { mutableStateOf(false) }
   val containerColor = personContainerColor(inPane)
-  Scaffold(
-    containerColor = containerColor,
-    contentWindowInsets = WindowInsets.navigationBars,
-    topBar = {
-      Row(
-        modifier =
-          Modifier
-            .fillMaxWidth()
-            .background(containerColor)
-            .windowInsetsPadding(WindowInsets.statusBars)
-            .padding(horizontal = ScreenMargin),
-        verticalAlignment = Alignment.CenterVertically,
-      ) {
-        // Amb el llistat al costat no hi ha on tornar: es canvia de persona des del llistat
-        if (!inPane) {
-          IconButton(onClick = onBack) {
-            Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = stringResource(R.string.back))
+  val noteButton: @Composable () -> Unit = {
+    if (person != null) {
+      NoteSplitButton(
+        archived = person.archived,
+        isPro = isPro,
+        menuExpanded = menuExpanded,
+        onMenuExpandedChange = onMenuExpandedChange,
+        onNewEntry = onNewEntry,
+        onNewTask = onNewTask,
+        onExport = onExport,
+        onToggleArchived = onToggleArchived,
+      )
+    }
+  }
+  BoxWithConstraints {
+    // Panell de detall ample (tauleta horitzontal): capçalera fixa amb les accions i dues columnes a sota. Es decideix
+    // per l'amplada del panell, no de la finestra: a 840 dp el panell encara és massa estret per a dues columnes
+    val twoColumns = inPane && maxWidth >= TwoColumnsMinWidth
+    Scaffold(
+      containerColor = containerColor,
+      contentWindowInsets = WindowInsets.navigationBars,
+      topBar = {
+        if (twoColumns && person != null) {
+          Column(
+            modifier =
+              Modifier
+                .fillMaxWidth()
+                .background(containerColor)
+                .windowInsetsPadding(WindowInsets.statusBars)
+                .padding(horizontal = ScreenMargin),
+          ) {
+            WideHeader(
+              person = person,
+              stats = EntryKind.entries.map { whoFilterLabel(it, firstName(person.name)) to state.countOf(it) },
+              onEditPerson = onEditPerson,
+              noteButton = noteButton,
+            )
+            if (state.channels.isNotEmpty()) ChannelRow(state.channels) else Spacer(Modifier.height(20.dp))
           }
-        }
-        Spacer(Modifier.weight(1f))
-        if (person != null) {
-          IconButton(onClick = onEditPerson) {
-            Icon(Icons.Rounded.Edit, contentDescription = stringResource(R.string.edit_person))
-          }
-        }
-      }
-    },
-    snackbarHost = { SnackbarHost(snackbarHostState, modifier = Modifier.padding(horizontal = 4.dp)) },
-    floatingActionButton = {
-      if (person != null) {
-        ConversesSplitButton(
-          label = stringResource(R.string.note_button),
-          icon = Icons.Rounded.EditNote,
-          onClick = onNewEntry,
-          menuExpanded = menuExpanded,
-          onMenuExpandedChange = onMenuExpandedChange,
-          menuContentDescription = stringResource(R.string.more_options),
-        ) {
-          ConversesMenuItem(
-            text = stringResource(R.string.task_new),
-            icon = Icons.Rounded.Flag,
-            onClick = onNewTask,
-            trailing =
-              if (!isPro) {
-                {
-                  ProBadge(
-                    text = stringResource(R.string.pro_badge),
-                    contentDescription = stringResource(R.string.pro_description),
-                  )
-                }
-              } else {
-                null
-              },
-          )
-          ConversesMenuItem(
-            text = stringResource(R.string.menu_export),
-            icon = Icons.Rounded.IosShare,
-            onClick = onExport,
-          )
-          ConversesMenuItem(
-            text = stringResource(if (person.archived) R.string.menu_unarchive else R.string.menu_archive),
-            icon = if (person.archived) Icons.Rounded.Unarchive else Icons.Rounded.Archive,
-            onClick = onToggleArchived,
-          )
-        }
-      }
-    },
-  ) { padding ->
-    if (person == null) return@Scaffold
-    val items = remember(state.entries) { state.entries.toTimelineItems() }
-    val firstName = remember(person.name) { firstName(person.name) }
-    val noEntries = EntryKind.entries.sumOf { state.countOf(it) } == 0
-
-    Box(modifier = Modifier.fillMaxSize()) {
-      LazyColumn(
-        modifier = Modifier.fillMaxSize(),
-        contentPadding =
-          PaddingValues(
-            start = ScreenMargin,
-            end = ScreenMargin,
-            top = padding.calculateTopPadding(),
-            bottom = 96.dp + padding.calculateBottomPadding(),
-          ),
-      ) {
-        item(key = "header") { Header(person) }
-        if (state.channels.isNotEmpty()) {
-          item(key = "channels") { ChannelRow(state.channels) }
         } else {
-          item(key = "channels-spacer") { Spacer(Modifier.height(20.dp)) }
+          Row(
+            modifier =
+              Modifier
+                .fillMaxWidth()
+                .background(containerColor)
+                .windowInsetsPadding(WindowInsets.statusBars)
+                .padding(horizontal = ScreenMargin),
+            verticalAlignment = Alignment.CenterVertically,
+          ) {
+            // Amb el llistat al costat no hi ha on tornar: es canvia de persona des del llistat
+            if (!inPane) {
+              IconButton(onClick = onBack) {
+                Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = stringResource(R.string.back))
+              }
+            }
+            Spacer(Modifier.weight(1f))
+            if (person != null) {
+              IconButton(onClick = onEditPerson) {
+                Icon(Icons.Rounded.Edit, contentDescription = stringResource(R.string.edit_person))
+              }
+            }
+          }
+        }
+      },
+      snackbarHost = { SnackbarHost(snackbarHostState, modifier = Modifier.padding(horizontal = 4.dp)) },
+      // Amb dues columnes el botó de nota va a la capçalera i ja no flota
+      floatingActionButton = { if (!twoColumns) noteButton() },
+    ) { padding ->
+      if (person == null) return@Scaffold
+      val items = remember(state.entries) { state.entries.toTimelineItems() }
+      val firstName = remember(person.name) { firstName(person.name) }
+      val noEntries = EntryKind.entries.sumOf { state.countOf(it) } == 0
+
+      val sideItems: LazyListScope.() -> Unit = {
+        if (twoColumns) {
+          item(key = "facts-header") { SectionHeader(title = stringResource(R.string.facts_title), topPadding = 0.dp) }
         }
         item(key = "facts") {
           PinnedFacts(
@@ -484,13 +475,16 @@ fun PersonDetailScreen(
               onOpen = onOpenTask,
               onDone = onTaskDone,
               onReopen = onTaskReopen,
+              compact = twoColumns,
             )
           }
         }
+      }
+      val timelineItems: LazyListScope.() -> Unit = {
         item(key = "timeline-header") {
           SectionHeader(
             title = stringResource(R.string.timeline),
-            topPadding = 24.dp,
+            topPadding = if (twoColumns) 0.dp else 24.dp,
             trailing =
               if (noEntries) {
                 null
@@ -591,6 +585,145 @@ fun PersonDetailScreen(
           }
         }
       }
+
+      if (twoColumns) {
+        val bottom = PaddingValues(bottom = 24.dp + padding.calculateBottomPadding())
+        Row(
+          modifier =
+            Modifier
+              .fillMaxSize()
+              .padding(start = ScreenMargin, end = ScreenMargin, top = padding.calculateTopPadding()),
+          horizontalArrangement = Arrangement.spacedBy(TwoColumnsGap),
+        ) {
+          LazyColumn(modifier = Modifier.width(SideColumnWidth).fillMaxHeight(), contentPadding = bottom) {
+            sideItems()
+          }
+          LazyColumn(modifier = Modifier.weight(1f).fillMaxHeight(), contentPadding = bottom) {
+            timelineItems()
+          }
+        }
+      } else {
+        LazyColumn(
+          modifier = Modifier.fillMaxSize(),
+          contentPadding =
+            PaddingValues(
+              start = ScreenMargin,
+              end = ScreenMargin,
+              top = padding.calculateTopPadding(),
+              bottom = 96.dp + padding.calculateBottomPadding(),
+            ),
+        ) {
+          item(key = "header") { Header(person) }
+          if (state.channels.isNotEmpty()) {
+            item(key = "channels") { ChannelRow(state.channels) }
+          } else {
+            item(key = "channels-spacer") { Spacer(Modifier.height(20.dp)) }
+          }
+          sideItems()
+          timelineItems()
+        }
+      }
+    }
+  }
+}
+
+private val TwoColumnsMinWidth = 600.dp
+private val SideColumnWidth = 280.dp
+private val TwoColumnsGap = 24.dp
+
+/** Botó «Nota ▾»: nota nova i, al menú, nova tasca, exportar i arxivar. Flota a baix o va a la capçalera ample. */
+@Composable
+private fun NoteSplitButton(
+  archived: Boolean,
+  isPro: Boolean,
+  menuExpanded: Boolean,
+  onMenuExpandedChange: (Boolean) -> Unit,
+  onNewEntry: () -> Unit,
+  onNewTask: () -> Unit,
+  onExport: () -> Unit,
+  onToggleArchived: () -> Unit,
+) {
+  ConversesSplitButton(
+    label = stringResource(R.string.note_button),
+    icon = Icons.Rounded.EditNote,
+    onClick = onNewEntry,
+    menuExpanded = menuExpanded,
+    onMenuExpandedChange = onMenuExpandedChange,
+    menuContentDescription = stringResource(R.string.more_options),
+  ) {
+    ConversesMenuItem(
+      text = stringResource(R.string.task_new),
+      icon = Icons.Rounded.Flag,
+      onClick = onNewTask,
+      trailing =
+        if (!isPro) {
+          {
+            ProBadge(
+              text = stringResource(R.string.pro_badge),
+              contentDescription = stringResource(R.string.pro_description),
+            )
+          }
+        } else {
+          null
+        },
+    )
+    ConversesMenuItem(
+      text = stringResource(R.string.menu_export),
+      icon = Icons.Rounded.IosShare,
+      onClick = onExport,
+    )
+    ConversesMenuItem(
+      text = stringResource(if (archived) R.string.menu_unarchive else R.string.menu_archive),
+      icon = if (archived) Icons.Rounded.Unarchive else Icons.Rounded.Archive,
+      onClick = onToggleArchived,
+    )
+  }
+}
+
+/**
+ * Capçalera del detall a dues columnes (12a): avatar de 96 dp, nom, àlies i antiguitat, el recompte d'entrades per
+ * «Qui» i, a la dreta, editar i el botó de nota.
+ */
+@Composable
+private fun WideHeader(
+  person: PersonEntity,
+  stats: List<Pair<String, Int>>,
+  onEditPerson: () -> Unit,
+  noteButton: @Composable () -> Unit,
+) {
+  Row(
+    modifier = Modifier.fillMaxWidth().padding(start = 4.dp, top = 24.dp),
+    verticalAlignment = Alignment.CenterVertically,
+    horizontalArrangement = Arrangement.spacedBy(20.dp),
+  ) {
+    Avatar(
+      initials = initialsOf(person.name),
+      shape = person.shape,
+      color = person.color,
+      size = 96.dp,
+    )
+    Column(modifier = Modifier.weight(1f)) {
+      Text(text = person.name, style = PersonNameStyle, maxLines = 1, overflow = TextOverflow.Ellipsis)
+      val since = stringResource(R.string.person_since, formatMonthYear(person.createdAt))
+      Text(
+        text = person.alias?.let { "@$it · $since" } ?: since,
+        style = MaterialTheme.typography.bodyMedium,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+      )
+      if (stats.any { it.second > 0 }) {
+        Text(
+          text = stats.joinToString("  ·  ") { (label, count) -> "$label $count" },
+          style = MaterialTheme.typography.labelLarge,
+          color = MaterialTheme.colorScheme.onSurfaceVariant,
+          modifier = Modifier.padding(top = 6.dp),
+        )
+      }
+    }
+    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+      IconButton(onClick = onEditPerson) {
+        Icon(Icons.Rounded.Edit, contentDescription = stringResource(R.string.edit_person))
+      }
+      noteButton()
     }
   }
 }

@@ -23,6 +23,7 @@ import com.alorma.contactnotes.ui.task.TasksSection
 private fun PersonDetailScreenPreview(
   state: PersonDetailUiState,
   isPro: Boolean = false,
+  inPane: Boolean = false,
 ) {
   ConversesPreviewTheme {
     PersonTheme(state.person?.color) {
@@ -42,9 +43,30 @@ private fun PersonDetailScreenPreview(
         snackbarHostState = remember { SnackbarHostState() },
         isPro = isPro,
         today = PreviewData.taskToday,
+        inPane = inPane,
       )
     }
   }
+}
+
+/** Panell de detall d'una tauleta horitzontal (12a): capçalera amb les accions i dues columnes. */
+@Preview(widthDp = 764, heightDp = 768)
+@Composable
+internal fun PersonDetailScreenTwoColumnsPreview() {
+  PersonDetailScreenPreview(
+    PersonDetailUiState(
+      person = PreviewData.marta,
+      channels = PreviewData.martaChannels,
+      facts = PreviewData.martaFacts,
+      entries = PreviewData.martaEntries,
+      saidCount = 1,
+      heardCount = 1,
+      happenedCount = PreviewData.martaEntries.count { it.kind == EntryKind.HAPPENED },
+      isLoading = false,
+    ),
+    isPro = true,
+    inPane = true,
+  )
 }
 
 @Preview

@@ -60,6 +60,7 @@ import com.alorma.contactnotes.ui.person.PersonDetailScreenFilteredEmptyPreview
 import com.alorma.contactnotes.ui.person.PersonDetailScreenLoadedPreview
 import com.alorma.contactnotes.ui.person.PersonDetailScreenSingleFactPreview
 import com.alorma.contactnotes.ui.person.PersonDetailScreenThemedPreview
+import com.alorma.contactnotes.ui.person.PersonDetailScreenTwoColumnsPreview
 import com.alorma.contactnotes.ui.person.PersonDetailTasksEmptyPreview
 import com.alorma.contactnotes.ui.person.PersonDetailTasksLockedPreview
 import com.alorma.contactnotes.ui.person.PersonDetailTasksPreview
@@ -129,6 +130,16 @@ annotation class TabletPortraitPreviews
 )
 annotation class TabletLandscapePreviews
 
+/** Panell de detall d'una tauleta horitzontal (el que queda al costat del rail i del llistat), a 160 dpi. */
+@Preview(name = "Light", locale = "en", device = "spec:width=764dp,height=768dp,dpi=160")
+@Preview(
+  name = "Dark",
+  locale = "en",
+  device = "spec:width=764dp,height=768dp,dpi=160",
+  uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_NORMAL,
+)
+annotation class DetailPanePreviews
+
 class ScreensScreenshotTests {
   @ScreenPreviews
   @PreviewTest
@@ -149,6 +160,13 @@ class ScreensScreenshotTests {
   @Composable
   fun appShellTwoPaneEmpty() {
     AppShellTwoPaneEmptyPreview()
+  }
+
+  @DetailPanePreviews
+  @PreviewTest
+  @Composable
+  fun personDetailTwoColumns() {
+    PersonDetailScreenTwoColumnsPreview()
   }
 
   @TabletLandscapePreviews
