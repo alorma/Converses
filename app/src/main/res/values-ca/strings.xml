@@ -2,6 +2,7 @@
     <string name="app_name">Converses</string>
 
     <string name="people_title">Converses</string>
+    <string name="nav_people">Persones</string>
     <string name="beta_description">Versió beta</string>
     <string name="pro_description">Funció Pro</string>
     <plurals name="people_count">

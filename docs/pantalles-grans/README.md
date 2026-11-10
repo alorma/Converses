@@ -75,7 +75,7 @@ Un pas per sessió, en ordre. Cada pas: `./gradlew ktlintCheck`, `./gradlew test
 horitzontal; Pixel Fold quan toqui; el redimensionable per a les transicions d'amplada). Commit només amb el vistiplau
 d'en Bernat.
 
-- [ ] **1. Base i rail.** Dependències adaptatives al catàleg de versions. Classe d'amplada disponible per a les
+- [x] **1. Base i rail.** Dependències adaptatives al catàleg de versions. Classe d'amplada disponible per a les
   pantalles. Rail de 96 dp (botó «Nota ràpida» a dalt, Persones, Arxivades, Ajustos) a partir de 600 dp en lloc de la
   barra flotant. Ajustos, Canals propis i Pro en columna centrada de 640 dp com a màxim. Fulls inferiors amb amplada
   màxima de 640 dp. Revisar el manifest (`resizeableActivity`, cap orientació bloquejada).
@@ -102,4 +102,22 @@ d'en Bernat.
 
 ## Notes entre sessions
 
-Res encara.
+**Després del pas 1**
+
+- Versions comprovades a la documentació oficial (10-11-2026): `androidx.compose.material3.adaptive` 1.3.0 estable, amb
+  `adaptive-navigation3` inclòs. De moment només s'ha afegit `adaptive` (per a `currentWindowAdaptiveInfo()`); la resta
+  s'afegeix al pas que la faci servir. `NavDisplay` rep les escenes amb `sceneStrategies` (una llista).
+- `ui/navigation/ScreenWidth.kt`: `ScreenWidth`, `currentScreenWidth()` i `shellNavigationFor(ruta, amplada)`, que
+  decideix si `AppShell` dibuixa la barra flotant, el rail o res. Ara el rail s'amaga a les pantalles modals (nota
+  ràpida, formularis, Pro) perquè encara són de pantalla completa; quan passin a diàleg (pas 4) s'ha de quedar a sota.
+- El rail és `ConversesNavigationRail` (`:designsystem`), fet amb `WideNavigationRail` de Material 3 Expressive, que ja
+  té les mides del disseny (96 dp, indicador de 56 × 32). Fa servir les icones del mòbil (`Groups`, `Archive`,
+  `EditNote`) i no les del disseny (`group`, `inventory_2`, `edit_square`), perquè mòbil i tauleta siguin iguals.
+- `Modifier.readableWidth()` (`:designsystem`) centra una columna de 640 dp com a màxim; al mòbil no fa res.
+- Fulls inferiors: `ModalBottomSheet` ja limita l'amplada a 640 dp per defecte; no ha calgut tocar res.
+- Manifest: no ha calgut tocar res (cap orientació bloquejada; `resizeableActivity` ja és `true` per defecte).
+- Captures de tauleta: anotacions `TabletPortraitPreviews` i `TabletLandscapePreviews` a 160 dpi. Amb la densitat per
+  defecte fan 2100 × 3360 px i la validació es queda sense memòria.
+- `TopLevelBackStack.navigateSingle` obre Ajustos sense apilar-ne una segona còpia (el rail es veu des d'Ajustos).
+- **Pendent de decidir amb en Bernat:** l'etiqueta BETA del llistat. El disseny diu que no surt enlloc, però treure-la
+  canvia el mòbil; no s'ha tocat.

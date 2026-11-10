@@ -62,6 +62,7 @@ import com.alorma.contactnotes.data.tracking.ErrorSites
 import com.alorma.contactnotes.designsystem.components.GroupedListDefaults
 import com.alorma.contactnotes.designsystem.components.asShape
 import com.alorma.contactnotes.designsystem.components.groupedItemShape
+import com.alorma.contactnotes.designsystem.components.readableWidth
 import com.alorma.contactnotes.designsystem.theme.ScreenTitleStyle
 import com.alorma.contactnotes.shared.AvatarShape
 import com.alorma.contactnotes.ui.tracking.rememberErrorTracker
@@ -154,6 +155,7 @@ fun PaywallContent(
           .fillMaxSize()
           .verticalScroll(rememberScrollState())
           .padding(padding)
+          .readableWidth()
           .padding(start = 16.dp, end = 16.dp, bottom = 16.dp),
       verticalArrangement = Arrangement.spacedBy(18.dp),
     ) {
@@ -296,7 +298,11 @@ private fun PaywallFooter(
 ) {
   Column(
     // Com els `bottomBar` de Material (BottomAppBar), el peu s'aparta de la barra de navegació del sistema
-    modifier = Modifier.navigationBarsPadding().padding(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 20.dp),
+    modifier =
+      Modifier
+        .navigationBarsPadding()
+        .readableWidth()
+        .padding(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 20.dp),
     verticalArrangement = Arrangement.spacedBy(6.dp),
   ) {
     if (state.isPro) {

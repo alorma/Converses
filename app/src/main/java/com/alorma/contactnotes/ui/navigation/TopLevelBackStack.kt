@@ -38,6 +38,19 @@ class TopLevelBackStack(
     }
   }
 
+  /**
+   * Pushes [route] unless it is already in the stack; then it drops what is on top of it. For a destination that
+   * stays reachable while it is open (Settings in the rail): pressing it again must not stack a second copy.
+   */
+  fun navigateSingle(route: AppRoute) {
+    val index = entries.indexOf(route)
+    if (index < 0) {
+      entries.add(route)
+    } else {
+      while (entries.lastIndex > index) entries.removeAt(entries.lastIndex)
+    }
+  }
+
   /** Leaves `[base]` for [PeopleRoute] or `[base, tab]` for any other tab, dropping everything else. */
   fun switchTab(tab: TopLevelRoute) {
     while (entries.size > 1) entries.removeAt(entries.lastIndex)

@@ -114,6 +114,27 @@ class TopLevelBackStackTest {
   }
 
   @Test
+  fun `opening settings twice keeps a single copy`() {
+    val stack = stackOf()
+
+    stack.navigateSingle(SettingsRoute)
+    stack.navigateSingle(SettingsRoute)
+
+    assertEquals(listOf<NavKey>(PeopleRoute, SettingsRoute), stack.backStack)
+  }
+
+  @Test
+  fun `opening settings from a screen inside it goes back to settings`() {
+    val stack = stackOf()
+    stack.navigateSingle(SettingsRoute)
+    stack.navigate(CustomChannelsRoute)
+
+    stack.navigateSingle(SettingsRoute)
+
+    assertEquals(listOf<NavKey>(PeopleRoute, SettingsRoute), stack.backStack)
+  }
+
+  @Test
   fun `unlocking a person replaces the locked screen`() {
     val stack = stackOf()
     stack.navigate(PersonLockedRoute(1))

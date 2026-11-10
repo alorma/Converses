@@ -90,6 +90,7 @@ import com.alorma.contactnotes.designsystem.components.SettingRow
 import com.alorma.contactnotes.designsystem.components.SettingSwitchRow
 import com.alorma.contactnotes.designsystem.components.ToggleOption
 import com.alorma.contactnotes.designsystem.components.groupedItemShape
+import com.alorma.contactnotes.designsystem.components.readableWidth
 import com.alorma.contactnotes.designsystem.components.rememberConversesHaptics
 import com.alorma.contactnotes.designsystem.components.rememberTopBarScrollBehavior
 import com.alorma.contactnotes.designsystem.theme.ThemeMode
@@ -223,6 +224,7 @@ fun SettingsContent(
           .fillMaxSize()
           .verticalScroll(rememberScrollState())
           .padding(padding)
+          .readableWidth()
           .padding(horizontal = 16.dp),
       verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {

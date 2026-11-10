@@ -35,6 +35,8 @@ import com.alorma.contactnotes.ui.entry.WhenSheetNowPreview
 import com.alorma.contactnotes.ui.lock.AppLockPreview
 import com.alorma.contactnotes.ui.navigation.AppShellArchivedPreview
 import com.alorma.contactnotes.ui.navigation.AppShellPeoplePreview
+import com.alorma.contactnotes.ui.navigation.AppShellRailPeoplePreview
+import com.alorma.contactnotes.ui.navigation.AppShellRailSettingsPreview
 import com.alorma.contactnotes.ui.onboarding.OnboardingStep1Preview
 import com.alorma.contactnotes.ui.onboarding.OnboardingStep2Preview
 import com.alorma.contactnotes.ui.onboarding.OnboardingStep3Preview
@@ -103,12 +105,49 @@ annotation class TallScreenPreviews
 @Preview(name = "FontScale2", locale = "en", widthDp = 411, heightDp = 891, fontScale = 2f)
 annotation class LargeFontScreenPreviews
 
+/**
+ * Tauleta vertical (amplada mitjana), en clar i en fosc. A 160 dpi (1 dp = 1 px): amb la densitat per defecte la
+ * captura fa 2100 × 3360 px i la validació es queda sense memòria.
+ */
+@Preview(name = "Light", locale = "en", device = "spec:width=800dp,height=1280dp,dpi=160")
+@Preview(
+  name = "Dark",
+  locale = "en",
+  device = "spec:width=800dp,height=1280dp,dpi=160",
+  uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_NORMAL,
+)
+annotation class TabletPortraitPreviews
+
+/** Tauleta horitzontal (amplada expandida), en clar i en fosc; a 160 dpi com [TabletPortraitPreviews]. */
+@Preview(name = "Light", locale = "en", device = "spec:width=1280dp,height=800dp,dpi=160")
+@Preview(
+  name = "Dark",
+  locale = "en",
+  device = "spec:width=1280dp,height=800dp,dpi=160",
+  uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_NORMAL,
+)
+annotation class TabletLandscapePreviews
+
 class ScreensScreenshotTests {
   @ScreenPreviews
   @PreviewTest
   @Composable
   fun appShellPeople() {
     AppShellPeoplePreview()
+  }
+
+  @TabletPortraitPreviews
+  @PreviewTest
+  @Composable
+  fun appShellRailPeople() {
+    AppShellRailPeoplePreview()
+  }
+
+  @TabletLandscapePreviews
+  @PreviewTest
+  @Composable
+  fun appShellRailSettings() {
+    AppShellRailSettingsPreview()
   }
 
   @ScreenPreviews

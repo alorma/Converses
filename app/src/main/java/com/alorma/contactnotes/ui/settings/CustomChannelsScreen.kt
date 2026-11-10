@@ -50,6 +50,7 @@ import com.alorma.contactnotes.designsystem.components.ConversesTopBar
 import com.alorma.contactnotes.designsystem.components.ProBadge
 import com.alorma.contactnotes.designsystem.components.SettingRow
 import com.alorma.contactnotes.designsystem.components.groupedItemShape
+import com.alorma.contactnotes.designsystem.components.readableWidth
 import com.alorma.contactnotes.designsystem.components.rememberConversesHaptics
 import com.alorma.contactnotes.designsystem.components.rememberTopBarScrollBehavior
 import com.alorma.contactnotes.shared.ChannelType
@@ -193,7 +194,7 @@ fun CustomChannelsContent(
     },
   ) { padding ->
     LazyColumn(
-      modifier = Modifier.fillMaxSize().padding(padding),
+      modifier = Modifier.fillMaxSize().padding(padding).readableWidth(),
       // Espai a baix perquè el FAB no tapi la nota del peu
       contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 4.dp, bottom = 96.dp),
       verticalArrangement = Arrangement.spacedBy(2.dp),

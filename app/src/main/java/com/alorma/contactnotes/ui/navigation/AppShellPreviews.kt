@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import com.alorma.contactnotes.designsystem.preview.ConversesPreviewTheme
 import com.alorma.contactnotes.ui.people.PeopleListScreenLoadedPreview
+import com.alorma.contactnotes.ui.settings.SettingsProPreview
 
 @Preview
 @Composable
@@ -11,7 +12,7 @@ internal fun AppShellPeoplePreview() {
   ConversesPreviewTheme {
     AppShell(
       currentTab = PeopleRoute,
-      showNavigation = true,
+      navigation = ShellNavigation.FloatingBar,
       onTabSelected = {},
       onQuickNote = {},
       onOpenSettings = {},
@@ -27,12 +28,47 @@ internal fun AppShellArchivedPreview() {
   ConversesPreviewTheme {
     AppShell(
       currentTab = ArchivedRoute,
-      showNavigation = true,
+      navigation = ShellNavigation.FloatingBar,
       onTabSelected = {},
       onQuickNote = {},
       onOpenSettings = {},
     ) {
       PeopleListScreenLoadedPreview()
+    }
+  }
+}
+
+/** Tauleta vertical: el rail en lloc de la barra flotant. */
+@Preview(widthDp = 800, heightDp = 1280)
+@Composable
+internal fun AppShellRailPeoplePreview() {
+  ConversesPreviewTheme {
+    AppShell(
+      currentTab = PeopleRoute,
+      navigation = ShellNavigation.Rail,
+      onTabSelected = {},
+      onQuickNote = {},
+      onOpenSettings = {},
+    ) {
+      PeopleListScreenLoadedPreview()
+    }
+  }
+}
+
+/** Tauleta horitzontal a Ajustos: el rail el marca i el contingut queda en una columna centrada. */
+@Preview(widthDp = 1280, heightDp = 800)
+@Composable
+internal fun AppShellRailSettingsPreview() {
+  ConversesPreviewTheme {
+    AppShell(
+      currentTab = PeopleRoute,
+      navigation = ShellNavigation.Rail,
+      onTabSelected = {},
+      onQuickNote = {},
+      onOpenSettings = {},
+      settingsSelected = true,
+    ) {
+      SettingsProPreview()
     }
   }
 }

@@ -47,7 +47,8 @@ import com.alorma.contactnotes.ui.navigation.QuickNoteRoute
 import com.alorma.contactnotes.ui.navigation.SettingsRoute
 import com.alorma.contactnotes.ui.navigation.TaskRoute
 import com.alorma.contactnotes.ui.navigation.TopLevelBackStack
-import com.alorma.contactnotes.ui.navigation.TopLevelRoute
+import com.alorma.contactnotes.ui.navigation.currentScreenWidth
+import com.alorma.contactnotes.ui.navigation.shellNavigationFor
 import com.alorma.contactnotes.ui.onboarding.OnboardingScreen
 import com.alorma.contactnotes.ui.paywall.PaywallScreen
 import com.alorma.contactnotes.ui.paywall.ProBenefit
@@ -92,10 +93,11 @@ fun AppNavigation(
 
   AppShell(
     currentTab = navigation.currentTab,
-    showNavigation = navigation.current is TopLevelRoute,
+    navigation = shellNavigationFor(current, currentScreenWidth()),
     onTabSelected = navigation::switchTab,
     onQuickNote = { navigation.navigate(QuickNoteRoute()) },
-    onOpenSettings = { navigation.navigate(SettingsRoute) },
+    onOpenSettings = { navigation.navigateSingle(SettingsRoute) },
+    settingsSelected = SettingsRoute in navigation.backStack,
   ) {
     NavDisplay(
       backStack = navigation.backStack,

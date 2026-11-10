@@ -150,6 +150,7 @@ dependencies {
   implementation(libs.androidx.lifecycle.process)
   implementation(libs.androidx.biometric)
   implementation(libs.fireandforget.core)
+  implementation(libs.androidx.compose.material3.adaptive)
   implementation(libs.androidx.navigation3.runtime)
   implementation(libs.androidx.navigation3.ui)
   implementation(libs.androidx.lifecycle.viewmodel.navigation3)
