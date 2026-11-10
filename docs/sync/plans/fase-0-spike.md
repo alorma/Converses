@@ -21,7 +21,7 @@ Res d'això es pot fer des del codi, i el segon punt no es pot desfer.
 - [x] **Firestore:** base de dades creada a `eur3`, en mode de prova. **El mode de prova deixa llegir i escriure a tothom** fins que caduca: cal desplegar `firestore.rules` abans de posar-hi res.
 - [x] **App Check:** activat. Falta confirmar que hi ha un token de debug per a l'emulador i que encara no es força a Firestore (es força durant el pas 4).
 - [x] **Empremtes SHA** de la clau de debug registrades, i `google-services.json` nou al projecte i als secrets de GitHub (Actions i dependabot). Falta confirmar que l'empremta de l'app de producció és la de la clau de signatura de Play i no la de pujada.
-- [ ] **Regles de Firestore:** són a `firestore.rules`. Falta desplegar-les: `firebase login --reauth` (la sessió de la CLI ha caducat) i `firebase deploy --only firestore:rules`.
+- [x] **Regles de Firestore:** són a `firestore.rules` i desplegades amb `firebase deploy --only firestore:rules` (10 de novembre de 2026). El mode de prova s'ha acabat: una lectura o una escriptura sense sessió torna 403.
 
 ## Passos
 
