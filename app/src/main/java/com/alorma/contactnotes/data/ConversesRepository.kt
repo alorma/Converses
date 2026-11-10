@@ -38,7 +38,20 @@ class ConversesRepository(
   private val pinnedFactDao: PinnedFactDao,
   private val customChannelDao: CustomChannelDao,
   private val taskDao: TaskDao,
+  /** L'hora de cada escriptura; els tests la fixen. */
+  private val clock: () -> Long = System::currentTimeMillis,
 ) {
+  // Sincronització (`docs/sync`): tota escriptura surt d'aquí segellada, és a dir, pendent de pujar i amb la data de
+  // modificació, encara que l'entitat vingués neta d'una pantalla. `SyncIdentityTest` falla si un mètode se n'oblida.
+
+  private fun PersonEntity.stamped(at: Long) = copy(updatedAt = at, dirty = true)
+
+  private fun EntryEntity.stamped(at: Long) = copy(modifiedAt = at, dirty = true)
+
+  private fun TaskEntity.stamped(at: Long) = copy(modifiedAt = at, dirty = true)
+
+  private fun CustomChannelEntity.stamped(at: Long) = copy(modifiedAt = at, dirty = true)
+
   /** Les persones protegides no exposen última entrada, canals ni pendents. */
   fun observePeople(archived: Boolean = false): Flow<List<PersonListItem>> =
     personDao.observeList(archived).map { items ->
@@ -69,7 +82,7 @@ class ConversesRepository(
   suspend fun savePerson(
     person: PersonEntity,
     facts: List<PinnedFactEntity>,
-  ): Long = personDao.save(person, facts)
+  ): Long = personDao.save(person.stamped(clock()), facts)
 
   suspend fun deletePerson(person: PersonEntity) = personDao.delete(person)
 
@@ -78,26 +91,26 @@ class ConversesRepository(
     excludePersonId: Long = 0,
   ): Boolean = personDao.countAliasConflicts(alias.trim(), excludePersonId) > 0
 
-  suspend fun addEntry(entry: EntryEntity): Long = entryDao.insert(entry)
+  suspend fun addEntry(entry: EntryEntity): Long = entryDao.insert(entry.stamped(clock()))
 
-  suspend fun updateEntry(entry: EntryEntity) = entryDao.update(entry)
+  suspend fun updateEntry(entry: EntryEntity) = entryDao.update(entry.stamped(clock()))
 
   suspend fun deleteEntry(entry: EntryEntity) = entryDao.delete(entry)
 
   suspend fun moveEntry(
     entry: EntryEntity,
     toPersonId: Long,
-  ) = entryDao.update(entry.copy(personId = toPersonId))
+  ) = entryDao.update(entry.copy(personId = toPersonId).stamped(clock()))
 
   suspend fun setArchived(
     person: PersonEntity,
     archived: Boolean,
-  ) = personDao.update(person.copy(archived = archived, updatedAt = System.currentTimeMillis()))
+  ) = personDao.update(person.copy(archived = archived).stamped(clock()))
 
   suspend fun setProtected(
     person: PersonEntity,
     isProtected: Boolean,
-  ) = personDao.update(person.copy(isProtected = isProtected, updatedAt = System.currentTimeMillis()))
+  ) = personDao.update(person.copy(isProtected = isProtected).stamped(clock()))
 
   suspend fun countEntriesInRange(
     personId: Long,
@@ -128,7 +141,7 @@ class ConversesRepository(
 
   /** Crea (`id == 0`) o desa una tasca; el text es desa sense espais als extrems. */
   suspend fun saveTask(task: TaskEntity): Long {
-    val trimmed = task.copy(text = task.text.trim())
+    val trimmed = task.copy(text = task.text.trim()).stamped(clock())
     return if (trimmed.id == 0L) {
       taskDao.insert(trimmed)
     } else {
@@ -141,11 +154,11 @@ class ConversesRepository(
 
   suspend fun markTaskDone(
     task: TaskEntity,
-    at: Long = System.currentTimeMillis(),
-  ) = taskDao.setDoneAt(task.id, at)
+    at: Long = clock(),
+  ) = taskDao.setDoneAt(task.id, doneAt = at, now = at)
 
   /** «Desfés» o tocar el check d'una feta: torna a pendents. */
-  suspend fun reopenTask(task: TaskEntity) = taskDao.setDoneAt(task.id, null)
+  suspend fun reopenTask(task: TaskEntity) = taskDao.setDoneAt(task.id, doneAt = null, now = clock())
 
   // Canals propis (Pro): globals, únics dins del grup sense distingir majúscules.
 
@@ -158,10 +171,12 @@ class ConversesRepository(
   suspend fun createCustomChannel(
     channelType: ChannelType,
     name: String,
-    now: Long = System.currentTimeMillis(),
+    now: Long = clock(),
   ): CustomChannelResult =
     validateName(channelType, name, excludeId = 0) { trimmed ->
-      customChannelDao.insert(CustomChannelEntity(channelType = channelType, name = trimmed, createdAt = now))
+      customChannelDao.insert(
+        CustomChannelEntity(channelType = channelType, name = trimmed, createdAt = now).stamped(now),
+      )
     }
 
   suspend fun renameCustomChannel(
@@ -169,7 +184,7 @@ class ConversesRepository(
     name: String,
   ): CustomChannelResult =
     validateName(channel.channelType, name, excludeId = channel.id) { trimmed ->
-      customChannelDao.update(channel.copy(name = trimmed))
+      customChannelDao.update(channel.copy(name = trimmed).stamped(clock()))
       channel.id
     }
 
@@ -179,7 +194,8 @@ class ConversesRepository(
     channelType: ChannelType,
   ): CustomChannelResult =
     validateName(channelType, channel.name, excludeId = channel.id) {
-      customChannelDao.changeGroup(channel, channelType)
+      val at = clock()
+      customChannelDao.changeGroup(channel.stamped(at), channelType, now = at)
       channel.id
     }
 
@@ -196,7 +212,8 @@ class ConversesRepository(
       createCustomChannel(channelType, name)
     } else {
       validateName(channelType, name, excludeId = editing.id) { trimmed ->
-        customChannelDao.changeGroup(editing.copy(name = trimmed), channelType)
+        val at = clock()
+        customChannelDao.changeGroup(editing.copy(name = trimmed).stamped(at), channelType, now = at)
         editing.id
       }
     }

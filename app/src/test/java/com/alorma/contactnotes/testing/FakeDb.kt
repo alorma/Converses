@@ -35,6 +35,9 @@ class FakeDb {
 
   fun nextId(): Long = next++
 
+  /** El rellotge del repositori; un test el fixa per comprovar les dates de modificació. */
+  var clock: () -> Long = System::currentTimeMillis
+
   val repository =
     ConversesRepository(
       FakePersonDao(this),
@@ -42,7 +45,16 @@ class FakeDb {
       FakePinnedFactDao(this),
       FakeCustomChannelDao(this),
       FakeTaskDao(this),
+      clock = { clock() },
     )
+
+  /** Deixa totes les files com després d'una pujada: cap de pendent. */
+  fun markAllClean() {
+    people.update { list -> list.map { it.copy(dirty = false) } }
+    entries.update { list -> list.map { it.copy(dirty = false) } }
+    tasks.update { list -> list.map { it.copy(dirty = false) } }
+    channels.update { list -> list.map { it.copy(dirty = false) } }
+  }
 
   fun addCustomChannel(
     name: String,
@@ -281,9 +293,12 @@ class FakeCustomChannelDao(
   override suspend fun moveEntries(
     channelId: Long,
     channelType: ChannelType,
+    now: Long,
   ) {
     db.entries.update { list ->
-      list.map { if (it.customChannelId == channelId) it.copy(channelType = channelType) else it }
+      list.map {
+        if (it.customChannelId == channelId) it.copy(channelType = channelType, modifiedAt = now, dirty = true) else it
+      }
     }
   }
 }
@@ -336,7 +351,10 @@ class FakeTaskDao(
   override suspend fun setDoneAt(
     id: Long,
     doneAt: Long?,
+    now: Long,
   ) {
-    db.tasks.update { list -> list.map { if (it.id == id) it.copy(doneAt = doneAt) else it } }
+    db.tasks.update { list ->
+      list.map { if (it.id == id) it.copy(doneAt = doneAt, modifiedAt = now, dirty = true) else it }
+    }
   }
 }

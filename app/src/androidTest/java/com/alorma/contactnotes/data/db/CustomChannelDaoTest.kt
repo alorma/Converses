@@ -71,7 +71,7 @@ class CustomChannelDaoTest {
       val other = entry(p, customChannelId = signal)
       val plain = entry(p)
 
-      channels.changeGroup(channels.get(whatsApp)!!, ChannelType.SOCIAL)
+      channels.changeGroup(channels.get(whatsApp)!!, ChannelType.SOCIAL, now = 0)
 
       assertEquals(ChannelType.SOCIAL, channels.get(whatsApp)!!.channelType)
       assertEquals(ChannelType.SOCIAL, entries.get(moved)!!.channelType)

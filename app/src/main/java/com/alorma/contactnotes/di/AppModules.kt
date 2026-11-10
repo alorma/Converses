@@ -64,7 +64,8 @@ val databaseModule =
     single { get<ConversesDatabase>().pinnedFactDao() }
     single { get<ConversesDatabase>().customChannelDao() }
     single { get<ConversesDatabase>().taskDao() }
-    singleOf(::ConversesRepository)
+    // Sense `singleOf`: intentaria resoldre el rellotge, que té valor per defecte
+    single { ConversesRepository(get(), get(), get(), get(), get()) }
   }
 
 val settingsModule =

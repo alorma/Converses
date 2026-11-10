@@ -165,10 +165,11 @@ interface TaskDao {
   fun observeDone(personId: Long): Flow<List<TaskEntity>>
 
   /** `doneAt = null` la torna a pendents («Desfés» o tocar el check d'una feta). */
-  @Query("UPDATE task SET doneAt = :doneAt WHERE id = :id")
+  @Query("UPDATE task SET doneAt = :doneAt, modifiedAt = :now, dirty = 1 WHERE id = :id")
   suspend fun setDoneAt(
     id: Long,
     doneAt: Long?,
+    now: Long,
   )
 }
 
@@ -208,10 +209,14 @@ abstract class CustomChannelDao {
     excludeId: Long,
   ): Int
 
-  @Query("UPDATE entry SET channelType = :channelType WHERE customChannelId = :channelId")
+  /** Les entrades canvien de grup, i per tant queden pendents de pujar. */
+  @Query(
+    "UPDATE entry SET channelType = :channelType, modifiedAt = :now, dirty = 1 WHERE customChannelId = :channelId",
+  )
   protected abstract suspend fun moveEntries(
     channelId: Long,
     channelType: ChannelType,
+    now: Long,
   )
 
   /** Canvia el canal de grup i hi mou les seves entrades, perquè el filtre per grups quadri. */
@@ -219,9 +224,10 @@ abstract class CustomChannelDao {
   open suspend fun changeGroup(
     channel: CustomChannelEntity,
     channelType: ChannelType,
+    now: Long,
   ) {
     update(channel.copy(channelType = channelType))
-    moveEntries(channel.id, channelType)
+    moveEntries(channel.id, channelType, now)
   }
 }
 

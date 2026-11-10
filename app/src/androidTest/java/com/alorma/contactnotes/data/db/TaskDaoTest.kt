@@ -64,11 +64,11 @@ class TaskDaoTest {
       val first = task(p)
       val second = task(p)
 
-      tasks.setDoneAt(first, 10)
-      tasks.setDoneAt(second, 20)
+      tasks.setDoneAt(first, 10, now = 10)
+      tasks.setDoneAt(second, 20, now = 20)
       assertEquals(listOf(second, first), tasks.observeDone(p).first().map { it.id })
 
-      tasks.setDoneAt(first, null)
+      tasks.setDoneAt(first, null, now = 30)
       assertNull(tasks.get(first)!!.doneAt)
       assertEquals(listOf(first), tasks.observeOpen(p).first().map { it.id })
     }
