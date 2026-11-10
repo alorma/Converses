@@ -3,6 +3,7 @@ package com.alorma.contactnotes.ui.people
 import androidx.activity.compose.ReportDrawnWhen
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.focusGroup
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -50,6 +51,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusProperties
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
@@ -117,6 +121,7 @@ fun PeopleListScreen(
   selectedPersonId: Long? = null,
 ) {
   val listState = rememberLazyListState()
+  val listFocus = remember { FocusRequester() }
   // Drawn once the rows are laid out (or there is nothing to show), not just when the data arrives
   ReportDrawnWhen { !state.isLoading && (state.people.isEmpty() || listState.layoutInfo.visibleItemsInfo.isNotEmpty()) }
   // En canviar els xips la llista torna a dalt (no a la primera composició, perquè no perdi la posició en tornar del detall)
@@ -135,6 +140,9 @@ fun PeopleListScreen(
       Column(
         modifier =
           Modifier
+            // Teclat: la fletxa avall des de la capçalera o els filtres entra a la llista. Sense això la cerca de
+            // focus salta als botons flotants, que queden per sobre de les files
+            .focusProperties { down = listFocus }
             .background(MaterialTheme.colorScheme.surface)
             .windowInsetsPadding(WindowInsets.statusBars)
             .padding(horizontal = ScreenMargin),
@@ -154,7 +162,7 @@ fun PeopleListScreen(
   ) { padding ->
     LazyColumn(
       state = listState,
-      modifier = Modifier.fillMaxSize(),
+      modifier = Modifier.fillMaxSize().focusRequester(listFocus).focusGroup(),
       contentPadding =
         PaddingValues(
           start = ScreenMargin,

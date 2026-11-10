@@ -1,5 +1,6 @@
 package com.alorma.contactnotes.ui
 
+import android.view.KeyEvent
 import androidx.activity.compose.LocalActivity
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.ContentTransform
@@ -24,12 +25,16 @@ import androidx.compose.material3.adaptive.navigation.BackNavigationBehavior
 import androidx.compose.material3.adaptive.navigation3.ListDetailSceneStrategy
 import androidx.compose.material3.adaptive.navigation3.rememberListDetailSceneStrategy
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import androidx.core.view.ViewCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.NavKey
@@ -62,9 +67,11 @@ import com.alorma.contactnotes.ui.navigation.PersonRoute
 import com.alorma.contactnotes.ui.navigation.QuickNoteRoute
 import com.alorma.contactnotes.ui.navigation.ScreenWidth
 import com.alorma.contactnotes.ui.navigation.SettingsRoute
+import com.alorma.contactnotes.ui.navigation.ShellNavigation
 import com.alorma.contactnotes.ui.navigation.TaskRoute
 import com.alorma.contactnotes.ui.navigation.TopLevelBackStack
 import com.alorma.contactnotes.ui.navigation.currentScreenWidth
+import com.alorma.contactnotes.ui.navigation.isQuickNoteShortcut
 import com.alorma.contactnotes.ui.navigation.screenWidthOf
 import com.alorma.contactnotes.ui.navigation.shellNavigationFor
 import com.alorma.contactnotes.ui.onboarding.OnboardingScreen
@@ -153,16 +160,35 @@ fun AppNavigation(
     ConsentSheet(onChoice = consentManager::setConsent)
   }
 
+  val shellNavigation = shellNavigationFor(navigation.backStack, currentScreenWidth(), book = book)
+  val quickNote = {
+    // Amb una persona oberta al costat, la nota ràpida ja ve amb ella triada (una protegida torna a demanar empremta)
+    val openId = if (twoPane) (navigation.current as? PersonRoute)?.id else null
+    navigation.navigate(QuickNoteRoute(personId = openId ?: 0L))
+  }
+
+  // Ctrl+N obre la nota ràpida allà on es veu el seu botó (el rail o la barra flotant). Es rep quan cap camp ni cap
+  // pantalla s'ha quedat la tecla; amb un formulari obert (una altra finestra, en diàleg) no arriba aquí
+  val view = LocalView.current
+  val currentQuickNote by rememberUpdatedState(quickNote)
+  val shortcutEnabled by rememberUpdatedState(shellNavigation != ShellNavigation.None)
+  DisposableEffect(view) {
+    val listener =
+      ViewCompat.OnUnhandledKeyEventListenerCompat { _, event ->
+        val isShortcut = isQuickNoteShortcut(event.action == KeyEvent.ACTION_DOWN, event.isCtrlPressed, event.keyCode)
+        if (isShortcut && shortcutEnabled) currentQuickNote()
+        isShortcut && shortcutEnabled
+      }
+    ViewCompat.addOnUnhandledKeyEventListener(view, listener)
+    onDispose { ViewCompat.removeOnUnhandledKeyEventListener(view, listener) }
+  }
+
   AppShell(
     currentTab = navigation.currentTab,
-    navigation = shellNavigationFor(navigation.backStack, currentScreenWidth(), book = book),
+    navigation = shellNavigation,
     floatingBarWidth = if (book) hingeLeft?.minus(HingeMargin) else null,
     onTabSelected = navigation::switchTab,
-    onQuickNote = {
-      // Amb una persona oberta al costat, la nota ràpida ja ve amb ella triada (una protegida torna a demanar empremta)
-      val openId = if (twoPane) (navigation.current as? PersonRoute)?.id else null
-      navigation.navigate(QuickNoteRoute(personId = openId ?: 0L))
-    },
+    onQuickNote = quickNote,
     onOpenSettings = { navigation.navigateSingle(SettingsRoute) },
     settingsSelected = SettingsRoute in navigation.backStack,
   ) {

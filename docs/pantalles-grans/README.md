@@ -94,13 +94,26 @@ d'en Bernat.
   a l'esquerra, detall a la dreta, sense rail, barra flotant i FAB dins del llistat, res interactiu a menys de 24 dp
   de la frontissa. Plegar i desplegar conserva persona, scroll i text. Sense `FoldingFeature`, disposició de tauleta
   vertical.
-- [ ] **6. Teclat i ratolí.** Fletxes amunt i avall pel llistat, Intro obre, Ctrl+N nota ràpida, Esc tanca diàlegs,
+- [x] **6. Teclat i ratolí.** Fletxes amunt i avall pel llistat, Intro obre, Ctrl+N nota ràpida, Esc tanca diàlegs,
   hover a tot el que es pot tocar.
 - [ ] **7. Tancament.** Revisió sencera a tauleta, plegable i finestra lliure. Actualitzar `CLAUDE.md` (arquitectura
   i regles de l'`AppShell`). Proposar la línia de les notes de versió. Valorar regenerar el Baseline Profile (la
   navegació haurà canviat). Condensar aquest document.
 
 ## Notes entre sessions
+
+**Després del pas 6**
+
+- **Ctrl+N** obre la nota ràpida: `AppNavigation` escolta les tecles que ningú s'ha quedat
+  (`ViewCompat.addOnUnhandledKeyEventListener`) i només actua on es veu el botó de nota ràpida (rail o barra flotant).
+  Amb un formulari obert en diàleg no arriba, perquè és una altra finestra. Funciona a qualsevol amplada.
+- **Fletxes i Intro** al llistat ja funcionaven soles (les files són `clickable`/`selectable`). Només calia
+  `focusProperties { down = listFocus }` a la capçalera del llistat: sense això, la fletxa avall des dels filtres
+  saltava als botons flotants en lloc d'entrar a la primera fila.
+- **Esc** tanca els diàlegs (ho fa `Dialog`). **Hover:** el que ja porten els components de Material i `clickable`;
+  no s'ha afegit res ni s'ha comprovat amb ratolí.
+- Provat a l'emulador amb `adb shell input keycombination 113 42` (Ctrl+N), `keyevent 20`/`19` (fletxes), `66`
+  (Intro), `61` (Tab) i `111` (Esc), mirant el node enfocat amb `uiautomator dump`.
 
 **Després del pas 5**
 

@@ -70,6 +70,15 @@ class ScreenWidthTest {
   }
 
   @Test
+  fun `only ctrl plus n pressed down is the quick note shortcut`() {
+    val n = 42
+    assertEquals(true, isQuickNoteShortcut(isDown = true, isCtrlPressed = true, keyCode = n))
+    assertEquals(false, isQuickNoteShortcut(isDown = false, isCtrlPressed = true, keyCode = n))
+    assertEquals(false, isQuickNoteShortcut(isDown = true, isCtrlPressed = false, keyCode = n))
+    assertEquals(false, isQuickNoteShortcut(isDown = true, isCtrlPressed = true, keyCode = n + 1))
+  }
+
+  @Test
   fun `a large screen hides the rail on onboarding and on an import`() {
     for (width in large) {
       assertEquals(ShellNavigation.None, shell(width, OnboardingRoute))

@@ -44,6 +44,15 @@ enum class ShellNavigation {
   Rail,
 }
 
+/** Ctrl+N (teclat físic): nota ràpida. `KeyEvent.KEYCODE_N` val 42; es passa el codi perquè es pugui provar a la JVM. */
+fun isQuickNoteShortcut(
+  isDown: Boolean,
+  isCtrlPressed: Boolean,
+  keyCode: Int,
+): Boolean = isDown && isCtrlPressed && keyCode == KeyCodeN
+
+private const val KeyCodeN = 42
+
 /** Nota ràpida, formularis i Pro: al mòbil són pantalles completes; en una pantalla gran, diàlegs sobre la resta. */
 fun NavKey.isFormRoute(): Boolean =
   this is QuickNoteRoute || this is EditPersonRoute || this is TaskRoute || this is PaywallRoute
