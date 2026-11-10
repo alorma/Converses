@@ -221,6 +221,18 @@ class EditPersonViewModelTest {
   }
 
   @Test
+  fun savingAnExistingPersonKeepsItsSyncId() {
+    val marta = db.addPerson("Marta")
+    val vm = viewModel(marta.id)
+    vm.onName("Marta S")
+
+    vm.save { }
+
+    assertEquals("Marta S", db.person(marta.id)!!.name)
+    assertEquals(marta.syncId, db.person(marta.id)!!.syncId)
+  }
+
+  @Test
   fun saveIsIgnoredWhileTheFormIsNotValid() {
     val vm = viewModel()
     var called = false

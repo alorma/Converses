@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.alorma.contactnotes.data.ConversesRepository
 import com.alorma.contactnotes.data.db.PersonEntity
 import com.alorma.contactnotes.data.db.PinnedFactEntity
+import com.alorma.contactnotes.data.db.newSyncId
 import com.alorma.contactnotes.data.tracking.EventTracker
 import com.alorma.contactnotes.shared.AvatarColor
 import com.alorma.contactnotes.shared.AvatarShape
@@ -283,6 +284,8 @@ class EditPersonViewModel(
           notes = base?.notes,
           createdAt = base?.createdAt ?: now,
           updatedAt = now,
+          // La identitat de sincronització és de la persona, no d'aquesta edició
+          syncId = base?.syncId ?: newSyncId(),
         )
       val facts =
         current.facts

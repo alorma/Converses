@@ -44,13 +44,27 @@ class ConversesRepository(
   // Sincronització (`docs/sync`): tota escriptura surt d'aquí segellada, és a dir, pendent de pujar i amb la data de
   // modificació, encara que l'entitat vingués neta d'una pantalla. `SyncIdentityTest` falla si un mètode se n'oblida.
 
-  private fun PersonEntity.stamped(at: Long) = copy(updatedAt = at, dirty = true)
+  //
+  // El `syncId` no canvia mai: si la fila ja existeix, el segell hi posa el que té desat, porti el que porti l'entitat.
+  // Una pantalla pot construir l'entitat de zero (l'editor de persones ho fa) i li sortiria un identificador nou.
 
-  private fun EntryEntity.stamped(at: Long) = copy(modifiedAt = at, dirty = true)
+  private suspend fun PersonEntity.stamped(at: Long) =
+    copy(updatedAt = at, dirty = true, syncId = stored(id) { personDao.get(it)?.syncId } ?: syncId)
 
-  private fun TaskEntity.stamped(at: Long) = copy(modifiedAt = at, dirty = true)
+  private suspend fun EntryEntity.stamped(at: Long) =
+    copy(modifiedAt = at, dirty = true, syncId = stored(id) { entryDao.get(it)?.syncId } ?: syncId)
 
-  private fun CustomChannelEntity.stamped(at: Long) = copy(modifiedAt = at, dirty = true)
+  private suspend fun TaskEntity.stamped(at: Long) =
+    copy(modifiedAt = at, dirty = true, syncId = stored(id) { taskDao.get(it)?.syncId } ?: syncId)
+
+  private suspend fun CustomChannelEntity.stamped(at: Long) =
+    copy(modifiedAt = at, dirty = true, syncId = stored(id) { customChannelDao.get(it)?.syncId } ?: syncId)
+
+  /** El `syncId` de la fila [id] si ja és a la base de dades; `null` per a una fila nova o que torna d'un «Desfés». */
+  private suspend fun stored(
+    id: Long,
+    syncIdOf: suspend (Long) -> String?,
+  ): String? = if (id == 0L) null else syncIdOf(id)
 
   /** Les persones protegides no exposen última entrada, canals ni pendents. */
   fun observePeople(archived: Boolean = false): Flow<List<PersonListItem>> =

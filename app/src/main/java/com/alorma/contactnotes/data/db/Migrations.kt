@@ -77,6 +77,6 @@ class Migration5To6 : Migration(5, 6) {
     /** Un UUID v4 en minúscules, amb el mateix format que `UUID.randomUUID()`; SQLite l'avalua per a cada fila. */
     const val RANDOM_UUID =
       "lower(hex(randomblob(4)) || '-' || hex(randomblob(2)) || '-4' || substr(hex(randomblob(2)), 2) || '-' || " +
-        "substr('89ab', abs(random()) % 4 + 1, 1) || substr(hex(randomblob(2)), 2) || '-' || hex(randomblob(6)))"
+        "substr('89ab', (random() & 3) + 1, 1) || substr(hex(randomblob(2)), 2) || '-' || hex(randomblob(6)))"
   }
 }

@@ -35,6 +35,16 @@ class FakeDb {
   val tombstones = MutableStateFlow<List<SyncTombstoneEntity>>(emptyList())
   private var next = 1L
 
+  /** Com la clau primària i l'índex únic de `syncId`: Room llançaria una `SQLiteConstraintException`. */
+  fun checkUnique(
+    rows: List<Pair<Long, String>>,
+    id: Long,
+    syncId: String,
+  ) {
+    check(rows.none { it.first == id }) { "A row with id $id already exists" }
+    check(rows.none { it.second == syncId }) { "A row with this syncId already exists" }
+  }
+
   /** Com `INSERT OR REPLACE`: un sol tombstone per `syncId`. */
   fun putTombstones(
     syncIds: List<String>,
@@ -150,6 +160,7 @@ class FakePersonDao(
 ) : PersonDao() {
   override suspend fun insert(person: PersonEntity): Long {
     val id = if (person.id == 0L) db.nextId() else person.id
+    db.checkUnique(db.people.value.map { it.id to it.syncId }, id, person.syncId)
     db.people.update { it + person.copy(id = id) }
     return id
   }
@@ -165,8 +176,15 @@ class FakePersonDao(
     db.tasks.update { list -> list.filterNot { it.personId == person.id } }
   }
 
-  override suspend fun insertTombstone(tombstone: SyncTombstoneEntity) =
-    db.putTombstones(listOf(tombstone.syncId), tombstone.deletedAt)
+  override suspend fun tombstone(
+    id: Long,
+    now: Long,
+  ) = db.putTombstones(
+    db.people.value
+      .filter { it.id == id }
+      .map { it.syncId },
+    now,
+  )
 
   override suspend fun tombstoneEntriesOf(
     personId: Long,
@@ -225,8 +243,15 @@ class FakePersonDao(
 class FakeEntryDao(
   private val db: FakeDb,
 ) : EntryDao() {
-  override suspend fun insertTombstone(tombstone: SyncTombstoneEntity) =
-    db.putTombstones(listOf(tombstone.syncId), tombstone.deletedAt)
+  override suspend fun tombstone(
+    id: Long,
+    now: Long,
+  ) = db.putTombstones(
+    db.entries.value
+      .filter { it.id == id }
+      .map { it.syncId },
+    now,
+  )
 
   override suspend fun clearTombstone(syncId: String) {
     db.tombstones.update { list -> list.filterNot { it.syncId == syncId } }
@@ -247,6 +272,7 @@ class FakeEntryDao(
 
   override suspend fun insert(entry: EntryEntity): Long {
     val id = if (entry.id == 0L) db.nextId() else entry.id
+    db.checkUnique(db.entries.value.map { it.id to it.syncId }, id, entry.syncId)
     db.entries.update { it + entry.copy(id = id) }
     return id
   }
@@ -309,8 +335,15 @@ class FakeEntryDao(
 class FakeCustomChannelDao(
   private val db: FakeDb,
 ) : CustomChannelDao() {
-  override suspend fun insertTombstone(tombstone: SyncTombstoneEntity) =
-    db.putTombstones(listOf(tombstone.syncId), tombstone.deletedAt)
+  override suspend fun tombstone(
+    id: Long,
+    now: Long,
+  ) = db.putTombstones(
+    db.channels.value
+      .filter { it.id == id }
+      .map { it.syncId },
+    now,
+  )
 
   override suspend fun stampEntriesOf(
     channelId: Long,
@@ -323,6 +356,7 @@ class FakeCustomChannelDao(
 
   override suspend fun insert(channel: CustomChannelEntity): Long {
     val id = if (channel.id == 0L) db.nextId() else channel.id
+    db.checkUnique(db.channels.value.map { it.id to it.syncId }, id, channel.syncId)
     db.channels.update { it + channel.copy(id = id) }
     return id
   }
@@ -380,11 +414,19 @@ class FakePinnedFactDao(
 class FakeTaskDao(
   private val db: FakeDb,
 ) : TaskDao() {
-  override suspend fun insertTombstone(tombstone: SyncTombstoneEntity) =
-    db.putTombstones(listOf(tombstone.syncId), tombstone.deletedAt)
+  override suspend fun tombstone(
+    id: Long,
+    now: Long,
+  ) = db.putTombstones(
+    db.tasks.value
+      .filter { it.id == id }
+      .map { it.syncId },
+    now,
+  )
 
   override suspend fun insert(task: TaskEntity): Long {
     val id = if (task.id == 0L) db.nextId() else task.id
+    db.checkUnique(db.tasks.value.map { it.id to it.syncId }, id, task.syncId)
     db.tasks.update { it + task.copy(id = id) }
     return id
   }

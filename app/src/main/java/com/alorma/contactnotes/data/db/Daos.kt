@@ -3,7 +3,6 @@ package com.alorma.contactnotes.data.db
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
-import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
@@ -23,8 +22,14 @@ abstract class PersonDao {
   @Delete
   protected abstract suspend fun delete(person: PersonEntity)
 
-  @Insert(onConflict = OnConflictStrategy.REPLACE)
-  protected abstract suspend fun insertTombstone(tombstone: SyncTombstoneEntity)
+  /** El `syncId` surt de la fila desada, no de l'entitat que arriba, que podria portar-ne un altre. */
+  @Query(
+    "INSERT OR REPLACE INTO sync_tombstone (syncId, deletedAt, dirty) SELECT syncId, :now, 1 FROM person WHERE id = :id",
+  )
+  protected abstract suspend fun tombstone(
+    id: Long,
+    now: Long,
+  )
 
   @Query(
     "INSERT OR REPLACE INTO sync_tombstone (syncId, deletedAt, dirty) " +
@@ -55,7 +60,7 @@ abstract class PersonDao {
   ) {
     tombstoneEntriesOf(person.id, now)
     tombstoneTasksOf(person.id, now)
-    insertTombstone(SyncTombstoneEntity(person.syncId, deletedAt = now))
+    tombstone(person.id, now)
     delete(person)
   }
 
@@ -132,8 +137,14 @@ abstract class EntryDao {
   @Delete
   protected abstract suspend fun delete(entry: EntryEntity)
 
-  @Insert(onConflict = OnConflictStrategy.REPLACE)
-  protected abstract suspend fun insertTombstone(tombstone: SyncTombstoneEntity)
+  /** El `syncId` surt de la fila desada, no de l'entitat que arriba. */
+  @Query(
+    "INSERT OR REPLACE INTO sync_tombstone (syncId, deletedAt, dirty) SELECT syncId, :now, 1 FROM entry WHERE id = :id",
+  )
+  protected abstract suspend fun tombstone(
+    id: Long,
+    now: Long,
+  )
 
   @Query("DELETE FROM sync_tombstone WHERE syncId = :syncId")
   protected abstract suspend fun clearTombstone(syncId: String)
@@ -153,7 +164,7 @@ abstract class EntryDao {
     entry: EntryEntity,
     now: Long,
   ) {
-    insertTombstone(SyncTombstoneEntity(entry.syncId, deletedAt = now))
+    tombstone(entry.id, now)
     delete(entry)
   }
 
@@ -237,15 +248,21 @@ abstract class TaskDao {
   @Delete
   protected abstract suspend fun delete(task: TaskEntity)
 
-  @Insert(onConflict = OnConflictStrategy.REPLACE)
-  protected abstract suspend fun insertTombstone(tombstone: SyncTombstoneEntity)
+  /** El `syncId` surt de la fila desada, no de l'entitat que arriba. */
+  @Query(
+    "INSERT OR REPLACE INTO sync_tombstone (syncId, deletedAt, dirty) SELECT syncId, :now, 1 FROM task WHERE id = :id",
+  )
+  protected abstract suspend fun tombstone(
+    id: Long,
+    now: Long,
+  )
 
   @Transaction
   open suspend fun deleteWithTombstone(
     task: TaskEntity,
     now: Long,
   ) {
-    insertTombstone(SyncTombstoneEntity(task.syncId, deletedAt = now))
+    tombstone(task.id, now)
     delete(task)
   }
 
@@ -287,8 +304,15 @@ abstract class CustomChannelDao {
   @Delete
   protected abstract suspend fun delete(channel: CustomChannelEntity)
 
-  @Insert(onConflict = OnConflictStrategy.REPLACE)
-  protected abstract suspend fun insertTombstone(tombstone: SyncTombstoneEntity)
+  /** El `syncId` surt de la fila desada, no de l'entitat que arriba. */
+  @Query(
+    "INSERT OR REPLACE INTO sync_tombstone (syncId, deletedAt, dirty) " +
+      "SELECT syncId, :now, 1 FROM custom_channel WHERE id = :id",
+  )
+  protected abstract suspend fun tombstone(
+    id: Long,
+    now: Long,
+  )
 
   @Query("UPDATE entry SET modifiedAt = :now, dirty = 1 WHERE customChannelId = :channelId")
   protected abstract suspend fun stampEntriesOf(
@@ -306,7 +330,7 @@ abstract class CustomChannelDao {
     now: Long,
   ) {
     stampEntriesOf(channel.id, now)
-    insertTombstone(SyncTombstoneEntity(channel.syncId, deletedAt = now))
+    tombstone(channel.id, now)
     delete(channel)
   }
 

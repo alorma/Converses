@@ -142,6 +142,26 @@ class SyncIdentityDaoTest {
     }
 
   @Test
+  fun aStaleEntityTombstonesTheStoredSyncId() =
+    runTest {
+      val anna = person()
+      val entry = entries.get(entry(anna))!!
+      val task = tasks.get(task(anna))!!
+      val channel = channels.get(channel())!!
+      val person = people.get(anna)!!
+
+      entries.deleteWithTombstone(entry.copy(syncId = "other"), now = 50)
+      tasks.deleteWithTombstone(task.copy(syncId = "other"), now = 50)
+      channels.deleteWithTombstone(channel.copy(syncId = "other"), now = 50)
+      people.deleteWithTombstones(person.copy(syncId = "other"), now = 50)
+
+      assertEquals(
+        setOf(entry.syncId, task.syncId, channel.syncId, person.syncId).map { "$it|50|1" }.toSet(),
+        tombstones(),
+      )
+    }
+
+  @Test
   fun deletingATaskLeavesATombstone() =
     runTest {
       val task = tasks.get(task(person()))!!

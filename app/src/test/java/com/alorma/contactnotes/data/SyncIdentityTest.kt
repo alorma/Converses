@@ -10,9 +10,11 @@ import com.alorma.contactnotes.shared.EntryKind
 import com.alorma.contactnotes.testing.FakeDb
 import java.lang.reflect.Modifier
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertThrows
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -350,6 +352,68 @@ class SyncIdentityTest {
       repository.deleteEntry(db.entries.value.single())
 
       assertEquals(listOf(entry.syncId), db.tombstones.value.map { it.syncId })
+    }
+
+  // La identitat no canvia: el `syncId` és el de la fila desada, porti el que porti l'entitat que arriba.
+
+  @Test
+  fun savingAPersonBuiltFromScratchKeepsItsSyncId() =
+    runTest {
+      val anna = db.addPerson("Anna")
+
+      repository.savePerson(PersonEntity(id = anna.id, name = "Anna B", createdAt = 1, updatedAt = 1), emptyList())
+
+      assertEquals("Anna B", person(anna.id).name)
+      assertEquals(anna.syncId, person(anna.id).syncId)
+    }
+
+  @Test
+  fun updatingRowsBuiltFromScratchKeepsTheirSyncId() =
+    runTest {
+      val anna = db.addPerson("Anna")
+      val entry = db.addEntry(anna.id)
+      val task = db.addTask(anna.id)
+      val channel = db.addCustomChannel("WhatsApp")
+
+      repository.updateEntry(entry.copy(text = "x", syncId = "other"))
+      repository.moveEntry(entry.copy(syncId = "other"), anna.id)
+      repository.saveTask(task.copy(text = "x", syncId = "other"))
+      repository.renameCustomChannel(channel.copy(syncId = "other"), "Signal")
+      repository.changeCustomChannelGroup(channel.copy(name = "Signal", syncId = "other"), ChannelType.SOCIAL)
+      repository.setArchived(anna.copy(syncId = "other"), true)
+      repository.setProtected(anna.copy(syncId = "other"), true)
+
+      assertEquals(entry.syncId, entry(entry.id).syncId)
+      assertEquals(task.syncId, task(task.id).syncId)
+      assertEquals(channel.syncId, channel(channel.id).syncId)
+      assertEquals(anna.syncId, person(anna.id).syncId)
+    }
+
+  @Test
+  fun deletingWithAStaleEntityTombstonesTheStoredSyncId() =
+    runTest {
+      val anna = db.addPerson("Anna")
+      val entry = db.addEntry(anna.id)
+      val task = db.addTask(anna.id)
+      val channel = db.addCustomChannel("WhatsApp")
+
+      repository.deleteEntry(entry.copy(syncId = "other"))
+      repository.deleteTask(task.copy(syncId = "other"))
+      repository.deleteCustomChannel(channel.copy(syncId = "other"))
+      repository.deletePerson(anna.copy(syncId = "other"))
+
+      assertEquals(setOf(anna.syncId, entry.syncId, task.syncId, channel.syncId), tombstoned())
+    }
+
+  @Test
+  fun theFakeRejectsADuplicateSyncIdLikeTheUniqueIndex() =
+    runTest {
+      val anna = db.addPerson("Anna")
+      val entry = db.addEntry(anna.id)
+
+      assertThrows(IllegalStateException::class.java) {
+        runBlocking { repository.addEntry(entry.copy(id = 0)) }
+      }
     }
 
   /** Si afegeixes un mètode d'escriptura al repositori: segella'l, afegeix-ne el test i apunta'l aquí. */
