@@ -107,7 +107,11 @@ Decisions preses en construir-ho **(C)**:
 
 - Plataforma i no Tink: tot el que cal ja hi és, i HKDF són quinze línies sobre HMAC comprovades amb els vectors de l'RFC. Tink afegiria una dependència i pes a l'APK.
 - La clau d'embolcall és `HKDF-SHA256(secret, sal buida, info = "converses/sync/v1/wrap")`. El secret ja té 128 bits d'entropia, i per això no cal cap derivació lenta com les de les contrasenyes.
-- La versió del format (`SYNC_FORMAT = 1`) no va dins del blob: va a les dades associades i al camp `format` del compte.
+- Els registres no es xifren amb la clau de dades directament, sinó amb una clau derivada només per a això: `HKDF-SHA256(clau de dades, sal buida, info = "converses/sync/v1/record")`. Així la clau de dades pot servir més endavant per a una altra cosa (fitxers adjunts, per exemple) sense que una mateixa clau faci dues feines ni calgui tornar-ho a xifrar tot.
+- La versió del format (`SYNC_FORMAT = 1`) no va dins del blob: va a les dades associades i al camp `format` del compte. `KeyWrap` i `RecordCipher` la reben com a paràmetre, per poder llegir un format antic el dia que n'hi hagi un de nou.
+- El format està fixat per dos tests amb valors coneguts (`theWrappedFormatIsFrozen`, `theRecordFormatIsFrozen`): si algú canvia la derivació, l'ordre dels camps o la versió, fallen. Un cop hi hagi dades al núvol, no es toquen sense una versió nova i un camí per llegir l'antiga.
+- `Bip39.split` és l'única manera de partir una frase enganxada (espais, salts de línia, comes o numerada). Les paraules es comparen només per les seves lletres, i així no hi fan res les majúscules ni els caràcters invisibles que s'enganxen en copiar.
+- Amb un nonce aleatori de 96 bits i una sola clau, el límit recomanat pel NIST és de 2³² xifratges; a 10.000 escriptures diàries, més de mil anys. «Començar de nou amb paraules noves» canvia la clau.
 - Les dades associades són camps prefixats per la seva llargada: `("wrap", format, uid)` per a la clau embolcallada i `("record", format, uid, recordId)` per als registres. Dos conjunts de camps diferents no poden donar mai els mateixos bytes.
 - La llista de paraules és un fitxer Kotlin (`Bip39Words.kt`), no un recurs, perquè el paquet continuï sent JVM pur.
 

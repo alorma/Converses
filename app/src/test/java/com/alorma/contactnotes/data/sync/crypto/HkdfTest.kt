@@ -34,6 +34,11 @@ class HkdfTest {
   }
 }
 
+/** Un `SecureRandom` que sempre dona zeros, per reproduir vectors coneguts. Mai fora dels tests: repetiria el nonce. */
+internal class Zeros : java.security.SecureRandom() {
+  override fun nextBytes(bytes: ByteArray) = bytes.fill(0)
+}
+
 internal fun ByteArray.hex(): String = joinToString("") { "%02x".format(it) }
 
 internal fun unhex(hex: String): ByteArray = hex.chunked(2).map { it.toInt(16).toByte() }.toByteArray()

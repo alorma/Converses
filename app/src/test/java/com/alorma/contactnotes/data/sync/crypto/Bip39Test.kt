@@ -65,6 +65,35 @@ class Bip39Test {
   }
 
   @Test
+  fun splitsAPastedPhraseHoweverItIsSeparated() {
+    val twelve = words("legal winner thank year wave sausage worth useful legal winner thank yellow")
+
+    listOf(
+      twelve.joinToString(" "),
+      twelve.joinToString("  "),
+      twelve.joinToString("\n") + "\n",
+      "  " + twelve.joinToString("\t") + "  ",
+      twelve.joinToString(", "),
+      twelve.mapIndexed { index, word -> "${index + 1}. $word" }.joinToString("\n"),
+      "﻿" + twelve.joinToString("​  ").uppercase(),
+    ).forEach { pasted ->
+      assertEquals(pasted, twelve, Bip39.split(pasted))
+      assertArrayEquals(bytes(0x7f), entropyOf(Bip39.decode(Bip39.split(pasted))))
+    }
+    assertEquals(emptyList<String>(), Bip39.split("  \n "))
+  }
+
+  @Test
+  fun ignoresInvisibleCharactersStuckToAWord() {
+    val typed = words("legal winner thank year wave sausage worth useful legal winner thank yellow").toMutableList()
+    typed[0] = "​legal"
+    typed[11] = "yellow﻿"
+
+    assertArrayEquals(bytes(0x7f), entropyOf(Bip39.decode(typed)))
+    assertTrue(Bip39.isWord("​zoo"))
+  }
+
+  @Test
   fun reportsThePositionsOfUnknownWords() {
     val typed = words("legal winner thank year wave sausage worth useful legal winner thank yellow").toMutableList()
     typed[2] = "xyz"

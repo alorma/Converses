@@ -12,9 +12,15 @@ class AesGcmTest {
   private val aad = aadOf("record", "1", "uid", "id")
   private val random = SecureRandom()
 
-  /** Un `SecureRandom` que sempre dona zeros, per reproduir un vector conegut. */
-  private class Zeros : SecureRandom() {
-    override fun nextBytes(bytes: ByteArray) = bytes.fill(0)
+  /** NIST, cas de prova 14: clau i nonce a zero, un bloc de zeros. Comprova el text xifrat, no només l'etiqueta. */
+  @Test
+  fun nistGcmVectorWithOneBlock() {
+    val sealed = AesGcm.seal(ByteArray(32), ByteArray(16), ByteArray(0), Zeros())
+
+    assertEquals(
+      "000000000000000000000000" + "cea7403d4d606b6e074ec5d3baf39d18" + "d0d1c8a799996bf0265b98b5d48ab919",
+      sealed.hex(),
+    )
   }
 
   /** NIST, «The Galois/Counter Mode of Operation», cas de prova 13: clau i nonce a zero, sense text. */

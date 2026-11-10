@@ -40,6 +40,37 @@ class RecordCipherTest {
   }
 
   @Test
+  fun aRecordInAnotherFormatOnlyOpensWhenAskedForThatFormat() {
+    val sealed = RecordCipher(key, uid = "u1", format = 2).encrypt("a", "hola".toByteArray())
+
+    assertNull(cipher.decrypt("a", sealed))
+    assertArrayEquals("hola".toByteArray(), RecordCipher(key, uid = "u1", format = 2).decrypt("a", sealed))
+  }
+
+  /**
+   * Fixa el format: si aquest test canvia, els registres que ja són al núvol deixen d'obrir-se. No es toca sense una
+   * versió nova de [SYNC_FORMAT] i un camí per llegir l'antiga. La clau derivada i el text xifrat (`0f4547bb`) s'han
+   * comprovat amb `openssl` (HKDF i AES-256-CTR); l'etiqueta surt d'aquesta implementació.
+   */
+  @Test
+  fun theRecordFormatIsFrozen() {
+    val frozen = RecordCipher(DataKey(ByteArray(32) { it.toByte() }), uid = "u1", random = Zeros())
+
+    assertEquals(
+      "000000000000000000000000" + "0f4547bb" + "ef1867bd877c335ba4b467669ec8fded",
+      frozen.encrypt("a", "hola".toByteArray()).hex(),
+    )
+  }
+
+  /** Els registres no es xifren amb la clau de dades directament, sinó amb una clau derivada només per a això. */
+  @Test
+  fun recordsAreNotSealedWithTheDataKeyItself() {
+    val sealed = cipher.encrypt("a", "hola".toByteArray())
+
+    assertNull(AesGcm.open(key.bytes, sealed, aadOf("record", "1", "u1", "a")))
+  }
+
+  @Test
   fun aWrappedKeyIsNotARecord() {
     val wrapped = KeyWrap.wrap(key, RecoverySecret.generate(), uid = "u1")
 

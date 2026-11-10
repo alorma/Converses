@@ -43,6 +43,50 @@ class KeyWrapTest {
     assertNull(KeyWrap.unwrap(ByteArray(0), secret, uid = "u1"))
   }
 
+  /**
+   * Fixa el format: si aquest test canvia, les claus embolcallades que ja són al núvol deixen d'obrir-se. No es toca
+   * sense una versió nova de [SYNC_FORMAT] i un camí per llegir l'antiga. La clau d'embolcall d'aquest vector s'ha
+   * comprovat amb `openssl kdf`.
+   */
+  @Test
+  fun theWrappedFormatIsFrozen() {
+    val wrapped =
+      KeyWrap.wrap(
+        dataKey = DataKey(ByteArray(32) { it.toByte() }),
+        secret = RecoverySecret(ByteArray(16) { 0x7f }),
+        uid = "u1",
+        random = Zeros(),
+      )
+
+    assertEquals(
+      "000000000000000000000000" +
+        "4eaf67519b0f2dd12dece0640faffb66b57053575094b1f7a4c9d5cbbc252cc2" +
+        "6bb259767d555cd7e404803f61fccc58",
+      wrapped.hex(),
+    )
+  }
+
+  @Test
+  fun aKeyWrappedInAnotherFormatOnlyOpensWhenAskedForThatFormat() {
+    val wrapped = KeyWrap.wrap(key, secret, uid = "u1", format = 2)
+
+    assertNull(KeyWrap.unwrap(wrapped, secret, uid = "u1"))
+    assertEquals(key, KeyWrap.unwrap(wrapped, secret, uid = "u1", format = 2))
+  }
+
+  @Test
+  fun aWrappedBlobOfTheWrongSizeIsNotAKey() {
+    val notAKey =
+      AesGcm.seal(
+        Hkdf.sha256(secret.bytes, ByteArray(0), "converses/sync/v1/wrap".toByteArray(), 32),
+        ByteArray(16),
+        aadOf("wrap", "1", "u1"),
+        Zeros(),
+      )
+
+    assertNull(KeyWrap.unwrap(notAKey, secret, uid = "u1"))
+  }
+
   @Test
   fun theWrappedKeyHasTheExpectedSize() {
     assertEquals(12 + 32 + 16, KeyWrap.wrap(key, secret, uid = "u1").size)

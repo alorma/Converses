@@ -37,7 +37,19 @@ object Bip39 {
     BIP39_ENGLISH.withIndex().associate { (index, word) -> word to index }
   }
 
-  private fun normalize(word: String) = word.trim().lowercase()
+  private val notALetter = Regex("[^A-Za-z]+")
+
+  /**
+   * Només en queden les lletres: la llista és ASCII, i així no hi fan res els espais, les majúscules ni els caràcters
+   * invisibles que s'enganxen en copiar (un espai d'amplada zero no es veu, i la paraula semblaria bona).
+   */
+  private fun normalize(word: String) = word.replace(notALetter, "").lowercase()
+
+  /**
+   * Separa una frase enganxada en paraules, vingui com vingui: amb espais, salts de línia, comes o numerada, com la
+   * desen els gestors de contrasenyes. És l'única manera de partir-la, perquè cada pantalla no ho faci a la seva.
+   */
+  fun split(text: String): List<String> = text.split(notALetter).filter { it.isNotEmpty() }.map { it.lowercase() }
 
   fun isWord(word: String): Boolean = normalize(word) in indexOfWord
 
@@ -47,7 +59,7 @@ object Bip39 {
     return bits.chunked(BITS_PER_WORD).map { word -> BIP39_ENGLISH[word.fold(0) { acc, bit -> acc * 2 + bit }] }
   }
 
-  /** Accepta majúscules i espais al voltant de cada paraula, com surten d'enganxar-les. */
+  /** Accepta majúscules i espais al voltant de cada paraula; una frase sencera es parteix abans amb [split]. */
   fun decode(words: List<String>): Bip39Result {
     if (words.size != WORD_COUNT) return Bip39Result.WrongLength(words.size)
     val indices = words.map { indexOfWord[normalize(it)] }
