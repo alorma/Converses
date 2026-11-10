@@ -86,7 +86,7 @@ class CustomChannelDaoTest {
       val id = channel("WhatsApp")
       val e = entry(p, customChannelId = id)
 
-      channels.delete(channels.get(id)!!)
+      channels.deleteWithTombstone(channels.get(id)!!, now = 0)
 
       val kept = entries.get(e)!!
       assertNull(kept.customChannelId)

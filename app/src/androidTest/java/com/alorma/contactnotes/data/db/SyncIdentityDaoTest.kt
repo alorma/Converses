@@ -65,6 +65,93 @@ class SyncIdentityDaoTest {
   private suspend fun channel(name: String = "WhatsApp"): Long =
     channels.insert(CustomChannelEntity(channelType = ChannelType.CHAT, name = name, createdAt = 0, dirty = false))
 
+  private fun tombstones(): Set<String> =
+    db.query("SELECT syncId || '|' || deletedAt || '|' || dirty FROM sync_tombstone", null).use { c ->
+      buildSet { while (c.moveToNext()) add(c.getString(0)) }
+    }
+
+  @Test
+  fun deletingAPersonLeavesTombstonesForThePersonItsEntriesAndItsTasks() =
+    runTest {
+      val anna = person()
+      val first = entries.get(entry(anna))!!
+      val second = entries.get(entry(anna))!!
+      val task = tasks.get(task(anna))!!
+      val other = person("Bernat")
+      val kept = entry(other)
+      val person = people.get(anna)!!
+
+      people.deleteWithTombstones(person, now = 50)
+
+      assertEquals(
+        setOf(person.syncId, first.syncId, second.syncId, task.syncId).map { "$it|50|1" }.toSet(),
+        tombstones(),
+      )
+      assertEquals(null, people.get(anna))
+      assertEquals(null, entries.get(first.id))
+      assertEquals(null, tasks.get(task.id))
+      assertEquals(kept, entries.get(kept)!!.id)
+    }
+
+  @Test
+  fun deleteInRangeLeavesATombstoneOnlyForTheDeletedEntries() =
+    runTest {
+      val anna = person()
+      val first = entries.get(entry(anna, occurredAt = 10))!!
+      val second = entries.get(entry(anna, occurredAt = 20))!!
+      val after = entry(anna, occurredAt = 30)
+
+      val deleted = entries.deleteInRangeWithTombstones(anna, ChannelType.CHAT, from = 10, to = 30, now = 50)
+
+      assertEquals(2, deleted)
+      assertEquals(setOf("${first.syncId}|50|1", "${second.syncId}|50|1"), tombstones())
+      assertEquals(after, entries.get(after)!!.id)
+    }
+
+  @Test
+  fun deletingAChannelStampsItsEntriesAndSetsThemToNoChannel() =
+    runTest {
+      val anna = person()
+      val whatsApp = channels.get(channel())!!
+      val inside = entry(anna, customChannelId = whatsApp.id)
+      val outside = entry(anna)
+
+      channels.deleteWithTombstone(whatsApp, now = 50)
+
+      assertEquals(setOf("${whatsApp.syncId}|50|1"), tombstones())
+      val orphan = entries.get(inside)!!
+      assertEquals(null, orphan.customChannelId)
+      assertEquals(50L, orphan.modifiedAt)
+      assertTrue(orphan.dirty)
+      assertFalse(entries.get(outside)!!.dirty)
+    }
+
+  @Test
+  fun insertLiveRemovesTheTombstoneOfThatSyncId() =
+    runTest {
+      val anna = person()
+      val entry = entries.get(entry(anna))!!
+      val other = entries.get(entry(anna))!!
+      entries.deleteWithTombstone(entry, now = 50)
+      entries.deleteWithTombstone(other, now = 50)
+
+      entries.insertLive(entry)
+
+      assertEquals(setOf("${other.syncId}|50|1"), tombstones())
+      assertEquals(entry, entries.get(entry.id))
+    }
+
+  @Test
+  fun deletingATaskLeavesATombstone() =
+    runTest {
+      val task = tasks.get(task(person()))!!
+
+      tasks.deleteWithTombstone(task, now = 50)
+
+      assertEquals(setOf("${task.syncId}|50|1"), tombstones())
+      assertEquals(null, tasks.get(task.id))
+    }
+
   @Test
   fun setDoneAtStampsTheTask() =
     runTest {

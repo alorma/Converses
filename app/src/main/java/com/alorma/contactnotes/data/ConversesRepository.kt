@@ -84,18 +84,19 @@ class ConversesRepository(
     facts: List<PinnedFactEntity>,
   ): Long = personDao.save(person.stamped(clock()), facts)
 
-  suspend fun deletePerson(person: PersonEntity) = personDao.delete(person)
+  suspend fun deletePerson(person: PersonEntity) = personDao.deleteWithTombstones(person, clock())
 
   suspend fun isAliasTaken(
     alias: String,
     excludePersonId: Long = 0,
   ): Boolean = personDao.countAliasConflicts(alias.trim(), excludePersonId) > 0
 
-  suspend fun addEntry(entry: EntryEntity): Long = entryDao.insert(entry.stamped(clock()))
+  /** També desfà un esborrat: l'entrada torna amb el seu `syncId` i sense tombstone. */
+  suspend fun addEntry(entry: EntryEntity): Long = entryDao.insertLive(entry.stamped(clock()))
 
   suspend fun updateEntry(entry: EntryEntity) = entryDao.update(entry.stamped(clock()))
 
-  suspend fun deleteEntry(entry: EntryEntity) = entryDao.delete(entry)
+  suspend fun deleteEntry(entry: EntryEntity) = entryDao.deleteWithTombstone(entry, clock())
 
   suspend fun moveEntry(
     entry: EntryEntity,
@@ -124,7 +125,7 @@ class ConversesRepository(
     channel: ChannelType,
     from: Long,
     to: Long,
-  ): Int = entryDao.deleteInRange(personId, channel, from, to)
+  ): Int = entryDao.deleteInRangeWithTombstones(personId, channel, from, to, clock())
 
   suspend fun getPerson(id: Long): PersonEntity? = personDao.get(id)
 
@@ -150,7 +151,7 @@ class ConversesRepository(
     }
   }
 
-  suspend fun deleteTask(task: TaskEntity) = taskDao.delete(task)
+  suspend fun deleteTask(task: TaskEntity) = taskDao.deleteWithTombstone(task, clock())
 
   suspend fun markTaskDone(
     task: TaskEntity,
@@ -219,7 +220,8 @@ class ConversesRepository(
     }
 
   /** Les seves entrades es queden al grup; no es perd cap nota. */
-  suspend fun deleteCustomChannel(channel: CustomChannelEntity) = customChannelDao.delete(channel)
+  suspend fun deleteCustomChannel(channel: CustomChannelEntity) =
+    customChannelDao.deleteWithTombstone(channel, clock())
 
   private suspend fun validateName(
     channelType: ChannelType,

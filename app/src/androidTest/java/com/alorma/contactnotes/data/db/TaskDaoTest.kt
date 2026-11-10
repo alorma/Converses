@@ -93,7 +93,7 @@ class TaskDaoTest {
       val p = person()
       task(p)
 
-      people.delete(people.get(p)!!)
+      people.deleteWithTombstones(people.get(p)!!, now = 0)
 
       assertEquals(emptyList<TaskEntity>(), tasks.observeOpen(p).first())
     }

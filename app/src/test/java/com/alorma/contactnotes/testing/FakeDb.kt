@@ -12,6 +12,7 @@ import com.alorma.contactnotes.data.db.PersonEntity
 import com.alorma.contactnotes.data.db.PersonListItem
 import com.alorma.contactnotes.data.db.PinnedFactDao
 import com.alorma.contactnotes.data.db.PinnedFactEntity
+import com.alorma.contactnotes.data.db.SyncTombstoneEntity
 import com.alorma.contactnotes.data.db.TaskDao
 import com.alorma.contactnotes.data.db.TaskEntity
 import com.alorma.contactnotes.shared.AvatarColor
@@ -31,7 +32,18 @@ class FakeDb {
   val facts = MutableStateFlow<List<PinnedFactEntity>>(emptyList())
   val channels = MutableStateFlow<List<CustomChannelEntity>>(emptyList())
   val tasks = MutableStateFlow<List<TaskEntity>>(emptyList())
+  val tombstones = MutableStateFlow<List<SyncTombstoneEntity>>(emptyList())
   private var next = 1L
+
+  /** Com `INSERT OR REPLACE`: un sol tombstone per `syncId`. */
+  fun putTombstones(
+    syncIds: List<String>,
+    now: Long,
+  ) {
+    tombstones.update { list ->
+      list.filterNot { it.syncId in syncIds } + syncIds.map { SyncTombstoneEntity(it, deletedAt = now) }
+    }
+  }
 
   fun nextId(): Long = next++
 
@@ -153,6 +165,19 @@ class FakePersonDao(
     db.tasks.update { list -> list.filterNot { it.personId == person.id } }
   }
 
+  override suspend fun insertTombstone(tombstone: SyncTombstoneEntity) =
+    db.putTombstones(listOf(tombstone.syncId), tombstone.deletedAt)
+
+  override suspend fun tombstoneEntriesOf(
+    personId: Long,
+    now: Long,
+  ) = db.putTombstones(db.entries.value.filter { it.personId == personId }.map { it.syncId }, now)
+
+  override suspend fun tombstoneTasksOf(
+    personId: Long,
+    now: Long,
+  ) = db.putTombstones(db.tasks.value.filter { it.personId == personId }.map { it.syncId }, now)
+
   override suspend fun insertFacts(facts: List<PinnedFactEntity>) {
     db.facts.update { list -> list + facts.map { it.copy(id = db.nextId()) } }
   }
@@ -189,7 +214,25 @@ class FakePersonDao(
 
 class FakeEntryDao(
   private val db: FakeDb,
-) : EntryDao {
+) : EntryDao() {
+  override suspend fun insertTombstone(tombstone: SyncTombstoneEntity) =
+    db.putTombstones(listOf(tombstone.syncId), tombstone.deletedAt)
+
+  override suspend fun clearTombstone(syncId: String) {
+    db.tombstones.update { list -> list.filterNot { it.syncId == syncId } }
+  }
+
+  override suspend fun tombstoneInRange(
+    personId: Long,
+    channelType: ChannelType,
+    from: Long,
+    to: Long,
+    now: Long,
+  ) = db.putTombstones(
+    db.entries.value.filter { inRange(it, personId, channelType, from, to) }.map { it.syncId },
+    now,
+  )
+
   override suspend fun insert(entry: EntryEntity): Long {
     val id = if (entry.id == 0L) db.nextId() else entry.id
     db.entries.update { it + entry.copy(id = id) }
@@ -254,6 +297,18 @@ class FakeEntryDao(
 class FakeCustomChannelDao(
   private val db: FakeDb,
 ) : CustomChannelDao() {
+  override suspend fun insertTombstone(tombstone: SyncTombstoneEntity) =
+    db.putTombstones(listOf(tombstone.syncId), tombstone.deletedAt)
+
+  override suspend fun stampEntriesOf(
+    channelId: Long,
+    now: Long,
+  ) {
+    db.entries.update { list ->
+      list.map { if (it.customChannelId == channelId) it.copy(modifiedAt = now, dirty = true) else it }
+    }
+  }
+
   override suspend fun insert(channel: CustomChannelEntity): Long {
     val id = if (channel.id == 0L) db.nextId() else channel.id
     db.channels.update { it + channel.copy(id = id) }
@@ -312,7 +367,10 @@ class FakePinnedFactDao(
 
 class FakeTaskDao(
   private val db: FakeDb,
-) : TaskDao {
+) : TaskDao() {
+  override suspend fun insertTombstone(tombstone: SyncTombstoneEntity) =
+    db.putTombstones(listOf(tombstone.syncId), tombstone.deletedAt)
+
   override suspend fun insert(task: TaskEntity): Long {
     val id = if (task.id == 0L) db.nextId() else task.id
     db.tasks.update { it + task.copy(id = id) }

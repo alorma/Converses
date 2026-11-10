@@ -3,6 +3,7 @@ package com.alorma.contactnotes.data.db
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
@@ -18,8 +19,45 @@ abstract class PersonDao {
   @Update
   abstract suspend fun update(person: PersonEntity)
 
+  /** Mai sol: [deleteWithTombstones] és l'únic esborrat. */
   @Delete
-  abstract suspend fun delete(person: PersonEntity)
+  protected abstract suspend fun delete(person: PersonEntity)
+
+  @Insert(onConflict = OnConflictStrategy.REPLACE)
+  protected abstract suspend fun insertTombstone(tombstone: SyncTombstoneEntity)
+
+  @Query(
+    "INSERT OR REPLACE INTO sync_tombstone (syncId, deletedAt, dirty) " +
+      "SELECT syncId, :now, 1 FROM entry WHERE personId = :personId",
+  )
+  protected abstract suspend fun tombstoneEntriesOf(
+    personId: Long,
+    now: Long,
+  )
+
+  @Query(
+    "INSERT OR REPLACE INTO sync_tombstone (syncId, deletedAt, dirty) " +
+      "SELECT syncId, :now, 1 FROM task WHERE personId = :personId",
+  )
+  protected abstract suspend fun tombstoneTasksOf(
+    personId: Long,
+    now: Long,
+  )
+
+  /**
+   * Esborra la persona i en deixa els tombstones: el seu i els de les entrades i tasques que cauen en cascada, que
+   * SQLite esborra sense avisar ningú. Els fets fixats viatgen dins de la persona i no en tenen.
+   */
+  @Transaction
+  open suspend fun deleteWithTombstones(
+    person: PersonEntity,
+    now: Long,
+  ) {
+    tombstoneEntriesOf(person.id, now)
+    tombstoneTasksOf(person.id, now)
+    insertTombstone(SyncTombstoneEntity(person.syncId, deletedAt = now))
+    delete(person)
+  }
 
   @Insert
   protected abstract suspend fun insertFacts(facts: List<PinnedFactEntity>)
@@ -83,37 +121,88 @@ abstract class PersonDao {
 }
 
 @Dao
-interface EntryDao {
+abstract class EntryDao {
   @Insert
-  suspend fun insert(entry: EntryEntity): Long
+  abstract suspend fun insert(entry: EntryEntity): Long
 
   @Update
-  suspend fun update(entry: EntryEntity)
+  abstract suspend fun update(entry: EntryEntity)
 
+  /** Mai sol: [deleteWithTombstone] és l'únic esborrat d'una entrada. */
   @Delete
-  suspend fun delete(entry: EntryEntity)
+  protected abstract suspend fun delete(entry: EntryEntity)
+
+  @Insert(onConflict = OnConflictStrategy.REPLACE)
+  protected abstract suspend fun insertTombstone(tombstone: SyncTombstoneEntity)
+
+  @Query("DELETE FROM sync_tombstone WHERE syncId = :syncId")
+  protected abstract suspend fun clearTombstone(syncId: String)
+
+  /**
+   * Insereix una entrada que torna a existir: si era un «Desfés» d'un esborrat, el seu tombstone se'n va, perquè una
+   * fila no pot ser alhora viva i esborrada.
+   */
+  @Transaction
+  open suspend fun insertLive(entry: EntryEntity): Long {
+    clearTombstone(entry.syncId)
+    return insert(entry)
+  }
+
+  @Transaction
+  open suspend fun deleteWithTombstone(
+    entry: EntryEntity,
+    now: Long,
+  ) {
+    insertTombstone(SyncTombstoneEntity(entry.syncId, deletedAt = now))
+    delete(entry)
+  }
 
   @Query("SELECT * FROM entry WHERE id = :id")
-  suspend fun get(id: Long): EntryEntity?
+  abstract suspend fun get(id: Long): EntryEntity?
 
   /** Grups de canal de les entrades de la persona (derivats, no desats). */
   @Query("SELECT DISTINCT channelType FROM entry WHERE personId = :personId")
-  fun observeChannelTypes(personId: Long): Flow<List<ChannelType>>
+  abstract fun observeChannelTypes(personId: Long): Flow<List<ChannelType>>
 
+  @Query(
+    "INSERT OR REPLACE INTO sync_tombstone (syncId, deletedAt, dirty) SELECT syncId, :now, 1 FROM entry " +
+      "WHERE personId = :personId AND channelType = :channelType AND occurredAt >= :from AND occurredAt < :to",
+  )
+  protected abstract suspend fun tombstoneInRange(
+    personId: Long,
+    channelType: ChannelType,
+    from: Long,
+    to: Long,
+    now: Long,
+  )
+
+  /** Mai sol: [deleteInRangeWithTombstones]. */
   @Query(
     "DELETE FROM entry WHERE personId = :personId AND channelType = :channelType AND occurredAt >= :from AND occurredAt < :to",
   )
-  suspend fun deleteInRange(
+  protected abstract suspend fun deleteInRange(
     personId: Long,
     channelType: ChannelType,
     from: Long,
     to: Long,
   ): Int
 
+  @Transaction
+  open suspend fun deleteInRangeWithTombstones(
+    personId: Long,
+    channelType: ChannelType,
+    from: Long,
+    to: Long,
+    now: Long,
+  ): Int {
+    tombstoneInRange(personId, channelType, from, to, now)
+    return deleteInRange(personId, channelType, from, to)
+  }
+
   @Query(
     "SELECT COUNT(*) FROM entry WHERE personId = :personId AND channelType = :channelType AND occurredAt >= :from AND occurredAt < :to",
   )
-  suspend fun countInRange(
+  abstract suspend fun countInRange(
     personId: Long,
     channelType: ChannelType,
     from: Long,
@@ -127,28 +216,41 @@ interface EntryDao {
     ORDER BY occurredAt DESC, id DESC
     """,
   )
-  fun observeTimeline(
+  abstract fun observeTimeline(
     personId: Long,
     kinds: Set<EntryKind>,
   ): Flow<List<EntryEntity>>
 
   @Query("SELECT kind AS kind, COUNT(*) AS count FROM entry WHERE personId = :personId GROUP BY kind")
-  fun observeCounts(personId: Long): Flow<List<KindCount>>
+  abstract fun observeCounts(personId: Long): Flow<List<KindCount>>
 }
 
 @Dao
-interface TaskDao {
+abstract class TaskDao {
   @Insert
-  suspend fun insert(task: TaskEntity): Long
+  abstract suspend fun insert(task: TaskEntity): Long
 
   @Update
-  suspend fun update(task: TaskEntity)
+  abstract suspend fun update(task: TaskEntity)
 
+  /** Mai sol: [deleteWithTombstone] és l'únic esborrat d'una tasca. */
   @Delete
-  suspend fun delete(task: TaskEntity)
+  protected abstract suspend fun delete(task: TaskEntity)
+
+  @Insert(onConflict = OnConflictStrategy.REPLACE)
+  protected abstract suspend fun insertTombstone(tombstone: SyncTombstoneEntity)
+
+  @Transaction
+  open suspend fun deleteWithTombstone(
+    task: TaskEntity,
+    now: Long,
+  ) {
+    insertTombstone(SyncTombstoneEntity(task.syncId, deletedAt = now))
+    delete(task)
+  }
 
   @Query("SELECT * FROM task WHERE id = :id")
-  suspend fun get(id: Long): TaskEntity?
+  abstract suspend fun get(id: Long): TaskEntity?
 
   /** Pendents (9d): primer les que tenen data, de la més antiga a la més nova, i després les que no en tenen. */
   @Query(
@@ -158,15 +260,15 @@ interface TaskDao {
     ORDER BY dueDate IS NULL, dueDate, createdAt, id
     """,
   )
-  fun observeOpen(personId: Long): Flow<List<TaskEntity>>
+  abstract fun observeOpen(personId: Long): Flow<List<TaskEntity>>
 
   /** Fetes (9f), la més recent primer. */
   @Query("SELECT * FROM task WHERE personId = :personId AND doneAt IS NOT NULL ORDER BY doneAt DESC, id DESC")
-  fun observeDone(personId: Long): Flow<List<TaskEntity>>
+  abstract fun observeDone(personId: Long): Flow<List<TaskEntity>>
 
   /** `doneAt = null` la torna a pendents («Desfés» o tocar el check d'una feta). */
   @Query("UPDATE task SET doneAt = :doneAt, modifiedAt = :now, dirty = 1 WHERE id = :id")
-  suspend fun setDoneAt(
+  abstract suspend fun setDoneAt(
     id: Long,
     doneAt: Long?,
     now: Long,
@@ -181,9 +283,32 @@ abstract class CustomChannelDao {
   @Update
   abstract suspend fun update(channel: CustomChannelEntity)
 
-  /** Les entrades que el feien servir es queden al seu grup (`ON DELETE SET NULL`). */
+  /** Mai sol: [deleteWithTombstone] és l'únic esborrat d'un canal. */
   @Delete
-  abstract suspend fun delete(channel: CustomChannelEntity)
+  protected abstract suspend fun delete(channel: CustomChannelEntity)
+
+  @Insert(onConflict = OnConflictStrategy.REPLACE)
+  protected abstract suspend fun insertTombstone(tombstone: SyncTombstoneEntity)
+
+  @Query("UPDATE entry SET modifiedAt = :now, dirty = 1 WHERE customChannelId = :channelId")
+  protected abstract suspend fun stampEntriesOf(
+    channelId: Long,
+    now: Long,
+  )
+
+  /**
+   * Les entrades que el feien servir es queden al seu grup (`ON DELETE SET NULL`). Com que perden el canal, queden
+   * pendents de pujar: si no, l'altre dispositiu les continuaria veient al canal esborrat.
+   */
+  @Transaction
+  open suspend fun deleteWithTombstone(
+    channel: CustomChannelEntity,
+    now: Long,
+  ) {
+    stampEntriesOf(channel.id, now)
+    insertTombstone(SyncTombstoneEntity(channel.syncId, deletedAt = now))
+    delete(channel)
+  }
 
   @Query("SELECT * FROM custom_channel WHERE id = :id")
   abstract suspend fun get(id: Long): CustomChannelEntity?

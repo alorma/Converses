@@ -3,6 +3,7 @@ package com.alorma.contactnotes.data
 import com.alorma.contactnotes.data.db.EntryEntity
 import com.alorma.contactnotes.data.db.PersonEntity
 import com.alorma.contactnotes.data.db.PinnedFactEntity
+import com.alorma.contactnotes.data.db.SyncTombstoneEntity
 import com.alorma.contactnotes.data.db.TaskEntity
 import com.alorma.contactnotes.shared.ChannelType
 import com.alorma.contactnotes.shared.EntryKind
@@ -13,6 +14,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import java.lang.reflect.Modifier
 
 /**
  * La identitat de sincronització (`docs/sync`): tota escriptura del repositori deixa la fila pendent de pujar, amb la
@@ -235,6 +237,152 @@ class SyncIdentityTest {
 
       assertTrue(nothingIsDirty())
     }
+
+  // Esborrats: cada fila que desapareix deixa un tombstone, també les que cauen en cascada.
+
+  private fun tombstoned() = db.tombstones.value.map { it.syncId }.toSet()
+
+  @Test
+  fun deleteEntryLeavesATombstone() =
+    runTest {
+      val anna = db.addPerson("Anna")
+      val entry = db.addEntry(anna.id)
+
+      repository.deleteEntry(entry)
+
+      assertEquals(listOf(SyncTombstoneEntity(entry.syncId, deletedAt = NOW, dirty = true)), db.tombstones.value)
+      assertTrue(db.entries.value.isEmpty())
+    }
+
+  @Test
+  fun undoingAnEntryDeleteRemovesItsTombstone() =
+    runTest {
+      val anna = db.addPerson("Anna")
+      val entry = db.addEntry(anna.id)
+      db.markAllClean()
+
+      repository.deleteEntry(entry)
+      repository.addEntry(entry)
+
+      assertTrue(db.tombstones.value.isEmpty())
+      val back = db.entries.value.single()
+      assertEquals(entry.syncId, back.syncId)
+      assertTrue(back.dirty)
+      assertEquals(NOW, back.modifiedAt)
+    }
+
+  @Test
+  fun deletePersonLeavesTombstonesForItsEntriesAndTasks() =
+    runTest {
+      val anna = db.addPerson("Anna")
+      val first = db.addEntry(anna.id)
+      val second = db.addEntry(anna.id)
+      val task = db.addTask(anna.id)
+      repository.savePerson(anna, listOf(PinnedFactEntity(personId = anna.id, label = "L", value = "V", position = 0)))
+      val other = db.addPerson("Bernat")
+      db.addEntry(other.id)
+
+      repository.deletePerson(anna)
+
+      assertEquals(setOf(anna.syncId, first.syncId, second.syncId, task.syncId), tombstoned())
+      assertTrue(db.tombstones.value.all { it.deletedAt == NOW && it.dirty })
+      assertEquals(listOf(other.id), db.people.value.map { it.id })
+      assertEquals(1, db.entries.value.size)
+    }
+
+  @Test
+  fun deleteEntriesInRangeLeavesATombstonePerEntry() =
+    runTest {
+      val anna = db.addPerson("Anna")
+      val first = db.addEntry(anna.id, occurredAt = 10)
+      val second = db.addEntry(anna.id, occurredAt = 20)
+      db.addEntry(anna.id, occurredAt = 30)
+
+      val deleted = repository.deleteEntriesInRange(anna.id, ChannelType.CHAT, from = 10, to = 30)
+
+      assertEquals(2, deleted)
+      assertEquals(setOf(first.syncId, second.syncId), tombstoned())
+    }
+
+  @Test
+  fun deleteTaskLeavesATombstone() =
+    runTest {
+      val anna = db.addPerson("Anna")
+      val task = db.addTask(anna.id)
+
+      repository.deleteTask(task)
+
+      assertEquals(listOf(SyncTombstoneEntity(task.syncId, deletedAt = NOW, dirty = true)), db.tombstones.value)
+    }
+
+  @Test
+  fun deletingAChannelStampsItsEntriesAndLeavesATombstone() =
+    runTest {
+      val anna = db.addPerson("Anna")
+      val whatsapp = db.addCustomChannel("WhatsApp")
+      val first = db.addEntry(anna.id, customChannelId = whatsapp.id)
+      val second = db.addEntry(anna.id, customChannelId = whatsapp.id)
+      val outside = db.addEntry(anna.id)
+      db.markAllClean()
+
+      repository.deleteCustomChannel(whatsapp)
+
+      assertEquals(setOf(whatsapp.syncId), tombstoned())
+      listOf(first, second).forEach {
+        assertTrue(entry(it.id).dirty)
+        assertEquals(NOW, entry(it.id).modifiedAt)
+        assertEquals(null, entry(it.id).customChannelId)
+      }
+      assertFalse(entry(outside.id).dirty)
+    }
+
+  @Test
+  fun deletingTheSameSyncIdTwiceKeepsOneTombstone() =
+    runTest {
+      val anna = db.addPerson("Anna")
+      val entry = db.addEntry(anna.id)
+
+      repository.deleteEntry(entry)
+      repository.addEntry(entry)
+      repository.deleteEntry(db.entries.value.single())
+
+      assertEquals(listOf(entry.syncId), db.tombstones.value.map { it.syncId })
+    }
+
+  /** Si afegeixes un mètode d'escriptura al repositori: segella'l, afegeix-ne el test i apunta'l aquí. */
+  private val writes =
+    setOf(
+      "savePerson",
+      "deletePerson",
+      "setArchived",
+      "setProtected",
+      "addEntry",
+      "updateEntry",
+      "deleteEntry",
+      "moveEntry",
+      "deleteEntriesInRange",
+      "saveTask",
+      "deleteTask",
+      "markTaskDone",
+      "reopenTask",
+      "createCustomChannel",
+      "renameCustomChannel",
+      "changeCustomChannelGroup",
+      "saveCustomChannel",
+      "deleteCustomChannel",
+    )
+
+  @Test
+  fun everyWriteMethodOfTheRepositoryIsCovered() {
+    val reads = Regex("^(observe|get|is|count).*")
+    val public =
+      ConversesRepository::class.java.declaredMethods
+        .filter { Modifier.isPublic(it.modifiers) && !it.isSynthetic && '$' !in it.name }
+        .map { it.name }
+        .toSet()
+
+    assertEquals(writes, public.filterNot(reads::matches).toSet())
+  }
 
   private companion object {
     const val NOW = 5_000L
