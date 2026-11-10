@@ -1,8 +1,10 @@
 package com.alorma.contactnotes.debug
 
 import androidx.compose.foundation.gestures.detectDragGestures
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
@@ -11,10 +13,10 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.BugReport
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
@@ -22,36 +24,57 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import com.alorma.contactnotes.R
 import kotlin.math.roundToInt
 
+private val ButtonSize = 56.dp
+
 /** Wraps the app with a draggable floating button that opens the debug sheet. Debug builds only. */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DebugMenuHost(content: @Composable () -> Unit) {
+  val context = LocalContext.current
+  val store = remember { DebugButtonStore(context) }
   var showSheet by remember { mutableStateOf(false) }
-  var dragOffset by remember { mutableStateOf(IntOffset.Zero) }
+  // Top-start position in px; null until the button is first dragged or placed at its default spot
+  var position by remember { mutableStateOf(store.loadPosition()) }
 
-  Box {
+  BoxWithConstraints {
+    val density = LocalDensity.current
+    val buttonSize = with(density) { ButtonSize.toPx() }
+    val maxX = (with(density) { maxWidth.toPx() } - buttonSize).coerceAtLeast(0f)
+    val maxY = (with(density) { maxHeight.toPx() } - buttonSize).coerceAtLeast(0f)
+    val defaultPosition =
+      with(density) { Offset(maxX - 8.dp.toPx(), maxY - 96.dp.toPx() - WindowInsets.navigationBars.getBottom(density)) }
+    // Clamped on every read, so a saved position stays reachable after a rotation or on another screen size
+    val current = (position ?: defaultPosition).let { Offset(it.x.coerceIn(0f, maxX), it.y.coerceIn(0f, maxY)) }
+
     content()
-    SmallFloatingActionButton(
+    FloatingActionButton(
       onClick = { showSheet = true },
       modifier =
         Modifier
-          .align(Alignment.BottomEnd)
-          .navigationBarsPadding()
-          .padding(end = 8.dp, bottom = 96.dp)
-          .offset { dragOffset }
-          .pointerInput(Unit) {
-            detectDragGestures { change, drag ->
+          .offset { IntOffset(current.x.roundToInt(), current.y.roundToInt()) }
+          .pointerInput(maxX, maxY) {
+            var dragged = current
+            detectDragGestures(
+              onDragStart = {
+                dragged =
+                  position?.let { Offset(it.x.coerceIn(0f, maxX), it.y.coerceIn(0f, maxY)) } ?: current
+              },
+              onDragEnd = { store.savePosition(dragged) },
+            ) { change, drag ->
               change.consume()
-              dragOffset += IntOffset(drag.x.roundToInt(), drag.y.roundToInt())
+              dragged = Offset((dragged.x + drag.x).coerceIn(0f, maxX), (dragged.y + drag.y).coerceIn(0f, maxY))
+              position = dragged
             }
           },
     ) {
