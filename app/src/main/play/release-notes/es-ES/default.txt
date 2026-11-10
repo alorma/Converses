@@ -1,4 +1,3 @@
-Versión 1.8.3:
-• Llega Converses Pro: canales propios, pendientes y personas a tu manera. Un solo pago, sin suscripción, y lo que era gratis sigue siéndolo.
-• Estadísticas de uso anónimas y opcionales, apagadas hasta que digas que sí (Ajustes › Privacidad). Preferimos encontrar nuestros fallos antes que tú.
-• Unas cuantas correcciones pequeñas que no notarás, que es justo la gracia.
+Versión 1.8.4:
+• Converses ya sabe qué hacer con una tableta o un plegable: la lista y la persona lado a lado, en vez de un móvil estirado haciendo como si nada.
+• La etiqueta BETA se ha ido del título. Nos ha costado, pero ya nos atrevemos a decir que esto es una app.

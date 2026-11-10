@@ -1,4 +1,3 @@
-Versió 1.8.3:
-• Arriba Converses Pro: canals propis, pendents i persones a la teva manera. Un sol pagament, sense subscripció, i el que era gratis continua sent-ho.
-• Estadístiques d'ús anònimes i opcionals, apagades fins que hi dius que sí (Ajustos › Privacitat). Preferim trobar els nostres errors abans que tu.
-• Unes quantes correccions petites que no notaràs, que és justament la gràcia.
+Versió 1.8.4:
+• Converses ja sap què fer amb una tauleta o un plegable: llistat i persona de costat, en lloc d'un mòbil estirat fent veure que no passa res.
+• L'etiqueta BETA ha marxat del títol. Ens ha costat, però ja ens atrevim a dir que això és una app.
