@@ -1,6 +1,6 @@
 # Sincronització al núvol: disseny
 
-Estat: **proposta; només hi ha construïda la fase 1** (identitat de sincronització a Room v6, vegeu «Canvis a Room»). Escrit el 10 de novembre de 2026 a partir de la conversa amb Bernat. Quan la funció existeixi, aquest fitxer es condensa en un `README.md` que descrigui el que hi ha, com la resta de `docs/`.
+Estat: **proposta; només hi ha construïdes les fases 1 i 2** (identitat de sincronització a Room v6, vegeu «Canvis a Room», i criptografia, vegeu «Claus»). Escrit el 10 de novembre de 2026 a partir de la conversa amb Bernat. Quan la funció existeixi, aquest fitxer es condensa en un `README.md` que descrigui el que hi ha, com la resta de `docs/`.
 
 Les decisions marcades **(B)** són de Bernat. Les marcades **(C)** les ha pres Claude en escriure el disseny i es poden canviar. Les pantalles són a `disseny/`: `INSTRUCCIONS.md` (mides, estats, textos en tres idiomes) i `pantalles.html` (referència visual, taulers 13a…13t i 0c). Les decisions que venen d'allà van marcades **(D)**.
 
@@ -90,7 +90,26 @@ La regla de `CLAUDE.md` i de `docs/analytics` passa a dir: «Analytics i Crashly
 - **Al dispositiu:** el secret i la clau de dades es guarden en un fitxer xifrat amb una clau AES de l'Android Keystore, no exportable. El fitxer queda fora del backup d'Android, com la base de dades. Consultar les paraules o mostrar el QR demana `BiometricPrompt` (`BIOMETRIC_STRONG` o la credencial del dispositiu) i `FLAG_SECURE`, sempre, també al primer dispositiu just després d'iniciar sessió.
 - **(D) Pantalles amb la clau a la vista:** `FLAG_SECURE` a les paraules (13f), a escriure-les (13j) i al QR (13p). El QR caduca en 5 minuts i se'n genera un de nou en tocar-lo. En copiar les paraules, el porta-retalls es marca com a sensible (`ClipDescription.EXTRA_IS_SENSITIVE`) i s'esborra al cap d'1 minut. Els camps per escriure-les no tenen autocorrecció ni aprenentatge del teclat (`IME_FLAG_NO_PERSONALIZED_LEARNING`). Les paraules es mostren sempre en anglès; la interfície, traduïda.
 - **Registres:** AES-256-GCM, nonce aleatori de 12 bytes per xifratge. Les dades associades (AAD) inclouen l'UID, l'identificador del registre i la versió del format, perquè un registre no es pugui moure a un altre lloc ni a un altre compte.
-- **Biblioteca:** primitives de la plataforma (`javax.crypto`) o Tink; ho decideix el pla després de mirar la versió estable actual **(C)**. Cap criptografia inventada.
+- **Biblioteca:** primitives de la plataforma (`javax.crypto`), sense Tink **(C)**. Cap criptografia inventada.
+
+**Construït (fase 2), a `data/sync/crypto`.** És Kotlin pur, sense Android ni Firebase, i encara no el crida ningú:
+
+| Peça | Què fa | Comprovat amb |
+| --- | --- | --- |
+| `Bip39` | Entropia de 128 bits ↔ 12 paraules. En llegir-les accepta majúscules i espais, i diu quines posicions no són a la llista o si falla la suma de control | Vectors de referència de BIP39 i el SHA-256 de la llista oficial |
+| `Hkdf` | HKDF-SHA256 | RFC 5869, casos 1 i 3 |
+| `AesGcm` | AES-256-GCM; el blob és `nonce (12 bytes) ‖ text xifrat i etiqueta (16 bytes)` | Vector del NIST |
+| `RecoverySecret`, `DataKey` | El secret i la clau de dades; no surten mai en un `toString()` | |
+| `KeyWrap` | Embolcalla la clau de dades. Unes paraules equivocades o un altre compte tornen `null` | |
+| `RecordCipher` | Xifra i desxifra un registre per al seu compte i el seu identificador | |
+
+Decisions preses en construir-ho **(C)**:
+
+- Plataforma i no Tink: tot el que cal ja hi és, i HKDF són quinze línies sobre HMAC comprovades amb els vectors de l'RFC. Tink afegiria una dependència i pes a l'APK.
+- La clau d'embolcall és `HKDF-SHA256(secret, sal buida, info = "converses/sync/v1/wrap")`. El secret ja té 128 bits d'entropia, i per això no cal cap derivació lenta com les de les contrasenyes.
+- La versió del format (`SYNC_FORMAT = 1`) no va dins del blob: va a les dades associades i al camp `format` del compte.
+- Les dades associades són camps prefixats per la seva llargada: `("wrap", format, uid)` per a la clau embolcallada i `("record", format, uid, recordId)` per als registres. Dos conjunts de camps diferents no poden donar mai els mateixos bytes.
+- La llista de paraules és un fitxer Kotlin (`Bip39Words.kt`), no un recurs, perquè el paquet continuï sent JVM pur.
 
 - **Començar de nou amb paraules noves:** genera un secret i una clau de dades nous, esborra els registres del núvol, puja-ho tot de nou des del local i substitueix `wrappedKey`. Els altres dispositius, en no poder desembolcallar la clau nova, passen a l'estat `NeedsKey` i demanen les paraules noves; no perden res en local.
 
@@ -224,7 +243,7 @@ Cada fase es valida abans de la següent. De la 1 a la 6 van darrere d'un featur
 
 ## Queda per al pla
 
-- Biblioteques i versions exactes (Auth, Firestore, App Check, Credential Manager, Tink o plataforma).
+- Biblioteques i versions exactes (Auth, Firestore, App Check, Credential Manager).
 - Format exacte del JSON de cada tipus de registre i com evoluciona (`format`).
 - Retard d'agrupació de pujades i política de reintents.
 - Biblioteca per llegir i generar el QR, i què porta exactament a dins (secret i caducitat).
