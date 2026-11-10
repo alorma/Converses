@@ -11,8 +11,12 @@ import com.alorma.contactnotes.shared.AvatarColor
 import com.alorma.contactnotes.shared.AvatarShape
 import com.alorma.contactnotes.shared.ChannelType
 import com.alorma.contactnotes.shared.EntryKind
+import java.util.UUID
 
-@Entity(tableName = "person")
+/** Identificador global d'una fila per a la sincronització: no canvia mai i és el mateix a tots els dispositius. */
+fun newSyncId(): String = UUID.randomUUID().toString()
+
+@Entity(tableName = "person", indices = [Index("syncId", unique = true)])
 data class PersonEntity(
   @PrimaryKey(autoGenerate = true) val id: Long = 0,
   val name: String,
@@ -25,6 +29,9 @@ data class PersonEntity(
   val notes: String? = null,
   val createdAt: Long,
   val updatedAt: Long,
+  val syncId: String = newSyncId(),
+  /** Pendent de pujar. La data de modificació de la persona és [updatedAt]. */
+  @ColumnInfo(defaultValue = "1") val dirty: Boolean = true,
 )
 
 val PersonEntity.shape: AvatarShape get() = avatarShape ?: AvatarShape.Standard
@@ -37,13 +44,16 @@ val PersonEntity.color: AvatarColor get() = avatarColor ?: AvatarColor.forName(n
  */
 @Entity(
   tableName = "custom_channel",
-  indices = [Index("channelType", "name", unique = true)],
+  indices = [Index("channelType", "name", unique = true), Index("syncId", unique = true)],
 )
 data class CustomChannelEntity(
   @PrimaryKey(autoGenerate = true) val id: Long = 0,
   val channelType: ChannelType,
   val name: String,
   val createdAt: Long,
+  val syncId: String = newSyncId(),
+  @ColumnInfo(defaultValue = "0") val modifiedAt: Long = 0,
+  @ColumnInfo(defaultValue = "1") val dirty: Boolean = true,
 )
 
 @Entity(
@@ -63,7 +73,7 @@ data class CustomChannelEntity(
       onDelete = ForeignKey.SET_NULL,
     ),
   ],
-  indices = [Index("personId", "occurredAt"), Index("customChannelId")],
+  indices = [Index("personId", "occurredAt"), Index("customChannelId"), Index("syncId", unique = true)],
 )
 data class EntryEntity(
   @PrimaryKey(autoGenerate = true) val id: Long = 0,
@@ -75,6 +85,9 @@ data class EntryEntity(
   val occurredAt: Long,
   /** Canal propi opcional (Pro), dins de [channelType]. */
   val customChannelId: Long? = null,
+  val syncId: String = newSyncId(),
+  @ColumnInfo(defaultValue = "0") val modifiedAt: Long = 0,
+  @ColumnInfo(defaultValue = "1") val dirty: Boolean = true,
 )
 
 /**
@@ -91,7 +104,7 @@ data class EntryEntity(
       onDelete = ForeignKey.CASCADE,
     ),
   ],
-  indices = [Index("personId")],
+  indices = [Index("personId"), Index("syncId", unique = true)],
 )
 data class TaskEntity(
   @PrimaryKey(autoGenerate = true) val id: Long = 0,
@@ -104,6 +117,9 @@ data class TaskEntity(
   val createdAt: Long,
   /** Quan es va marcar com a feta; `null` mentre és pendent. */
   val doneAt: Long? = null,
+  val syncId: String = newSyncId(),
+  @ColumnInfo(defaultValue = "0") val modifiedAt: Long = 0,
+  @ColumnInfo(defaultValue = "1") val dirty: Boolean = true,
 )
 
 @Entity(
@@ -124,6 +140,17 @@ data class PinnedFactEntity(
   val label: String,
   val value: String,
   val position: Int,
+)
+
+/**
+ * Una fila esborrada que encara s'ha de dir al núvol. Es queda fins que la sincronització l'hagi pujat; si la fila
+ * torna (un «Desfés»), el seu registre s'esborra.
+ */
+@Entity(tableName = "sync_tombstone")
+data class SyncTombstoneEntity(
+  @PrimaryKey val syncId: String,
+  val deletedAt: Long,
+  @ColumnInfo(defaultValue = "1") val dirty: Boolean = true,
 )
 
 data class KindCount(

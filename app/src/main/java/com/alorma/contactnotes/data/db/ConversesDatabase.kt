@@ -14,8 +14,9 @@ import androidx.room.migration.AutoMigrationSpec
     PinnedFactEntity::class,
     CustomChannelEntity::class,
     TaskEntity::class,
+    SyncTombstoneEntity::class,
   ],
-  version = 5,
+  version = 6,
   autoMigrations = [
     AutoMigration(from = 3, to = 4, spec = ConversesDatabase.DropContactLink::class),
     // v4 → v5: canals propis i tasques (Pro). Taules `custom_channel` i `task` noves; `entry` es recrea amb la clau

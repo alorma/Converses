@@ -1,9 +1,11 @@
 package com.alorma.contactnotes.data.db
 
+import android.database.sqlite.SQLiteConstraintException
 import androidx.room.testing.MigrationTestHelper
 import androidx.sqlite.db.SupportSQLiteDatabase
 import androidx.test.platform.app.InstrumentationRegistry
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertThrows
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -249,6 +251,105 @@ class MigrationTest {
     assertEquals(listOf("P1"), db.strings("SELECT name FROM person"))
     assertEquals(listOf("CHAT"), db.strings("SELECT channelType FROM entry"))
     assertEquals(listOf("0"), db.strings("SELECT COUNT(*) FROM task"))
+  }
+
+  private val uuid = Regex("[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}")
+
+  @Test
+  fun migrate5To6GivesEveryRowItsOwnSyncIdAndKeepsTheData() {
+    helper.createDatabase(TEST_DB, 5).use { db ->
+      db.insertPerson(1)
+      db.execSQL(
+        "INSERT INTO person (id, name, alias, avatarShape, avatarColor, isProtected, archived, notes, createdAt, " +
+          "updatedAt) VALUES (2, 'P2', 'Alias', 'Sunny', 'Rose', 1, 1, 'n', 10, 20)",
+      )
+      db.execSQL("INSERT INTO custom_channel (id, channelType, name, createdAt) VALUES (3, 'CHAT', 'WhatsApp', 30)")
+      db.execSQL(
+        "INSERT INTO entry (id, personId, kind, channelType, text, occurredAt, customChannelId) " +
+          "VALUES (5, 1, 'HEARD', 'CHAT', 'a', 100, 3)",
+      )
+      db.execSQL(
+        "INSERT INTO entry (id, personId, kind, channelType, text, occurredAt) VALUES (9, 2, 'SAID', 'PHONE', 'b', 200)",
+      )
+      db.execSQL(
+        "INSERT INTO task (id, personId, text, dueDate, createdAt, doneAt) VALUES (1, 1, 'open', NULL, 40, NULL)",
+      )
+      db.execSQL("INSERT INTO task (id, personId, text, dueDate, createdAt, doneAt) VALUES (2, 1, 'done', 7, 40, 50)")
+      db.execSQL("INSERT INTO pinned_fact (personId, label, value, position) VALUES (2, 'L', 'V', 0)")
+    }
+
+    val db = helper.runMigrationsAndValidate(TEST_DB, 6, true, Migration5To6())
+
+    val ids =
+      db.strings(
+        "SELECT syncId FROM person UNION ALL SELECT syncId FROM entry " +
+          "UNION ALL SELECT syncId FROM task UNION ALL SELECT syncId FROM custom_channel",
+      )
+    assertEquals(7, ids.size)
+    assertEquals(7, ids.toSet().size)
+    assertTrue(ids.all(uuid::matches))
+    assertEquals(
+      listOf("Alias|Sunny|Rose|1|1|n|10|20|1"),
+      db.strings(
+        "SELECT alias || '|' || avatarShape || '|' || avatarColor || '|' || isProtected || '|' || archived || '|' || " +
+          "notes || '|' || createdAt || '|' || updatedAt || '|' || dirty FROM person WHERE id = 2",
+      ),
+    )
+    assertEquals(
+      listOf("5|1|a|3|100|1", "9|2|b|-|200|1"),
+      db.strings(
+        "SELECT id || '|' || personId || '|' || text || '|' || IFNULL(customChannelId, '-') || '|' || " +
+          "modifiedAt || '|' || dirty FROM entry ORDER BY id",
+      ),
+    )
+    assertEquals(
+      listOf("open|40|1", "done|50|1"),
+      db.strings("SELECT text || '|' || modifiedAt || '|' || dirty FROM task ORDER BY id"),
+    )
+    assertEquals(
+      listOf("WhatsApp|30|1"),
+      db.strings("SELECT name || '|' || modifiedAt || '|' || dirty FROM custom_channel"),
+    )
+    assertEquals(listOf("2|V"), db.strings("SELECT personId || '|' || value FROM pinned_fact"))
+    assertEquals(listOf("0"), db.strings("SELECT COUNT(*) FROM sync_tombstone"))
+  }
+
+  @Test
+  fun migrate5To6OnAnEmptyDatabase() {
+    helper.createDatabase(TEST_DB, 5).close()
+
+    val db = helper.runMigrationsAndValidate(TEST_DB, 6, true, Migration5To6())
+
+    assertEquals(listOf("0"), db.strings("SELECT COUNT(*) FROM person"))
+  }
+
+  @Test
+  fun migrate5To6RejectsTwoRowsWithTheSameSyncId() {
+    helper.createDatabase(TEST_DB, 5).use { db -> db.insertPerson(1) }
+
+    val db = helper.runMigrationsAndValidate(TEST_DB, 6, true, Migration5To6())
+    val taken = db.strings("SELECT syncId FROM person").single()
+
+    assertThrows(SQLiteConstraintException::class.java) {
+      db.execSQL(
+        "INSERT INTO person (name, isProtected, archived, createdAt, updatedAt, syncId, dirty) " +
+          "VALUES ('P2', 0, 0, 0, 0, '$taken', 1)",
+      )
+    }
+  }
+
+  @Test
+  fun migrate1To6RunsEveryMigration() {
+    helper.createDatabase(TEST_DB, 1).use { db ->
+      db.insertPerson(1)
+      db.insertChannel(1, "WHATSAPP")
+      db.insertEntry(1, "TELEGRAM")
+    }
+
+    val db = helper.runMigrationsAndValidate(TEST_DB, 6, true, Migration1To2(), Migration2To3(), Migration5To6())
+
+    assertEquals(listOf("CHAT"), db.strings("SELECT channelType FROM entry"))
+    assertTrue(db.strings("SELECT syncId FROM person UNION ALL SELECT syncId FROM entry").all(uuid::matches))
   }
 
   private companion object {

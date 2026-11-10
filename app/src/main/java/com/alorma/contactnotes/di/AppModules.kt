@@ -7,6 +7,7 @@ import com.alorma.contactnotes.data.ConversesRepository
 import com.alorma.contactnotes.data.db.ConversesDatabase
 import com.alorma.contactnotes.data.db.Migration1To2
 import com.alorma.contactnotes.data.db.Migration2To3
+import com.alorma.contactnotes.data.db.Migration5To6
 import com.alorma.contactnotes.data.flags.FeatureFlagRunner
 import com.alorma.contactnotes.data.flags.FeatureFlagStore
 import com.alorma.contactnotes.data.flags.LocalFeatureFlagRunner
@@ -54,7 +55,7 @@ val databaseModule =
       val isDebuggable = context.applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE != 0
       Room
         .databaseBuilder(context, ConversesDatabase::class.java, "converses.db")
-        .addMigrations(Migration1To2(), Migration2To3())
+        .addMigrations(Migration1To2(), Migration2To3(), Migration5To6())
         .apply { if (isDebuggable) fallbackToDestructiveMigration(dropAllTables = true) }
         .build()
     }

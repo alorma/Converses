@@ -58,6 +58,7 @@ abstract class PersonDao {
       e.id AS last_id, e.personId AS last_personId, e.kind AS last_kind,
       e.channelType AS last_channelType, e.text AS last_text, e.occurredAt AS last_occurredAt,
       e.customChannelId AS last_customChannelId,
+      e.syncId AS last_syncId, e.modifiedAt AS last_modifiedAt, e.dirty AS last_dirty,
       (SELECT COUNT(*) FROM task WHERE personId = p.id AND doneAt IS NULL) AS openTasks
     FROM person p
     LEFT JOIN entry e ON e.id = (
