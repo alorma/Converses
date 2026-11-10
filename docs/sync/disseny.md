@@ -73,15 +73,51 @@ La resta de l'app no sap res de Firebase: parla amb un `SyncRepository` que expo
 
 Avui Firebase **no s'inicialitza** sense el «Sí» a les estadístiques (`docs/analytics/README.md`). La sincronització necessita Auth i Firestore encara que l'usuari hagi dit «No».
 
-**(B)** Firebase es pot inicialitzar sense el consentiment d'estadístiques; el que depèn del consentiment és **enviar** dades d'ús. Per tant hi ha una sola instància de Firebase, la per defecte:
+**(B, 11 de novembre de 2026)** Hi ha dues instàncies de Firebase, i cadascuna té el seu motiu per existir:
 
-- S'inicialitza quan hi ha sessió de sincronització o consentiment d'estadístiques, el que arribi primer **(C: no a cada arrencada per a qui no fa servir cap de les dues coses)**.
-- La recollida d'Analytics i de Crashlytics continua apagada per defecte i només s'encén amb el «Sí». `FirebaseController` deixa de decidir si Firebase existeix i passa a decidir només si es recull.
-- En passar de «Sí» a «No» amb sessió iniciada, s'apaga la recollida i es descarten els pendents com ara, però Firebase continua viu per a la sincronització.
+| Instància | Què hi viu | Quan s'inicialitza |
+| --- | --- | --- |
+| La per defecte | Analytics i Crashlytics | Només amb el «Sí» a les estadístiques, com fins ara (`FirebaseGateway`) |
+| `sync`, amb nom | Auth, Firestore i App Check | Només quan hi ha sessió de sincronització o l'usuari la comença **(C: no a cada arrencada per a qui no sincronitza)** |
 
-El spike de la fase 0 ho ha de comprovar mirant el trànsit de xarxa: amb sessió iniciada i estadístiques en «No», no ha de sortir res cap a Analytics ni Crashlytics. Si en sortís, l'alternativa és una segona instància de `FirebaseApp` amb nom només per a Auth, Firestore i App Check.
+- La regla de `CLAUDE.md` i de `docs/analytics` no canvia: Firebase Analytics i Crashlytics no s'inicialitzen mai sense consentiment. Iniciar sessió per sincronitzar no els engega.
+- Les dues són independents: dir «Sí» o «No» a les estadístiques no toca la sincronització, i tancar la sessió no toca les estadístiques.
+- `AndroidFirebaseGateway` ha de mirar si existeix la instància per defecte (`FirebaseApp.DEFAULT_APP_NAME`), no si n'hi ha alguna.
 
-La regla de `CLAUDE.md` i de `docs/analytics` passa a dir: «Analytics i Crashlytics no recullen ni envien res sense consentiment. Firebase només s'inicialitza amb consentiment o amb sessió de sincronització».
+La primera idea era una sola instància amb la recollida apagada. El spike la va descartar: vegeu a sota què passa amb el que Crashlytics i Analytics recullen durant el «No».
+
+#### Resultat del spike (10 i 11 de novembre de 2026)
+
+Fet en un emulador amb Play Store (`37_Pixel_Phone`), amb la variant de debug i el compte de Google de Bernat. El codi del spike és a la branca local `spike/sync-firebase` i no es fusiona. Les proves es van llegir als registres (`log.tag.FA`, `FA-SVC` i `FirebaseCrashlytics` en detall), amb una prova de control en «Sí» per confirmar que el mètode veu les pujades quan n'hi ha.
+
+**Amb una sola instància (la idea inicial), durant el «No» no surt res, però el que es recull llavors surt després.**
+
+- Analytics diu «App measurement disabled via the manifest» i «Event not sent since app measurement is disabled», i el servei de mesura de Google Play no registra cap esdeveniment ni cap pujada de l'app. Crashlytics diu «automatic data collection DISABLED».
+- Tot i així, Crashlytics **captura els crashes i els desa al disc** («Waiting for send/deleteUnsentReports to be called»). Quan l'usuari passa a «Sí», els envia: «Sending cached crash reports». Són crashes de quan havia dit «No», i sense passar pel `SanitizingExceptionHandler`, que només s'instal·la des de `FirebaseGateway.enable()`.
+- Analytics desa l'hora de la primera obertura en inicialitzar-se i, amb el «Sí», envia `first_open` amb aquella hora i un `app_exception` amb l'hora del crash antic.
+
+**Amb una segona instància amb nom (`FirebaseApp.initializeApp(context, FirebaseOptions.fromResource(context), "sync")`), Analytics i Crashlytics no arrenquen.**
+
+- Zero línies d'Analytics i de Crashlytics als registres, cap fitxer de Crashlytics al disc després d'un crash provocat.
+- Auth (`FirebaseAuth.getInstance(app)`), Firestore i App Check funcionen igual sobre la instància amb nom, i la sessió es conserva en reiniciar l'app.
+- Les dues instàncies conviuen: amb el «Sí» s'inicialitza la per defecte al costat de `sync`; en tornar a «No» s'apaga la recollida i la sincronització continua escrivint.
+- Cal un canvi a `AndroidFirebaseGateway`: avui mira si hi ha *alguna* instància (`FirebaseApp.getApps(context).isEmpty()`). Amb `sync` present creu que Firebase ja està inicialitzat i l'app peta en dir «Sí» («Default FirebaseApp is not initialized»). Ha de mirar la instància per defecte (`FirebaseApp.DEFAULT_APP_NAME`), tant a `enable()` com a `disable()`. Comprovat al spike.
+
+**(B)** Es fa servir la segona instància. Així la regla d'avui es queda tal com és i no cal refiar-se d'esborrar a temps el que s'hagi recollit durant el «No».
+
+**La resta de preguntes del spike:**
+
+- **Inici de sessió:** Credential Manager 1.6.0 amb `googleid` 1.2.1 i `R.string.default_web_client_id` (el genera el plugin a partir del `google-services.json` nou) cap a Firebase Auth. Funciona amb l'empremta de debug. La primera vegada Google mostra el seu propi full: «Google will share your name, email address, and profile picture». No s'ha provat amb la clau de signatura de Play.
+- **App Check:** el proveïdor de debug escriu un token al logcat a cada instal·lació. Es registra amb `firebase appcheck:debugtokens:create <token> --app <appId>`. Sense registrar, el servidor torna 403 («App attestation failed»), l'SDK fa servir un token de substitució i les crides passen mentre App Check no es forci.
+  - **Forçat (11 de novembre de 2026):** amb el token registrat, l'app inicia sessió i escriu. Amb un token sense registrar (dades de l'app esborrades), ja falla l'inici de sessió: «Firebase App Check token is invalid». Per tant App Check també es força a Authentication, no només a Firestore, i una app sense atestació no arriba ni a tenir sessió.
+  - **Conseqüència que cal decidir (B):** amb App Check forçat, només poden sincronitzar les instal·lacions que Play Integrity reconeix. Un APK baixat de GitHub Releases (signat amb la clau de pujada) o un dispositiu sense serveis de Google previsiblement no passarien l'atestació. No s'ha provat; cal fer-ho amb una build de Play i una de GitHub abans de publicar.
+  - Queda per provar: Play Integrity en una build distribuïda per Play, i cada emulador o dispositiu de proves necessita el seu token de debug registrat.
+- **Regles:** l'escriptura i la lectura a `users/{uid}/spike/ping` funcionen; l'escriptura al document d'un altre usuari és rebutjada (`PERMISSION_DENIED`).
+- **Versions:** el `firebase-bom` 35.1.0 del projecte ja és l'últim estable i porta Auth 25.0.0, Firestore 27.1.0 i App Check 20.0.0. No cal pujar-lo.
+- **Manifest fusionat:** un permís nou, `com.google.android.providers.gsf.permission.READ_GSERVICES`, que ve de `com.google.android.recaptcha` (dependència de Firebase Auth). Activitats noves: les ocultes de Credential Manager, `SignInHubActivity`, `GenericIdpActivity` i `RecaptchaActivity` de Firebase Auth, i `PlayCoreDialogWrapperActivity`. Serveis nous: `CredentialProviderMetadataHolder` i `RevocationBoundService`. Cap permís de càmera ni de notificacions.
+- **Servidors contactats i identificadors nous: no mesurat.** La captura de xarxa de l'emulador no va recollir res d'útil i no hi havia cap proxy instal·lat. Cal fer-ho abans de tocar la política de privacitat.
+
+**Per netejar quan s'acabi el spike:** l'usuari de Firebase Auth creat amb el compte de Bernat, el document `users/{uid}/spike/ping` i el token de debug «Emulador 37_Pixel_Phone (spike)».
 
 ### Claus
 
@@ -231,7 +267,7 @@ Cal, abans de publicar:
 
 Cada fase es valida abans de la següent. De la 1 a la 6 van darrere d'un feature flag (`data/flags`).
 
-0. **Spike** (es llença): inicialitzar Firebase sense consentiment d'estadístiques, inici de sessió amb Google, App Check, i comprovar que no surt res cap a Analytics ni Crashlytics.
+0. **Spike** (es llença): inicialitzar Firebase sense consentiment d'estadístiques, inici de sessió amb Google, App Check, i comprovar que no surt res cap a Analytics ni Crashlytics. **Fet**, tret de mesurar els servidors contactats; vegeu «Resultat del spike».
 1. **Room v6:** identitat de sincronització, migració i test. Publicable sola.
 2. **Criptografia:** paraules, claus, registres. JVM pur, amb vectors de prova.
 3. **Compte i clau:** iniciar sessió, generar i guardar la clau, paraules, QR, magatzem al Keystore.
