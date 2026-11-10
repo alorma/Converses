@@ -1,6 +1,6 @@
 # Sincronització al núvol: disseny
 
-Estat: **proposta, res construït**. Escrit el 10 de novembre de 2026 a partir de la conversa amb Bernat. Quan la funció existeixi, aquest fitxer es condensa en un `README.md` que descrigui el que hi ha, com la resta de `docs/`.
+Estat: **proposta; només hi ha construïda la fase 1** (identitat de sincronització a Room v6, vegeu «Canvis a Room»). Escrit el 10 de novembre de 2026 a partir de la conversa amb Bernat. Quan la funció existeixi, aquest fitxer es condensa en un `README.md` que descrigui el que hi ha, com la resta de `docs/`.
 
 Les decisions marcades **(B)** són de Bernat. Les marcades **(C)** les ha pres Claude en escriure el disseny i es poden canviar. Les pantalles són a `disseny/`: `INSTRUCCIONS.md` (mides, estats, textos en tres idiomes) i `pantalles.html` (referència visual, taulers 13a…13t i 0c). Les decisions que venen d'allà van marcades **(D)**.
 
@@ -131,18 +131,27 @@ users/{uid}/records/{recordId}
 
 ### Canvis a Room (v5 → v6)
 
-Avui les files tenen `id` autoincremental local i només `person` té `updatedAt`. Cal:
+**Construït (fase 1).** És l'única part de la sincronització que ja existeix:
 
-- `syncId` (text, únic) a `person`, `entry`, `task` i `custom_channel`. La migració n'omple un per a cada fila existent.
-- `modifiedAt` i `dirty` a les mateixes taules (`person` ja té `updatedAt`, que es pot reaprofitar).
-- Una taula `sync_tombstone` (`syncId`, `deletedAt`, `dirty`) per recordar els esborrats fins que s'hagin pujat. Esborrar una persona n'hi afegeix també per a les seves entrades i tasques.
-- Una taula o DataStore petit per a l'estat del motor (cursor de l'última baixada).
+- `syncId` (un UUID, únic) a `person`, `entry`, `task` i `custom_channel`. `Migration5To6` n'omple un per a cada fila que ja hi era.
+- `dirty` («pendent de pujar») a les mateixes taules, i `modifiedAt` a `entry`, `task` i `custom_channel`. La data de modificació de la persona és el seu `updatedAt`. Les files que ja hi eren queden pendents, amb `occurredAt` (entrades), `COALESCE(doneAt, createdAt)` (tasques) i `createdAt` (canals) com a data **(C)**.
+- Una taula `sync_tombstone` (`syncId`, `deletedAt`, `dirty`) que recorda els esborrats fins que s'hagin pujat. Esborrar una persona n'hi afegeix també per a les seves entrades i tasques; els fets fixats no en tenen, perquè viatgen dins de la persona.
 
-Els `id` locals no canvien: la UI, les rutes i les claus foranes continuen igual. Com mana `CLAUDE.md`: pujar la versió, esquema exportat, `Migration` registrada a `di/AppModules.kt` i test amb `MigrationTestHelper`.
+Els `id` locals no canvien: la UI, les rutes i les claus foranes continuen igual. Sense sessió res d'això es veu, i per això es pot publicar abans que la resta.
 
-Aquesta migració es pot publicar abans que la resta, perquè sense sessió no té cap efecte visible.
+**(B)** `dirty` es marca als DAOs i al repositori, no amb triggers de SQLite: els triggers no es poden provar a la JVM, que és el que executa el CI, i una `AutoMigration` que recreï una taula els esborraria en silenci.
 
-On es marca `dirty`: al `ConversesRepository` o amb triggers de SQLite. Ho decideix el pla; el criteri és que cap camí d'escriptura (incloses les cascades i `changeGroup`) se'n pugui escapar.
+- Tota escriptura d'una entitat surt de `ConversesRepository` segellada (`dirty` i la data), encara que la pantalla l'hagi carregat neta.
+- Els canvis en bloc (marcar una tasca com a feta, moure les entrades d'un canal a un altre grup) segellen a l'SQL.
+- L'únic esborrat públic de cada DAO és una transacció que deixa el tombstone. Esborrar un canal propi també segella les entrades que el feien servir, perquè passen a no tenir canal.
+- Tornar a inserir una entrada esborrada («Desfés») treu el seu tombstone i la segella amb l'hora actual, perquè una edició posterior guanyi a l'esborrat **(C)**.
+- `SyncIdentityTest` recorre els mètodes públics del repositori i falla si n'hi ha cap d'escriptura sense classificar.
+
+Queda per a la fase 4:
+
+- L'estat del motor (cursor de l'última baixada) anirà a un DataStore, no a Room **(C)**.
+- Sense sessió els tombstones s'acumulen, una fila petita per esborrat. El motor els neteja en pujar-los, i la pujada inicial del primer dispositiu els pot llençar tots, perquè al núvol encara no hi ha res per esborrar **(C)**.
+- `SampleData` i «esborra-ho tot» del menú de debug escriuen pels DAOs, sense passar pel repositori; només existeixen en debug.
 
 ### Motor
 
@@ -216,7 +225,6 @@ Cada fase es valida abans de la següent. De la 1 a la 6 van darrere d'un featur
 ## Queda per al pla
 
 - Biblioteques i versions exactes (Auth, Firestore, App Check, Credential Manager, Tink o plataforma).
-- On es marca `dirty` (repositori o triggers).
 - Format exacte del JSON de cada tipus de registre i com evoluciona (`format`).
 - Retard d'agrupació de pujades i política de reintents.
 - Biblioteca per llegir i generar el QR, i què porta exactament a dins (secret i caducitat).

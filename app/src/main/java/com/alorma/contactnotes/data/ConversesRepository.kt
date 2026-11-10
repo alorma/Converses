@@ -220,8 +220,7 @@ class ConversesRepository(
     }
 
   /** Les seves entrades es queden al grup; no es perd cap nota. */
-  suspend fun deleteCustomChannel(channel: CustomChannelEntity) =
-    customChannelDao.deleteWithTombstone(channel, clock())
+  suspend fun deleteCustomChannel(channel: CustomChannelEntity) = customChannelDao.deleteWithTombstone(channel, clock())
 
   private suspend fun validateName(
     channelType: ChannelType,

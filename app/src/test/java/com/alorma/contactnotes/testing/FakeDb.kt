@@ -171,12 +171,22 @@ class FakePersonDao(
   override suspend fun tombstoneEntriesOf(
     personId: Long,
     now: Long,
-  ) = db.putTombstones(db.entries.value.filter { it.personId == personId }.map { it.syncId }, now)
+  ) = db.putTombstones(
+    db.entries.value
+      .filter { it.personId == personId }
+      .map { it.syncId },
+    now,
+  )
 
   override suspend fun tombstoneTasksOf(
     personId: Long,
     now: Long,
-  ) = db.putTombstones(db.tasks.value.filter { it.personId == personId }.map { it.syncId }, now)
+  ) = db.putTombstones(
+    db.tasks.value
+      .filter { it.personId == personId }
+      .map { it.syncId },
+    now,
+  )
 
   override suspend fun insertFacts(facts: List<PinnedFactEntity>) {
     db.facts.update { list -> list + facts.map { it.copy(id = db.nextId()) } }
@@ -229,7 +239,9 @@ class FakeEntryDao(
     to: Long,
     now: Long,
   ) = db.putTombstones(
-    db.entries.value.filter { inRange(it, personId, channelType, from, to) }.map { it.syncId },
+    db.entries.value
+      .filter { inRange(it, personId, channelType, from, to) }
+      .map { it.syncId },
     now,
   )
 

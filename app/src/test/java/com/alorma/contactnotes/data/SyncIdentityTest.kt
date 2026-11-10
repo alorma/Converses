@@ -8,13 +8,13 @@ import com.alorma.contactnotes.data.db.TaskEntity
 import com.alorma.contactnotes.shared.ChannelType
 import com.alorma.contactnotes.shared.EntryKind
 import com.alorma.contactnotes.testing.FakeDb
+import java.lang.reflect.Modifier
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
-import java.lang.reflect.Modifier
 
 /**
  * La identitat de sincronització (`docs/sync`): tota escriptura del repositori deixa la fila pendent de pujar, amb la
@@ -240,7 +240,10 @@ class SyncIdentityTest {
 
   // Esborrats: cada fila que desapareix deixa un tombstone, també les que cauen en cascada.
 
-  private fun tombstoned() = db.tombstones.value.map { it.syncId }.toSet()
+  private fun tombstoned() =
+    db.tombstones.value
+      .map { it.syncId }
+      .toSet()
 
   @Test
   fun deleteEntryLeavesATombstone() =
