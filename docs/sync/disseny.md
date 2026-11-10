@@ -2,7 +2,7 @@
 
 Estat: **proposta, res construït**. Escrit el 10 de novembre de 2026 a partir de la conversa amb Bernat. Quan la funció existeixi, aquest fitxer es condensa en un `README.md` que descrigui el que hi ha, com la resta de `docs/`.
 
-Les decisions marcades **(B)** són de Bernat. Les marcades **(C)** les ha pres Claude en escriure el disseny i es poden canviar. Les pantalles les fa disseny a partir de `converses-sincronitzacio-brief-disseny.md`.
+Les decisions marcades **(B)** són de Bernat. Les marcades **(C)** les ha pres Claude en escriure el disseny i es poden canviar. Les pantalles són a `disseny/`: `INSTRUCCIONS.md` (mides, estats, textos en tres idiomes) i `pantalles.html` (referència visual, taulers 13a…13t i 0c). Les decisions que venen d'allà van marcades **(D)**.
 
 ## Per què
 
@@ -39,11 +39,15 @@ Les decisions marcades **(B)** són de Bernat. Les marcades **(C)** les ha pres 
 
 ## Com es veu per a l'usuari
 
-Resum; el detall de pantalles i estats és al brief de disseny.
+Resum; el detall de pantalles i estats és a `disseny/INSTRUCCIONS.md`.
 
-- **(B)** Un indicador de compte a la capçalera del llistat de persones (anònim o avatar) i una fila a Ajustos porten a la pantalla «Sincronització».
-- **(B)** L'onboarding ofereix iniciar sessió, com a opció i sense obligar: qui ve d'un reset recupera les dades abans de crear res.
-- **Primer dispositiu:** iniciar sessió amb Google, veure les paraules de seguretat, confirmar que s'han guardat, pujada inicial.
+- **(B)** Un indicador de compte a la capçalera del llistat de persones (anònim o avatar) i una fila a Ajustos porten a la pantalla «Sincronització». **(D)** L'indicador va a la dreta de `more_vert`; a la tauleta va a baix del rail i la capçalera no en porta. La fila d'Ajustos va en una secció nova «Compte», sota la targeta de Pro.
+- **(B)** L'onboarding ofereix iniciar sessió, com a opció i sense obligar: qui ve d'un reset recupera les dades abans de crear res. **(D)** És un botó de text «Ja tinc dades al núvol» al pas 3/3. El mateix pas canvia els xips «Sense núvol» i «Sense comptes» per «Xifrat» i «Compte opcional», i el text.
+- **Primer dispositiu:** iniciar sessió amb Google, veure les paraules de seguretat, confirmar que s'han guardat, pujada inicial. **(D)** Fins que no es marca «Les he guardat en un lloc segur» i es continua, no es puja res; tancar abans tanca la sessió i no deixa res al núvol.
+- **(D)** Pujada i baixada inicials: barra de progrés determinada pel nombre d'entrades. «Amaga» deixa la feina en segon pla amb WorkManager i una notificació de progrés, sense noms ni text.
+- **(D)** Nom del dispositiu: per defecte el model (`Settings.Global.DEVICE_NAME`, o `Build.MODEL`); es pot canviar des de la llista de dispositius.
+- **(D)** No hi ha avisos per recordar les paraules. La fila «Paraules de seguretat» diu quan es van revisar per última vegada, i obrir-les reinicia el comptador.
+- **(D)** Sense connexió no hi ha cap diàleg: l'indicador i la fila canvien d'estat, i els canvis pugen sols. Esborrar el compte sí que necessita connexió.
 - **Dispositiu addicional o després d'un reset:** iniciar sessió, donar la clau (paraules o QR d'un dispositiu que ja sincronitza), triar quin dispositiu surt si les places són plenes, fusionar amb el que hi hagi en local, baixar.
 - **(B)** Places plenes: tria el dispositiu que entra. Mai s'expulsa ningú automàticament. Sense límit de canvis d'entrada.
 - **Dispositiu tret:** conserva les dades, deixa de sincronitzar i mostra un avís fix. En tornar, es fusiona.
@@ -83,7 +87,8 @@ La regla de `CLAUDE.md` i de `docs/analytics` passa a dir: «Analytics i Crashly
 
 - **Secret de recuperació:** 128 bits aleatoris, generats al primer dispositiu. Les **paraules de seguretat** en són la forma llegible: 12 paraules de la llista anglesa de BIP39, amb la seva suma de control **(C)**. El QR porta el mateix secret.
 - **Clau de dades:** 256 bits aleatoris. Xifra tots els registres. Es puja al document del compte **embolcallada** amb una clau derivada del secret (HKDF-SHA256). Paraules incorrectes fan fallar el desembolcallat, i així es detecten. Canviar de paraules en el futur no obligaria a tornar a xifrar-ho tot.
-- **Al dispositiu:** el secret i la clau de dades es guarden en un fitxer xifrat amb una clau AES de l'Android Keystore, no exportable. El fitxer queda fora del backup d'Android, com la base de dades. Consultar les paraules o mostrar el QR demana `BiometricPrompt` i `FLAG_SECURE`.
+- **Al dispositiu:** el secret i la clau de dades es guarden en un fitxer xifrat amb una clau AES de l'Android Keystore, no exportable. El fitxer queda fora del backup d'Android, com la base de dades. Consultar les paraules o mostrar el QR demana `BiometricPrompt` (`BIOMETRIC_STRONG` o la credencial del dispositiu) i `FLAG_SECURE`, sempre, també al primer dispositiu just després d'iniciar sessió.
+- **(D) Pantalles amb la clau a la vista:** `FLAG_SECURE` a les paraules (13f), a escriure-les (13j) i al QR (13p). El QR caduca en 5 minuts i se'n genera un de nou en tocar-lo. En copiar les paraules, el porta-retalls es marca com a sensible (`ClipDescription.EXTRA_IS_SENSITIVE`) i s'esborra al cap d'1 minut. Els camps per escriure-les no tenen autocorrecció ni aprenentatge del teclat (`IME_FLAG_NO_PERSONALIZED_LEARNING`). Les paraules es mostren sempre en anglès; la interfície, traduïda.
 - **Registres:** AES-256-GCM, nonce aleatori de 12 bytes per xifratge. Les dades associades (AAD) inclouen l'UID, l'identificador del registre i la versió del format, perquè un registre no es pugui moure a un altre lloc ni a un altre compte.
 - **Biblioteca:** primitives de la plataforma (`javax.crypto`) o Tink; ho decideix el pla després de mirar la versió estable actual **(C)**. Cap criptografia inventada.
 
@@ -176,10 +181,15 @@ Surt del telèfon, només si l'usuari inicia sessió (opcional):
 | Atestació de Play Integrity | App Check | Evitar abús |
 | IP | Google | Inherent a la connexió |
 
+Permisos nous, que no fan sortir cap dada del telèfon **(D)**:
+
+- `CAMERA`, per llegir el QR d'un altre dispositiu. Es demana en tocar «Llegeix el QR», no abans; la imatge es processa al dispositiu i no es guarda. Sense el permís, queda l'opció d'escriure les paraules.
+- `POST_NOTIFICATIONS`, per a la notificació de progrés de la pujada o la baixada en segon pla. Cal mirar al manifest fusionat si alguna biblioteca ja l'afegeix.
+
 Cal, abans de publicar:
 
 - **Política de privacitat** a ConversesLanding (`privacy/`, `ca/privacitat/`, `es/privacidad/`): compte opcional, què es puja i què no, xifratge d'extrem a extrem, retenció («es poden esborrar després de 24 mesos sense activitat»), com esborrar el compte. Text a proposar i aprovar per Bernat.
-- **Formulari de seguretat de dades de Play** (només Bernat): adreça de correu i identificadors d'usuari, recollits, opcionals, per a la funcionalitat de l'app i la gestió del compte; esborrat de dades disponible. Cal comprovar com es declara el contingut xifrat d'extrem a extrem.
+- **Formulari de seguretat de dades de Play** (només Bernat): adreça de correu i identificadors d'usuari, recollits, opcionals, per a la funcionalitat de l'app i la gestió del compte; esborrat de dades disponible. Cal comprovar com es declara el contingut xifrat d'extrem a extrem, i si el permís de càmera (ús només local) hi canvia alguna resposta.
 - `docs/pro/README.md`: Pro deixa de ser «sense compte» a seques; el compte és opcional i només per sincronitzar.
 - Catàleg d'analítica: pantalla `sync` i accions amb valors tancats (activar, tancar sessió, treure dispositiu, esborrar compte), només amb consentiment.
 
@@ -209,7 +219,9 @@ Cada fase es valida abans de la següent. De la 1 a la 6 van darrere d'un featur
 - On es marca `dirty` (repositori o triggers).
 - Format exacte del JSON de cada tipus de registre i com evoluciona (`format`).
 - Retard d'agrupació de pujades i política de reintents.
-- Com es mostra el progrés de la pujada i la baixada inicials.
+- Biblioteca per llegir i generar el QR, i què porta exactament a dins (secret i caducitat).
+- On es guarda la data de l'última revisió de les paraules (és de cada dispositiu o del compte).
+- Rebase sobre `main` abans de tocar codi: el rail i `docs/pantalles-grans` hi són, i la secció 11 de `disseny/INSTRUCCIONS.md` en depèn.
 
 ## Queda per a Bernat
 
