@@ -119,5 +119,5 @@ d'en Bernat.
 - Captures de tauleta: anotacions `TabletPortraitPreviews` i `TabletLandscapePreviews` a 160 dpi. Amb la densitat per
   defecte fan 2100 × 3360 px i la validació es queda sense memòria.
 - `TopLevelBackStack.navigateSingle` obre Ajustos sense apilar-ne una segona còpia (el rail es veu des d'Ajustos).
-- **Pendent de decidir amb en Bernat:** l'etiqueta BETA del llistat. El disseny diu que no surt enlloc, però treure-la
-  canvia el mòbil; no s'ha tocat.
+- L'etiqueta BETA del llistat s'ha tret a tot arreu (també al mòbil), per decisió d'en Bernat: és l'única excepció a
+  «el mòbil no canvia».

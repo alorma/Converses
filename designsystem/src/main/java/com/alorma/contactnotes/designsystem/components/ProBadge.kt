@@ -27,7 +27,7 @@ fun ProBadge(
   modifier: Modifier = Modifier,
 ) {
   val scheme = MaterialTheme.colorScheme
-  // Com BetaBadge: el text de l'etiqueta no escala amb la mida de lletra del sistema (la descripció sí que es llegeix)
+  // El text de l'etiqueta no escala amb la mida de lletra del sistema (la descripció sí que es llegeix)
   val fontSize = with(LocalDensity.current) { 10.5.dp.toSp() }
   val letterSpacing = with(LocalDensity.current) { 0.6.dp.toSp() }
   val lineHeight = with(LocalDensity.current) { 13.dp.toSp() }

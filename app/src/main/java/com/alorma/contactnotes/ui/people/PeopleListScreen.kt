@@ -7,7 +7,6 @@ import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -64,7 +63,6 @@ import com.alorma.contactnotes.data.db.PersonListItem
 import com.alorma.contactnotes.data.db.color
 import com.alorma.contactnotes.data.db.shape
 import com.alorma.contactnotes.designsystem.components.Avatar
-import com.alorma.contactnotes.designsystem.components.BetaBadge
 import com.alorma.contactnotes.designsystem.components.DashedActionRow
 import com.alorma.contactnotes.designsystem.components.GroupedListDefaults
 import com.alorma.contactnotes.designsystem.components.WelcomeEmptyState
@@ -210,25 +208,12 @@ private fun Header(
     verticalAlignment = Alignment.Top,
   ) {
     Column(modifier = Modifier.weight(1f)) {
-      // Amb lletra gran el badge baixa a la línia següent en comptes de partir el títol
-      FlowRow(
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-        verticalArrangement = Arrangement.spacedBy(2.dp),
-      ) {
-        Text(
-          text = stringResource(if (archived) R.string.filter_archived else R.string.people_title),
-          style = ListTitleStyle,
-          maxLines = 1,
-          softWrap = false,
-        )
-        if (!archived) {
-          BetaBadge(
-            text = stringResource(R.string.beta_badge),
-            contentDescription = stringResource(R.string.beta_description),
-            modifier = Modifier.padding(top = 7.dp),
-          )
-        }
-      }
+      Text(
+        text = stringResource(if (archived) R.string.filter_archived else R.string.people_title),
+        style = ListTitleStyle,
+        maxLines = 1,
+        softWrap = false,
+      )
       if (!isLoading) {
         Text(
           text =

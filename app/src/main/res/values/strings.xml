@@ -3,8 +3,6 @@
 
     <string name="people_title">Converses</string>
     <string name="nav_people">People</string>
-    <string name="beta_badge" translatable="false">BETA</string>
-    <string name="beta_description">Beta version</string>
     <string name="pro_badge" translatable="false">PRO</string>
     <string name="pro_description">Pro feature</string>
     <plurals name="people_count">
