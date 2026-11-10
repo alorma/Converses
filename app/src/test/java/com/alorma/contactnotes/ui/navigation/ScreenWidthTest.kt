@@ -1,9 +1,17 @@
 package com.alorma.contactnotes.ui.navigation
 
+import androidx.navigation3.runtime.NavKey
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
 class ScreenWidthTest {
+  private val large = listOf(ScreenWidth.Medium, ScreenWidth.Expanded)
+
+  private fun shell(
+    width: ScreenWidth,
+    vararg stack: NavKey,
+  ) = shellNavigationFor(stack.toList(), width)
+
   @Test
   fun `width classes break at 600 and 840 dp`() {
     assertEquals(ScreenWidth.Compact, screenWidthOf(411))
@@ -16,33 +24,43 @@ class ScreenWidthTest {
 
   @Test
   fun `the phone shows the floating bar only on tabs`() {
-    assertEquals(ShellNavigation.FloatingBar, shellNavigationFor(PeopleRoute, ScreenWidth.Compact))
-    assertEquals(ShellNavigation.FloatingBar, shellNavigationFor(ArchivedRoute, ScreenWidth.Compact))
-    assertEquals(ShellNavigation.None, shellNavigationFor(PersonRoute(1), ScreenWidth.Compact))
-    assertEquals(ShellNavigation.None, shellNavigationFor(SettingsRoute, ScreenWidth.Compact))
-    assertEquals(ShellNavigation.None, shellNavigationFor(QuickNoteRoute(), ScreenWidth.Compact))
+    val width = ScreenWidth.Compact
+    assertEquals(ShellNavigation.FloatingBar, shell(width, PeopleRoute))
+    assertEquals(ShellNavigation.FloatingBar, shell(width, PeopleRoute, ArchivedRoute))
+    assertEquals(ShellNavigation.None, shell(width, PeopleRoute, PersonRoute(1)))
+    assertEquals(ShellNavigation.None, shell(width, PeopleRoute, SettingsRoute))
+    assertEquals(ShellNavigation.None, shell(width, PeopleRoute, QuickNoteRoute()))
   }
 
   @Test
   fun `a large screen shows the rail on tabs, people and settings`() {
-    for (width in listOf(ScreenWidth.Medium, ScreenWidth.Expanded)) {
-      assertEquals(ShellNavigation.Rail, shellNavigationFor(PeopleRoute, width))
-      assertEquals(ShellNavigation.Rail, shellNavigationFor(ArchivedRoute, width))
-      assertEquals(ShellNavigation.Rail, shellNavigationFor(PersonRoute(1), width))
-      assertEquals(ShellNavigation.Rail, shellNavigationFor(PersonLockedRoute(1), width))
-      assertEquals(ShellNavigation.Rail, shellNavigationFor(SettingsRoute, width))
-      assertEquals(ShellNavigation.Rail, shellNavigationFor(CustomChannelsRoute, width))
+    for (width in large) {
+      assertEquals(ShellNavigation.Rail, shell(width, PeopleRoute))
+      assertEquals(ShellNavigation.Rail, shell(width, PeopleRoute, ArchivedRoute))
+      assertEquals(ShellNavigation.Rail, shell(width, PeopleRoute, PersonRoute(1)))
+      assertEquals(ShellNavigation.Rail, shell(width, PeopleRoute, PersonLockedRoute(1)))
+      assertEquals(ShellNavigation.Rail, shell(width, PeopleRoute, SettingsRoute))
+      assertEquals(ShellNavigation.Rail, shell(width, PeopleRoute, SettingsRoute, CustomChannelsRoute))
     }
   }
 
   @Test
-  fun `a large screen hides the rail on onboarding and on modal screens`() {
-    for (width in listOf(ScreenWidth.Medium, ScreenWidth.Expanded)) {
-      assertEquals(ShellNavigation.None, shellNavigationFor(OnboardingRoute, width))
-      assertEquals(ShellNavigation.None, shellNavigationFor(QuickNoteRoute(), width))
-      assertEquals(ShellNavigation.None, shellNavigationFor(EditPersonRoute(), width))
-      assertEquals(ShellNavigation.None, shellNavigationFor(TaskRoute(1), width))
-      assertEquals(ShellNavigation.None, shellNavigationFor(PaywallRoute(), width))
+  fun `a large screen keeps the rail under a form, which is a dialog`() {
+    for (width in large) {
+      assertEquals(ShellNavigation.Rail, shell(width, PeopleRoute, QuickNoteRoute()))
+      assertEquals(ShellNavigation.Rail, shell(width, PeopleRoute, PersonRoute(1), EditPersonRoute(1)))
+      assertEquals(ShellNavigation.Rail, shell(width, PeopleRoute, PersonRoute(1), TaskRoute(1)))
+      assertEquals(ShellNavigation.Rail, shell(width, PeopleRoute, SettingsRoute, PaywallRoute()))
+      assertEquals(ShellNavigation.Rail, shell(width, PeopleRoute, QuickNoteRoute(), EditPersonRoute()))
+    }
+  }
+
+  @Test
+  fun `a large screen hides the rail on onboarding and on an import`() {
+    for (width in large) {
+      assertEquals(ShellNavigation.None, shell(width, OnboardingRoute))
+      assertEquals(ShellNavigation.None, shell(width, QuickNoteRoute(sharedText = "hi")))
+      assertEquals(ShellNavigation.None, shell(width, QuickNoteRoute(sharedText = "hi"), EditPersonRoute()))
     }
   }
 }

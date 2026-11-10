@@ -44,20 +44,22 @@ enum class ShellNavigation {
   Rail,
 }
 
+/** Nota ràpida, formularis i Pro: al mòbil són pantalles completes; en una pantalla gran, diàlegs sobre la resta. */
+fun NavKey.isFormRoute(): Boolean =
+  this is QuickNoteRoute || this is EditPersonRoute || this is TaskRoute || this is PaywallRoute
+
 /**
- * En una pantalla gran el rail acompanya les pestanyes, la persona i Ajustos. No surt a l'onboarding ni a les
- * pantalles modals (nota ràpida, formularis, Pro), on tocar una destinació faria perdre el que s'hi escrivia.
+ * Al mòbil, la barra flotant només a les pestanyes. En una pantalla gran el rail acompanya les pestanyes, la persona
+ * i Ajustos, i s'hi queda quan a sobre s'obre un formulari, que és un diàleg i el tapa. No surt a l'onboarding ni
+ * quan a la pila només hi ha un formulari (un import des d'una altra app), que ocupa tota la pantalla.
  */
 fun shellNavigationFor(
-  current: NavKey,
+  backStack: List<NavKey>,
   width: ScreenWidth,
-): ShellNavigation =
-  when {
-    width == ScreenWidth.Compact -> if (current is TopLevelRoute) ShellNavigation.FloatingBar else ShellNavigation.None
-    current is TopLevelRoute ||
-      current is PersonRoute ||
-      current is PersonLockedRoute ||
-      current is SettingsRoute ||
-      current is CustomChannelsRoute -> ShellNavigation.Rail
-    else -> ShellNavigation.None
+): ShellNavigation {
+  if (width == ScreenWidth.Compact) {
+    return if (backStack.lastOrNull() is TopLevelRoute) ShellNavigation.FloatingBar else ShellNavigation.None
   }
+  val screen = backStack.lastOrNull { !it.isFormRoute() }
+  return if (screen == null || screen is OnboardingRoute) ShellNavigation.None else ShellNavigation.Rail
+}

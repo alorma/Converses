@@ -87,7 +87,7 @@ d'en Bernat.
 - [x] **3. Detall a dues columnes** (expandida, 12a). Capçalera amb avatar de 96 dp, `edit` i el split button
   «Nota ▾» a la dreta (ja no flota). Dades i Pendents en 280 dp a l'esquerra, Cronologia a la dreta. En amplada
   mitjana (12c): una columna, avatar de 80 dp i el split button flotant dins del panell.
-- [ ] **4. Diàlegs.** A partir de 600 dp, Nova/Editar persona, Nota ràpida (12b), Nova tasca i Pro són diàlegs de
+- [x] **4. Diàlegs.** A partir de 600 dp, Nova/Editar persona, Nota ràpida (12b), Nova tasca i Pro són diàlegs de
   560 dp (radi 28, scrim, Esc tanca). La Nota ràpida ve amb la persona oberta ja triada. El text escrit sobreviu a
   girar i redimensionar.
 - [ ] **5. Plegable** (12d). Amb un `FoldingFeature` vertical que separa, la divisió s'alinea amb la frontissa: llistat
@@ -101,6 +101,26 @@ d'en Bernat.
   navegació haurà canviat). Condensar aquest document.
 
 ## Notes entre sessions
+
+**Després del pas 4**
+
+- Amb dos panells, `QuickNoteRoute`, `EditPersonRoute`, `TaskRoute` i `PaywallRoute` porten el metadata de
+  `DialogSceneStrategy` (de Navigation 3) en lloc de `modalTransitions`, i `FormDialogFrame` els limita a 560 dp.
+  Un import des d'una altra app (la pila és només la nota ràpida) es queda a pantalla completa.
+- **Privacitat:** el diàleg és una finestra a part i el `FLAG_SECURE` de l'activitat no el cobreix si es demana amb
+  el diàleg ja obert (triar una persona protegida a la nota ràpida). `FormDialogFrame` posa el flag a la finestra del
+  diàleg seguint `SecureWindow.isRequested`. No serveix canviar `DialogProperties`: `NavDisplay` es queda amb la
+  primera escena superposada d'una ruta i n'ignora els canvis. Es comprova amb
+  `adb shell dumpsys window windows` (les dues finestres han de dir `SECURE`).
+- Tocar fora del diàleg no el tanca (es perdria el text); Esc i enrere sí.
+- `shellNavigationFor` rep tota la pila: el rail es queda sota un diàleg i s'amaga a l'onboarding i en un import.
+- La nota ràpida oberta des del rail amb una persona al detall ja ve amb ella triada (una protegida torna a demanar
+  l'empremta). L'etiqueta continua dient «AMB QUI».
+- Una persona nova es desa amb `openPerson`, perquè substitueixi la que hi hagués oberta al detall.
+- Provat a l'emulador: els quatre diàlegs, el teclat (el diàleg s'encongeix), Esc, i escriure text, estrènyer la
+  finestra per sota de 600 dp i tornar-la a eixamplar sense perdre'l.
+- L'alçada del diàleg és fixa (fins a 720 dp) encara que el formulari sigui curt: les pantalles són `Scaffold` i no
+  s'ajusten al contingut.
 
 **Després del pas 3**
 

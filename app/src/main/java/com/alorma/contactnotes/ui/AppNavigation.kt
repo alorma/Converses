@@ -24,17 +24,21 @@ import androidx.compose.material3.adaptive.navigation.BackNavigationBehavior
 import androidx.compose.material3.adaptive.navigation3.ListDetailSceneStrategy
 import androidx.compose.material3.adaptive.navigation3.rememberListDetailSceneStrategy
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
+import androidx.navigation3.scene.DialogSceneStrategy
 import androidx.navigation3.ui.NavDisplay
 import com.alorma.contactnotes.data.db.PersonEntity
+import com.alorma.contactnotes.data.settings.SecureWindow
 import com.alorma.contactnotes.data.tracking.ConsentManager
 import com.alorma.contactnotes.ui.consent.ConsentSheet
 import com.alorma.contactnotes.ui.edit.EditPersonScreen
@@ -47,6 +51,8 @@ import com.alorma.contactnotes.ui.navigation.CustomChannelsRoute
 import com.alorma.contactnotes.ui.navigation.DetailPanel
 import com.alorma.contactnotes.ui.navigation.EditPersonRoute
 import com.alorma.contactnotes.ui.navigation.EmptyDetailPane
+import com.alorma.contactnotes.ui.navigation.FormDialogFrame
+import com.alorma.contactnotes.ui.navigation.FormDialogProperties
 import com.alorma.contactnotes.ui.navigation.OnboardingRoute
 import com.alorma.contactnotes.ui.navigation.PaywallRoute
 import com.alorma.contactnotes.ui.navigation.PeopleRoute
@@ -117,6 +123,14 @@ fun AppNavigation(
       backNavigationBehavior = BackNavigationBehavior.PopLatest,
       directive = paneDirective,
     )
+  // Amb dos panells, la nota ràpida, els formularis i Pro són diàlegs sobre el llistat i el detall. Un import des
+  // d'una altra app no té res a sota: es queda a pantalla completa
+  val formsAsDialogs = twoPane && !imported
+  val dialogStrategy = remember { DialogSceneStrategy<NavKey>() }
+  val secureWindow: SecureWindow = koinInject()
+  val secure by secureWindow.isRequested.collectAsStateWithLifecycle(initialValue = false)
+  val formMetadata =
+    if (formsAsDialogs) DialogSceneStrategy.dialog(FormDialogProperties) else modalTransitions
   val openPerson: (PersonEntity) -> Unit = { person -> navigation.openPerson(personRoute(person)) }
   val newPerson = { navigation.navigate(EditPersonRoute()) }
 
@@ -131,16 +145,20 @@ fun AppNavigation(
 
   AppShell(
     currentTab = navigation.currentTab,
-    navigation = shellNavigationFor(current, currentScreenWidth()),
+    navigation = shellNavigationFor(navigation.backStack, currentScreenWidth()),
     onTabSelected = navigation::switchTab,
-    onQuickNote = { navigation.navigate(QuickNoteRoute()) },
+    onQuickNote = {
+      // Amb una persona oberta al costat, la nota ràpida ja ve amb ella triada (una protegida torna a demanar empremta)
+      val openId = if (twoPane) (navigation.current as? PersonRoute)?.id else null
+      navigation.navigate(QuickNoteRoute(personId = openId ?: 0L))
+    },
     onOpenSettings = { navigation.navigateSingle(SettingsRoute) },
     settingsSelected = SettingsRoute in navigation.backStack,
   ) {
     NavDisplay(
       backStack = navigation.backStack,
       onBack = { if (!navigation.pop()) activity?.finish() },
-      sceneStrategies = listOf(listDetailStrategy),
+      sceneStrategies = listOf(dialogStrategy, listDetailStrategy),
       transitionSpec = { nativeTransition(forward = true, vertical = false) },
       popTransitionSpec = { nativeTransition(forward = false, vertical = false) },
       predictivePopTransitionSpec = { edge -> predictiveBack(edge, vertical = false) },
@@ -176,26 +194,32 @@ fun AppNavigation(
               selectedPersonId = navigation.openPersonId,
             )
           }
-          entry<QuickNoteRoute>(metadata = modalTransitions) { route ->
-            QuickNoteScreen(
-              personId = route.personId,
-              sharedText = route.sharedText,
-              // Entrat des d'una altra app: tancar torna a l'app d'origen
-              onClose = { if (imported) activity?.finish() else navigation.pop() },
-              onNewPerson = { navigation.navigate(EditPersonRoute(returnSelection = true)) },
-              onOpenPro = { navigation.navigate(PaywallRoute(ProBenefit.Channels)) },
-            )
+          entry<QuickNoteRoute>(metadata = formMetadata) { route ->
+            FormDialogFrame(asDialog = formsAsDialogs, secure = secure) {
+              QuickNoteScreen(
+                personId = route.personId,
+                sharedText = route.sharedText,
+                // Entrat des d'una altra app: tancar torna a l'app d'origen
+                onClose = { if (imported) activity?.finish() else navigation.pop() },
+                onNewPerson = { navigation.navigate(EditPersonRoute(returnSelection = true)) },
+                onOpenPro = { navigation.navigate(PaywallRoute(ProBenefit.Channels)) },
+              )
+            }
           }
-          entry<TaskRoute>(metadata = modalTransitions) { route ->
-            TaskFormScreen(
-              personId = route.personId,
-              taskId = route.taskId,
-              onClose = { navigation.pop() },
-              onNewPerson = { navigation.navigate(EditPersonRoute(returnSelection = true)) },
-            )
+          entry<TaskRoute>(metadata = formMetadata) { route ->
+            FormDialogFrame(asDialog = formsAsDialogs, secure = secure) {
+              TaskFormScreen(
+                personId = route.personId,
+                taskId = route.taskId,
+                onClose = { navigation.pop() },
+                onNewPerson = { navigation.navigate(EditPersonRoute(returnSelection = true)) },
+              )
+            }
           }
-          entry<PaywallRoute>(metadata = modalTransitions) { route ->
-            PaywallScreen(highlight = route.highlight, onClose = { navigation.pop() })
+          entry<PaywallRoute>(metadata = formMetadata) { route ->
+            FormDialogFrame(asDialog = formsAsDialogs, secure = secure) {
+              PaywallScreen(highlight = route.highlight, onClose = { navigation.pop() })
+            }
           }
           entry<SettingsRoute> {
             SettingsScreen(
@@ -234,25 +258,28 @@ fun AppNavigation(
               )
             }
           }
-          entry<EditPersonRoute>(metadata = modalTransitions) { route ->
-            EditPersonScreen(
-              personId = route.personId,
-              focus = route.focus,
-              onOpenPro = { navigation.navigate(PaywallRoute(it)) },
-              onClose = { navigation.pop() },
-              onSaved = { id ->
-                navigation.pop()
-                if (route.returnSelection) {
-                  selectionBridge.post(id, authenticated = true)
-                } else if (route.personId == 0L) {
-                  navigation.navigate(PersonRoute(id))
-                }
-              },
-              onDeleted = {
-                navigation.pop()
-                navigation.pop()
-              },
-            )
+          entry<EditPersonRoute>(metadata = formMetadata) { route ->
+            FormDialogFrame(asDialog = formsAsDialogs, secure = secure) {
+              EditPersonScreen(
+                personId = route.personId,
+                focus = route.focus,
+                onOpenPro = { navigation.navigate(PaywallRoute(it)) },
+                onClose = { navigation.pop() },
+                onSaved = { id ->
+                  navigation.pop()
+                  if (route.returnSelection) {
+                    selectionBridge.post(id, authenticated = true)
+                  } else if (route.personId == 0L) {
+                    // Amb dos panells pot haver-hi una altra persona oberta: la nova la substitueix
+                    navigation.openPerson(PersonRoute(id))
+                  }
+                },
+                onDeleted = {
+                  navigation.pop()
+                  navigation.pop()
+                },
+              )
+            }
           }
         },
     )
