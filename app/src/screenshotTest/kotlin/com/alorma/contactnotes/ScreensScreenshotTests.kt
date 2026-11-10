@@ -472,6 +472,20 @@ class ScreensScreenshotTests {
     EntryActionsDayPreview()
   }
 
+  @TabletLandscapePreviews
+  @PreviewTest
+  @Composable
+  fun onboardingStep1TabletLandscape() {
+    OnboardingStep1Preview()
+  }
+
+  @TabletPortraitPreviews
+  @PreviewTest
+  @Composable
+  fun onboardingStep2TabletPortrait() {
+    OnboardingStep2Preview()
+  }
+
   @ScreenPreviews
   @PreviewTest
   @Composable

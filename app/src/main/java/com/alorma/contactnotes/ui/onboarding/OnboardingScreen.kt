@@ -11,6 +11,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -54,6 +55,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.alorma.contactnotes.R
 import com.alorma.contactnotes.data.settings.OnboardingFlag
+import com.alorma.contactnotes.designsystem.components.readableWidth
 import com.alorma.contactnotes.designsystem.theme.OnboardingTitleStyle
 import com.alorma.contactnotes.ui.tracking.Actions
 import com.alorma.contactnotes.ui.tracking.rememberActionTracker
@@ -140,8 +142,9 @@ fun OnboardingContent(
       Row(
         modifier =
           Modifier
-            .fillMaxWidth()
             .navigationBarsPadding()
+            // Pantalla gran: l'indicador i el botó queden sota la columna del contingut, no a les vores de la finestra
+            .readableWidth()
             .padding(start = 28.dp, end = 28.dp, bottom = 32.dp, top = 12.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -183,45 +186,55 @@ private fun OnboardingPageContent(
       go(a[0], 150, tween(500, easing = FastOutSlowInEasing))
       go(a[1], 300, tween(500, easing = FastOutSlowInEasing))
     }
-  Column(modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
-    Box(
-      modifier =
-        Modifier
-          .padding(horizontal = 20.dp)
-          .fillMaxWidth()
-          .height(380.dp)
-          .clearAndSetSemantics {},
-      contentAlignment = Alignment.TopCenter,
+  BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
+    // Pantalla gran (600 dp o més): una columna centrada de 640 dp, també en vertical si sobra espai. Al mòbil el
+    // contingut continua a dalt i a tota l'amplada
+    val wide = maxWidth >= WideMinWidth
+    Column(
+      modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()).readableWidth(),
+      verticalArrangement = if (wide) Arrangement.Center else Arrangement.Top,
     ) {
-      page.illustration(active, 0, reduced)
-    }
-    Column(modifier = Modifier.padding(start = 28.dp, end = 28.dp, top = 20.dp)) {
-      Text(
-        text = stringResource(page.title),
-        style = OnboardingTitleStyle,
-        color = MaterialTheme.colorScheme.onSurface,
+      Box(
         modifier =
-          Modifier.graphicsLayer {
-            alpha = intro[0].value
-            translationY = (1f - intro[0].value) * 16.dp.toPx()
-          },
-      )
-      Spacer(Modifier.height(12.dp))
-      Text(
-        text = stringResource(page.body),
-        style = MaterialTheme.typography.bodyLarge,
-        fontSize = 17.sp,
-        lineHeight = 24.65.sp,
-        color = MaterialTheme.colorScheme.onSurfaceVariant,
-        modifier =
-          Modifier.graphicsLayer {
-            alpha = intro[1].value
-            translationY = (1f - intro[1].value) * 16.dp.toPx()
-          },
-      )
+          Modifier
+            .padding(horizontal = 20.dp)
+            .fillMaxWidth()
+            .height(380.dp)
+            .clearAndSetSemantics {},
+        contentAlignment = Alignment.TopCenter,
+      ) {
+        page.illustration(active, 0, reduced)
+      }
+      Column(modifier = Modifier.padding(start = 28.dp, end = 28.dp, top = 20.dp)) {
+        Text(
+          text = stringResource(page.title),
+          style = OnboardingTitleStyle,
+          color = MaterialTheme.colorScheme.onSurface,
+          modifier =
+            Modifier.graphicsLayer {
+              alpha = intro[0].value
+              translationY = (1f - intro[0].value) * 16.dp.toPx()
+            },
+        )
+        Spacer(Modifier.height(12.dp))
+        Text(
+          text = stringResource(page.body),
+          style = MaterialTheme.typography.bodyLarge,
+          fontSize = 17.sp,
+          lineHeight = 24.65.sp,
+          color = MaterialTheme.colorScheme.onSurfaceVariant,
+          modifier =
+            Modifier.graphicsLayer {
+              alpha = intro[1].value
+              translationY = (1f - intro[1].value) * 16.dp.toPx()
+            },
+        )
+      }
     }
   }
 }
+
+private val WideMinWidth = 600.dp
 
 @Composable
 private fun PageIndicator(pagerState: PagerState) {
