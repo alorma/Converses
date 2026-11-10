@@ -37,6 +37,7 @@ import com.alorma.contactnotes.ui.navigation.AppShellArchivedPreview
 import com.alorma.contactnotes.ui.navigation.AppShellPeoplePreview
 import com.alorma.contactnotes.ui.navigation.AppShellRailPeoplePreview
 import com.alorma.contactnotes.ui.navigation.AppShellRailSettingsPreview
+import com.alorma.contactnotes.ui.navigation.AppShellTwoPaneEmptyPreview
 import com.alorma.contactnotes.ui.onboarding.OnboardingStep1Preview
 import com.alorma.contactnotes.ui.onboarding.OnboardingStep2Preview
 import com.alorma.contactnotes.ui.onboarding.OnboardingStep3Preview
@@ -141,6 +142,13 @@ class ScreensScreenshotTests {
   @Composable
   fun appShellRailPeople() {
     AppShellRailPeoplePreview()
+  }
+
+  @TabletLandscapePreviews
+  @PreviewTest
+  @Composable
+  fun appShellTwoPaneEmpty() {
+    AppShellTwoPaneEmptyPreview()
   }
 
   @TabletLandscapePreviews

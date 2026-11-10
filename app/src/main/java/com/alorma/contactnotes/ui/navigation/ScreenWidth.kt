@@ -1,6 +1,6 @@
 package com.alorma.contactnotes.ui.navigation
 
-import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfoV2
 import androidx.compose.runtime.Composable
 import androidx.navigation3.runtime.NavKey
 
@@ -31,7 +31,7 @@ fun screenWidthOf(widthDp: Int): ScreenWidth =
 
 /** Amplada de la finestra actual; es recalcula en girar, redimensionar, plegar o desplegar. */
 @Composable
-fun currentScreenWidth(): ScreenWidth = screenWidthOf(currentWindowAdaptiveInfo().windowSizeClass.minWidthDp)
+fun currentScreenWidth(): ScreenWidth = screenWidthOf(currentWindowAdaptiveInfoV2().windowSizeClass.minWidthDp)
 
 /** Navegació principal que [AppShell] dibuixa per a la pantalla de dalt de la pila. */
 enum class ShellNavigation {

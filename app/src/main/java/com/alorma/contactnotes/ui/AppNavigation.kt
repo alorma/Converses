@@ -17,10 +17,17 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
+import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfoV2
+import androidx.compose.material3.adaptive.layout.calculatePaneScaffoldDirectiveWithTwoPanesOnMediumWidth
+import androidx.compose.material3.adaptive.navigation.BackNavigationBehavior
+import androidx.compose.material3.adaptive.navigation3.ListDetailSceneStrategy
+import androidx.compose.material3.adaptive.navigation3.rememberListDetailSceneStrategy
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
 import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
@@ -37,17 +44,21 @@ import com.alorma.contactnotes.ui.navigation.AppRoute
 import com.alorma.contactnotes.ui.navigation.AppShell
 import com.alorma.contactnotes.ui.navigation.ArchivedRoute
 import com.alorma.contactnotes.ui.navigation.CustomChannelsRoute
+import com.alorma.contactnotes.ui.navigation.DetailPanel
 import com.alorma.contactnotes.ui.navigation.EditPersonRoute
+import com.alorma.contactnotes.ui.navigation.EmptyDetailPane
 import com.alorma.contactnotes.ui.navigation.OnboardingRoute
 import com.alorma.contactnotes.ui.navigation.PaywallRoute
 import com.alorma.contactnotes.ui.navigation.PeopleRoute
 import com.alorma.contactnotes.ui.navigation.PersonLockedRoute
 import com.alorma.contactnotes.ui.navigation.PersonRoute
 import com.alorma.contactnotes.ui.navigation.QuickNoteRoute
+import com.alorma.contactnotes.ui.navigation.ScreenWidth
 import com.alorma.contactnotes.ui.navigation.SettingsRoute
 import com.alorma.contactnotes.ui.navigation.TaskRoute
 import com.alorma.contactnotes.ui.navigation.TopLevelBackStack
 import com.alorma.contactnotes.ui.navigation.currentScreenWidth
+import com.alorma.contactnotes.ui.navigation.screenWidthOf
 import com.alorma.contactnotes.ui.navigation.shellNavigationFor
 import com.alorma.contactnotes.ui.onboarding.OnboardingScreen
 import com.alorma.contactnotes.ui.paywall.PaywallScreen
@@ -62,6 +73,7 @@ import com.alorma.contactnotes.ui.tracking.TrackScreen
 import com.alorma.contactnotes.ui.tracking.toScreen
 import org.koin.compose.koinInject
 
+@OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @Composable
 fun AppNavigation(
   startOnboarding: Boolean = false,
@@ -81,6 +93,32 @@ fun AppNavigation(
   val navigation = remember(backStack) { TopLevelBackStack(backStack) }
   val activity = LocalActivity.current
   val selectionBridge: PersonSelectionBridge = koinInject()
+
+  // A partir de 600 dp, llistat i detall de costat. La directiva és l'única que ho decideix (també separa els panells
+  // per la frontissa d'un plegable), i `twoPane` en surt perquè les pantalles i l'escena no es puguin contradir
+  val windowInfo = currentWindowAdaptiveInfoV2()
+  val paneDirective =
+    remember(windowInfo) {
+      val listWidth =
+        if (screenWidthOf(windowInfo.windowSizeClass.minWidthDp) ==
+          ScreenWidth.Expanded
+        ) {
+          380.dp
+        } else {
+          300.dp
+        }
+      calculatePaneScaffoldDirectiveWithTwoPanesOnMediumWidth(windowInfo).copy(defaultPanePreferredWidth = listWidth)
+    }
+  val twoPane = paneDirective.maxHorizontalPartitions > 1
+  // PopLatest: enrere treu sempre una sola ruta, com `TopLevelBackStack.pop`. Amb el valor per defecte, tancar la
+  // persona amb dos panells no compta com un canvi i enrere tancaria l'app amb la persona encara oberta
+  val listDetailStrategy =
+    rememberListDetailSceneStrategy<NavKey>(
+      backNavigationBehavior = BackNavigationBehavior.PopLatest,
+      directive = paneDirective,
+    )
+  val openPerson: (PersonEntity) -> Unit = { person -> navigation.openPerson(personRoute(person)) }
+  val newPerson = { navigation.navigate(EditPersonRoute()) }
 
   // Un sol lloc per a totes les pantalles: cada canvi de ruta (també tornant enrere) envia la seva
   val current = navigation.current
@@ -102,6 +140,7 @@ fun AppNavigation(
     NavDisplay(
       backStack = navigation.backStack,
       onBack = { if (!navigation.pop()) activity?.finish() },
+      sceneStrategies = listOf(listDetailStrategy),
       transitionSpec = { nativeTransition(forward = true, vertical = false) },
       popTransitionSpec = { nativeTransition(forward = false, vertical = false) },
       predictivePopTransitionSpec = { edge -> predictiveBack(edge, vertical = false) },
@@ -115,18 +154,26 @@ fun AppNavigation(
           entry<OnboardingRoute> {
             OnboardingScreen(onFinished = { navigation.resetTo(PeopleRoute) })
           }
-          entry<PeopleRoute> {
+          entry<PeopleRoute>(
+            metadata = ListDetailSceneStrategy.listPane(detailPlaceholder = { EmptyDetailPane() }),
+          ) {
             PeopleListRoute(
               archived = false,
-              onPersonClick = { person -> navigation.navigate(personRoute(person)) },
-              onNewPerson = { navigation.navigate(EditPersonRoute()) },
+              onPersonClick = openPerson,
+              onNewPerson = newPerson,
+              inPane = twoPane,
+              selectedPersonId = navigation.openPersonId,
             )
           }
-          entry<ArchivedRoute>(metadata = tabTransitions) {
+          entry<ArchivedRoute>(
+            metadata = tabTransitions + ListDetailSceneStrategy.listPane(detailPlaceholder = { EmptyDetailPane() }),
+          ) {
             PeopleListRoute(
               archived = true,
-              onPersonClick = { person -> navigation.navigate(personRoute(person)) },
-              onNewPerson = { navigation.navigate(EditPersonRoute()) },
+              onPersonClick = openPerson,
+              onNewPerson = newPerson,
+              inPane = twoPane,
+              selectedPersonId = navigation.openPersonId,
             )
           }
           entry<QuickNoteRoute>(metadata = modalTransitions) { route ->
@@ -160,26 +207,32 @@ fun AppNavigation(
           entry<CustomChannelsRoute> {
             CustomChannelsScreen(onBack = { navigation.pop() })
           }
-          entry<PersonLockedRoute> { route ->
-            PersonLockedScreen(
-              personId = route.id,
-              onBack = { navigation.pop() },
-              onUnlocked = {
-                navigation.pop()
-                navigation.navigate(PersonRoute(route.id, openNewEntry = route.openNewEntry))
-              },
-            )
+          entry<PersonLockedRoute>(metadata = ListDetailSceneStrategy.detailPane()) { route ->
+            DetailPanel(inPane = twoPane) {
+              PersonLockedScreen(
+                personId = route.id,
+                onBack = { navigation.pop() },
+                onUnlocked = {
+                  navigation.pop()
+                  navigation.navigate(PersonRoute(route.id, openNewEntry = route.openNewEntry))
+                },
+                inPane = twoPane,
+              )
+            }
           }
-          entry<PersonRoute> { route ->
-            PersonDetailRoute(
-              personId = route.id,
-              openNewEntry = route.openNewEntry,
-              onBack = { navigation.pop() },
-              onEdit = { focus -> navigation.navigate(EditPersonRoute(route.id, focus = focus)) },
-              onOpenPro = { navigation.navigate(PaywallRoute(it)) },
-              onNewTask = { navigation.navigate(TaskRoute(route.id)) },
-              onOpenTask = { navigation.navigate(TaskRoute(route.id, it.id)) },
-            )
+          entry<PersonRoute>(metadata = ListDetailSceneStrategy.detailPane()) { route ->
+            DetailPanel(inPane = twoPane) {
+              PersonDetailRoute(
+                personId = route.id,
+                openNewEntry = route.openNewEntry,
+                onBack = { navigation.pop() },
+                onEdit = { focus -> navigation.navigate(EditPersonRoute(route.id, focus = focus)) },
+                onOpenPro = { navigation.navigate(PaywallRoute(it)) },
+                onNewTask = { navigation.navigate(TaskRoute(route.id)) },
+                onOpenTask = { navigation.navigate(TaskRoute(route.id, it.id)) },
+                inPane = twoPane,
+              )
+            }
           }
           entry<EditPersonRoute>(metadata = modalTransitions) { route ->
             EditPersonScreen(

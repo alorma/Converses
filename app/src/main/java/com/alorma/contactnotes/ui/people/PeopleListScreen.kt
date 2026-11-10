@@ -7,6 +7,7 @@ import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -22,6 +23,7 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Archive
@@ -35,6 +37,7 @@ import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -83,6 +86,8 @@ fun PeopleListRoute(
   archived: Boolean,
   onPersonClick: (PersonEntity) -> Unit,
   onNewPerson: () -> Unit,
+  inPane: Boolean = false,
+  selectedPersonId: Long? = null,
   viewModel: PeopleListViewModel = koinViewModel(parameters = { parametersOf(archived) }),
 ) {
   val state by viewModel.uiState.collectAsStateWithLifecycle()
@@ -92,9 +97,15 @@ fun PeopleListRoute(
     onFilterToggled = viewModel::onFilterToggled,
     onPersonClick = onPersonClick,
     onNewPerson = onNewPerson,
+    inPane = inPane,
+    selectedPersonId = selectedPersonId,
   )
 }
 
+/**
+ * @param inPane pantalla gran: el llistat és el panell estret al costat del detall. Els xips passen a dues línies en
+ *   lloc de fer scroll, els avatars s'encongeixen i la fila de [selectedPersonId] (la persona oberta) queda marcada.
+ */
 @Composable
 fun PeopleListScreen(
   state: PeopleListUiState,
@@ -102,6 +113,8 @@ fun PeopleListScreen(
   onFilterToggled: (ChannelType) -> Unit,
   onPersonClick: (PersonEntity) -> Unit,
   onNewPerson: () -> Unit,
+  inPane: Boolean = false,
+  selectedPersonId: Long? = null,
 ) {
   val listState = rememberLazyListState()
   // Drawn once the rows are laid out (or there is nothing to show), not just when the data arrives
@@ -134,7 +147,7 @@ fun PeopleListScreen(
           onNewPerson = onNewPerson,
         )
         if (!archived) {
-          FilterRow(selected = state.filter, onToggle = onFilterToggled)
+          FilterRow(selected = state.filter, onToggle = onFilterToggled, wrap = inPane)
         }
       }
     },
@@ -177,8 +190,17 @@ fun PeopleListScreen(
           }
         }
       }
-      groupedItems(state.people, key = { it.person.id }) { item ->
-        PersonRow(item, onClick = { onPersonClick(item.person) })
+      groupedItems(
+        state.people,
+        key = { it.person.id },
+        selected = { inPane && it.person.id == selectedPersonId },
+      ) { item ->
+        PersonRow(
+          item = item,
+          onClick = { onPersonClick(item.person) },
+          inPane = inPane,
+          selected = inPane && item.person.id == selectedPersonId,
+        )
       }
       if (!state.isLoading && !archived && state.people.isNotEmpty()) {
         item(key = "add_person") {
@@ -194,7 +216,6 @@ fun PeopleListScreen(
   }
 }
 
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun Header(
   archived: Boolean,
@@ -237,78 +258,112 @@ private fun Header(
   }
 }
 
+/** @param wrap panell estret d'una pantalla gran: els xips que no caben passen a la línia següent en lloc de fer scroll. */
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun FilterRow(
   selected: Set<ChannelType>,
   onToggle: (ChannelType) -> Unit,
+  wrap: Boolean,
 ) {
-  val scheme = MaterialTheme.colorScheme
-  val haptics = rememberConversesHaptics()
-  Row(
-    modifier =
-      Modifier
-        .fillMaxWidth()
-        .horizontalScroll(rememberScrollState())
-        .padding(top = 12.dp, bottom = 14.dp),
-    horizontalArrangement = Arrangement.spacedBy(8.dp),
-  ) {
-    ChannelType.entries.forEach { group ->
-      val isSelected = group in selected
-      FilterChip(
-        selected = isSelected,
-        onClick = {
-          haptics.segmentTick()
-          onToggle(group)
-        },
-        label = {
-          Text(
-            text = stringResource(group.label()),
-            fontSize = 14.sp,
-            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
-            maxLines = 1,
-          )
-        },
-        leadingIcon =
-          if (isSelected) {
-            { Icon(Icons.Rounded.Check, contentDescription = null, modifier = Modifier.size(18.dp)) }
-          } else {
-            null
-          },
-        shape = RoundedCornerShape(8.dp),
-        colors =
-          FilterChipDefaults.filterChipColors(
-            containerColor = Color.Transparent,
-            labelColor = scheme.onSurfaceVariant,
-            selectedContainerColor = scheme.primaryContainer,
-            selectedLabelColor = scheme.onPrimaryContainer,
-            selectedLeadingIconColor = scheme.onPrimaryContainer,
-          ),
-        border =
-          FilterChipDefaults.filterChipBorder(
-            enabled = true,
-            selected = isSelected,
-            borderColor = scheme.outlineVariant,
-            selectedBorderColor = Color.Transparent,
-            borderWidth = 1.dp,
-            selectedBorderWidth = 0.dp,
-          ),
-      )
+  val chips: @Composable () -> Unit = { FilterChips(selected = selected, onToggle = onToggle) }
+  if (wrap) {
+    FlowRow(
+      modifier = Modifier.fillMaxWidth().padding(top = 12.dp, bottom = 14.dp),
+      horizontalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+      chips()
+    }
+  } else {
+    Row(
+      modifier =
+        Modifier
+          .fillMaxWidth()
+          .horizontalScroll(rememberScrollState())
+          .padding(top = 12.dp, bottom = 14.dp),
+      horizontalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+      chips()
     }
   }
 }
 
 @Composable
+private fun FilterChips(
+  selected: Set<ChannelType>,
+  onToggle: (ChannelType) -> Unit,
+) {
+  val scheme = MaterialTheme.colorScheme
+  val haptics = rememberConversesHaptics()
+  ChannelType.entries.forEach { group ->
+    val isSelected = group in selected
+    FilterChip(
+      selected = isSelected,
+      onClick = {
+        haptics.segmentTick()
+        onToggle(group)
+      },
+      label = {
+        Text(
+          text = stringResource(group.label()),
+          fontSize = 14.sp,
+          fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
+          maxLines = 1,
+        )
+      },
+      leadingIcon =
+        if (isSelected) {
+          { Icon(Icons.Rounded.Check, contentDescription = null, modifier = Modifier.size(18.dp)) }
+        } else {
+          null
+        },
+      shape = RoundedCornerShape(8.dp),
+      colors =
+        FilterChipDefaults.filterChipColors(
+          containerColor = Color.Transparent,
+          labelColor = scheme.onSurfaceVariant,
+          selectedContainerColor = scheme.primaryContainer,
+          selectedLabelColor = scheme.onPrimaryContainer,
+          selectedLeadingIconColor = scheme.onPrimaryContainer,
+        ),
+      border =
+        FilterChipDefaults.filterChipBorder(
+          enabled = true,
+          selected = isSelected,
+          borderColor = scheme.outlineVariant,
+          selectedBorderColor = Color.Transparent,
+          borderWidth = 1.dp,
+          selectedBorderWidth = 0.dp,
+        ),
+    )
+  }
+}
+
+/**
+ * @param inPane fila del panell de llistat d'una pantalla gran: avatar de 48 dp i, a la semàntica, si és la
+ *   [selected] (la persona oberta al detall). El fons de la seleccionada el posa `groupedItems`.
+ */
+@Composable
 private fun PersonRow(
   item: PersonListItem,
   onClick: () -> Unit,
+  inPane: Boolean = false,
+  selected: Boolean = false,
 ) {
   val person = item.person
+  // Sobre el fons de la fila seleccionada, el text secundari pren el color del contingut en lloc del gris
+  val secondaryColor = if (selected) LocalContentColor.current else MaterialTheme.colorScheme.onSurfaceVariant
   Row(
     modifier =
       Modifier
         .fillMaxWidth()
-        .clickable(onClick = onClick)
-        .padding(horizontal = 16.dp, vertical = 14.dp),
+        .then(
+          if (inPane) {
+            Modifier.selectable(selected = selected, onClick = onClick)
+          } else {
+            Modifier.clickable(onClick = onClick)
+          },
+        ).padding(horizontal = 16.dp, vertical = 14.dp),
     horizontalArrangement = Arrangement.spacedBy(16.dp),
     verticalAlignment = Alignment.CenterVertically,
   ) {
@@ -316,7 +371,7 @@ private fun PersonRow(
       initials = initialsOf(person.name),
       shape = person.shape,
       color = person.color,
-      size = 56.dp,
+      size = if (inPane) 48.dp else 56.dp,
       locked = person.isProtected,
     )
     Column(modifier = Modifier.weight(1f)) {
@@ -325,7 +380,7 @@ private fun PersonRow(
           Text(
             text = person.name,
             style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.Bold,
+            fontWeight = if (selected) FontWeight.ExtraBold else FontWeight.Bold,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
             modifier = Modifier.weight(1f, fill = false),
@@ -334,7 +389,7 @@ private fun PersonRow(
             Icon(
               imageVector = Icons.Rounded.Lock,
               contentDescription = null,
-              tint = MaterialTheme.colorScheme.onSurfaceVariant,
+              tint = secondaryColor,
               modifier = Modifier.padding(start = 6.dp).size(16.dp),
             )
           }
@@ -343,7 +398,7 @@ private fun PersonRow(
           Text(
             text = formatLastActivity(entry.occurredAt),
             style = MaterialTheme.typography.labelLarge,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            color = secondaryColor,
             modifier = Modifier.padding(start = 8.dp),
           )
         }
@@ -353,7 +408,7 @@ private fun PersonRow(
         Text(
           text = stringResource(R.string.protected_hint),
           style = MaterialTheme.typography.bodyLarge,
-          color = MaterialTheme.colorScheme.onSurfaceVariant,
+          color = secondaryColor,
         )
       } else {
         val channels = item.channels.distinct().sorted()
@@ -364,7 +419,7 @@ private fun PersonRow(
               text = channels.map { channelName(it).uppercase() }.joinToString(" · "),
               style = MaterialTheme.typography.labelMedium,
               fontWeight = FontWeight.SemiBold,
-              color = MaterialTheme.colorScheme.onSurfaceVariant,
+              color = secondaryColor,
               maxLines = 1,
               overflow = TextOverflow.Ellipsis,
               modifier = Modifier.weight(1f),
@@ -375,7 +430,7 @@ private fun PersonRow(
         Text(
           text = item.lastEntry?.text ?: stringResource(R.string.no_entries_yet),
           style = MaterialTheme.typography.bodyLarge,
-          color = if (item.lastEntry == null) MaterialTheme.colorScheme.onSurfaceVariant else Color.Unspecified,
+          color = if (item.lastEntry == null) secondaryColor else Color.Unspecified,
           maxLines = 1,
           overflow = TextOverflow.Ellipsis,
         )

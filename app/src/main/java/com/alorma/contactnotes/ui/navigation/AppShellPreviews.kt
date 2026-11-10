@@ -1,9 +1,16 @@
 package com.alorma.contactnotes.ui.navigation
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import com.alorma.contactnotes.designsystem.preview.ConversesPreviewTheme
 import com.alorma.contactnotes.ui.people.PeopleListScreenLoadedPreview
+import com.alorma.contactnotes.ui.people.PeopleListScreenPanePreview
 import com.alorma.contactnotes.ui.settings.SettingsProPreview
 
 @Preview
@@ -51,6 +58,27 @@ internal fun AppShellRailPeoplePreview() {
       onOpenSettings = {},
     ) {
       PeopleListScreenLoadedPreview()
+    }
+  }
+}
+
+/** Tauleta horitzontal sense cap persona oberta: rail, llistat de 380 dp i el panell de detall buit. */
+@Preview(widthDp = 1280, heightDp = 800)
+@Composable
+internal fun AppShellTwoPaneEmptyPreview() {
+  ConversesPreviewTheme {
+    AppShell(
+      currentTab = PeopleRoute,
+      navigation = ShellNavigation.Rail,
+      onTabSelected = {},
+      onQuickNote = {},
+      onOpenSettings = {},
+    ) {
+      Row {
+        Box(modifier = Modifier.width(380.dp)) { PeopleListScreenPanePreview() }
+        Spacer(Modifier.width(24.dp))
+        EmptyDetailPane()
+      }
     }
   }
 }

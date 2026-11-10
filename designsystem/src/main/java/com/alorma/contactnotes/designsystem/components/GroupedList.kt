@@ -60,10 +60,16 @@ fun <T> GroupedList(
 
 private const val GroupedItemContentType = "grouped-item"
 
-/** Variant per a `LazyColumn`; el separador de 2 dp s'ha de donar amb `Arrangement.spacedBy`. */
+/**
+ * Variant per a `LazyColumn`; el separador de 2 dp s'ha de donar amb `Arrangement.spacedBy`.
+ *
+ * @param selected la fila oberta al panell del costat (pantalles grans): `primaryContainer` i les quatre cantonades
+ *   de 24 dp, sigui on sigui del grup.
+ */
 fun <T> LazyListScope.groupedItems(
   items: List<T>,
   key: ((T) -> Any)? = null,
+  selected: (T) -> Boolean = { false },
   content: @Composable (item: T) -> Unit,
 ) {
   itemsIndexed(
@@ -71,11 +77,21 @@ fun <T> LazyListScope.groupedItems(
     key = key?.let { k -> { _, item -> k(item) } },
     contentType = { _, _ -> GroupedItemContentType },
   ) { index, item ->
-    Surface(
-      shape = groupedItemShape(index, items.size),
-      color = GroupedListDefaults.containerColor,
-    ) {
-      content(item)
+    if (selected(item)) {
+      Surface(
+        shape = RoundedCornerShape(GroupedListDefaults.OuterCorner),
+        color = MaterialTheme.colorScheme.primaryContainer,
+        contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+      ) {
+        content(item)
+      }
+    } else {
+      Surface(
+        shape = groupedItemShape(index, items.size),
+        color = GroupedListDefaults.containerColor,
+      ) {
+        content(item)
+      }
     }
   }
 }

@@ -29,6 +29,23 @@ internal fun PeopleListScreenLoadedPreview() {
   )
 }
 
+/** Panell de llistat d'una pantalla gran: xips en dues línies, avatars de 48 dp i la tercera persona oberta. */
+@Preview(widthDp = 380, heightDp = 800)
+@Composable
+internal fun PeopleListScreenPanePreview() {
+  ConversesPreviewTheme {
+    PeopleListScreen(
+      state = PeopleListUiState(people = PreviewData.people, total = PreviewData.people.size, isLoading = false),
+      archived = false,
+      onFilterToggled = {},
+      onPersonClick = {},
+      onNewPerson = {},
+      inPane = true,
+      selectedPersonId = PreviewData.people[2].person.id,
+    )
+  }
+}
+
 @Preview
 @Composable
 internal fun PeopleListScreenEmptyPreview() {

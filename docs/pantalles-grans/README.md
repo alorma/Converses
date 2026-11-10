@@ -79,7 +79,7 @@ d'en Bernat.
   pantalles. Rail de 96 dp (botó «Nota ràpida» a dalt, Persones, Arxivades, Ajustos) a partir de 600 dp en lloc de la
   barra flotant. Ajustos, Canals propis i Pro en columna centrada de 640 dp com a màxim. Fulls inferiors amb amplada
   màxima de 640 dp. Revisar el manifest (`resizeableActivity`, cap orientació bloquejada).
-- [ ] **2. Llistat i detall.** Dos panells: llistat de 300 dp (mitjana) o 380 dp (expandida) i detall en un panell amb
+- [x] **2. Llistat i detall.** Dos panells: llistat de 300 dp (mitjana) o 380 dp (expandida) i detall en un panell amb
   fons i radi 28. Capçalera del llistat i xips en `FlowRow`. Persona oberta marcada (`selected` a la semàntica).
   Estat buit «Tria una persona» (textos nous en en/ca/es, secció 8). Detall sense fletxa enrere. Triar una altra
   persona substitueix el detall, no l'apila. Persones protegides. Passar de dos panells a un (i al revés) conserva la
@@ -101,6 +101,28 @@ d'en Bernat.
   navegació haurà canviat). Condensar aquest document.
 
 ## Notes entre sessions
+
+**Després del pas 2**
+
+- `AppNavigation` passa a `NavDisplay` un `ListDetailSceneStrategy` (`sceneStrategies = listOf(...)`; la variant
+  `sceneStrategy` és obsoleta i trenca les transicions). `PeopleRoute` i `ArchivedRoute` són `listPane` (amb
+  `EmptyDetailPane` de substitut); `PersonRoute` i `PersonLockedRoute`, `detailPane`.
+- La directiva (`calculatePaneScaffoldDirectiveWithTwoPanesOnMediumWidth`) decideix si hi ha dos panells; `twoPane` en
+  surt i es passa a les pantalles com a `inPane`. Ja porta els límits de la frontissa (`excludedBounds`): el pas 5
+  hauria de ser sobretot comprovar-ho i moure la barra flotant.
+- `BackNavigationBehavior.PopLatest` és necessari: amb el valor per defecte, enrere amb dos panells tancava l'app amb
+  la persona oberta.
+- `inPane` a `PersonDetailScreen` i `PersonLockedScreen`: sense fletxa enrere i fons `surfaceContainerHigh`
+  (`personContainerColor`). `DetailPanel` posa el marc (radi 28, marges de 16 dp) i es crida sempre des del mateix
+  lloc perquè no es perdi l'estat en canviar d'un panell a dos.
+- Persona protegida amb dos panells: cancel·lar l'empremta treu la ruta (torna a «Tria una persona»). La pantalla és
+  segura, així que a les captures de l'emulador surt en negre: s'ha comprovat amb `uiautomator dump`.
+- `TopLevelBackStack.openPerson` substitueix la persona oberta en lloc d'apilar-la; `openPersonId` és la fila marcada.
+- Provat a l'emulador (Pixel Tablet): obrir i canviar de persona, enrere, protegida (cancel·lar i desbloquejar amb
+  PIN) i estrènyer la finestra a menys de 600 dp i tornar-la a eixamplar conservant la persona. L'emulador s'ha quedat
+  amb el PIN 1111.
+- Dubte obert: la galeta de l'estat buit surt de color (`WelcomeEmptyState`, 120 dp); el disseny la vol neutra i de
+  96 dp. La capçalera del llistat manté el botó d'afegir persona del mòbil en lloc del `more_vert` del disseny.
 
 **Després del pas 1**
 

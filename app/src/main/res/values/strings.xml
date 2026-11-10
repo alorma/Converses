@@ -3,6 +3,8 @@
 
     <string name="people_title">Converses</string>
     <string name="nav_people">People</string>
+    <string name="detail_empty_title">Choose a person</string>
+    <string name="detail_empty_description">Their timeline, details and to-dos will show up here.</string>
     <string name="pro_badge" translatable="false">PRO</string>
     <string name="pro_description">Pro feature</string>
     <plurals name="people_count">

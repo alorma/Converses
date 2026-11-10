@@ -114,6 +114,42 @@ class TopLevelBackStackTest {
   }
 
   @Test
+  fun `opening another person replaces the one that was open`() {
+    val stack = stackOf()
+    stack.openPerson(PersonRoute(1))
+
+    stack.openPerson(PersonRoute(2))
+
+    assertEquals(listOf<NavKey>(PeopleRoute, PersonRoute(2)), stack.backStack)
+    assertEquals(2L, stack.openPersonId)
+  }
+
+  @Test
+  fun `opening a person replaces a locked one and keeps the tab`() {
+    val stack = stackOf()
+    stack.navigate(ArchivedRoute)
+    stack.openPerson(PersonLockedRoute(1))
+
+    stack.openPerson(PersonRoute(2))
+
+    assertEquals(listOf<NavKey>(PeopleRoute, ArchivedRoute, PersonRoute(2)), stack.backStack)
+  }
+
+  @Test
+  fun `the open person is known with a screen on top and gone after going back`() {
+    val stack = stackOf()
+    assertEquals(null, stack.openPersonId)
+
+    stack.openPerson(PersonLockedRoute(7))
+    stack.navigate(EditPersonRoute(7))
+    assertEquals(7L, stack.openPersonId)
+
+    stack.pop()
+    stack.pop()
+    assertEquals(null, stack.openPersonId)
+  }
+
+  @Test
   fun `opening settings twice keeps a single copy`() {
     val stack = stackOf()
 

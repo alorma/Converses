@@ -61,6 +61,7 @@ import com.alorma.contactnotes.designsystem.theme.PersonTheme
 import com.alorma.contactnotes.shared.AvatarColor
 import com.alorma.contactnotes.shared.AvatarShape
 import com.alorma.contactnotes.shared.initialsOf
+import com.alorma.contactnotes.ui.navigation.personContainerColor
 import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
@@ -77,6 +78,8 @@ fun PersonLockedScreen(
   personId: Long,
   onBack: () -> Unit,
   onUnlocked: () -> Unit,
+  /** Pantalla gran: és el panell de detall al costat del llistat, sense fletxa enrere. */
+  inPane: Boolean = false,
   viewModel: PersonViewModel = koinViewModel(parameters = { parametersOf(personId) }),
   lockViewModel: PersonLockViewModel = koinViewModel(),
 ) {
@@ -84,6 +87,12 @@ fun PersonLockedScreen(
   val state by lockViewModel.state.collectAsStateWithLifecycle()
   val activity = LocalActivity.current as FragmentActivity
   val currentOnUnlocked by rememberUpdatedState(onUnlocked)
+  val currentOnBack by rememberUpdatedState(onBack)
+
+  // Amb el llistat al costat, cancel·lar l'empremta tanca el panell: torna a «Tria una persona»
+  LaunchedEffect(state, inPane) {
+    if (inPane && state == LockState.Canceled()) currentOnBack()
+  }
 
   val secureWindow: SecureWindow = koinInject()
   DisposableEffect(Unit) {
@@ -118,8 +127,9 @@ fun PersonLockedScreen(
         onBack = onBack,
         onRetry = { begin() },
         onSetup = { activity.openSecuritySetup() },
+        inPane = inPane,
       )
-    } ?: Scaffold(containerColor = MaterialTheme.colorScheme.surface) {}
+    } ?: Scaffold(containerColor = personContainerColor(inPane)) {}
   }
 }
 
@@ -132,22 +142,25 @@ fun PersonLockedContent(
   onBack: () -> Unit,
   onRetry: () -> Unit,
   onSetup: () -> Unit,
+  inPane: Boolean = false,
 ) {
   Scaffold(
-    containerColor = MaterialTheme.colorScheme.surface,
+    containerColor = personContainerColor(inPane),
     contentWindowInsets = WindowInsets.safeDrawing,
     topBar = {
-      IconButton(
-        onClick = onBack,
-        modifier =
-          Modifier
-            .windowInsetsPadding(
-              WindowInsets.safeDrawing.only(
-                WindowInsetsSides.Top + WindowInsetsSides.Horizontal,
-              ),
-            ).padding(8.dp),
-      ) {
-        Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = stringResource(R.string.back))
+      if (!inPane) {
+        IconButton(
+          onClick = onBack,
+          modifier =
+            Modifier
+              .windowInsetsPadding(
+                WindowInsets.safeDrawing.only(
+                  WindowInsetsSides.Top + WindowInsetsSides.Horizontal,
+                ),
+              ).padding(8.dp),
+        ) {
+          Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = stringResource(R.string.back))
+        }
       }
     },
   ) { padding ->

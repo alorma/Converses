@@ -91,6 +91,7 @@ import com.alorma.contactnotes.shared.initialsOf
 import com.alorma.contactnotes.ui.edit.EditFocus
 import com.alorma.contactnotes.ui.entry.EntryChannel
 import com.alorma.contactnotes.ui.entry.NewEntrySheet
+import com.alorma.contactnotes.ui.navigation.personContainerColor
 import com.alorma.contactnotes.ui.paywall.ProBenefit
 import com.alorma.contactnotes.ui.people.label
 import com.alorma.contactnotes.ui.task.TasksSection
@@ -142,6 +143,8 @@ fun PersonDetailRoute(
   openNewEntry: Boolean = false,
   onNewTask: () -> Unit = {},
   onOpenTask: (TaskEntity) -> Unit = {},
+  /** Pantalla gran: és el panell de detall al costat del llistat, sense fletxa enrere. */
+  inPane: Boolean = false,
   viewModel: PersonDetailViewModel = koinViewModel(parameters = { parametersOf(personId) }),
 ) {
   val state by viewModel.uiState.collectAsStateWithLifecycle()
@@ -253,6 +256,7 @@ fun PersonDetailRoute(
       },
       onTaskReopen = { viewModel.reopenTask(it) },
       snackbarHostState = snackbarHostState,
+      inPane = inPane,
     )
 
     if (showNewEntry) {
@@ -364,24 +368,29 @@ fun PersonDetailScreen(
   onTaskDone: (TaskEntity) -> Unit = {},
   onTaskReopen: (TaskEntity) -> Unit = {},
   today: LocalDate = LocalDate.now(),
+  inPane: Boolean = false,
 ) {
   val person = state.person
   var factsExpanded by rememberSaveable { mutableStateOf(false) }
+  val containerColor = personContainerColor(inPane)
   Scaffold(
-    containerColor = MaterialTheme.colorScheme.surface,
+    containerColor = containerColor,
     contentWindowInsets = WindowInsets.navigationBars,
     topBar = {
       Row(
         modifier =
           Modifier
             .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.surface)
+            .background(containerColor)
             .windowInsetsPadding(WindowInsets.statusBars)
             .padding(horizontal = ScreenMargin),
         verticalAlignment = Alignment.CenterVertically,
       ) {
-        IconButton(onClick = onBack) {
-          Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = stringResource(R.string.back))
+        // Amb el llistat al costat no hi ha on tornar: es canvia de persona des del llistat
+        if (!inPane) {
+          IconButton(onClick = onBack) {
+            Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = stringResource(R.string.back))
+          }
         }
         Spacer(Modifier.weight(1f))
         if (person != null) {

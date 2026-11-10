@@ -3,6 +3,8 @@
 
     <string name="people_title">Converses</string>
     <string name="nav_people">Personas</string>
+    <string name="detail_empty_title">Elige una persona</string>
+    <string name="detail_empty_description">Su cronología, los datos y los pendientes aparecerán aquí.</string>
     <string name="pro_description">Función Pro</string>
     <plurals name="people_count">
         <item quantity="one">%d persona</item>

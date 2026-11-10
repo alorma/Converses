@@ -39,6 +39,29 @@ class TopLevelBackStack(
   }
 
   /**
+   * Id of the person on top of the list (open or still locked), even with other screens above it; `null` when the
+   * list has nobody open. On large screens it is the row the list marks as selected.
+   */
+  val openPersonId: Long?
+    get() =
+      when (val route = entries.lastOrNull { it.isPerson() }) {
+        is PersonRoute -> route.id
+        is PersonLockedRoute -> route.id
+        else -> null
+      }
+
+  /**
+   * Opens a person from the list. With two panes the list stays visible while a person is open, so picking another
+   * one replaces it instead of stacking: back must return to the list, not to every person visited.
+   */
+  fun openPerson(route: AppRoute) {
+    while (entries.size > 1 && entries.last().isPerson()) entries.removeAt(entries.lastIndex)
+    entries.add(route)
+  }
+
+  private fun NavKey.isPerson() = this is PersonRoute || this is PersonLockedRoute
+
+  /**
    * Pushes [route] unless it is already in the stack; then it drops what is on top of it. For a destination that
    * stays reachable while it is open (Settings in the rail): pressing it again must not stack a second copy.
    */
