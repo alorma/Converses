@@ -378,6 +378,8 @@
     <string name="sync_key_change_account">Cambiar</string>
     <string name="sync_paste">Pegar</string>
     <string name="sync_words_wrong">Estas palabras no abren los datos de esta cuenta. Revisa el orden y cómo están escritas.</string>
+    <string name="sync_words_field">Las 12 palabras, separadas por espacios</string>
+    <string name="sync_words_count">%1$d / %2$d</string>
     <string name="sync_security">Seguridad</string>
     <string name="sync_words_reviewed">Las revisaste %1$s</string>
     <string name="sync_account">Cuenta</string>

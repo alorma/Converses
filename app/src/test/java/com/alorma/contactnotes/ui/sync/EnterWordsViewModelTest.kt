@@ -4,6 +4,7 @@ import android.app.Activity
 import com.alorma.contactnotes.data.sync.RemoteAccount
 import com.alorma.contactnotes.data.sync.SyncState
 import com.alorma.contactnotes.data.sync.crypto.Bip39
+import com.alorma.contactnotes.data.sync.crypto.Bip39Result
 import com.alorma.contactnotes.data.sync.crypto.DataKey
 import com.alorma.contactnotes.data.sync.crypto.KeyWrap
 import com.alorma.contactnotes.data.sync.crypto.RecoverySecret
@@ -20,7 +21,6 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
-import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -43,83 +43,92 @@ class EnterWordsViewModelTest {
     return EnterWordsViewModel(env.repository)
   }
 
-  private fun EnterWordsViewModel.fill(words: List<String>) {
-    onPaste(words.joinToString(" "))
-  }
+  private fun EnterWordsViewModel.fill(words: List<String>) = onTextChange(words.joinToString(" "))
 
   @Test
-  fun pastingTwelveWordsFillsAllTheFieldsWhateverTheFormat() {
+  fun pastingTwelveWordsWhateverTheFormatCountsAndCanBeSubmitted() {
     val vm = viewModel()
     val messy = goodWords.mapIndexed { i, w -> "${i + 1}. ${w.uppercase()}" }.joinToString("\n")
-    assertNull(vm.onPaste(messy))
+    vm.onPaste(messy)
     assertEquals(goodWords, vm.state.value.words)
+    assertEquals(12, vm.state.value.wordCount)
     assertTrue(vm.state.value.canSubmit)
+    // El text és el que s'ha enganxat: no es reformata
+    assertEquals(messy, vm.state.value.text)
   }
 
   @Test
-  fun pastingFewerWordsFillsFromTheFocusedField() {
+  fun theCounterFollowsTheWordsTyped() {
     val vm = viewModel()
-    vm.onFocus(4)
-    assertEquals(0, vm.onPaste("abandon ability"))
-    assertEquals(
-      listOf("", "", "", "", "abandon", "ability"),
-      vm.state.value.words
-        .take(6),
-    )
-  }
-
-  @Test
-  fun aSpaceFinishesTheWordAndMovesOn() {
-    val vm = viewModel()
-    assertNull(vm.onWordChange(0, "Aban"))
-    assertEquals("aban", vm.state.value.words[0])
-    assertEquals(1, vm.onWordChange(0, "abandon "))
-    assertEquals("abandon", vm.state.value.words[0])
-    assertNull(vm.onWordChange(11, "zoo "))
-  }
-
-  @Test
-  fun severalWordsTypedIntoOneFieldAreSpread() {
-    val vm = viewModel()
-    // El focus va al primer camp buit que queda
-    assertEquals(0, vm.onWordChange(1, "able about above"))
-    assertEquals(
-      listOf("", "able", "about", "above"),
-      vm.state.value.words
-        .take(4),
-    )
-  }
-
-  @Test
-  fun suggestionsFollowTheFocusedFieldAndTapFillsIt() {
-    val vm = viewModel()
-    vm.onFocus(0)
-    vm.onWordChange(0, "a")
-    assertTrue(
-      vm.state.value.suggestions
-        .isEmpty(),
-    )
-    vm.onWordChange(0, "act")
-    assertEquals(listOf("act", "action", "actor", "actress"), vm.state.value.suggestions)
-    assertEquals(1, vm.onSuggestion(0, "action"))
-    assertEquals("action", vm.state.value.words[0])
-    vm.onWordChange(1, "zoo")
-    vm.onFocus(1)
-    assertTrue(
-      vm.state.value.suggestions
-        .isEmpty(),
-    )
-  }
-
-  @Test
-  fun aCompleteUnknownWordIsMarkedOnceItLosesTheFocus() {
-    val vm = viewModel()
-    vm.onFocus(2)
-    vm.onWordChange(2, "zzzz")
-    assertFalse(vm.state.value.isUnknown(2))
-    vm.onBlur(2)
-    assertTrue(vm.state.value.isUnknown(2))
+    assertEquals(0, vm.state.value.wordCount)
+    vm.onTextChange("able about, ab")
+    assertEquals(3, vm.state.value.wordCount)
     assertFalse(vm.state.value.canSubmit)
+  }
+
+  @Test
+  fun suggestionsFollowTheLastWordAndTapCompletesIt() {
+    val vm = viewModel()
+    vm.onTextChange("able a")
+    assertTrue(
+      vm.state.value.suggestions
+        .isEmpty(),
+    )
+    vm.onTextChange("able act")
+    assertEquals(listOf("act", "action", "actor", "actress"), vm.state.value.suggestions)
+    vm.onSuggestion("action")
+    assertEquals("able action ", vm.state.value.text)
+    // Acabat en espai ja no s'està escrivint cap paraula
+    assertTrue(
+      vm.state.value.suggestions
+        .isEmpty(),
+    )
+  }
+
+  @Test
+  fun noSuggestionsWhenTheWordIsTheOnlyMatch() {
+    val vm = viewModel()
+    vm.onTextChange("zoo")
+    assertTrue(
+      vm.state.value.suggestions
+        .isEmpty(),
+    )
+  }
+
+  @Test
+  fun anUnknownWordIsMarkedOnlyOnceItIsComplete() {
+    val vm = viewModel()
+    vm.onFocusChange(true)
+    vm.onTextChange("able zzzz")
+    assertTrue(
+      vm.state.value.unknownRanges
+        .isEmpty(),
+    )
+    vm.onTextChange("able zzzz ")
+    assertEquals(listOf(5..8), vm.state.value.unknownRanges)
+    assertFalse(vm.state.value.canSubmit)
+    // Sense focus, l'última paraula també es dona per completa
+    vm.onTextChange("able zzzz")
+    vm.onFocusChange(false)
+    assertEquals(listOf(5..8), vm.state.value.unknownRanges)
+  }
+
+  @Test
+  fun theRangesMatchTheWordsOfBip39() {
+    val text = "1. Able, ZZZZ\nabout"
+    assertEquals(Bip39.split(text).size, Regex("[A-Za-z]+").findAll(text).count())
+    assertEquals(listOf(9..12), unknownRanges(text, emptySet(), lastInProgress = false))
+  }
+
+  @Test
+  fun elevenOrThirteenWordsCannotBeSubmitted() {
+    val vm = viewModel()
+    vm.fill(goodWords.take(11))
+    assertFalse(vm.state.value.canSubmit)
+    vm.fill(goodWords + "abandon")
+    assertFalse(vm.state.value.canSubmit)
+    vm.submit()
+    assertFalse(vm.state.value.submitting)
   }
 
   @Test
@@ -152,7 +161,7 @@ class EnterWordsViewModelTest {
       // La suma de verificació ho detecta amb gairebé qualsevol permutació: es busca una que falli
       val shuffled =
         (1 until 12).map { k -> goodWords.drop(k) + goodWords.take(k) }.first {
-          Bip39.decode(it) is com.alorma.contactnotes.data.sync.crypto.Bip39Result.BadChecksum
+          Bip39.decode(it) is Bip39Result.BadChecksum
         }
       vm.fill(shuffled)
       vm.submit()
@@ -186,13 +195,13 @@ class EnterWordsViewModelTest {
     }
 
   @Test
-  fun editingAWordClearsTheNote() =
+  fun editingTheTextClearsTheNote() =
     scope.runTest {
       val vm = viewModel()
       vm.fill(RecoverySecret.generate().words)
       vm.submit()
       assertTrue(vm.state.value.wrongWords)
-      vm.onWordChange(3, "abandon")
+      vm.onTextChange(vm.state.value.text + " ")
       assertFalse(vm.state.value.wrongWords)
     }
 

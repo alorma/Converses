@@ -12,8 +12,7 @@ Totes les pantalles són un `Scaffold` amb `ConversesTopBar`, i fan servir el te
    - També cal actualitzar el pas 3: els xips passen de «Sense núvol» i «Sense comptes» a «Xifrat» i «Compte opcional».
    - El text passa a ser «Les notes es queden al mòbil i, si les sincronitzes, viatgen xifrades. Si vols, protegeix una persona amb l'empremta i ningú més la podrà obrir.».
 2. **Paraules:**
-   - Amb 12 paraules, una graella de 2 columnes × 6, amb files de 44 dp.
-   - Amb 24 paraules, 3 columnes × 8 a la mateixa amplada, amb cel·les de 104 dp i text de 15 sp.
+   - Decisió de Bernat d'11 de novembre de 2026, que substitueix la graella de `pantalles.html`: les 12 paraules es mostren juntes, una darrere l'altra, com un sol bloc de text dins una targeta, sense números.
    - Les paraules van en anglès; la interfície que les envolta, traduïda.
 3. **Indicador i `more_vert`:** conviuen. Primer va `more_vert` i, a la dreta de tot, l'indicador (àrea tàctil de 48 dp, avatar de 40).
 4. **Recordatori de les paraules:** no hi ha avisos.
@@ -66,7 +65,7 @@ Va a la capçalera del llistat, a la dreta de `more_vert`. Té una àrea tàctil
 - **Pantalla:** TopAppBar amb «Tancar». Té `FLAG_SECURE`.
 - **Contingut:**
   - text;
-  - graella de paraules: cel·les `card` de 44 dp, radi 14, número en 13 sp i paraula en 17 sp pes 600;
+  - les paraules en una sola targeta `card` (radi 20), separades per espais i amb salt de línia natural, en 19 sp, pes 600 i interlineat de 30 sp, sense números ni guionet (decisió de Bernat d'11 de novembre de 2026, no pas la graella 2×6 de `pantalles.html`);
   - botó tonal «Copia» de 40 dp;
   - nota `card` amb la icona `info` i el text sobre què passa si es perden.
 - **Copiar:** el porta-retalls es marca com a sensible (`ClipDescription.EXTRA_IS_SENSITIVE`) i s'esborra al cap d'1 minut. Snackbar: «Copiades. S'esborraran del porta-retalls en 1 minut.».
@@ -97,12 +96,14 @@ Va a la capçalera del llistat, a la dreta de `more_vert`. Té una àrea tàctil
 - Al peu, «No tinc les paraules».
 
 ### Escriure (13j, 13j2)
-- **Pantalla:** té `FLAG_SECURE`. Al costat del títol, a la dreta, hi ha un botó «Enganxa» amb vora, que reparteix les 12 paraules.
-- **Camps:** 12 de 48 dp en 2 columnes. El camp actiu porta una vora de 2 dp en `pri`.
+- **Pantalla:** té `FLAG_SECURE`. Al costat del títol, a la dreta, hi ha un botó «Enganxa» amb vora, que substitueix el text pel del porta-retalls.
+- **Camp:** decisió de Bernat d'11 de novembre de 2026, que substitueix els 12 camps de `pantalles.html`: un sol camp multilínia (mínim 4 línies, radi 16) on s'escriuen o s'enganxen les paraules, separades per espais o salts de línia. Es veu el que l'usuari ha escrit; `Bip39.split` tolera números, comes i majúscules. El camp porta una vora de 2 dp en `pri` amb el focus. Té descripció per a lectors de pantalla.
 - **Mentre s'escriu:**
-  - sota la graella, xips de suggeriment a partir de la llista de paraules;
+  - sota el camp, un comptador «7 / 12»;
+  - xips de suggeriment (fins a 4) per a l'última paraula, a partir de 2 lletres i només mentre s'escriu; tocar-ne un la completa i hi afegeix un espai;
   - teclat sense suggeriments ni aprenentatge (`KeyboardOptions(autoCorrect = false)`, `IME_FLAG_NO_PERSONALIZED_LEARNING`).
-- **Paraula que no és a la llista:** número i vora en `err`.
+- **Paraula que no és a la llista:** es pinta en `err` dins el camp un cop completa (seguida d'un espai o amb el camp sense focus), i la vora del camp passa a `err`.
+- **«Continua»:** s'activa amb exactament 12 paraules i totes de la llista.
 - **Paraules incorrectes:** nota `err-c` a dalt amb el text «Aquestes paraules no obren les dades d'aquest compte…».
 
 ### QR (13k, 13k2)

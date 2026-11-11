@@ -10,7 +10,7 @@ import androidx.compose.ui.platform.PlatformTextInputInterceptor
 import androidx.compose.ui.platform.PlatformTextInputMethodRequest
 
 /**
- * Els camps de dins demanen al teclat que no aprengui el que s'hi escriu (`IME_FLAG_NO_PERSONALIZED_LEARNING`):
+ * El camp de dins demana al teclat que no aprengui el que s'hi escriu (`IME_FLAG_NO_PERSONALIZED_LEARNING`):
  * són les paraules de la clau. Compose no té cap opció pròpia per a aquest senyal, i per això s'afegeix a l'`EditorInfo`
  * en el moment en què el camp connecta amb el teclat.
  */

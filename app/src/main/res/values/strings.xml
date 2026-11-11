@@ -377,6 +377,8 @@
     <string name="sync_key_change_account">Change</string>
     <string name="sync_paste">Paste</string>
     <string name="sync_words_wrong">These words don\'t open this account\'s data. Check the order and the spelling.</string>
+    <string name="sync_words_field">The 12 words, separated by spaces</string>
+    <string name="sync_words_count">%1$d / %2$d</string>
     <string name="sync_security">Security</string>
     <string name="sync_words_reviewed">You last checked them %1$s</string>
     <string name="sync_account">Account</string>

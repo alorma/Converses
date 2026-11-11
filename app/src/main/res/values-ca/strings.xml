@@ -376,6 +376,8 @@
     <string name="sync_key_change_account">Canvia</string>
     <string name="sync_paste">Enganxa</string>
     <string name="sync_words_wrong">Aquestes paraules no obren les dades d\'aquest compte. Revisa l\'ordre i com estan escrites.</string>
+    <string name="sync_words_field">Les 12 paraules, separades per espais</string>
+    <string name="sync_words_count">%1$d / %2$d</string>
     <string name="sync_security">Seguretat</string>
     <string name="sync_words_reviewed">Les vas revisar %1$s</string>
     <string name="sync_account">Compte</string>

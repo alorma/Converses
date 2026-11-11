@@ -7,21 +7,7 @@ import com.alorma.contactnotes.designsystem.preview.ConversesPreviewTheme
 
 private val PreviewAccount = SyncAccount(uid = "uid", name = "Anna", email = "anna@example.com")
 
-private val PreviewWords =
-  listOf(
-    "harbor",
-    "harvest",
-    "hazard",
-    "abandon",
-    "ability",
-    "able",
-    "about",
-    "above",
-    "absent",
-    "absorb",
-    "abstract",
-    "",
-  )
+private const val PreviewWords = "harbor harvest hazard abandon ability able about above absent absorb abstract"
 
 @Composable
 private fun EnterWordsPreview(state: EnterWordsUiState) {
@@ -29,11 +15,10 @@ private fun EnterWordsPreview(state: EnterWordsUiState) {
     EnterWordsContent(
       state = state,
       onClose = {},
-      onPaste = { null },
-      onFocus = {},
-      onBlur = {},
-      onWordChange = { _, _ -> null },
-      onSuggestion = { _, _ -> null },
+      onPaste = {},
+      onTextChange = {},
+      onFocusChange = {},
+      onSuggestion = {},
       onSubmit = {},
     )
   }
@@ -50,29 +35,24 @@ internal fun SyncNeedsKeyPreview() {
   }
 }
 
-/** 13j: els dotze camps buits. */
+/** 13j: el camp buit. */
 @Preview
 @Composable
 internal fun EnterWordsEmptyPreview() {
   EnterWordsPreview(EnterWordsUiState())
 }
 
-/** 13j: s'escriu el dotzè camp, amb suggeriments, i una paraula que no és a la llista. */
+/** 13j: s'escriu l'última paraula, amb suggeriments, i una paraula completa que no és a la llista. */
 @Preview
 @Composable
 internal fun EnterWordsTypingPreview() {
-  val words =
-    PreviewWords.toMutableList().also {
-      it[3] = "abandn"
-      it[11] = "abs"
-    }
-  EnterWordsPreview(EnterWordsUiState(words = words, focused = 11))
+  val text = PreviewWords.replace("abandon", "abandn") + " abs"
+  EnterWordsPreview(EnterWordsUiState(text = text, focused = true))
 }
 
 /** 13j2: dotze paraules que no obren el compte. */
 @Preview
 @Composable
 internal fun EnterWordsWrongPreview() {
-  val words = PreviewWords.toMutableList().also { it[11] = "absurd" }
-  EnterWordsPreview(EnterWordsUiState(words = words, wrongWords = true))
+  EnterWordsPreview(EnterWordsUiState(text = "$PreviewWords absurd", wrongWords = true))
 }

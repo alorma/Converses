@@ -23,31 +23,70 @@ import kotlinx.coroutines.launch
 private const val SUGGESTION_MIN_PREFIX = 2
 private const val SUGGESTION_LIMIT = 4
 
+/** Les mateixes paraules que parteix [Bip39.split]: seqüències de lletres ASCII. Així el color cau on toca. */
+private val wordRegex = Regex("[A-Za-z]+")
+
 /**
- * Les 12 paraules escrites. [focused] és el camp amb el focus (`null` si cap). [rejected] són les posicions que el
- * repositori ha dit que no són de la llista. Mai es mostra en un log: [toString] no porta les paraules.
+ * Els trams de [text] que són paraules, amb la posició que ocupen (0, 1, 2…) i sense tocar el que l'usuari ha escrit.
+ */
+private fun wordMatches(text: String): List<MatchResult> = wordRegex.findAll(text).toList()
+
+/** L'última paraula s'està escrivint encara: el text acaba en una lletra. */
+private fun endsInWord(text: String): Boolean = text.lastOrNull()?.let { it in 'A'..'Z' || it in 'a'..'z' } == true
+
+/**
+ * Els trams de [text] que cal pintar d'error: les paraules que no són de la llista i les [rejected] (per posició).
+ * Si [lastInProgress], l'última paraula encara s'està escrivint i no compta, tret que sigui de [rejected].
+ */
+fun unknownRanges(
+  text: String,
+  rejected: Set<Int>,
+  lastInProgress: Boolean,
+): List<IntRange> {
+  val matches = wordMatches(text)
+  return matches
+    .withIndex()
+    .filter { (index, match) ->
+      val inProgress = lastInProgress && index == matches.lastIndex && endsInWord(text)
+      index in rejected || (!inProgress && !Bip39.isWord(match.value))
+    }.map { it.value.range }
+}
+
+/**
+ * El text de les paraules tal com l'usuari l'ha escrit o enganxat. [focused] diu si el camp té el focus; [rejected]
+ * són les posicions de paraula que el repositori ha dit que no són de la llista. Mai es mostra en un log: [toString]
+ * no porta el text.
  */
 data class EnterWordsUiState(
-  val words: List<String> = List(Bip39.WORD_COUNT) { "" },
-  val focused: Int? = null,
+  val text: String = "",
+  val focused: Boolean = false,
   val rejected: Set<Int> = emptySet(),
   /** «Aquestes paraules no obren les dades d'aquest compte». */
   val wrongWords: Boolean = false,
   val submitting: Boolean = false,
 ) {
-  /** Una paraula completa que no és de la llista. El camp que s'està escrivint encara no compta. */
-  fun isUnknown(index: Int): Boolean =
-    index in rejected || (index != focused && words[index].isNotEmpty() && !Bip39.isWord(words[index]))
+  val words: List<String> get() = Bip39.split(text)
 
-  /** Les paraules de la llista que comencen com el camp actiu; res si ja és l'única opció. */
+  val wordCount: Int get() = wordMatches(text).size
+
+  /** Si el camp té el focus i el text acaba en una lletra, l'última paraula encara no és completa. */
+  private val lastInProgress: Boolean get() = focused
+
+  /** Els trams que es pinten d'error (vegeu [unknownRanges]). */
+  val unknownRanges: List<IntRange> get() = unknownRanges(text, rejected, lastInProgress)
+
+  val hasUnknown: Boolean get() = unknownRanges.isNotEmpty()
+
+  /** Les paraules de la llista que comencen com l'última que s'escriu; res si ja és l'única opció. */
   val suggestions: List<String>
     get() {
-      val word = focused?.let(words::get).orEmpty()
+      if (!endsInWord(text)) return emptyList()
+      val word = wordMatches(text).last().value.lowercase()
       if (word.length < SUGGESTION_MIN_PREFIX) return emptyList()
       return Bip39.suggestions(word, SUGGESTION_LIMIT).takeUnless { it == listOf(word) }.orEmpty()
     }
 
-  val canSubmit: Boolean get() = !submitting && words.all(Bip39::isWord)
+  val canSubmit: Boolean get() = !submitting && words.size == Bip39.WORD_COUNT && words.all(Bip39::isWord)
 
   override fun toString(): String = "EnterWordsUiState"
 }
@@ -74,79 +113,22 @@ class EnterWordsViewModel(
   private val messageChannel = Channel<EnterWordsMessage>(Channel.BUFFERED)
   val messages: Flow<EnterWordsMessage> = messageChannel.receiveAsFlow()
 
-  fun onFocus(index: Int) = mutableState.update { it.copy(focused = index) }
+  fun onFocusChange(focused: Boolean) = mutableState.update { it.copy(focused = focused) }
 
-  fun onBlur(index: Int) = mutableState.update { if (it.focused == index) it.copy(focused = null) else it }
-
-  /**
-   * El camp [index] ha canviat a [raw]. Retorna el camp al qual cal passar el focus: un espai (o un salt de línia)
-   * dona la paraula per acabada. Si arriben diverses paraules juntes (enganxades des del teclat), es reparteixen.
-   */
-  fun onWordChange(
-    index: Int,
-    raw: String,
-  ): Int? {
-    val tokens = Bip39.split(raw)
-    if (tokens.size > 1) return fill(tokens, from = index)
-    val word = tokens.firstOrNull().orEmpty()
-    setWord(index, word)
-    return if (word.isNotEmpty() && raw.last().isWhitespace()) nextAfter(index) else null
+  /** El text ha canviat (escrit o enganxat amb el teclat). Qualsevol canvi esborra la nota i les marques del servidor. */
+  fun onTextChange(text: String) {
+    mutableState.update { if (it.text == text) it else it.copy(text = text, rejected = emptySet(), wrongWords = false) }
   }
 
-  /** Tocar un suggeriment: omple el camp i passa al següent. */
-  fun onSuggestion(
-    index: Int,
-    word: String,
-  ): Int? {
-    setWord(index, word)
-    return nextAfter(index)
-  }
+  /** «Enganxa»: el que hi hagi al porta-retalls substitueix el text. */
+  fun onPaste(text: String) = onTextChange(text)
 
-  /**
-   * «Enganxa». Amb 12 paraules les posa totes; amb menys, a partir del camp actiu (o del primer buit). Retorna el
-   * primer camp buit que queda, si n'hi ha.
-   */
-  fun onPaste(text: String): Int? {
-    val tokens = Bip39.split(text)
-    if (tokens.isEmpty()) return null
-    val current = mutableState.value
-    val from =
-      when {
-        tokens.size >= Bip39.WORD_COUNT -> 0
-        else -> current.focused ?: current.words.indexOfFirst { it.isEmpty() }.coerceAtLeast(0)
-      }
-    return fill(tokens, from)
+  /** Tocar un suggeriment: completa l'última paraula i hi afegeix un espai. */
+  fun onSuggestion(word: String) {
+    val text = mutableState.value.text
+    val last = wordMatches(text).lastOrNull()?.takeIf { endsInWord(text) } ?: return
+    onTextChange(text.substring(0, last.range.first) + word + " ")
   }
-
-  private fun fill(
-    tokens: List<String>,
-    from: Int,
-  ): Int? {
-    mutableState.update { current ->
-      val words = current.words.toMutableList()
-      tokens.forEachIndexed { offset, token -> if (from + offset < words.size) words[from + offset] = token }
-      val touched = from until minOf(from + tokens.size, words.size)
-      current.copy(words = words, rejected = current.rejected - touched.toSet(), wrongWords = false)
-    }
-    return mutableState.value.words
-      .indexOfFirst { it.isEmpty() }
-      .takeIf { it >= 0 }
-  }
-
-  private fun setWord(
-    index: Int,
-    word: String,
-  ) {
-    mutableState.update { current ->
-      current.copy(
-        words = current.words.toMutableList().also { it[index] = word },
-        rejected = current.rejected - index,
-        wrongWords = false,
-      )
-    }
-  }
-
-  private fun nextAfter(index: Int): Int? = (index + 1).takeIf { it < Bip39.WORD_COUNT }
 
   fun submit() {
     val current = mutableState.value
