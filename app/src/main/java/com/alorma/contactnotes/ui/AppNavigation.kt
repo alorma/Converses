@@ -57,6 +57,7 @@ import com.alorma.contactnotes.ui.navigation.CustomChannelsRoute
 import com.alorma.contactnotes.ui.navigation.DetailPanel
 import com.alorma.contactnotes.ui.navigation.EditPersonRoute
 import com.alorma.contactnotes.ui.navigation.EmptyDetailPane
+import com.alorma.contactnotes.ui.navigation.EnterWordsRoute
 import com.alorma.contactnotes.ui.navigation.FormDialogFrame
 import com.alorma.contactnotes.ui.navigation.FormDialogProperties
 import com.alorma.contactnotes.ui.navigation.OnboardingRoute
@@ -66,8 +67,10 @@ import com.alorma.contactnotes.ui.navigation.PersonLockedRoute
 import com.alorma.contactnotes.ui.navigation.PersonRoute
 import com.alorma.contactnotes.ui.navigation.QuickNoteRoute
 import com.alorma.contactnotes.ui.navigation.ScreenWidth
+import com.alorma.contactnotes.ui.navigation.SecurityWordsRoute
 import com.alorma.contactnotes.ui.navigation.SettingsRoute
 import com.alorma.contactnotes.ui.navigation.ShellNavigation
+import com.alorma.contactnotes.ui.navigation.SyncRoute
 import com.alorma.contactnotes.ui.navigation.TaskRoute
 import com.alorma.contactnotes.ui.navigation.TopLevelBackStack
 import com.alorma.contactnotes.ui.navigation.currentScreenWidth
@@ -82,6 +85,9 @@ import com.alorma.contactnotes.ui.person.PersonDetailRoute
 import com.alorma.contactnotes.ui.person.PersonLockedScreen
 import com.alorma.contactnotes.ui.settings.CustomChannelsScreen
 import com.alorma.contactnotes.ui.settings.SettingsScreen
+import com.alorma.contactnotes.ui.sync.EnterWordsScreen
+import com.alorma.contactnotes.ui.sync.SecurityWordsScreen
+import com.alorma.contactnotes.ui.sync.SyncScreen
 import com.alorma.contactnotes.ui.task.TaskFormScreen
 import com.alorma.contactnotes.ui.tracking.TrackScreen
 import com.alorma.contactnotes.ui.tracking.toScreen
@@ -267,6 +273,23 @@ fun AppNavigation(
           }
           entry<CustomChannelsRoute> {
             CustomChannelsScreen(onBack = { navigation.pop() })
+          }
+          entry<SyncRoute> {
+            SyncScreen(
+              onBack = { navigation.pop() },
+              onOpenWords = { activation -> navigation.navigate(SecurityWordsRoute(activation)) },
+              onEnterWords = { navigation.navigate(EnterWordsRoute) },
+            )
+          }
+          entry<SecurityWordsRoute>(metadata = formMetadata) { route ->
+            FormDialogFrame(asDialog = formsAsDialogs, secure = secure) {
+              SecurityWordsScreen(activation = route.activation, onClose = { navigation.pop() })
+            }
+          }
+          entry<EnterWordsRoute>(metadata = formMetadata) {
+            FormDialogFrame(asDialog = formsAsDialogs, secure = secure) {
+              EnterWordsScreen(onClose = { navigation.pop() })
+            }
           }
           entry<PersonLockedRoute>(metadata = ListDetailSceneStrategy.detailPane()) { route ->
             DetailPanel(inPane = twoPane) {

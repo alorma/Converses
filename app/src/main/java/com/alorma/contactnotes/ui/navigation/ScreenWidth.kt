@@ -55,7 +55,12 @@ private const val KeyCodeN = 42
 
 /** Nota ràpida, formularis i Pro: al mòbil són pantalles completes; en una pantalla gran, diàlegs sobre la resta. */
 fun NavKey.isFormRoute(): Boolean =
-  this is QuickNoteRoute || this is EditPersonRoute || this is TaskRoute || this is PaywallRoute
+  this is QuickNoteRoute ||
+    this is EditPersonRoute ||
+    this is TaskRoute ||
+    this is PaywallRoute ||
+    this is SecurityWordsRoute ||
+    this is EnterWordsRoute
 
 /**
  * Al mòbil, la barra flotant només a les pestanyes. En una pantalla gran el rail acompanya les pestanyes, la persona

@@ -5,13 +5,16 @@ import com.alorma.contactnotes.ui.navigation.AppRoute
 import com.alorma.contactnotes.ui.navigation.ArchivedRoute
 import com.alorma.contactnotes.ui.navigation.CustomChannelsRoute
 import com.alorma.contactnotes.ui.navigation.EditPersonRoute
+import com.alorma.contactnotes.ui.navigation.EnterWordsRoute
 import com.alorma.contactnotes.ui.navigation.OnboardingRoute
 import com.alorma.contactnotes.ui.navigation.PaywallRoute
 import com.alorma.contactnotes.ui.navigation.PeopleRoute
 import com.alorma.contactnotes.ui.navigation.PersonLockedRoute
 import com.alorma.contactnotes.ui.navigation.PersonRoute
 import com.alorma.contactnotes.ui.navigation.QuickNoteRoute
+import com.alorma.contactnotes.ui.navigation.SecurityWordsRoute
 import com.alorma.contactnotes.ui.navigation.SettingsRoute
+import com.alorma.contactnotes.ui.navigation.SyncRoute
 import com.alorma.contactnotes.ui.navigation.TaskRoute
 import com.alorma.contactnotes.ui.paywall.ProBenefit
 
@@ -50,6 +53,15 @@ object Screens {
   class Settings : Screen("settings", 1)
 
   class CustomChannels : Screen("custom_channels", 1)
+
+  /** Sense l'estat del compte: si l'usuari sincronitza o no, no es diu. */
+  class Sync : Screen("sync", 1)
+
+  class SyncWords(
+    activation: Boolean,
+  ) : Screen("sync_words", 1, mapOf("mode" to if (activation) "activation" else "review"))
+
+  class SyncEnterWords : Screen("sync_enter_words", 1)
 }
 
 private fun mode(creating: Boolean) = if (creating) "create" else "edit"
@@ -71,4 +83,7 @@ fun AppRoute.toScreen(): Screen? =
     is PaywallRoute -> Screens.Paywall(highlight)
     SettingsRoute -> Screens.Settings()
     CustomChannelsRoute -> Screens.CustomChannels()
+    SyncRoute -> Screens.Sync()
+    is SecurityWordsRoute -> Screens.SyncWords(activation)
+    EnterWordsRoute -> Screens.SyncEnterWords()
   }

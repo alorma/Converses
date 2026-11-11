@@ -6,6 +6,8 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
 import com.alorma.contactnotes.data.pro.ProDataSource
 import com.alorma.contactnotes.data.settings.AppLockManager
+import com.alorma.contactnotes.data.sync.SyncFlag
+import com.alorma.contactnotes.data.sync.SyncRepository
 import com.alorma.contactnotes.data.tracking.EventTracker
 import com.alorma.contactnotes.data.tracking.FirebaseController
 import com.alorma.contactnotes.data.tracking.ProTrackingProperty
@@ -30,6 +32,8 @@ class ConversesApp : Application() {
     StartupErrors.attach(get<EventTracker>())
     val pro: ProDataSource by inject()
     pro.start()
+    // Amb el flag apagat no es crea res de la sincronització; encès, només toca Firebase si el dispositiu té sessió
+    if (get<SyncFlag>().isEnabled()) get<SyncRepository>().start()
     val appLock: AppLockManager by inject()
     ProcessLifecycleOwner.get().lifecycle.addObserver(
       object : DefaultLifecycleObserver {

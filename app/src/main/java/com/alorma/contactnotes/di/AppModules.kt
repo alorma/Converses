@@ -8,6 +8,7 @@ import com.alorma.contactnotes.data.db.ConversesDatabase
 import com.alorma.contactnotes.data.db.Migration1To2
 import com.alorma.contactnotes.data.db.Migration2To3
 import com.alorma.contactnotes.data.db.Migration5To6
+import com.alorma.contactnotes.data.flags.FeatureFlag
 import com.alorma.contactnotes.data.flags.FeatureFlagRunner
 import com.alorma.contactnotes.data.flags.FeatureFlagStore
 import com.alorma.contactnotes.data.flags.LocalFeatureFlagRunner
@@ -21,6 +22,16 @@ import com.alorma.contactnotes.data.settings.DataStoreSettingsRepository
 import com.alorma.contactnotes.data.settings.OnboardingFlag
 import com.alorma.contactnotes.data.settings.SecureWindow
 import com.alorma.contactnotes.data.settings.SettingsRepository
+import com.alorma.contactnotes.data.sync.AccountRemote
+import com.alorma.contactnotes.data.sync.AndroidSyncKeyStore
+import com.alorma.contactnotes.data.sync.AuthGateway
+import com.alorma.contactnotes.data.sync.DataStoreSyncLocalStore
+import com.alorma.contactnotes.data.sync.FirebaseAuthGateway
+import com.alorma.contactnotes.data.sync.FirestoreAccountRemote
+import com.alorma.contactnotes.data.sync.SyncFlag
+import com.alorma.contactnotes.data.sync.SyncKeyStore
+import com.alorma.contactnotes.data.sync.SyncLocalStore
+import com.alorma.contactnotes.data.sync.SyncRepository
 import com.alorma.contactnotes.data.tracking.AndroidFirebaseGateway
 import com.alorma.contactnotes.data.tracking.ConsentManager
 import com.alorma.contactnotes.data.tracking.EventTracker
@@ -38,6 +49,7 @@ import com.alorma.contactnotes.ui.person.PersonLockViewModel
 import com.alorma.contactnotes.ui.person.PersonViewModel
 import com.alorma.contactnotes.ui.settings.CustomChannelsViewModel
 import com.alorma.contactnotes.ui.settings.SettingsViewModel
+import com.alorma.contactnotes.ui.sync.SyncViewModel
 import com.alorma.contactnotes.ui.task.TaskFormViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -46,6 +58,7 @@ import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.dsl.singleOf
 import org.koin.core.module.dsl.viewModel
 import org.koin.core.module.dsl.viewModelOf
+import org.koin.dsl.bind
 import org.koin.dsl.module
 
 val databaseModule =
@@ -110,8 +123,21 @@ val settingsModule =
     }
   }
 
+/** La sincronització al núvol (`docs/sync/disseny.md`). Res d'aquí es crea fins que algú el demana amb [SyncFlag] encès. */
+val syncModule =
+  module {
+    single { SyncFlag(get()) } bind FeatureFlag::class
+    single<AuthGateway> { FirebaseAuthGateway(androidContext()) }
+    single<AccountRemote> { FirestoreAccountRemote(androidContext()) }
+    single<SyncKeyStore> { AndroidSyncKeyStore(androidContext()) }
+    single<SyncLocalStore> { DataStoreSyncLocalStore(androidContext()) }
+    // Sense `singleOf`: intentaria resoldre el rellotge i l'aleatori, que tenen valor per defecte
+    single { SyncRepository(get(), get(), get(), get(), CoroutineScope(SupervisorJob() + Dispatchers.Default)) }
+  }
+
 val viewModelModule =
   module {
+    viewModelOf(::SyncViewModel)
     viewModel { (archived: Boolean) -> PeopleListViewModel(archived, get(), get()) }
     viewModelOf(::SettingsViewModel)
     viewModelOf(::CustomChannelsViewModel)
@@ -130,5 +156,6 @@ val appModules =
     proDataSourceModule,
     trackersModule,
     settingsModule,
+    syncModule,
     viewModelModule,
   )

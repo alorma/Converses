@@ -36,4 +36,7 @@ object ErrorSites {
   const val DATASTORE_PRO = "datastore_pro"
 
   const val DATASTORE_FLAGS = "datastore_flags"
+
+  /** El dispositiu queda sense sessió de sincronització; les dades i la clau no es toquen. */
+  const val DATASTORE_SYNC = "datastore_sync"
 }

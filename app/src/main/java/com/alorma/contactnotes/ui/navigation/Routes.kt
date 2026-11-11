@@ -62,6 +62,23 @@ data class PaywallRoute(
 @Serializable
 data object CustomChannelsRoute : AppRoute
 
+/** Pantalla «Sincronització» (13d, 13i, 13o): el que mostra depèn de l'estat del compte, no de la ruta. */
+@Serializable
+data object SyncRoute : AppRoute
+
+/**
+ * Les paraules de seguretat (13f). Amb [activation], al primer dispositiu: porta el peu de «Les he guardat» i tancar-la
+ * tanca la sessió. Sense, és la revisió des de Sincronització. No porta mai les paraules: les dona el repositori.
+ */
+@Serializable
+data class SecurityWordsRoute(
+  val activation: Boolean = false,
+) : AppRoute
+
+/** Escriure les paraules en un dispositiu nou (13j). */
+@Serializable
+data object EnterWordsRoute : AppRoute
+
 /** Formulari de tasca (Pro): nova per a [personId] o, amb [taskId], edició. S'hi arriba des del detall. */
 @Serializable
 data class TaskRoute(
