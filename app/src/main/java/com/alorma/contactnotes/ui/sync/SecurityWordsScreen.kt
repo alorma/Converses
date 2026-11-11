@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -46,6 +45,8 @@ import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.Hyphens
+import androidx.compose.ui.text.style.LineBreak
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -157,7 +158,7 @@ fun SecurityWordsContent(
           color = MaterialTheme.colorScheme.onSurfaceVariant,
           modifier = Modifier.padding(horizontal = 4.dp),
         )
-        WordsGrid(state.words)
+        WordsBlock(state.words)
         FilledTonalButton(onClick = onCopy, modifier = Modifier.height(40.dp)) {
           Icon(Icons.Rounded.ContentCopy, contentDescription = null, modifier = Modifier.size(20.dp))
           Text(
@@ -180,46 +181,28 @@ fun SecurityWordsContent(
   }
 }
 
-/** Dues columnes de sis: l'1–6 a l'esquerra i el 7–12 a la dreta, com al disseny. */
+/**
+ * Les paraules juntes, com un sol bloc de text dins una targeta (decisió de Bernat, no pas la graella del disseny).
+ * No es parteixen amb guionet ni es tradueixen: són una clau, no una frase.
+ */
 @Composable
-private fun WordsGrid(words: List<String>) {
-  val rows = (words.size + 1) / 2
-  Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-    for (column in 0..1) {
-      Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-        for (row in 0 until rows) {
-          val index = column * rows + row
-          if (index < words.size) WordCell(number = index + 1, word = words[index])
-        }
-      }
-    }
-  }
-}
-
-@Composable
-private fun WordCell(
-  number: Int,
-  word: String,
-) {
-  Surface(
-    shape = RoundedCornerShape(14.dp),
-    color = GroupedListDefaults.containerColor,
-    modifier = Modifier.fillMaxWidth().height(44.dp),
-  ) {
-    Row(
-      modifier = Modifier.padding(horizontal = 14.dp),
-      verticalAlignment = Alignment.CenterVertically,
-      horizontalArrangement = Arrangement.spacedBy(10.dp),
-    ) {
-      Text(
-        text = number.toString(),
-        modifier = Modifier.width(20.dp),
-        fontSize = 13.sp,
-        fontWeight = FontWeight.Bold,
-        color = MaterialTheme.colorScheme.onSurfaceVariant,
-      )
-      Text(text = word, fontSize = 17.sp, fontWeight = FontWeight.SemiBold, maxLines = 1)
-    }
+private fun WordsBlock(words: List<String>) {
+  Surface(shape = RoundedCornerShape(20.dp), color = GroupedListDefaults.containerColor) {
+    Text(
+      text = words.joinToString(" "),
+      modifier =
+        Modifier
+          .fillMaxWidth()
+          .padding(horizontal = 20.dp, vertical = 18.dp),
+      style =
+        MaterialTheme.typography.bodyLarge.copy(
+          fontSize = 19.sp,
+          lineHeight = 30.sp,
+          fontWeight = FontWeight.SemiBold,
+          hyphens = Hyphens.None,
+          lineBreak = LineBreak.Simple,
+        ),
+    )
   }
 }
 
