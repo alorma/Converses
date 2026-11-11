@@ -53,6 +53,21 @@ object Bip39 {
 
   fun isWord(word: String): Boolean = normalize(word) in indexOfWord
 
+  /**
+   * Les primeres [limit] paraules de la llista que comencen per [prefix], per ajudar a escriure-les. La llista està
+   * ordenada alfabèticament, i per això n'hi ha prou de trobar la primera i seguir endavant.
+   */
+  fun suggestions(
+    prefix: String,
+    limit: Int,
+  ): List<String> {
+    val start = normalize(prefix)
+    if (start.isEmpty() || limit <= 0) return emptyList()
+    val found = BIP39_ENGLISH.binarySearch(start)
+    val first = if (found >= 0) found else -(found + 1)
+    return BIP39_ENGLISH.subList(first, BIP39_ENGLISH.size).take(limit).takeWhile { it.startsWith(start) }
+  }
+
   fun encode(entropy: ByteArray): List<String> {
     require(entropy.size == ENTROPY_BYTES) { "The entropy must be $ENTROPY_BYTES bytes" }
     val bits = entropy.flatMap(::bitsOf) + checksumBits(entropy)

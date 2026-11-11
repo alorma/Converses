@@ -129,4 +129,15 @@ class Bip39Test {
     assertTrue(Bip39.isWord(" Abandon "))
     assertTrue(!Bip39.isWord("converses"))
   }
+
+  @Test
+  fun suggestsTheWordsThatStartWithAPrefix() {
+    assertEquals(listOf("act", "action", "actor", "actress"), Bip39.suggestions("act", limit = 4))
+    assertEquals(listOf("zone", "zoo"), Bip39.suggestions(" ZO", limit = 4))
+    assertEquals(listOf("abandon", "ability"), Bip39.suggestions("a", limit = 2))
+    assertEquals(listOf("zoo"), Bip39.suggestions("zoo", limit = 4))
+    assertEquals(emptyList<String>(), Bip39.suggestions("zz", limit = 4))
+    assertEquals(emptyList<String>(), Bip39.suggestions("", limit = 4))
+    assertEquals(emptyList<String>(), Bip39.suggestions("act", limit = 0))
+  }
 }

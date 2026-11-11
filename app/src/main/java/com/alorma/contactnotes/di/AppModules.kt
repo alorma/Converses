@@ -50,6 +50,7 @@ import com.alorma.contactnotes.ui.person.PersonLockViewModel
 import com.alorma.contactnotes.ui.person.PersonViewModel
 import com.alorma.contactnotes.ui.settings.CustomChannelsViewModel
 import com.alorma.contactnotes.ui.settings.SettingsViewModel
+import com.alorma.contactnotes.ui.sync.EnterWordsViewModel
 import com.alorma.contactnotes.ui.sync.SecurityWordsViewModel
 import com.alorma.contactnotes.ui.sync.SyncViewModel
 import com.alorma.contactnotes.ui.task.TaskFormViewModel
@@ -143,6 +144,7 @@ val viewModelModule =
   module {
     viewModelOf(::SyncViewModel)
     viewModel { (activation: Boolean) -> SecurityWordsViewModel(activation, get()) }
+    viewModelOf(::EnterWordsViewModel)
     viewModel { (archived: Boolean) -> PeopleListViewModel(archived, get(), get()) }
     viewModelOf(::SettingsViewModel)
     viewModelOf(::CustomChannelsViewModel)
