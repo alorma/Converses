@@ -33,13 +33,19 @@ import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.alorma.contactnotes.R
 import com.alorma.contactnotes.designsystem.components.ConversesFloatingToolbar
 import com.alorma.contactnotes.designsystem.components.ConversesNavigationRail
+import com.alorma.contactnotes.designsystem.components.RailCustomDestination
 import com.alorma.contactnotes.designsystem.components.RailDestination
 import com.alorma.contactnotes.designsystem.components.ToolbarDestination
+import com.alorma.contactnotes.ui.sync.SyncIndicatorState
+import com.alorma.contactnotes.ui.sync.SyncIndicatorVisual
+import com.alorma.contactnotes.ui.sync.descriptionRes
 
 /**
  * Space a screen should leave at the end of its scrollable content so the last row can clear the
@@ -80,6 +86,11 @@ fun AppShell(
    * instead of spanning the window across the hinge. `null` everywhere else.
    */
   floatingBarWidth: Dp? = null,
+  /** Account indicator at the bottom of the rail; `null` (sync flag off) draws nothing there. */
+  accountIndicator: SyncIndicatorState? = null,
+  onOpenAccount: () -> Unit = {},
+  /** Sync (or a screen inside it) is open: the rail marks the account instead of [currentTab]. */
+  accountSelected: Boolean = false,
   content: @Composable () -> Unit,
 ) {
   val floatingBar: @Composable () -> Unit = {
@@ -133,26 +144,40 @@ fun AppShell(
           fabIcon = Icons.Rounded.EditNote,
           fabContentDescription = stringResource(R.string.quick_note),
           onFabClick = onQuickNote,
+          bottom =
+            accountIndicator?.let { indicator ->
+              {
+                val description = stringResource(indicator.descriptionRes())
+                RailCustomDestination(
+                  label = stringResource(R.string.sync_rail_account),
+                  selected = accountSelected,
+                  onClick = onOpenAccount,
+                  modifier = Modifier.semantics { contentDescription = description },
+                ) {
+                  SyncIndicatorVisual(state = indicator, background = MaterialTheme.colorScheme.surface)
+                }
+              }
+            },
         ) {
           RailDestination(
             icon = Icons.Outlined.Groups,
             selectedIcon = Icons.Rounded.Groups,
             label = stringResource(R.string.nav_people),
-            selected = !settingsSelected && currentTab == PeopleRoute,
+            selected = !settingsSelected && !accountSelected && currentTab == PeopleRoute,
             onClick = { onTabSelected(PeopleRoute) },
           )
           RailDestination(
             icon = Icons.Outlined.Archive,
             selectedIcon = Icons.Rounded.Archive,
             label = stringResource(R.string.filter_archived),
-            selected = !settingsSelected && currentTab == ArchivedRoute,
+            selected = !settingsSelected && !accountSelected && currentTab == ArchivedRoute,
             onClick = { onTabSelected(ArchivedRoute) },
           )
           RailDestination(
             icon = Icons.Outlined.Settings,
             selectedIcon = Icons.Rounded.Settings,
             label = stringResource(R.string.settings_title),
-            selected = settingsSelected,
+            selected = settingsSelected && !accountSelected,
             onClick = onOpenSettings,
           )
         }

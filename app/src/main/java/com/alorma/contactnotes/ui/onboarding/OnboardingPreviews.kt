@@ -23,3 +23,12 @@ internal fun OnboardingStep2Preview() = OnboardingPreview(1)
 @Preview
 @Composable
 internal fun OnboardingStep3Preview() = OnboardingPreview(2)
+
+/** Pas 3 amb SyncFlag encès (0c): pastilles, text i enllaç nous. */
+@Preview
+@Composable
+internal fun OnboardingStep3SyncPreview() {
+  ConversesPreviewTheme {
+    OnboardingContent(onFinish = {}, initialPage = 2, forceReducedMotion = true, syncEnabled = true)
+  }
+}

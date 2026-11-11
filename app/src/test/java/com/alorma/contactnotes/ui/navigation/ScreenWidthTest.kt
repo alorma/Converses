@@ -56,6 +56,17 @@ class ScreenWidthTest {
   }
 
   @Test
+  fun `sync keeps the rail on a large screen and shows no bar on the phone`() {
+    assertEquals(ShellNavigation.None, shell(ScreenWidth.Compact, PeopleRoute, SyncRoute))
+    assertEquals(ShellNavigation.None, shell(ScreenWidth.Compact, PeopleRoute, SyncRoute, SecurityWordsRoute()))
+    for (width in large) {
+      assertEquals(ShellNavigation.Rail, shell(width, PeopleRoute, SyncRoute))
+      assertEquals(ShellNavigation.Rail, shell(width, PeopleRoute, SyncRoute, SecurityWordsRoute()))
+      assertEquals(ShellNavigation.Rail, shell(width, PeopleRoute, SyncRoute, EnterWordsRoute))
+    }
+  }
+
+  @Test
   fun `an open foldable shows the floating bar while the list is visible, never the rail`() {
     fun book(vararg stack: NavKey) = shellNavigationFor(stack.toList(), ScreenWidth.Expanded, book = true)
 

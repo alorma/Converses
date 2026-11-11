@@ -6,6 +6,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.provider.Settings
+import androidx.annotation.StringRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -30,11 +31,14 @@ import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Mail
 import androidx.compose.material.icons.outlined.Policy
 import androidx.compose.material.icons.rounded.BrightnessAuto
+import androidx.compose.material.icons.rounded.Cloud
+import androidx.compose.material.icons.rounded.CloudDone
 import androidx.compose.material.icons.rounded.DarkMode
 import androidx.compose.material.icons.rounded.Face
 import androidx.compose.material.icons.rounded.Fingerprint
 import androidx.compose.material.icons.rounded.Forum
 import androidx.compose.material.icons.rounded.Insights
+import androidx.compose.material.icons.rounded.Key
 import androidx.compose.material.icons.rounded.Language
 import androidx.compose.material.icons.rounded.LightMode
 import androidx.compose.material.icons.rounded.Palette
@@ -98,6 +102,8 @@ import com.alorma.contactnotes.ui.paywall.ProBenefit
 import com.alorma.contactnotes.ui.person.canUnlockWithDevice
 import com.alorma.contactnotes.ui.person.openSecuritySetup
 import com.alorma.contactnotes.ui.person.promptUnlock
+import com.alorma.contactnotes.ui.sync.SyncIndicatorState
+import com.alorma.contactnotes.ui.sync.currentSyncIndicatorState
 import com.alorma.contactnotes.ui.tracking.Actions
 import com.alorma.contactnotes.ui.tracking.LinkTarget
 import com.alorma.contactnotes.ui.tracking.rememberActionTracker
@@ -113,6 +119,7 @@ fun SettingsScreen(
   onBack: () -> Unit,
   onOpenPro: (ProBenefit?) -> Unit,
   onOpenCustomChannels: () -> Unit = {},
+  onOpenSync: () -> Unit = {},
   viewModel: SettingsViewModel = koinViewModel(),
   appLock: AppLockManager = koinInject(),
   pro: ProRepository = koinInject(),
@@ -139,6 +146,8 @@ fun SettingsScreen(
     onOpenPro = onOpenPro,
     customChannelCount = customChannelCount,
     onOpenCustomChannels = onOpenCustomChannels,
+    syncState = currentSyncIndicatorState(),
+    onOpenSync = onOpenSync,
     canUnlock = canUnlock,
     languageName = remember { currentLanguageName(context) },
     versionName = remember { versionLabel(context) },
@@ -199,6 +208,9 @@ fun SettingsContent(
   onOpenPro: (ProBenefit?) -> Unit = {},
   customChannelCount: Int = 0,
   onOpenCustomChannels: () -> Unit = {},
+  /** Estat de la sincronització per a la secció «Compte»; `null` (SyncFlag apagat) no la dibuixa. */
+  syncState: SyncIndicatorState? = null,
+  onOpenSync: () -> Unit = {},
 ) {
   val scrollBehavior = rememberTopBarScrollBehavior()
   Scaffold(
@@ -229,6 +241,21 @@ fun SettingsContent(
       verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
       ProCard(isPro = isPro, onClick = { onOpenPro(null) })
+      if (syncState != null) {
+        SettingsGroup(
+          title = { SectionTitle(stringResource(R.string.sync_account)) },
+          verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap),
+        ) {
+          SettingRow(
+            title = stringResource(R.string.sync_title),
+            subtitle = stringResource(syncState.subtitleRes()),
+            icon = syncState.icon(),
+            trailing = { Icon(Icons.AutoMirrored.Rounded.KeyboardArrowRight, contentDescription = null) },
+            shape = groupedItemShape(0, 1),
+            onClick = onOpenSync,
+          )
+        }
+      }
       SettingsGroup(
         title = { SectionTitle(stringResource(R.string.settings_appearance)) },
         verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap),
@@ -630,6 +657,22 @@ private fun SectionTitle(text: String) {
     color = MaterialTheme.colorScheme.onSurfaceVariant,
   )
 }
+
+/** El subtítol de la fila «Sincronització» segons l'estat (13b). */
+@StringRes
+internal fun SyncIndicatorState.subtitleRes(): Int =
+  when (this) {
+    SyncIndicatorState.SignedOut -> R.string.sync_state_off
+    is SyncIndicatorState.On -> R.string.sync_state_on
+    is SyncIndicatorState.NeedsKey -> R.string.sync_state_key
+  }
+
+private fun SyncIndicatorState.icon(): androidx.compose.ui.graphics.vector.ImageVector =
+  when (this) {
+    SyncIndicatorState.SignedOut -> Icons.Rounded.Cloud
+    is SyncIndicatorState.On -> Icons.Rounded.CloudDone
+    is SyncIndicatorState.NeedsKey -> Icons.Rounded.Key
+  }
 
 @Composable
 private fun TileTitle(text: String) {

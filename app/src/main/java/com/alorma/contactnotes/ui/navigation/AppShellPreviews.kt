@@ -12,6 +12,7 @@ import com.alorma.contactnotes.designsystem.preview.ConversesPreviewTheme
 import com.alorma.contactnotes.ui.people.PeopleListScreenLoadedPreview
 import com.alorma.contactnotes.ui.people.PeopleListScreenPanePreview
 import com.alorma.contactnotes.ui.settings.SettingsProPreview
+import com.alorma.contactnotes.ui.sync.SyncIndicatorState
 
 @Preview
 @Composable
@@ -117,6 +118,47 @@ internal fun AppShellRailSettingsPreview() {
       onQuickNote = {},
       onOpenSettings = {},
       settingsSelected = true,
+    ) {
+      SettingsProPreview()
+    }
+  }
+}
+
+/** Amb SyncFlag encès (13r): el compte a baix de tot del rail. */
+@Preview(widthDp = 1280, heightDp = 800)
+@Composable
+internal fun AppShellRailAccountPreview() {
+  ConversesPreviewTheme {
+    AppShell(
+      currentTab = PeopleRoute,
+      navigation = ShellNavigation.Rail,
+      onTabSelected = {},
+      onQuickNote = {},
+      onOpenSettings = {},
+      accountIndicator = SyncIndicatorState.On("B"),
+    ) {
+      Row {
+        Box(modifier = Modifier.width(380.dp)) { PeopleListScreenPanePreview() }
+        Spacer(Modifier.width(24.dp))
+        EmptyDetailPane()
+      }
+    }
+  }
+}
+
+/** Sincronització oberta: el compte queda marcat al rail amb l'indicador de 56 dp. */
+@Preview(widthDp = 1280, heightDp = 800)
+@Composable
+internal fun AppShellRailAccountSelectedPreview() {
+  ConversesPreviewTheme {
+    AppShell(
+      currentTab = PeopleRoute,
+      navigation = ShellNavigation.Rail,
+      onTabSelected = {},
+      onQuickNote = {},
+      onOpenSettings = {},
+      accountIndicator = SyncIndicatorState.NeedsKey("B"),
+      accountSelected = true,
     ) {
       SettingsProPreview()
     }

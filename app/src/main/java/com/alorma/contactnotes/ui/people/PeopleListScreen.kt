@@ -80,6 +80,9 @@ import com.alorma.contactnotes.shared.ChannelType
 import com.alorma.contactnotes.shared.initialsOf
 import com.alorma.contactnotes.ui.navigation.LocalFloatingBarPadding
 import com.alorma.contactnotes.ui.person.channelName
+import com.alorma.contactnotes.ui.sync.SyncIndicator
+import com.alorma.contactnotes.ui.sync.SyncIndicatorState
+import com.alorma.contactnotes.ui.sync.currentSyncIndicatorState
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 
@@ -92,9 +95,12 @@ fun PeopleListRoute(
   onNewPerson: () -> Unit,
   inPane: Boolean = false,
   selectedPersonId: Long? = null,
+  onOpenSync: () -> Unit = {},
   viewModel: PeopleListViewModel = koinViewModel(parameters = { parametersOf(archived) }),
 ) {
   val state by viewModel.uiState.collectAsStateWithLifecycle()
+  // Amb el rail (pantalla gran) l'indicador és al rail, no a la capçalera; amb SyncFlag apagat és `null`
+  val syncIndicator = currentSyncIndicatorState()
   PeopleListScreen(
     state = state,
     archived = archived,
@@ -103,6 +109,8 @@ fun PeopleListRoute(
     onNewPerson = onNewPerson,
     inPane = inPane,
     selectedPersonId = selectedPersonId,
+    syncIndicator = if (inPane) null else syncIndicator,
+    onOpenSync = onOpenSync,
   )
 }
 
@@ -119,6 +127,8 @@ fun PeopleListScreen(
   onNewPerson: () -> Unit,
   inPane: Boolean = false,
   selectedPersonId: Long? = null,
+  syncIndicator: SyncIndicatorState? = null,
+  onOpenSync: () -> Unit = {},
 ) {
   val listState = rememberLazyListState()
   val listFocus = remember { FocusRequester() }
@@ -153,6 +163,8 @@ fun PeopleListScreen(
           total = state.total,
           isLoading = state.isLoading,
           onNewPerson = onNewPerson,
+          syncIndicator = syncIndicator,
+          onOpenSync = onOpenSync,
         )
         if (!archived) {
           FilterRow(selected = state.filter, onToggle = onFilterToggled, wrap = inPane)
@@ -230,6 +242,8 @@ private fun Header(
   total: Int,
   isLoading: Boolean,
   onNewPerson: () -> Unit,
+  syncIndicator: SyncIndicatorState?,
+  onOpenSync: () -> Unit,
   modifier: Modifier = Modifier,
 ) {
   Row(
@@ -262,6 +276,10 @@ private fun Header(
       FilledTonalIconButton(onClick = onNewPerson) {
         Icon(Icons.Rounded.PersonAdd, contentDescription = stringResource(R.string.add_person))
       }
+    }
+    // L'últim de la dreta, després dels botons de la capçalera
+    if (syncIndicator != null) {
+      SyncIndicator(state = syncIndicator, onClick = onOpenSync, modifier = Modifier.padding(start = 4.dp))
     }
   }
 }

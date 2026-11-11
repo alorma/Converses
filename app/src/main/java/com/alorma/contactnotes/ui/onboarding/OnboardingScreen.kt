@@ -31,6 +31,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowForward
+import androidx.compose.material.icons.rounded.CloudDownload
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -54,7 +55,9 @@ import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.alorma.contactnotes.R
+import com.alorma.contactnotes.data.flags.rememberFeatureEnabled
 import com.alorma.contactnotes.data.settings.OnboardingFlag
+import com.alorma.contactnotes.data.sync.SyncFlag
 import com.alorma.contactnotes.designsystem.components.readableWidth
 import com.alorma.contactnotes.designsystem.theme.OnboardingTitleStyle
 import com.alorma.contactnotes.ui.tracking.Actions
@@ -67,7 +70,9 @@ private const val PageCount = 3
 private class OnboardingPage(
   val title: Int,
   val body: Int,
-  val illustration: @Composable (Boolean, Int, Boolean) -> Unit,
+  /** Text del cos quan la sincronització està disponible; el pas 3 és l'únic que en canvia. */
+  val syncBody: Int = body,
+  val illustration: @Composable (active: Boolean, key: Int, reduced: Boolean, sync: Boolean) -> Unit,
 )
 
 private val Pages =
@@ -75,26 +80,38 @@ private val Pages =
     OnboardingPage(
       R.string.onb_1_title,
       R.string.onb_1_body,
-    ) { active, key, reduced -> StepOneIllustration(active, key, reduced) },
+    ) { active, key, reduced, _ -> StepOneIllustration(active, key, reduced) },
     OnboardingPage(
       R.string.onb_2_title,
       R.string.onb_2_body,
-    ) { active, key, reduced -> StepTwoIllustration(active, key, reduced) },
+    ) { active, key, reduced, _ -> StepTwoIllustration(active, key, reduced) },
     OnboardingPage(
       R.string.onb_3_title,
       R.string.onb_3_body,
-    ) { active, key, reduced -> StepThreeIllustration(active, key, reduced) },
+      syncBody = R.string.sync_onboarding_body,
+    ) { active, key, reduced, sync -> StepThreeIllustration(active, key, reduced, sync = sync) },
   )
 
 @Composable
-fun OnboardingScreen(onFinished: () -> Unit) {
+fun OnboardingScreen(
+  onFinished: () -> Unit,
+  /** Acaba l'onboarding com sempre i obre Sincronització (0c). Només amb SyncFlag encès. */
+  onHaveCloudData: () -> Unit = {},
+) {
   val flag: OnboardingFlag = koinInject()
   val trackAction = rememberActionTracker()
+  val syncEnabled = rememberFeatureEnabled<SyncFlag>()
   OnboardingContent(
     onFinish = { skipped ->
       trackAction(Actions.OnboardingFinished(skipped))
       flag.disable()
       onFinished()
+    },
+    syncEnabled = syncEnabled,
+    onHaveCloudData = {
+      trackAction(Actions.OnboardingFinished(false))
+      flag.disable()
+      onHaveCloudData()
     },
   )
 }
@@ -105,6 +122,9 @@ fun OnboardingContent(
   onFinish: (skipped: Boolean) -> Unit,
   initialPage: Int = 0,
   forceReducedMotion: Boolean = false,
+  /** SyncFlag encès: el pas 3 canvia les pastilles i el text, i hi surt l'enllaç «Ja tinc dades al núvol». */
+  syncEnabled: Boolean = false,
+  onHaveCloudData: () -> Unit = {},
 ) {
   val pagerState = rememberPagerState(initialPage = initialPage) { PageCount }
   val scope = rememberCoroutineScope()
@@ -139,38 +159,57 @@ fun OnboardingContent(
       }
     },
     bottomBar = {
-      Row(
-        modifier =
-          Modifier
-            .navigationBarsPadding()
-            // Pantalla gran: l'indicador i el botó queden sota la columna del contingut, no a les vores de la finestra
-            .readableWidth()
-            .padding(start = 28.dp, end = 28.dp, bottom = 32.dp, top = 12.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween,
-      ) {
-        PageIndicator(pagerState = pagerState)
-        Button(
-          onClick = {
-            if (isLast) onFinish(false) else scope.launch { pagerState.animateScrollToPage(pagerState.currentPage + 1) }
-          },
-          modifier = Modifier.height(56.dp),
-          shape = CircleShape,
+      // Pantalla gran: l'indicador i el botó queden sota la columna del contingut, no a les vores de la finestra
+      Column(modifier = Modifier.navigationBarsPadding().readableWidth()) {
+        if (isLast && syncEnabled) {
+          TextButton(onClick = onHaveCloudData, modifier = Modifier.padding(horizontal = 16.dp)) {
+            Icon(Icons.Rounded.CloudDownload, contentDescription = null, modifier = Modifier.size(18.dp))
+            Spacer(Modifier.width(8.dp))
+            Text(stringResource(R.string.sync_onboarding_link), fontSize = 15.sp)
+          }
+        }
+        Row(
+          modifier =
+            Modifier
+              .fillMaxWidth()
+              .padding(start = 28.dp, end = 28.dp, bottom = 32.dp, top = 12.dp),
+          verticalAlignment = Alignment.CenterVertically,
+          horizontalArrangement = Arrangement.SpaceBetween,
         ) {
-          Text(stringResource(if (isLast) R.string.onb_start else R.string.onb_next), fontSize = 16.sp)
-          if (!isLast) {
-            Icon(
-              Icons.AutoMirrored.Rounded.ArrowForward,
-              contentDescription = null,
-              modifier = Modifier.padding(start = 8.dp),
-            )
+          PageIndicator(pagerState = pagerState)
+          Button(
+            onClick = {
+              if (isLast) {
+                onFinish(
+                  false,
+                )
+              } else {
+                scope.launch { pagerState.animateScrollToPage(pagerState.currentPage + 1) }
+              }
+            },
+            modifier = Modifier.height(56.dp),
+            shape = CircleShape,
+          ) {
+            Text(stringResource(if (isLast) R.string.onb_start else R.string.onb_next), fontSize = 16.sp)
+            if (!isLast) {
+              Icon(
+                Icons.AutoMirrored.Rounded.ArrowForward,
+                contentDescription = null,
+                modifier = Modifier.padding(start = 8.dp),
+              )
+            }
           }
         }
       }
     },
   ) { padding ->
     HorizontalPager(state = pagerState, modifier = Modifier.fillMaxSize().padding(padding)) { page ->
-      OnboardingPageContent(page = Pages[page], active = pagerState.settledPage == page, reduced = reducedMotion)
+      OnboardingPageContent(
+        page = Pages[page],
+        active = pagerState.settledPage == page,
+        reduced = reducedMotion,
+        sync = syncEnabled,
+      )
     }
   }
 }
@@ -180,6 +219,7 @@ private fun OnboardingPageContent(
   page: OnboardingPage,
   active: Boolean,
   reduced: Boolean,
+  sync: Boolean,
 ) {
   val intro =
     rememberSequence(count = 2, active = active, replayKey = 0, reduced = reduced) { a ->
@@ -203,7 +243,7 @@ private fun OnboardingPageContent(
             .clearAndSetSemantics {},
         contentAlignment = Alignment.TopCenter,
       ) {
-        page.illustration(active, 0, reduced)
+        page.illustration(active, 0, reduced, sync)
       }
       Column(modifier = Modifier.padding(start = 28.dp, end = 28.dp, top = 20.dp)) {
         Text(
@@ -218,7 +258,7 @@ private fun OnboardingPageContent(
         )
         Spacer(Modifier.height(12.dp))
         Text(
-          text = stringResource(page.body),
+          text = stringResource(if (sync) page.syncBody else page.body),
           style = MaterialTheme.typography.bodyLarge,
           fontSize = 17.sp,
           lineHeight = 24.65.sp,

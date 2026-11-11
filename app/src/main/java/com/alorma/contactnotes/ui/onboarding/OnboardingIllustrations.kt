@@ -31,6 +31,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.AccountCircle
 import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material.icons.rounded.CloudOff
 import androidx.compose.material.icons.rounded.EditNote
@@ -390,6 +391,8 @@ fun StepThreeIllustration(
   replayKey: Int,
   reduced: Boolean,
   modifier: Modifier = Modifier,
+  /** Amb la sincronització disponible, les pastilles ja no diuen «sense núvol» ni «sense comptes». */
+  sync: Boolean = false,
 ) {
   // 0 cercle, 1 avatar, 2 botó, 3 pols, 4 escaneig, 5 verd, 6 empremta surt, 7 check entra,
   // 8 cadenat obert, 9 rebot de l'avatar, 10 pastilles
@@ -547,8 +550,13 @@ fun StepThreeIllustration(
           },
       horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-      InfoPill(Icons.Rounded.CloudOff, stringResource(R.string.onb_no_cloud))
-      InfoPill(Icons.Rounded.NoAccounts, stringResource(R.string.onb_no_accounts))
+      if (sync) {
+        InfoPill(Icons.Rounded.Lock, stringResource(R.string.sync_onboarding_chip_encrypted))
+        InfoPill(Icons.Rounded.AccountCircle, stringResource(R.string.sync_onboarding_chip_account))
+      } else {
+        InfoPill(Icons.Rounded.CloudOff, stringResource(R.string.onb_no_cloud))
+        InfoPill(Icons.Rounded.NoAccounts, stringResource(R.string.onb_no_accounts))
+      }
     }
   }
 }
