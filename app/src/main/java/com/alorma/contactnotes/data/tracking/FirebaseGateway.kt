@@ -32,7 +32,7 @@ class AndroidFirebaseGateway(
   @Synchronized
   override fun enable() {
     if (enabled) return
-    if (FirebaseApp.getApps(context).isEmpty()) {
+    if (!hasDefaultApp()) {
       FirebaseApp.initializeApp(context)
       sanitizeFatalCrashes()
     }
@@ -53,6 +53,12 @@ class AndroidFirebaseGateway(
     )
   }
 
+  /**
+   * Només la instància per defecte, que és on viuen Analytics i Crashlytics. La sincronització té la seva, amb nom
+   * (`SyncFirebase`), i que existeixi no vol dir que l'usuari hagi dit que sí a les estadístiques.
+   */
+  private fun hasDefaultApp(): Boolean = FirebaseApp.getApps(context).any { it.name == FirebaseApp.DEFAULT_APP_NAME }
+
   private companion object {
     const val TAG = "Converses"
   }
@@ -60,7 +66,7 @@ class AndroidFirebaseGateway(
   @Synchronized
   override fun disable() {
     enabled = false
-    if (FirebaseApp.getApps(context).isEmpty()) return
+    if (!hasDefaultApp()) return
     FirebaseAnalytics.getInstance(context).run {
       setAnalyticsCollectionEnabled(false)
       resetAnalyticsData()

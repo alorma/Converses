@@ -28,6 +28,7 @@ import com.alorma.contactnotes.data.sync.AuthGateway
 import com.alorma.contactnotes.data.sync.DataStoreSyncLocalStore
 import com.alorma.contactnotes.data.sync.FirebaseAuthGateway
 import com.alorma.contactnotes.data.sync.FirestoreAccountRemote
+import com.alorma.contactnotes.data.sync.SyncFirebase
 import com.alorma.contactnotes.data.sync.SyncFlag
 import com.alorma.contactnotes.data.sync.SyncKeyStore
 import com.alorma.contactnotes.data.sync.SyncLocalStore
@@ -127,9 +128,11 @@ val settingsModule =
 val syncModule =
   module {
     single { SyncFlag(get()) } bind FeatureFlag::class
-    single<AuthGateway> { FirebaseAuthGateway(androidContext()) }
-    single<AccountRemote> { FirestoreAccountRemote(androidContext()) }
-    single<SyncKeyStore> { AndroidSyncKeyStore(androidContext()) }
+    // El proveïdor d'App Check (`syncAppCheckModule`, un per tipus de build) no es demana fins que la instància es crea
+    single { SyncFirebase(androidContext()) { get() } }
+    single<AuthGateway> { FirebaseAuthGateway(androidContext(), get(), get<EventTracker>()) }
+    single<AccountRemote> { FirestoreAccountRemote(get(), get<EventTracker>()) }
+    single<SyncKeyStore> { AndroidSyncKeyStore(androidContext(), get<EventTracker>()) }
     single<SyncLocalStore> { DataStoreSyncLocalStore(androidContext()) }
     // Sense `singleOf`: intentaria resoldre el rellotge i l'aleatori, que tenen valor per defecte
     single { SyncRepository(get(), get(), get(), get(), CoroutineScope(SupervisorJob() + Dispatchers.Default)) }
@@ -157,5 +160,6 @@ val appModules =
     trackersModule,
     settingsModule,
     syncModule,
+    syncAppCheckModule,
     viewModelModule,
   )

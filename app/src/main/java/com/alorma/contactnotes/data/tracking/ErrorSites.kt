@@ -39,4 +39,15 @@ object ErrorSites {
 
   /** El dispositiu queda sense sessió de sincronització; les dades i la clau no es toquen. */
   const val DATASTORE_SYNC = "datastore_sync"
+
+  // Sincronització. Sense xarxa o tancar el full de Google no són errors.
+
+  /** L'inici (o el tancament) de sessió amb Google ha fallat per un motiu que no és la xarxa ni l'usuari. */
+  const val SYNC_SIGN_IN = "sync_sign_in"
+
+  /** No s'ha pogut llegir o crear el document del compte, o el que hi ha no té una clau vàlida. */
+  const val SYNC_ACCOUNT = "sync_account"
+
+  /** El fitxer de la clau del dispositiu no es pot obrir o desar; caldran les paraules de seguretat. */
+  const val SYNC_KEY_STORE = "sync_key_store"
 }
