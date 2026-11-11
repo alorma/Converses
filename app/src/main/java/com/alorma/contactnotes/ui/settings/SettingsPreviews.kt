@@ -4,12 +4,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import com.alorma.contactnotes.data.settings.AppSettings
 import com.alorma.contactnotes.designsystem.preview.ConversesPreviewTheme
+import com.alorma.contactnotes.ui.sync.SyncIndicatorState
 
 @Composable
 private fun SettingsPreview(
   settings: AppSettings,
   canUnlock: Boolean,
   isPro: Boolean = false,
+  syncState: SyncIndicatorState? = null,
 ) {
   ConversesPreviewTheme {
     SettingsContent(
@@ -30,6 +32,7 @@ private fun SettingsPreview(
       onOpenPrivacyPolicy = {},
       onOpenFeedback = {},
       isPro = isPro,
+      syncState = syncState,
     )
   }
 }
@@ -70,4 +73,23 @@ internal fun SettingsPersonColorLockedPreview() {
 @Composable
 internal fun SettingsAnalyticsOnPreview() {
   SettingsPreview(settings = AppSettings(analyticsConsent = true), canUnlock = true, isPro = true)
+}
+
+/** Amb SyncFlag encès (13b): la secció «Compte» sota la targeta de Pro, sense sessió. */
+@Preview
+@Composable
+internal fun SettingsSyncOffPreview() {
+  SettingsPreview(settings = AppSettings(), canUnlock = true, syncState = SyncIndicatorState.SignedOut)
+}
+
+@Preview
+@Composable
+internal fun SettingsSyncOnPreview() {
+  SettingsPreview(settings = AppSettings(), canUnlock = true, syncState = SyncIndicatorState.On("B"))
+}
+
+@Preview
+@Composable
+internal fun SettingsSyncKeyPreview() {
+  SettingsPreview(settings = AppSettings(), canUnlock = true, syncState = SyncIndicatorState.NeedsKey("B"))
 }

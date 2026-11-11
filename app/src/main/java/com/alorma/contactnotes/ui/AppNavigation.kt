@@ -88,6 +88,7 @@ import com.alorma.contactnotes.ui.settings.SettingsScreen
 import com.alorma.contactnotes.ui.sync.EnterWordsScreen
 import com.alorma.contactnotes.ui.sync.SecurityWordsScreen
 import com.alorma.contactnotes.ui.sync.SyncScreen
+import com.alorma.contactnotes.ui.sync.currentSyncIndicatorState
 import com.alorma.contactnotes.ui.task.TaskFormScreen
 import com.alorma.contactnotes.ui.tracking.TrackScreen
 import com.alorma.contactnotes.ui.tracking.toScreen
@@ -156,6 +157,8 @@ fun AppNavigation(
     if (formsAsDialogs) DialogSceneStrategy.dialog(FormDialogProperties) else modalTransitions
   val openPerson: (PersonEntity) -> Unit = { person -> navigation.openPerson(personRoute(person)) }
   val newPerson = { navigation.navigate(EditPersonRoute()) }
+  // Sense duplicar-la a la pila, com Ajustos: l'indicador, la fila d'Ajustos i el rail porten al mateix lloc
+  val openSync = { navigation.navigateSingle(SyncRoute) }
 
   // Un sol lloc per a totes les pantalles: cada canvi de ruta (també tornant enrere) envia la seva
   val current = navigation.current
@@ -197,6 +200,9 @@ fun AppNavigation(
     onQuickNote = quickNote,
     onOpenSettings = { navigation.navigateSingle(SettingsRoute) },
     settingsSelected = SettingsRoute in navigation.backStack,
+    accountIndicator = currentSyncIndicatorState(),
+    onOpenAccount = openSync,
+    accountSelected = SyncRoute in navigation.backStack,
   ) {
     NavDisplay(
       backStack = navigation.backStack,
@@ -213,7 +219,13 @@ fun AppNavigation(
       entryProvider =
         entryProvider {
           entry<OnboardingRoute> {
-            OnboardingScreen(onFinished = { navigation.resetTo(PeopleRoute) })
+            OnboardingScreen(
+              onFinished = { navigation.resetTo(PeopleRoute) },
+              onHaveCloudData = {
+                navigation.resetTo(PeopleRoute)
+                navigation.navigate(SyncRoute)
+              },
+            )
           }
           entry<PeopleRoute>(
             metadata = ListDetailSceneStrategy.listPane(detailPlaceholder = { EmptyDetailPane() }),
@@ -224,6 +236,7 @@ fun AppNavigation(
               onNewPerson = newPerson,
               inPane = twoPane,
               selectedPersonId = navigation.openPersonId,
+              onOpenSync = openSync,
             )
           }
           entry<ArchivedRoute>(
@@ -235,6 +248,7 @@ fun AppNavigation(
               onNewPerson = newPerson,
               inPane = twoPane,
               selectedPersonId = navigation.openPersonId,
+              onOpenSync = openSync,
             )
           }
           entry<QuickNoteRoute>(metadata = formMetadata) { route ->
@@ -269,6 +283,7 @@ fun AppNavigation(
               onBack = { navigation.pop() },
               onOpenPro = { navigation.navigate(PaywallRoute(it)) },
               onOpenCustomChannels = { navigation.navigate(CustomChannelsRoute) },
+              onOpenSync = openSync,
             )
           }
           entry<CustomChannelsRoute> {

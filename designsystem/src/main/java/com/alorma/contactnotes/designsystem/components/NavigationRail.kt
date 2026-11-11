@@ -1,10 +1,19 @@
 package com.alorma.contactnotes.designsystem.components
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
@@ -18,7 +27,10 @@ import androidx.compose.material3.WideNavigationRailItemDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
@@ -33,6 +45,38 @@ fun ConversesNavigationRail(
   fabContentDescription: String,
   onFabClick: () -> Unit,
   modifier: Modifier = Modifier,
+  /** Al peu del rail, sota les destinacions (el compte de sincronització); `null` no hi posa res. */
+  bottom: (@Composable () -> Unit)? = null,
+  content: @Composable () -> Unit,
+) {
+  if (bottom == null) {
+    ConversesNavigationRailBody(fabIcon, fabContentDescription, onFabClick, modifier, content)
+    return
+  }
+  Box(modifier = modifier) {
+    ConversesNavigationRailBody(fabIcon, fabContentDescription, onFabClick, Modifier, content)
+    // Per sobre del rail, que ja ocupa tota l'alçada: la fila queda a baix de tot, sobre la barra de navegació
+    Box(
+      modifier =
+        Modifier
+          .align(Alignment.BottomStart)
+          .width(RailWidth)
+          .navigationBarsPadding()
+          .padding(bottom = 16.dp),
+      contentAlignment = Alignment.Center,
+    ) {
+      bottom()
+    }
+  }
+}
+
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@Composable
+private fun ConversesNavigationRailBody(
+  fabIcon: ImageVector,
+  fabContentDescription: String,
+  onFabClick: () -> Unit,
+  modifier: Modifier,
   content: @Composable () -> Unit,
 ) {
   WideNavigationRail(
@@ -85,6 +129,46 @@ fun RailDestination(
         selectedTextColorTopIconPosition = MaterialTheme.colorScheme.onSurface,
       ),
   )
+}
+
+/**
+ * Destinació del rail amb contingut propi en lloc d'una icona (l'avatar del compte): indicador [selected] de 56 dp
+ * en `primaryContainer` i l'etiqueta a sota. Va a la ranura `bottom` de [ConversesNavigationRail].
+ */
+@Composable
+fun RailCustomDestination(
+  label: String,
+  selected: Boolean,
+  onClick: () -> Unit,
+  modifier: Modifier = Modifier,
+  content: @Composable () -> Unit,
+) {
+  Column(
+    modifier =
+      modifier
+        .clip(RoundedCornerShape(16.dp))
+        .selectable(selected = selected, role = Role.Tab, onClick = onClick)
+        .padding(horizontal = 8.dp, vertical = 4.dp),
+    horizontalAlignment = Alignment.CenterHorizontally,
+    verticalArrangement = Arrangement.spacedBy(4.dp),
+  ) {
+    Box(
+      modifier =
+        Modifier
+          .size(width = 56.dp, height = 48.dp)
+          .clip(CircleShape)
+          .background(if (selected) MaterialTheme.colorScheme.primaryContainer else Color.Transparent),
+      contentAlignment = Alignment.Center,
+    ) {
+      content()
+    }
+    Text(
+      text = label,
+      style = MaterialTheme.typography.labelMedium,
+      color = MaterialTheme.colorScheme.onSurface,
+      maxLines = 1,
+    )
+  }
 }
 
 /** Amplada màxima d'una columna de lectura (Ajustos, Pro) en una pantalla gran. */

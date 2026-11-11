@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import com.alorma.contactnotes.designsystem.preview.ConversesPreviewTheme
 import com.alorma.contactnotes.ui.preview.PreviewData
+import com.alorma.contactnotes.ui.sync.SyncIndicatorState
 
 @Composable
 private fun PeopleListScreenPreview(
@@ -70,4 +71,20 @@ internal fun PeopleListScreenTasksPreview() {
   PeopleListScreenPreview(
     PeopleListUiState(people = people, total = people.size, isLoading = false),
   )
+}
+
+/** Amb SyncFlag encès (13a): l'indicador a la dreta de la capçalera, aquí amb sessió i falten les paraules. */
+@Preview
+@Composable
+internal fun PeopleListScreenSyncPreview() {
+  ConversesPreviewTheme {
+    PeopleListScreen(
+      state = PeopleListUiState(people = PreviewData.people, total = PreviewData.people.size, isLoading = false),
+      archived = false,
+      onFilterToggled = {},
+      onPersonClick = {},
+      onNewPerson = {},
+      syncIndicator = SyncIndicatorState.NeedsKey("B"),
+    )
+  }
 }
