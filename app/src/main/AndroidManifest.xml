@@ -16,6 +16,15 @@
         android:name="com.google.android.finsky.permission.BIND_GET_INSTALL_REFERRER_SERVICE"
         tools:node="remove" />
 
+    <!-- WorkManager afegeix aquests dos per a feines en primer pla i per reprogramar-les després de reiniciar. La
+         sincronització no en fa servir cap: sense servei en primer pla, i el que quedi pendent puja en obrir l'app -->
+    <uses-permission
+        android:name="android.permission.FOREGROUND_SERVICE"
+        tools:node="remove" />
+    <uses-permission
+        android:name="android.permission.RECEIVE_BOOT_COMPLETED"
+        tools:node="remove" />
+
     <application
         android:name=".ConversesApp"
         android:allowBackup="true"
@@ -50,7 +59,7 @@
         <meta-data
             android:name="google_analytics_default_allow_ad_personalization_signals"
             android:value="false" />
-        <!-- WorkManager s inicialitza a demanda (ConversesApp és Configuration.Provider): amb la sincronització apagada no arrenca -->
+        <!-- WorkManager s'inicialitza a demanda (ConversesApp és Configuration.Provider): amb la sincronització apagada no arrenca -->
         <provider
             android:name="androidx.startup.InitializationProvider"
             android:authorities="${applicationId}.androidx-startup"
