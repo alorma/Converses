@@ -119,6 +119,14 @@ class SyncViewModelTest {
     }
 
   @Test
+  fun withoutTheEngineThereIsNoInitialSyncToShow() =
+    scope.runTest {
+      vm.onSignIn(Activity())
+      env.repository.confirmActivation()
+      assertEquals(null, vm.initialSync.value)
+    }
+
+  @Test
   fun leavingTheScreenWithTheAccountReadyKeepsTheSession() =
     scope.runTest {
       vm.onSignIn(Activity())

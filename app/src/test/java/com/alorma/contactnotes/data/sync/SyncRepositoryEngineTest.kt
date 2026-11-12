@@ -226,6 +226,21 @@ class SyncRepositoryEngineTest {
     }
 
   @Test
+  fun hidingTheInitialUploadKeepsItRunningButDoesNotShowTheResult() =
+    scope.runTest {
+      val gate = CompletableDeferred<Unit>()
+      runner.onPush = { gate.await() }
+      val job = scope.launch { activate() }
+      assertTrue(repository.initialSync.value is InitialSync.Uploading)
+      repository.dismissInitialSync()
+      gate.complete(Unit)
+      job.join()
+      assertEquals(listOf("push"), runner.calls)
+      assertNull(repository.initialSync.value)
+      assertEquals(SyncStatus.UpToDate(7_000L), repository.status.value)
+    }
+
+  @Test
   fun aNewDeviceWithoutEntriesJustDownloads() =
     scope.runTest {
       val seen = mutableListOf<InitialSync?>()

@@ -202,6 +202,9 @@ class SyncRepository(
   private var readyJob: Job? = null
   private var initialPlan: InitialPlan? = null
 
+  /** «Amaga» a la pujada o baixada inicial: la feina segueix, però la pantalla ja no la mostra. */
+  @Volatile private var initialHidden = false
+
   private enum class InitialPlan { Upload, Download, Merge }
 
   private enum class Entry { Restored, Activated, JoinedDevice }
@@ -430,10 +433,17 @@ class SyncRepository(
     if (mutableInitial.value is InitialSync.Offline || mutableInitial.value is InitialSync.Failed) runInitial(plan)
   }
 
-  /** La pantalla ha acabat: ja no hi ha res a seguir. */
+  /**
+   * La pantalla ha acabat, o l'usuari ha tocat «Amaga»: ja no hi ha res a seguir. Si la feina encara corre, continua,
+   * però en acabar no torna a ensenyar el resultat; l'estat de 13o ja el diu.
+   */
   fun dismissInitialSync() {
+    initialHidden = true
     mutableInitial.value = null
   }
+
+  /** El nom d'aquest dispositiu, per a «Sincronització activada»; `null` sense motor. */
+  fun deviceName(): String? = sync?.deviceName?.invoke()
 
   private fun onReady(
     account: SyncAccount,
@@ -468,10 +478,11 @@ class SyncRepository(
 
   private suspend fun runInitialNow(plan: InitialPlan) {
     initialPlan = plan
+    initialHidden = false
     var outcome = SyncOutcome.Done
     if (plan != InitialPlan.Download) outcome = upload()
     if (plan != InitialPlan.Upload && outcome == SyncOutcome.Done) outcome = download()
-    if (session == null) return
+    if (session == null || initialHidden) return
     mutableInitial.value =
       when (outcome) {
         SyncOutcome.Done -> InitialSync.Done
@@ -482,7 +493,7 @@ class SyncRepository(
 
   /** El progrés surt de quants pendents queden: cada fila pujada en treu un. */
   private suspend fun upload(): SyncOutcome {
-    mutableInitial.value = InitialSync.Uploading(0f)
+    if (!initialHidden) mutableInitial.value = InitialSync.Uploading(0f)
     return tracked { s, report ->
       val data = checkNotNull(sync)
       coroutineScope {
@@ -503,7 +514,7 @@ class SyncRepository(
   }
 
   private suspend fun download(): SyncOutcome {
-    mutableInitial.value = InitialSync.Downloading(null)
+    if (!initialHidden) mutableInitial.value = InitialSync.Downloading(null)
     return tracked { s, report ->
       checkNotNull(sync).runner.pull(s.uid, s.cipher) { done, total ->
         report(total?.takeIf { it > 0 }?.let { (done.toFloat() / it).coerceIn(0f, 1f) })

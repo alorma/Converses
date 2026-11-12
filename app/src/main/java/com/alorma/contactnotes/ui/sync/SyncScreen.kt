@@ -45,6 +45,7 @@ fun SyncScreen(
   val state by viewModel.state.collectAsStateWithLifecycle()
   val wordsReviewedAt by viewModel.wordsReviewedAt.collectAsStateWithLifecycle()
   val status by viewModel.status.collectAsStateWithLifecycle()
+  val initialSync by viewModel.initialSync.collectAsStateWithLifecycle()
   val activity = LocalActivity.current
   val snackbar = remember { SnackbarHostState() }
   val resources = LocalResources.current
@@ -57,6 +58,17 @@ fun SyncScreen(
         }
       snackbar.showSnackbar(resources.getString(text))
     }
+  }
+  // La pujada o baixada de després d'activar ocupa tota la pantalla. «Amaga» i «Fet» hi tornen: la feina, si encara
+  // corre, es veu a l'estat de 13o
+  initialSync?.let { initial ->
+    InitialSyncContent(
+      state = initial,
+      onHide = viewModel::onInitialSyncDismissed,
+      onDone = viewModel::onInitialSyncDismissed,
+      onMergeContinue = viewModel::onMergeContinue,
+    )
+    return
   }
   SyncScaffold(onBack = onBack, snackbar = snackbar) { padding ->
     when (val current = state) {

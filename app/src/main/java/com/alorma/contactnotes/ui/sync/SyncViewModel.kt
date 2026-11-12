@@ -3,10 +3,13 @@ package com.alorma.contactnotes.ui.sync
 import android.app.Activity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.alorma.contactnotes.data.sync.InitialSync
 import com.alorma.contactnotes.data.sync.SignInOutcome
+import com.alorma.contactnotes.data.sync.SyncOutcome
 import com.alorma.contactnotes.data.sync.SyncRepository
 import com.alorma.contactnotes.data.sync.SyncState
 import com.alorma.contactnotes.data.sync.SyncStatus
+import com.alorma.contactnotes.data.tracking.Action
 import com.alorma.contactnotes.data.tracking.EventTracker
 import com.alorma.contactnotes.ui.tracking.Actions
 import com.alorma.contactnotes.ui.tracking.SyncSignInResult
@@ -17,6 +20,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -36,7 +40,43 @@ class SyncViewModel(
   /** Com van les dades (13o): al dia, sincronitzant, sense connexió o error. */
   val status: StateFlow<SyncStatus> get() = repository.status
 
-  // TODO(fase 4): connectar amb SyncRepository.initialSync (InitialSyncUi, ui/sync/InitialSyncContent.kt)
+  /** La pujada o baixada de després d'activar (13g, 13h, 13m, 13m2); `null` quan no n'hi ha cap a la vista. */
+  val initialSync: StateFlow<InitialSyncUi?> =
+    repository.initialSync
+      .map { it?.toUi() }
+      .stateIn(viewModelScope, SharingStarted.Eagerly, repository.initialSync.value?.toUi())
+
+  private fun InitialSync.toUi(): InitialSyncUi =
+    when (this) {
+      is InitialSync.Uploading -> InitialSyncUi.Uploading(progress)
+      is InitialSync.Downloading -> InitialSyncUi.Downloading(progress)
+      is InitialSync.MergePrompt -> InitialSyncUi.MergePrompt(entryCount)
+      InitialSync.Done -> InitialSyncUi.Done(repository.deviceName().orEmpty())
+      InitialSync.Offline -> InitialSyncUi.Offline
+      InitialSync.Failed -> InitialSyncUi.Failed
+    }
+
+  init {
+    // L'analítica de la pujada i la baixada inicials surt dels canvis d'estat. Només compta mentre aquesta pantalla
+    // existeix: amb «Amaga» i la pantalla tancada, el resultat ja no es veu ni es compta.
+    viewModelScope.launch {
+      var previous: InitialSync? = repository.initialSync.value
+      repository.initialSync.collect { current ->
+        trackInitialTransition(previous, current)
+        previous = current
+      }
+    }
+  }
+
+  private fun trackInitialTransition(
+    previous: InitialSync?,
+    current: InitialSync?,
+  ) = initialSyncActions(previous, current).forEach(tracker::trackAction)
+
+  /** «Amaga» o «Fet»: la feina, si encara n'hi ha, continua sola. */
+  fun onInitialSyncDismissed() = repository.dismissInitialSync()
+
+  fun onMergeContinue() = repository.continueMerge()
 
   /** `null` sense sessió o mentre es carrega. */
   val wordsReviewedAt: StateFlow<Long?> =
@@ -109,4 +149,30 @@ class SyncViewModel(
       if (repository.cancelActivation()) tracker.trackAction(Actions.SyncActivationCancelled())
     }
   }
+}
+
+/**
+ * Què es compta quan la pujada o baixada inicial passa de [previous] a [current]: el diàleg de fusió en aparèixer, i
+ * el resultat de cada fase en acabar. A la fusió, la pujada acaba bé quan comença la baixada.
+ */
+internal fun initialSyncActions(
+  previous: InitialSync?,
+  current: InitialSync?,
+): List<Action> {
+  val actions = mutableListOf<Action>()
+  if (current is InitialSync.MergePrompt && previous !is InitialSync.MergePrompt) actions += Actions.SyncMergeShown()
+  val outcome =
+    when (current) {
+      InitialSync.Done -> SyncOutcome.Done
+      InitialSync.Offline -> SyncOutcome.Offline
+      InitialSync.Failed -> SyncOutcome.Failed
+      is InitialSync.Downloading -> SyncOutcome.Done.takeIf { previous is InitialSync.Uploading }
+      else -> null
+    } ?: return actions
+  when (previous) {
+    is InitialSync.Uploading -> actions += Actions.SyncUploadFinished(outcome)
+    is InitialSync.Downloading -> actions += Actions.SyncDownloadFinished(outcome)
+    else -> Unit
+  }
+  return actions
 }
