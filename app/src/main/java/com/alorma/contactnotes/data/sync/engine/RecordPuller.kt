@@ -135,8 +135,12 @@ internal class RecordPuller(
     if (deletedAt != null) {
       waiting.remove(id)
       val state = local.localState(id)
-      if (state is LocalState.Live && ConflictRules.remoteDeletionWins(state, deletedAt)) {
-        local.applyRemoteDeletion(id, state.type)
+      if (state is LocalState.Live) {
+        if (ConflictRules.remoteDeletionWins(state, deletedAt)) {
+          local.applyRemoteDeletion(id, state.type)
+        } else {
+          reassertIfOverwritten(id, state, item.meta.by)
+        }
       }
       return
     }
@@ -144,6 +148,7 @@ internal class RecordPuller(
     val state = local.localState(id)
     if (!ConflictRules.remoteEditWins(state, record.modifiedAt, item.meta.by, ownDeviceId)) {
       waiting.remove(id)
+      if (state is LocalState.Live) reassertIfOverwritten(id, state, item.meta.by)
       return
     }
     when (val result = local.applyRemote(id, record)) {
@@ -158,6 +163,19 @@ internal class RecordPuller(
         mergeChannel(id, record, result.localSyncId)
       }
     }
+  }
+
+  /**
+   * El registre baixat ha perdut contra una fila local ja pujada: vol dir que una escriptura més antiga d'un altre
+   * dispositiu ha caigut a sobre de la nostra al núvol. Sense tornar-la a pujar, cada dispositiu es quedaria amb la seva
+   * i el núvol amb la que perd. Si la fila és pendent, ja pujarà; si el registre és nostre, no hi ha res a corregir.
+   */
+  private suspend fun reassertIfOverwritten(
+    id: String,
+    state: LocalState.Live,
+    by: String,
+  ) {
+    if (ConflictRules.mustReassert(state, by, ownDeviceId)) local.markDirty(id, state.type)
   }
 
   private suspend fun mergeChannel(

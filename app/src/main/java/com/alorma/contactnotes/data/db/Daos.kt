@@ -100,6 +100,10 @@ abstract class PersonDao {
   @Query("SELECT COUNT(*) FROM person WHERE dirty = 1")
   abstract fun observeDirtyCount(): Flow<Int>
 
+  /** Torna a pujar la fila tal com és: el núvol té una versió que hi perd (vegeu `RecordPuller`). */
+  @Query("UPDATE person SET dirty = 1 WHERE syncId = :syncId")
+  abstract suspend fun markDirty(syncId: String)
+
   /** Només si la fila continua tal com es va pujar: una edició feta mentrestant es queda pendent. */
   @Query("UPDATE person SET dirty = 0 WHERE syncId = :syncId AND updatedAt = :modifiedAt")
   abstract suspend fun markClean(
@@ -232,6 +236,10 @@ abstract class EntryDao {
   @Query("SELECT COUNT(*) FROM entry")
   abstract suspend fun count(): Int
 
+  /** Torna a pujar la fila tal com és: el núvol té una versió que hi perd (vegeu `RecordPuller`). */
+  @Query("UPDATE entry SET dirty = 1 WHERE syncId = :syncId")
+  abstract suspend fun markDirty(syncId: String)
+
   /** Només si la fila continua tal com es va pujar: una edició feta mentrestant es queda pendent. */
   @Query("UPDATE entry SET dirty = 0 WHERE syncId = :syncId AND modifiedAt = :modifiedAt")
   abstract suspend fun markClean(
@@ -359,6 +367,10 @@ abstract class TaskDao {
   @Query("SELECT COUNT(*) FROM task WHERE dirty = 1")
   abstract fun observeDirtyCount(): Flow<Int>
 
+  /** Torna a pujar la fila tal com és: el núvol té una versió que hi perd (vegeu `RecordPuller`). */
+  @Query("UPDATE task SET dirty = 1 WHERE syncId = :syncId")
+  abstract suspend fun markDirty(syncId: String)
+
   /** Només si la fila continua tal com es va pujar: una edició feta mentrestant es queda pendent. */
   @Query("UPDATE task SET dirty = 0 WHERE syncId = :syncId AND modifiedAt = :modifiedAt")
   abstract suspend fun markClean(
@@ -466,6 +478,10 @@ abstract class CustomChannelDao {
     name: String,
     syncId: String,
   ): CustomChannelEntity?
+
+  /** Torna a pujar la fila tal com és: el núvol té una versió que hi perd (vegeu `RecordPuller`). */
+  @Query("UPDATE custom_channel SET dirty = 1 WHERE syncId = :syncId")
+  abstract suspend fun markDirty(syncId: String)
 
   /** Només si la fila continua tal com es va pujar: una edició feta mentrestant es queda pendent. */
   @Query("UPDATE custom_channel SET dirty = 0 WHERE syncId = :syncId AND modifiedAt = :modifiedAt")

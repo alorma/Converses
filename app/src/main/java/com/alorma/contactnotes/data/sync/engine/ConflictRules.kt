@@ -29,6 +29,16 @@ internal object ConflictRules {
         }
     }
 
+  /**
+   * Quan un registre baixat perd contra [local], si la versió d'aquí ha de tornar al núvol: només si ja s'havia pujat
+   * (no és `dirty`) i el registre és d'un altre dispositiu, que l'ha trepitjada amb una escriptura més antiga.
+   */
+  fun mustReassert(
+    local: LocalState.Live,
+    by: String,
+    ownDeviceId: String,
+  ): Boolean = !local.dirty && by != ownDeviceId
+
   /** Si un esborrat baixat ha d'esborrar la fila local: guanya a una edició anterior o simultània, no a una posterior. */
   fun remoteDeletionWins(
     local: LocalState,

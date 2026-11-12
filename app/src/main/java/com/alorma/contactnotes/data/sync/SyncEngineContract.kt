@@ -148,6 +148,15 @@ interface LocalSyncSource {
     modifiedAt: Long,
   )
 
+  /**
+   * Torna a deixar la fila pendent sense tocar-ne la data: el núvol té una versió que perd contra la d'aquí (una pujada
+   * antiga que hi ha caigut a sobre) i la d'aquí hi ha de tornar.
+   */
+  suspend fun markDirty(
+    syncId: String,
+    type: RecordType,
+  )
+
   /** Esborra el tombstone pujat, si encara és aquest [deletedAt]. */
   suspend fun markDeletionUploaded(
     syncId: String,
@@ -223,11 +232,19 @@ class SyncEngine(
   private val onError: (Throwable, String) -> Unit = { _, _ -> },
   private val pageSize: Int = DEFAULT_PAGE_SIZE,
 ) {
-  /** Puja el que és `dirty` i els tombstones, per lots. */
+  /**
+   * Puja el que és `dirty` i els tombstones, per lots. Abans baixa: Firestore escriu sense mirar què hi ha, i un
+   * dispositiu que torna d'estar sense xarxa trepitjaria amb la seva edició antiga una de més nova (o un esborrat). Baixant
+   * primer, el conflicte es resol aquí i només puja el que hi guanya.
+   */
   suspend fun pushPending(
     uid: String,
     cipher: RecordCipher,
-  ): SyncOutcome = RecordPusher(local, remote, cursors, pageSize).push(uid, cipher)
+  ): SyncOutcome {
+    val pulled = pullAll(uid, cipher)
+    if (pulled != SyncOutcome.Done) return pulled
+    return RecordPusher(local, remote, cursors, pageSize).push(uid, cipher)
+  }
 
   /** Baixa des del cursor. [onProgress] rep els registres processats i el total, si se sap (`null` si no). */
   suspend fun pullAll(

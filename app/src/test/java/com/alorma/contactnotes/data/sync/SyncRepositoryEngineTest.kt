@@ -70,6 +70,11 @@ private class FakeSource(
     modifiedAt: Long,
   ) = error("not used")
 
+  override suspend fun markDirty(
+    syncId: String,
+    type: RecordType,
+  ) = error("not used")
+
   override suspend fun markDeletionUploaded(
     syncId: String,
     deletedAt: Long,

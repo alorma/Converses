@@ -29,7 +29,8 @@ private class HookedRemote(
   var failPushFrom: Int? = null
   var failPullFrom: Int? = null
   private var pushCalls = 0
-  private var pullCalls = 0
+  var pullCalls = 0
+    private set
 
   override suspend fun push(
     uid: String,
@@ -256,6 +257,83 @@ class SyncEngineTest {
     }
 
   @Test
+  fun aDeviceBackOnlineDoesNotOverwriteANewerEditWithItsOlderOne() =
+    runTest {
+      val id = sharedPerson()
+      b.edit(id, "from-b", at = 2_000) // sense xarxa
+      a.edit(id, "from-a", at = 3_000)
+      a.push()
+
+      b.push() // torna la xarxa: només puja, sense haver baixat abans
+
+      assertEquals(listOf("from-a"), b.names)
+      a.pull()
+      assertEquals(listOf("from-a"), a.names)
+      val fresh = Device("device-c", remote)
+      fresh.pull()
+      assertEquals(listOf("from-a"), fresh.names)
+    }
+
+  @Test
+  fun anOlderWriteThatLandsOnTheServerIsPutRightByTheNewerDevice() =
+    runTest {
+      val id = sharedPerson()
+      b.edit(id, "from-b", at = 2_000)
+      a.edit(id, "from-a", at = 3_000)
+      a.push()
+      // Una pujada a cegues de b (de l'època en què no baixava abans) trepitja la d'a al núvol
+      RecordPusher(b.db.syncSource, remote, b.cursors, 200).push(UID, b.cipher)
+
+      a.pull()
+      a.push()
+      b.pull()
+
+      assertEquals(listOf("from-a"), a.names)
+      assertEquals(listOf("from-a"), b.names)
+      val fresh = Device("device-c", remote)
+      fresh.pull()
+      assertEquals(listOf("from-a"), fresh.names)
+    }
+
+  @Test
+  fun anOlderDeletionThatLandsOnTheServerIsPutRightByTheLaterEdit() =
+    runTest {
+      val id = sharedPerson()
+      b.db.clock = { 5_000 }
+      b.db.repository.deletePerson(
+        b.db.people.value
+          .single(),
+      )
+      a.edit(id, "from-a", at = 9_000)
+      a.push()
+      RecordPusher(b.db.syncSource, remote, b.cursors, 200).push(UID, b.cipher)
+
+      a.pull()
+      assertEquals(listOf("from-a"), a.names)
+      a.push()
+      b.pull()
+
+      assertEquals(listOf("from-a"), b.names)
+    }
+
+  @Test
+  fun ourOwnOlderRecordComingBackIsNotPushedAgain() =
+    runTest {
+      val id = sharedPerson()
+      a.edit(id, "from-a", at = 3_000)
+      a.push()
+      a.cursors.cursor = 0 // la baixada torna a veure el registre propi
+
+      a.pull()
+
+      assertTrue(
+        a.db.syncSource
+          .readPending()
+          .isEmpty,
+      )
+    }
+
+  @Test
   fun aTieGoesToTheLargerDeviceId() =
     runTest {
       val id = sharedPerson()
@@ -400,7 +478,7 @@ class SyncEngineTest {
       a.push()
       val entryUpdatedAt = server.records.values.minOf { it.updatedAt }
       val c = Device("device-c", remote, pageSize = 1)
-      remote.failPullFrom = 2
+      remote.failPullFrom = remote.pullCalls + 2 // les pujades de l'«a» ja n'han fet: ara baixen abans de pujar
 
       assertEquals(SyncOutcome.Failed, c.pull())
       // L'entrada espera la persona: el cursor es queda abans d'ella

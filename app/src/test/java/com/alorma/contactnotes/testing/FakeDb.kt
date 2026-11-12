@@ -236,6 +236,10 @@ class FakePersonDao(
 
   override fun observeDirtyCount(): Flow<Int> = db.people.map { list -> list.count { it.dirty } }
 
+  override suspend fun markDirty(syncId: String) {
+    db.people.update { list -> list.map { if (it.syncId == syncId) it.copy(dirty = true) else it } }
+  }
+
   override suspend fun markClean(
     syncId: String,
     modifiedAt: Long,
@@ -329,6 +333,10 @@ class FakeEntryDao(
   override fun observeDirtyCount(): Flow<Int> = db.entries.map { list -> list.count { it.dirty } }
 
   override suspend fun count(): Int = db.entries.value.size
+
+  override suspend fun markDirty(syncId: String) {
+    db.entries.update { list -> list.map { if (it.syncId == syncId) it.copy(dirty = true) else it } }
+  }
 
   override suspend fun markClean(
     syncId: String,
@@ -449,6 +457,10 @@ class FakeCustomChannelDao(
   ): CustomChannelEntity? =
     db.channels.value.firstOrNull { it.channelType == channelType && it.name == name && it.syncId != syncId }
 
+  override suspend fun markDirty(syncId: String) {
+    db.channels.update { list -> list.map { if (it.syncId == syncId) it.copy(dirty = true) else it } }
+  }
+
   override suspend fun markClean(
     syncId: String,
     modifiedAt: Long,
@@ -549,6 +561,10 @@ class FakeTaskDao(
   override suspend fun dirtyRows(): List<TaskEntity> = db.tasks.value.filter { it.dirty }
 
   override fun observeDirtyCount(): Flow<Int> = db.tasks.map { list -> list.count { it.dirty } }
+
+  override suspend fun markDirty(syncId: String) {
+    db.tasks.update { list -> list.map { if (it.syncId == syncId) it.copy(dirty = true) else it } }
+  }
 
   override suspend fun markClean(
     syncId: String,

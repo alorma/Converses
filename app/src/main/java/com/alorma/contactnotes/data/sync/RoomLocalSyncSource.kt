@@ -114,6 +114,18 @@ class RoomLocalSyncSource(
     }
   }
 
+  override suspend fun markDirty(
+    syncId: String,
+    type: RecordType,
+  ) {
+    when (type) {
+      RecordType.Person -> people.markDirty(syncId)
+      RecordType.Entry -> entries.markDirty(syncId)
+      RecordType.Task -> tasks.markDirty(syncId)
+      RecordType.Channel -> channels.markDirty(syncId)
+    }
+  }
+
   override suspend fun markDeletionUploaded(
     syncId: String,
     deletedAt: Long,
