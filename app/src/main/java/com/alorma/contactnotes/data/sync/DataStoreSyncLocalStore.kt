@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 
-private val Context.syncDataStore by preferencesDataStore(
+internal val Context.syncDataStore by preferencesDataStore(
   name = "sync",
   corruptionHandler = resetOnCorruption(ErrorSites.DATASTORE_SYNC),
 )

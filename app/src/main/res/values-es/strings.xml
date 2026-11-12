@@ -413,4 +413,19 @@
     <string name="sync_onboarding_chip_account">Cuenta opcional</string>
     <string name="sync_error_offline">No hay conexión. Inténtalo de nuevo.</string>
     <string name="sync_error_failed">No se ha podido completar. Inténtalo de nuevo.</string>
+    <string name="sync_up_t">Subiendo tus datos</string>
+    <string name="sync_done_t">Sincronización activada</string>
+    <string name="sync_done_s">Este dispositivo: %1$s</string>
+    <string name="sync_done">Hecho</string>
+    <string name="sync_merge_t">Este dispositivo ya tiene notas</string>
+    <plurals name="sync_merge_b">
+        <item quantity="one">La entrada que tienes aquí se añadirá a las de la nube. No se pierde ninguna.</item>
+        <item quantity="other">Las %d entradas que tienes aquí se añadirán a las de la nube. No se pierde ninguna.</item>
+    </plurals>
+    <string name="sync_st_ok">Al día · %1$s</string>
+    <string name="sync_st_sync">Sincronizando…</string>
+    <plurals name="sync_st_pend">
+        <item quantity="one">Sin conexión · %d cambio pendiente</item>
+        <item quantity="other">Sin conexión · %d cambios pendientes</item>
+    </plurals>
 </resources>

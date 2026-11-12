@@ -93,6 +93,11 @@ class SyncRepository(
 
   val state: StateFlow<SyncState> = mutableState.asStateFlow()
 
+  /**
+   * Com va la sincronització de dades. Fins que el motor hi sigui (tasca C) és sempre [SyncStatus.UpToDate] sense data.
+   */
+  val status: StateFlow<SyncStatus> = MutableStateFlow<SyncStatus>(SyncStatus.UpToDate(null)).asStateFlow()
+
   val wordsReviewedAt: Flow<Long?> get() = local.wordsReviewedAt
 
   /**

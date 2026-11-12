@@ -36,6 +36,8 @@ abstract class ConversesDatabase : RoomDatabase() {
 
   abstract fun taskDao(): TaskDao
 
+  abstract fun syncTombstoneDao(): SyncTombstoneDao
+
   /**
    * v3 → v4: es retira el vincle amb Contactes. Room recrea `person` sense les tres columnes; la resta de dades i les
    * entrades i fets de cada persona es conserven. No es treu mai: qualsevol BBDD a la v3 ha de passar per aquí.

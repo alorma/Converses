@@ -12,9 +12,11 @@ import com.alorma.contactnotes.data.db.PersonEntity
 import com.alorma.contactnotes.data.db.PersonListItem
 import com.alorma.contactnotes.data.db.PinnedFactDao
 import com.alorma.contactnotes.data.db.PinnedFactEntity
+import com.alorma.contactnotes.data.db.SyncTombstoneDao
 import com.alorma.contactnotes.data.db.SyncTombstoneEntity
 import com.alorma.contactnotes.data.db.TaskDao
 import com.alorma.contactnotes.data.db.TaskEntity
+import com.alorma.contactnotes.data.sync.RoomLocalSyncSource
 import com.alorma.contactnotes.shared.AvatarColor
 import com.alorma.contactnotes.shared.AvatarShape
 import com.alorma.contactnotes.shared.ChannelType
@@ -60,15 +62,25 @@ class FakeDb {
   /** El rellotge del repositori; un test el fixa per comprovar les dates de modificació. */
   var clock: () -> Long = System::currentTimeMillis
 
+  private val personDao = FakePersonDao(this)
+  private val entryDao = FakeEntryDao(this)
+  private val factDao = FakePinnedFactDao(this)
+  private val channelDao = FakeCustomChannelDao(this)
+  private val taskDao = FakeTaskDao(this)
+  private val tombstoneDao = FakeSyncTombstoneDao(this)
+
   val repository =
     ConversesRepository(
-      FakePersonDao(this),
-      FakeEntryDao(this),
-      FakePinnedFactDao(this),
-      FakeCustomChannelDao(this),
-      FakeTaskDao(this),
+      personDao,
+      entryDao,
+      factDao,
+      channelDao,
+      taskDao,
       clock = { clock() },
     )
+
+  /** El costat de Room del motor, sobre els mateixos DAOs en memòria. */
+  val syncSource = RoomLocalSyncSource(personDao, entryDao, taskDao, channelDao, factDao, tombstoneDao)
 
   /** Deixa totes les files com després d'una pujada: cap de pendent. */
   fun markAllClean() {
@@ -218,6 +230,29 @@ class FakePersonDao(
 
   override suspend fun get(id: Long): PersonEntity? = db.person(id)
 
+  override suspend fun getBySyncId(syncId: String): PersonEntity? = db.people.value.firstOrNull { it.syncId == syncId }
+
+  override suspend fun dirtyRows(): List<PersonEntity> = db.people.value.filter { it.dirty }
+
+  override fun observeDirtyCount(): Flow<Int> = db.people.map { list -> list.count { it.dirty } }
+
+  override suspend fun markClean(
+    syncId: String,
+    modifiedAt: Long,
+  ): Int {
+    val hits = db.people.value.count { it.syncId == syncId && it.updatedAt == modifiedAt }
+    db.people.update { list ->
+      list.map { if (it.syncId == syncId && it.updatedAt == modifiedAt) it.copy(dirty = false) else it }
+    }
+    return hits
+  }
+
+  override suspend fun deleteFromRemote(syncId: String) {
+    db.people.value
+      .firstOrNull { it.syncId == syncId }
+      ?.let { delete(it) }
+  }
+
   override fun observeList(archived: Boolean): Flow<List<PersonListItem>> =
     combine(db.people, db.entries, db.tasks) { people, entries, tasks ->
       people
@@ -286,6 +321,29 @@ class FakeEntryDao(
   }
 
   override suspend fun get(id: Long): EntryEntity? = db.entries.value.firstOrNull { it.id == id }
+
+  override suspend fun getBySyncId(syncId: String): EntryEntity? = db.entries.value.firstOrNull { it.syncId == syncId }
+
+  override suspend fun dirtyRows(): List<EntryEntity> = db.entries.value.filter { it.dirty }
+
+  override fun observeDirtyCount(): Flow<Int> = db.entries.map { list -> list.count { it.dirty } }
+
+  override suspend fun count(): Int = db.entries.value.size
+
+  override suspend fun markClean(
+    syncId: String,
+    modifiedAt: Long,
+  ): Int {
+    val hits = db.entries.value.count { it.syncId == syncId && it.modifiedAt == modifiedAt }
+    db.entries.update { list ->
+      list.map { if (it.syncId == syncId && it.modifiedAt == modifiedAt) it.copy(dirty = false) else it }
+    }
+    return hits
+  }
+
+  override suspend fun deleteFromRemote(syncId: String) {
+    db.entries.update { list -> list.filterNot { it.syncId == syncId } }
+  }
 
   override fun observeChannelTypes(personId: Long): Flow<List<ChannelType>> =
     db.entries.map { list -> list.filter { it.personId == personId }.map { it.channelType }.distinct() }
@@ -375,6 +433,46 @@ class FakeCustomChannelDao(
 
   override suspend fun get(id: Long): CustomChannelEntity? = db.channels.value.firstOrNull { it.id == id }
 
+  override suspend fun getBySyncId(syncId: String): CustomChannelEntity? =
+    db.channels.value.firstOrNull { it.syncId == syncId }
+
+  override suspend fun all(): List<CustomChannelEntity> = db.channels.value
+
+  override suspend fun dirtyRows(): List<CustomChannelEntity> = db.channels.value.filter { it.dirty }
+
+  override fun observeDirtyCount(): Flow<Int> = db.channels.map { list -> list.count { it.dirty } }
+
+  override suspend fun findClash(
+    channelType: ChannelType,
+    name: String,
+    syncId: String,
+  ): CustomChannelEntity? =
+    db.channels.value.firstOrNull { it.channelType == channelType && it.name == name && it.syncId != syncId }
+
+  override suspend fun markClean(
+    syncId: String,
+    modifiedAt: Long,
+  ): Int {
+    val hits = db.channels.value.count { it.syncId == syncId && it.modifiedAt == modifiedAt }
+    db.channels.update { list ->
+      list.map { if (it.syncId == syncId && it.modifiedAt == modifiedAt) it.copy(dirty = false) else it }
+    }
+    return hits
+  }
+
+  override suspend fun deleteFromRemote(syncId: String) {
+    db.channels.value
+      .firstOrNull { it.syncId == syncId }
+      ?.let { delete(it) }
+  }
+
+  override suspend fun rename(
+    id: Long,
+    newSyncId: String,
+  ) {
+    db.channels.update { list -> list.map { if (it.id == id) it.copy(syncId = newSyncId, dirty = false) else it } }
+  }
+
   override fun observeAll(): Flow<List<CustomChannelWithCount>> =
     combine(db.channels, db.entries) { channels, entries ->
       channels
@@ -409,6 +507,11 @@ class FakePinnedFactDao(
 ) : PinnedFactDao {
   override fun observeForPerson(personId: Long): Flow<List<PinnedFactEntity>> =
     db.facts.map { list -> list.filter { it.personId == personId }.sortedBy { it.position } }
+
+  override suspend fun getForPerson(personId: Long): List<PinnedFactEntity> =
+    db.facts.value
+      .filter { it.personId == personId }
+      .sortedBy { it.position }
 }
 
 class FakeTaskDao(
@@ -441,6 +544,27 @@ class FakeTaskDao(
 
   override suspend fun get(id: Long): TaskEntity? = db.tasks.value.firstOrNull { it.id == id }
 
+  override suspend fun getBySyncId(syncId: String): TaskEntity? = db.tasks.value.firstOrNull { it.syncId == syncId }
+
+  override suspend fun dirtyRows(): List<TaskEntity> = db.tasks.value.filter { it.dirty }
+
+  override fun observeDirtyCount(): Flow<Int> = db.tasks.map { list -> list.count { it.dirty } }
+
+  override suspend fun markClean(
+    syncId: String,
+    modifiedAt: Long,
+  ): Int {
+    val hits = db.tasks.value.count { it.syncId == syncId && it.modifiedAt == modifiedAt }
+    db.tasks.update { list ->
+      list.map { if (it.syncId == syncId && it.modifiedAt == modifiedAt) it.copy(dirty = false) else it }
+    }
+    return hits
+  }
+
+  override suspend fun deleteFromRemote(syncId: String) {
+    db.tasks.update { list -> list.filterNot { it.syncId == syncId } }
+  }
+
   override fun observeOpen(personId: Long): Flow<List<TaskEntity>> =
     db.tasks.map { list ->
       list
@@ -468,5 +592,31 @@ class FakeTaskDao(
     db.tasks.update { list ->
       list.map { if (it.id == id) it.copy(doneAt = doneAt, modifiedAt = now, dirty = true) else it }
     }
+  }
+}
+
+class FakeSyncTombstoneDao(
+  private val db: FakeDb,
+) : SyncTombstoneDao {
+  override suspend fun dirty(): List<SyncTombstoneEntity> = db.tombstones.value.filter { it.dirty }
+
+  override suspend fun get(syncId: String): SyncTombstoneEntity? =
+    db.tombstones.value.firstOrNull { it.syncId == syncId }
+
+  override fun observeDirtyCount(): Flow<Int> = db.tombstones.map { list -> list.count { it.dirty } }
+
+  override suspend fun deleteUploaded(
+    syncId: String,
+    deletedAt: Long,
+  ) {
+    db.tombstones.update { list -> list.filterNot { it.syncId == syncId && it.deletedAt == deletedAt } }
+  }
+
+  override suspend fun clear(syncId: String) {
+    db.tombstones.update { list -> list.filterNot { it.syncId == syncId } }
+  }
+
+  override suspend fun put(tombstone: SyncTombstoneEntity) {
+    db.tombstones.update { list -> list.filterNot { it.syncId == tombstone.syncId } + tombstone }
   }
 }

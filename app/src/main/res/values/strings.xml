@@ -412,4 +412,19 @@
     <string name="sync_onboarding_chip_account">Account optional</string>
     <string name="sync_error_offline">No connection. Try again.</string>
     <string name="sync_error_failed">It couldn\'t be completed. Try again.</string>
+    <string name="sync_up_t">Uploading your data</string>
+    <string name="sync_done_t">Sync is on</string>
+    <string name="sync_done_s">This device: %1$s</string>
+    <string name="sync_done">Done</string>
+    <string name="sync_merge_t">This device already has notes</string>
+    <plurals name="sync_merge_b">
+        <item quantity="one">The %d entry you have here will be added to the ones in the cloud. None will be lost.</item>
+        <item quantity="other">The %d entries you have here will be added to the ones in the cloud. None will be lost.</item>
+    </plurals>
+    <string name="sync_st_ok">Up to date · %1$s</string>
+    <string name="sync_st_sync">Syncing…</string>
+    <plurals name="sync_st_pend">
+        <item quantity="one">Offline · %d change pending</item>
+        <item quantity="other">Offline · %d changes pending</item>
+    </plurals>
 </resources>

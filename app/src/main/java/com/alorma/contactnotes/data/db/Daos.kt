@@ -3,6 +3,7 @@ package com.alorma.contactnotes.data.db
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
@@ -88,6 +89,52 @@ abstract class PersonDao {
     return id
   }
 
+  // Només per al motor de sincronització: res d'això segella la fila
+
+  @Query("SELECT * FROM person WHERE syncId = :syncId")
+  abstract suspend fun getBySyncId(syncId: String): PersonEntity?
+
+  @Query("SELECT * FROM person WHERE dirty = 1")
+  abstract suspend fun dirtyRows(): List<PersonEntity>
+
+  @Query("SELECT COUNT(*) FROM person WHERE dirty = 1")
+  abstract fun observeDirtyCount(): Flow<Int>
+
+  /** Només si la fila continua tal com es va pujar: una edició feta mentrestant es queda pendent. */
+  @Query("UPDATE person SET dirty = 0 WHERE syncId = :syncId AND updatedAt = :modifiedAt")
+  abstract suspend fun markClean(
+    syncId: String,
+    modifiedAt: Long,
+  ): Int
+
+  /**
+   * Només per al motor: esborra una persona que un altre dispositiu ha esborrat, **sense** tombstone. Amb tombstone,
+   * l'esborrat tornaria a pujar. Cau en cascada, com [delete].
+   */
+  @Query("DELETE FROM person WHERE syncId = :syncId")
+  abstract suspend fun deleteFromRemote(syncId: String)
+
+  /**
+   * Només per al motor: desa una persona baixada, per `syncId`, **sense segellar**: el `dirty` i la data són els que
+   * porta [person]. Conserva l'id local si ja hi era; els fets fixats es substitueixen.
+   */
+  @Transaction
+  open suspend fun applyRemote(
+    person: PersonEntity,
+    facts: List<PinnedFactEntity>,
+  ) {
+    val existing = getBySyncId(person.syncId)
+    val id =
+      if (existing == null) {
+        insert(person.copy(id = 0))
+      } else {
+        update(person.copy(id = existing.id))
+        deleteFacts(existing.id)
+        existing.id
+      }
+    insertFacts(facts.mapIndexed { index, fact -> fact.copy(id = 0, personId = id, position = index) })
+  }
+
   @Query("SELECT * FROM person WHERE id = :id")
   abstract fun observe(id: Long): Flow<PersonEntity?>
 
@@ -170,6 +217,38 @@ abstract class EntryDao {
 
   @Query("SELECT * FROM entry WHERE id = :id")
   abstract suspend fun get(id: Long): EntryEntity?
+
+  // Només per al motor de sincronització: res d'això segella la fila
+
+  @Query("SELECT * FROM entry WHERE syncId = :syncId")
+  abstract suspend fun getBySyncId(syncId: String): EntryEntity?
+
+  @Query("SELECT * FROM entry WHERE dirty = 1")
+  abstract suspend fun dirtyRows(): List<EntryEntity>
+
+  @Query("SELECT COUNT(*) FROM entry WHERE dirty = 1")
+  abstract fun observeDirtyCount(): Flow<Int>
+
+  @Query("SELECT COUNT(*) FROM entry")
+  abstract suspend fun count(): Int
+
+  /** Només si la fila continua tal com es va pujar: una edició feta mentrestant es queda pendent. */
+  @Query("UPDATE entry SET dirty = 0 WHERE syncId = :syncId AND modifiedAt = :modifiedAt")
+  abstract suspend fun markClean(
+    syncId: String,
+    modifiedAt: Long,
+  ): Int
+
+  /** Només per al motor: esborra una entrada que un altre dispositiu ha esborrat, **sense** tombstone. */
+  @Query("DELETE FROM entry WHERE syncId = :syncId")
+  abstract suspend fun deleteFromRemote(syncId: String)
+
+  /** Només per al motor: desa una entrada baixada, per `syncId`, **sense segellar**. Conserva l'id local. */
+  @Transaction
+  open suspend fun applyRemote(entry: EntryEntity) {
+    val existing = getBySyncId(entry.syncId)
+    if (existing == null) insert(entry.copy(id = 0)) else update(entry.copy(id = existing.id))
+  }
 
   /** Grups de canal de les entrades de la persona (derivats, no desats). */
   @Query("SELECT DISTINCT channelType FROM entry WHERE personId = :personId")
@@ -269,6 +348,35 @@ abstract class TaskDao {
   @Query("SELECT * FROM task WHERE id = :id")
   abstract suspend fun get(id: Long): TaskEntity?
 
+  // Només per al motor de sincronització: res d'això segella la fila
+
+  @Query("SELECT * FROM task WHERE syncId = :syncId")
+  abstract suspend fun getBySyncId(syncId: String): TaskEntity?
+
+  @Query("SELECT * FROM task WHERE dirty = 1")
+  abstract suspend fun dirtyRows(): List<TaskEntity>
+
+  @Query("SELECT COUNT(*) FROM task WHERE dirty = 1")
+  abstract fun observeDirtyCount(): Flow<Int>
+
+  /** Només si la fila continua tal com es va pujar: una edició feta mentrestant es queda pendent. */
+  @Query("UPDATE task SET dirty = 0 WHERE syncId = :syncId AND modifiedAt = :modifiedAt")
+  abstract suspend fun markClean(
+    syncId: String,
+    modifiedAt: Long,
+  ): Int
+
+  /** Només per al motor: esborra una tasca que un altre dispositiu ha esborrat, **sense** tombstone. */
+  @Query("DELETE FROM task WHERE syncId = :syncId")
+  abstract suspend fun deleteFromRemote(syncId: String)
+
+  /** Només per al motor: desa una tasca baixada, per `syncId`, **sense segellar**. Conserva l'id local. */
+  @Transaction
+  open suspend fun applyRemote(task: TaskEntity) {
+    val existing = getBySyncId(task.syncId)
+    if (existing == null) insert(task.copy(id = 0)) else update(task.copy(id = existing.id))
+  }
+
   /** Pendents (9d): primer les que tenen data, de la més antiga a la més nova, i després les que no en tenen. */
   @Query(
     """
@@ -337,6 +445,71 @@ abstract class CustomChannelDao {
   @Query("SELECT * FROM custom_channel WHERE id = :id")
   abstract suspend fun get(id: Long): CustomChannelEntity?
 
+  // Només per al motor de sincronització: res d'això segella la fila
+
+  @Query("SELECT * FROM custom_channel WHERE syncId = :syncId")
+  abstract suspend fun getBySyncId(syncId: String): CustomChannelEntity?
+
+  @Query("SELECT * FROM custom_channel")
+  abstract suspend fun all(): List<CustomChannelEntity>
+
+  @Query("SELECT * FROM custom_channel WHERE dirty = 1")
+  abstract suspend fun dirtyRows(): List<CustomChannelEntity>
+
+  @Query("SELECT COUNT(*) FROM custom_channel WHERE dirty = 1")
+  abstract fun observeDirtyCount(): Flow<Int>
+
+  /** El mateix índex únic que vigila `custom_channel`: un altre canal amb el mateix grup i nom exactes. */
+  @Query("SELECT * FROM custom_channel WHERE channelType = :channelType AND name = :name AND syncId != :syncId")
+  abstract suspend fun findClash(
+    channelType: ChannelType,
+    name: String,
+    syncId: String,
+  ): CustomChannelEntity?
+
+  /** Només si la fila continua tal com es va pujar: una edició feta mentrestant es queda pendent. */
+  @Query("UPDATE custom_channel SET dirty = 0 WHERE syncId = :syncId AND modifiedAt = :modifiedAt")
+  abstract suspend fun markClean(
+    syncId: String,
+    modifiedAt: Long,
+  ): Int
+
+  /** Només per al motor: esborra un canal que un altre dispositiu ha esborrat, **sense** tombstone. */
+  @Query("DELETE FROM custom_channel WHERE syncId = :syncId")
+  abstract suspend fun deleteFromRemote(syncId: String)
+
+  /**
+   * Només per al motor: desa un canal baixat, per `syncId`, **sense segellar**. Conserva l'id local. No comprova
+   * l'índex únic: el motor ha de mirar [findClash] abans.
+   */
+  @Transaction
+  open suspend fun applyRemote(channel: CustomChannelEntity) {
+    val existing = getBySyncId(channel.syncId)
+    if (existing == null) insert(channel.copy(id = 0)) else update(channel.copy(id = existing.id))
+  }
+
+  @Query("UPDATE custom_channel SET syncId = :newSyncId, dirty = 0 WHERE id = :id")
+  protected abstract suspend fun rename(
+    id: Long,
+    newSyncId: String,
+  )
+
+  /**
+   * Només per al motor: un canal propi repetit en dos dispositius. El local passa a ser el `syncId` del remot (el més
+   * petit guanya) conservant l'id, perquè les entrades no s'hagin de moure. L'antic `syncId` deixa un tombstone, per si
+   * ja s'havia pujat, i les entrades que hi apuntaven queden pendents, perquè ara apunten a un altre `syncId`.
+   */
+  @Transaction
+  open suspend fun adoptSyncId(
+    id: Long,
+    newSyncId: String,
+    now: Long,
+  ) {
+    stampEntriesOf(id, now)
+    tombstone(id, now)
+    rename(id, newSyncId)
+  }
+
   @Query(
     """
     SELECT c.*, (SELECT COUNT(*) FROM entry WHERE customChannelId = c.id) AS entryCount
@@ -382,6 +555,37 @@ abstract class CustomChannelDao {
 
 @Dao
 interface PinnedFactDao {
+  /** Els fets de la persona, per pujar-los dins del seu registre. */
+  @Query("SELECT * FROM pinned_fact WHERE personId = :personId ORDER BY position")
+  suspend fun getForPerson(personId: Long): List<PinnedFactEntity>
+
   @Query("SELECT * FROM pinned_fact WHERE personId = :personId ORDER BY position")
   fun observeForPerson(personId: Long): Flow<List<PinnedFactEntity>>
+}
+
+/** Els tombstones, només per al motor de sincronització; els esborrats de l'app els escriuen els DAOs de cada taula. */
+@Dao
+interface SyncTombstoneDao {
+  @Query("SELECT * FROM sync_tombstone WHERE dirty = 1")
+  suspend fun dirty(): List<SyncTombstoneEntity>
+
+  @Query("SELECT * FROM sync_tombstone WHERE syncId = :syncId")
+  suspend fun get(syncId: String): SyncTombstoneEntity?
+
+  @Query("SELECT COUNT(*) FROM sync_tombstone WHERE dirty = 1")
+  fun observeDirtyCount(): Flow<Int>
+
+  /** Només si és el que s'ha pujat: un esborrat nou del mateix `syncId` es queda pendent. */
+  @Query("DELETE FROM sync_tombstone WHERE syncId = :syncId AND deletedAt = :deletedAt")
+  suspend fun deleteUploaded(
+    syncId: String,
+    deletedAt: Long,
+  )
+
+  /** Una fila que torna a existir no pot ser alhora esborrada. */
+  @Query("DELETE FROM sync_tombstone WHERE syncId = :syncId")
+  suspend fun clear(syncId: String)
+
+  @Insert(onConflict = OnConflictStrategy.REPLACE)
+  suspend fun put(tombstone: SyncTombstoneEntity)
 }

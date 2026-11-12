@@ -411,4 +411,19 @@
     <string name="sync_onboarding_chip_account">Compte opcional</string>
     <string name="sync_error_offline">No hi ha connexió. Torna-ho a provar.</string>
     <string name="sync_error_failed">No s\'ha pogut completar. Torna-ho a provar.</string>
+    <string name="sync_up_t">Pujant les teves dades</string>
+    <string name="sync_done_t">Sincronització activada</string>
+    <string name="sync_done_s">Aquest dispositiu: %1$s</string>
+    <string name="sync_done">Fet</string>
+    <string name="sync_merge_t">Aquest dispositiu ja té notes</string>
+    <plurals name="sync_merge_b">
+        <item quantity="one">L\'entrada que tens aquí s\'afegirà a les del núvol. No se\'n perd cap.</item>
+        <item quantity="other">Les %d entrades que tens aquí s\'afegiran a les del núvol. No se\'n perd cap.</item>
+    </plurals>
+    <string name="sync_st_ok">Al dia · %1$s</string>
+    <string name="sync_st_sync">Sincronitzant…</string>
+    <plurals name="sync_st_pend">
+        <item quantity="one">Sense connexió · %d canvi pendent</item>
+        <item quantity="other">Sense connexió · %d canvis pendents</item>
+    </plurals>
 </resources>

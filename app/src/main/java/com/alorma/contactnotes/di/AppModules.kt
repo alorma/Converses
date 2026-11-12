@@ -25,13 +25,20 @@ import com.alorma.contactnotes.data.settings.SettingsRepository
 import com.alorma.contactnotes.data.sync.AccountRemote
 import com.alorma.contactnotes.data.sync.AndroidSyncKeyStore
 import com.alorma.contactnotes.data.sync.AuthGateway
+import com.alorma.contactnotes.data.sync.DataStoreSyncCursorStore
 import com.alorma.contactnotes.data.sync.DataStoreSyncLocalStore
 import com.alorma.contactnotes.data.sync.FirebaseAuthGateway
 import com.alorma.contactnotes.data.sync.FirestoreAccountRemote
+import com.alorma.contactnotes.data.sync.FirestoreSyncRemote
+import com.alorma.contactnotes.data.sync.LocalSyncSource
+import com.alorma.contactnotes.data.sync.RoomLocalSyncSource
+import com.alorma.contactnotes.data.sync.SyncCursorStore
+import com.alorma.contactnotes.data.sync.SyncEngine
 import com.alorma.contactnotes.data.sync.SyncFirebase
 import com.alorma.contactnotes.data.sync.SyncFlag
 import com.alorma.contactnotes.data.sync.SyncKeyStore
 import com.alorma.contactnotes.data.sync.SyncLocalStore
+import com.alorma.contactnotes.data.sync.SyncRemote
 import com.alorma.contactnotes.data.sync.SyncRepository
 import com.alorma.contactnotes.data.tracking.AndroidFirebaseGateway
 import com.alorma.contactnotes.data.tracking.ConsentManager
@@ -80,6 +87,7 @@ val databaseModule =
     single { get<ConversesDatabase>().pinnedFactDao() }
     single { get<ConversesDatabase>().customChannelDao() }
     single { get<ConversesDatabase>().taskDao() }
+    single { get<ConversesDatabase>().syncTombstoneDao() }
     // Sense `singleOf`: intentaria resoldre el rellotge, que té valor per defecte
     single { ConversesRepository(get(), get(), get(), get(), get()) }
   }
@@ -136,6 +144,10 @@ val syncModule =
     single<AccountRemote> { FirestoreAccountRemote(get(), get<EventTracker>()) }
     single<SyncKeyStore> { AndroidSyncKeyStore(androidContext(), get<EventTracker>()) }
     single<SyncLocalStore> { DataStoreSyncLocalStore(androidContext()) }
+    single<SyncCursorStore> { DataStoreSyncCursorStore(androidContext()) }
+    single<SyncRemote> { FirestoreSyncRemote() }
+    single<LocalSyncSource> { RoomLocalSyncSource(get(), get(), get(), get(), get(), get()) }
+    single { SyncEngine(get(), get(), get()) }
     // Sense `singleOf`: intentaria resoldre el rellotge i l'aleatori, que tenen valor per defecte
     single { SyncRepository(get(), get(), get(), get(), CoroutineScope(SupervisorJob() + Dispatchers.Default)) }
   }
