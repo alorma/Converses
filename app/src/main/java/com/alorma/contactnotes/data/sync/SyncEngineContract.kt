@@ -1,6 +1,8 @@
 package com.alorma.contactnotes.data.sync
 
 import com.alorma.contactnotes.data.sync.crypto.RecordCipher
+import com.alorma.contactnotes.data.sync.engine.RecordPuller
+import com.alorma.contactnotes.data.sync.engine.RecordPusher
 import com.alorma.contactnotes.data.sync.record.SyncRecord
 import kotlinx.coroutines.flow.Flow
 
@@ -209,25 +211,32 @@ sealed interface SyncStatus {
 enum class SyncOutcome { Done, Offline, Failed }
 
 /**
- * El motor: JVM pur, sense Android ni Firebase. De moment buit: la tasca A hi posa la lògica. Retornen [SyncOutcome.Done]
- * sense fer res.
+ * El motor: JVM pur, sense Android ni Firebase. La lògica és a `engine/`; aquí només hi ha les dues peces públiques.
+ * [clock] dóna l'hora local; [onError] rep els registres que no s'han pogut llegir (només l'error i el lloc, mai
+ * dades); [pageSize] és el nombre de registres per lot de pujada i per pàgina de baixada.
  */
-@Suppress("unused")
 class SyncEngine(
   private val local: LocalSyncSource,
   private val remote: SyncRemote,
   private val cursors: SyncCursorStore,
+  private val clock: () -> Long = System::currentTimeMillis,
+  private val onError: (Throwable, String) -> Unit = { _, _ -> },
+  private val pageSize: Int = DEFAULT_PAGE_SIZE,
 ) {
   /** Puja el que és `dirty` i els tombstones, per lots. */
   suspend fun pushPending(
     uid: String,
     cipher: RecordCipher,
-  ): SyncOutcome = SyncOutcome.Done
+  ): SyncOutcome = RecordPusher(local, remote, cursors, pageSize).push(uid, cipher)
 
   /** Baixa des del cursor. [onProgress] rep els registres processats i el total, si se sap (`null` si no). */
   suspend fun pullAll(
     uid: String,
     cipher: RecordCipher,
     onProgress: (done: Int, total: Int?) -> Unit = { _, _ -> },
-  ): SyncOutcome = SyncOutcome.Done
+  ): SyncOutcome = RecordPuller(local, remote, cursors, clock, onError, pageSize).pull(uid, cipher, onProgress)
+
+  private companion object {
+    const val DEFAULT_PAGE_SIZE = 200
+  }
 }

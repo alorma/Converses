@@ -50,4 +50,7 @@ object ErrorSites {
 
   /** El fitxer de la clau del dispositiu no es pot obrir o desar; caldran les paraules de seguretat. */
   const val SYNC_KEY_STORE = "sync_key_store"
+
+  /** Un registre baixat no s'ha pogut desxifrar o llegir; es salta i la resta continua. */
+  const val SYNC_RECORD = "sync_record"
 }
