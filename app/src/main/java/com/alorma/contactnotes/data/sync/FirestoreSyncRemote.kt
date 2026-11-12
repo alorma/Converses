@@ -18,6 +18,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeoutOrNull
 
 /**
  * Els registres xifrats a `users/{uid}/records/{id}` de Firestore, sobre la instància `sync`. Les regles
@@ -32,9 +33,20 @@ class FirestoreSyncRemote(
   override suspend fun push(
     uid: String,
     records: List<RemoteRecord>,
+  ): RemoteResult<Unit> {
+    if (records.isEmpty()) return RemoteResult.Ok(Unit)
+    // Sense xarxa, Firestore no fa fallar l'escriptura: la deixa a la cua i espera la connexió. Sense límit, el motor
+    // es quedaria «Sincronitzant» per sempre i amb el pany agafat. Si el servidor no confirma a temps es diu «sense
+    // connexió»; el lot es queda a la cua de Firestore i tornar-lo a pujar no fa res, perquè es reescriu igual
+    return withTimeoutOrNull(PUSH_TIMEOUT_MILLIS) { commit(uid, records) } ?: RemoteResult.Offline
+  }
+
+  private suspend fun commit(
+    uid: String,
+    records: List<RemoteRecord>,
   ): RemoteResult<Unit> =
     guarded {
-      if (records.isNotEmpty()) {
+      run {
         val collection = recordsOf(uid)
         val batch = withContext(Dispatchers.IO) { firebase.firestore.batch() }
         records.forEach { record ->
@@ -184,6 +196,7 @@ class FirestoreSyncRemote(
     )
 
   private companion object {
+    const val PUSH_TIMEOUT_MILLIS = 20_000L
     const val COLLECTION_USERS = "users"
     const val COLLECTION_RECORDS = "records"
     const val FIELD_CONTENT = "c"
