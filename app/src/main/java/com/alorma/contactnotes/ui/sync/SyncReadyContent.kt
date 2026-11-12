@@ -1,6 +1,5 @@
 package com.alorma.contactnotes.ui.sync
 
-import android.text.format.DateUtils
 import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -83,13 +82,7 @@ fun SyncReadyContent(
     Section(title = stringResource(R.string.sync_security)) {
       SettingRow(
         title = stringResource(R.string.sync_words_title),
-        subtitle =
-          wordsReviewedAt?.let {
-            stringResource(
-              R.string.sync_words_reviewed,
-              DateUtils.getRelativeTimeSpanString(it, now, DateUtils.MINUTE_IN_MILLIS),
-            )
-          },
+        subtitle = wordsReviewedAt?.let { reviewedAgo(it, now).label() },
         shape = groupedItemShape(0, 1),
         onClick = {
           if (activity != null && !inspection) {

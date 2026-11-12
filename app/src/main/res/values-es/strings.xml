@@ -381,7 +381,19 @@
     <string name="sync_words_field">Las 12 palabras, separadas por espacios</string>
     <string name="sync_words_count">%1$d / %2$d</string>
     <string name="sync_security">Seguridad</string>
-    <string name="sync_words_reviewed">Las revisaste %1$s</string>
+    <string name="sync_words_reviewed_today">Las has revisado hoy</string>
+    <plurals name="sync_words_reviewed_days">
+        <item quantity="one">Las revisaste hace %d día</item>
+        <item quantity="other">Las revisaste hace %d días</item>
+    </plurals>
+    <plurals name="sync_words_reviewed_months">
+        <item quantity="one">Las revisaste hace %d mes</item>
+        <item quantity="other">Las revisaste hace %d meses</item>
+    </plurals>
+    <plurals name="sync_words_reviewed_years">
+        <item quantity="one">Las revisaste hace %d año</item>
+        <item quantity="other">Las revisaste hace %d años</item>
+    </plurals>
     <string name="sync_account">Cuenta</string>
     <string name="sync_sign_out">Cerrar sesión</string>
     <string name="sync_sign_out_summary">Los datos se quedan en este dispositivo</string>

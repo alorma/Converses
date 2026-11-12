@@ -380,7 +380,19 @@
     <string name="sync_words_field">The 12 words, separated by spaces</string>
     <string name="sync_words_count">%1$d / %2$d</string>
     <string name="sync_security">Security</string>
-    <string name="sync_words_reviewed">You last checked them %1$s</string>
+    <string name="sync_words_reviewed_today">You checked them today</string>
+    <plurals name="sync_words_reviewed_days">
+        <item quantity="one">You last checked them %d day ago</item>
+        <item quantity="other">You last checked them %d days ago</item>
+    </plurals>
+    <plurals name="sync_words_reviewed_months">
+        <item quantity="one">You last checked them %d month ago</item>
+        <item quantity="other">You last checked them %d months ago</item>
+    </plurals>
+    <plurals name="sync_words_reviewed_years">
+        <item quantity="one">You last checked them %d year ago</item>
+        <item quantity="other">You last checked them %d years ago</item>
+    </plurals>
     <string name="sync_account">Account</string>
     <string name="sync_sign_out">Sign out</string>
     <string name="sync_sign_out_summary">Your data stays on this device</string>

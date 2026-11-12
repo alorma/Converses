@@ -379,7 +379,19 @@
     <string name="sync_words_field">Les 12 paraules, separades per espais</string>
     <string name="sync_words_count">%1$d / %2$d</string>
     <string name="sync_security">Seguretat</string>
-    <string name="sync_words_reviewed">Les vas revisar %1$s</string>
+    <string name="sync_words_reviewed_today">Les has revisat avui</string>
+    <plurals name="sync_words_reviewed_days">
+        <item quantity="one">Les vas revisar fa %d dia</item>
+        <item quantity="other">Les vas revisar fa %d dies</item>
+    </plurals>
+    <plurals name="sync_words_reviewed_months">
+        <item quantity="one">Les vas revisar fa %d mes</item>
+        <item quantity="other">Les vas revisar fa %d mesos</item>
+    </plurals>
+    <plurals name="sync_words_reviewed_years">
+        <item quantity="one">Les vas revisar fa %d any</item>
+        <item quantity="other">Les vas revisar fa %d anys</item>
+    </plurals>
     <string name="sync_account">Compte</string>
     <string name="sync_sign_out">Tanca la sessió</string>
     <string name="sync_sign_out_summary">Les dades es queden en aquest dispositiu</string>
