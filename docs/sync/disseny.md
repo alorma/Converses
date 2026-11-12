@@ -1,6 +1,6 @@
 # Sincronització al núvol: disseny
 
-Estat: **proposta; només hi ha construïdes les fases 1 i 2** (identitat de sincronització a Room v6, vegeu «Canvis a Room», i criptografia, vegeu «Claus»). Escrit el 10 de novembre de 2026 a partir de la conversa amb Bernat. Quan la funció existeixi, aquest fitxer es condensa en un `README.md` que descrigui el que hi ha, com la resta de `docs/`.
+Estat: **proposta; només hi ha construïdes les fases 1, 2 i 3** (identitat de sincronització a Room v6, vegeu «Canvis a Room»; criptografia, vegeu «Claus»; compte i clau darrere del flag `sync`, vegeu «Construït (fase 3)»). Escrit el 10 de novembre de 2026 a partir de la conversa amb Bernat. Quan la funció existeixi, aquest fitxer es condensa en un `README.md` que descrigui el que hi ha, com la resta de `docs/`.
 
 Les decisions marcades **(B)** són de Bernat. Les marcades **(C)** les ha pres Claude en escriure el disseny i es poden canviar. Les pantalles són a `disseny/`: `INSTRUCCIONS.md` (mides, estats, textos en tres idiomes) i `pantalles.html` (referència visual, taulers 13a…13t i 0c). Les decisions que venen d'allà van marcades **(D)**.
 
@@ -237,6 +237,57 @@ Es sincronitzen com qualsevol altra: `isProtected` va dins del xifrat i el dispo
 - **Tancar sessió:** treu el dispositiu de `devices`, esborra la clau local, atura el motor. Les dades i els `syncId` es queden.
 - **Esborrar el compte:** esborra els registres per lots, el document del compte i l'usuari d'Auth (pot demanar tornar a iniciar sessió). Play també exigeix una **pàgina web** per demanar l'esborrat: va a ConversesLanding, i Bernat l'executa a mà.
 - **Comptes inactius (B):** 24 mesos sense sincronitzar; es poden esborrar, a mà. `lastSyncAt` ho fa possible.
+
+**Construït (fase 3), a `data/sync` i `ui/sync`.** Compte i clau, tot darrere de `SyncFlag` (apagat per defecte). Encara no es puja ni es baixa cap registre: això és la fase 4. Amb el flag apagat l'app és la d'abans: sense indicador, sense fila a Ajustos, l'onboarding amb els textos de sempre i Firebase `sync` sense inicialitzar.
+
+| Peça | Què fa |
+| --- | --- |
+| `SyncFirebase` | La instància `sync` de Firebase (Auth, Firestore, App Check), a part de la per defecte. No es crea fins que algú la demana, i amb App Check instal·lat abans de la primera crida: Play Integrity en release, el proveïdor de debug en debug |
+| `FirebaseAuthGateway` | Credential Manager amb «Continua amb Google» i el token cap a Firebase Auth. Tancar el full no és cap error; sense connexió es distingeix d'un error. Tancar la sessió no peta mai |
+| `FirestoreAccountRemote` | El document `users/{uid}` amb `wrappedKey`, `format` i `createdAt`. Es llegeix sempre del servidor, no de la memòria cau. Es crea en una transacció que no escriu si ja existeix |
+| `AndroidSyncKeyStore`, `StoredKeysCodec` | El secret i la clau de dades en un fitxer a `noBackupFilesDir`, xifrat amb una clau AES-GCM de l'Android Keystore. Un fitxer que no es pot llegir és com si no hi fos |
+| `DataStoreSyncLocalStore` | La marca de sessió i la data de l'última revisió de les paraules (DataStore `sync`, de cada dispositiu) |
+| `SyncRepository` | L'estat i les accions; la resta de l'app no sap res de Firebase |
+
+Estats de `SyncRepository`:
+
+- `SignedOut`: sense sessió; res surt del dispositiu.
+- `Checking`: recuperant la sessió en arrencar o iniciant-la.
+- `Activating`: primer dispositiu, amb les paraules generades i res pujat.
+- `NeedsKey`: el compte ja té dades i aquest dispositiu no en té la clau.
+- `Ready`: sessió i clau al dispositiu.
+
+Pantalles, totes amb el tema de l'app i sense mostrar mai noms ni contingut de persones:
+
+- **Sense sessió:** galeta, tres files, el botó de Google i una nota al peu. Si falla, un snackbar diu si és per falta de connexió o un error.
+- **Activació (primer dispositiu):** demana l'empremta (`BiometricPrompt`) i ensenya les 12 paraules **juntes, en un sol bloc de text**, amb «Copia», una nota i, al peu, la casella «Les he guardat» i «Continua». Només amb la casella marcada es puja la clau embolcallada i es desa al dispositiu. Cancel·lar l'empremta, tancar la pantalla o morir el procés abans de continuar tanca la sessió i no deixa res al núvol.
+- **Clau en un dispositiu nou (`NeedsKey`):** la targeta «Escriu les paraules» i el compte amb «Canvia», que tanca la sessió. Les paraules s'**escriuen en un sol camp**, no en dotze: el teclat no té autocorrecció ni aprenentatge, hi ha suggeriments de `Bip39`, les paraules desconegudes es marquen i es pot enganxar tot d'una (`Bip39.split`). Unes paraules vàlides que no obren el compte, o d'un altre compte, donen «no obren les dades d'aquest compte» i el dispositiu es queda a `NeedsKey`.
+- **Amb sessió:** el compte, «Paraules de seguretat» amb la data de la revisió i «Tanca la sessió» amb confirmació. Veure les paraules demana l'empremta de nou.
+- **Indicador i entrades:** un indicador a la dreta del menú de la llista de persones (sense sessió, amb sessió, «falten les paraules»), que a pantalla gran és al peu del rail amb l'etiqueta «Compte»; la secció «Compte» d'Ajustos amb la fila «Sincronització»; i, a l'onboarding, l'enllaç «Ja tinc dades al núvol» amb el text del pas 3 canviat.
+- Les rutes són `SyncRoute`, `SecurityWordsRoute(activation)` i `EnterWordsRoute`; les dues últimes són formularis (`isFormRoute()`), diàlegs de 560 dp en pantalla gran.
+
+Decisions preses en construir-ho **(C)**:
+
+- Firebase `sync` només s'inicialitza si el dispositiu té una sessió marcada o quan l'usuari toca «Continua amb Google». Iniciar sessió no engega Analytics ni Crashlytics: `AndroidFirebaseGateway` només mira la instància per defecte, no la `sync`.
+- La clau del Keystore que xifra el fitxer no demana autenticació, perquè el motor l'ha de poder llegir sol. L'empremta la demana la UI, i el repositori no dona les paraules si abans no s'han desbloquejat (`unlockWords`), tampoc després de restaurar el procés; en sortir de la pantalla tornen a quedar bloquejades.
+- Les paraules van amb `FLAG_SECURE`, el porta-retalls es marca com a sensible i s'esborra al cap d'1 minut, i el camp d'escriure-les no té aprenentatge del teclat.
+- Un procés mort a mitja activació deixa una sessió sense clau ni document: en arrencar, es tanca. Si en arrencar no hi ha connexió per saber-ho, es queda a `NeedsKey` i es resol en donar les paraules.
+- Dos dispositius que s'activen alhora no es trepitgen la clau: el segon troba el document, passa a `NeedsKey` i demana les paraules del primer.
+- Un dispositiu que havia tancat la sessió sempre demana les paraules en tornar a entrar, encara que el Keystore en conservés la clau.
+- Tancar la sessió és, ara, la forma mínima: tanca Auth, esborra la clau local i la marca de sessió, i les dades es queden. Alliberar la plaça arriba amb la fase 5.
+- L'avatar de l'indicador és la inicial del nom (o del correu) i no la foto de Google: carregar-la demanaria una biblioteca d'imatges i una connexió més.
+- Permís nou al manifest fusionat: `READ_GSERVICES`, de reCAPTCHA (dependència de Firebase Auth). Surt de l'spike.
+
+**Sense QR a la fase 3 (B, 11 de novembre de 2026).** Les targetes i files que hi porten no es dibuixen; el QR passa a una fase 3b. Tampoc hi són «No tinc les paraules» («Comença de nou», que necessita el motor), l'estat «Al dia», els dispositius, esborrar el compte ni el dispositiu tret.
+
+Comprovat amb tests JVM (`SyncRepositoryTest`, `StoredKeysCodecTest`, `SecurityWordsViewModelTest`, `EnterWordsViewModelTest`, `SyncIndicatorTest`) amb falsos de les quatre portes (`FakeSync`), i amb captures de pantalla de cada pantalla.
+
+Pendent de la fase 3:
+
+- La **prova a l'emulador** amb el flag encès: activar, tancar la sessió, tornar a entrar amb les paraules i paraules equivocades. El proveïdor de debug d'App Check escriu un token al logcat que cal registrar a la consola de Firebase.
+- L'**analítica de sync** (pantalles `sync`, `sync_words` i `sync_enter_words` ja són al catàleg de pantalles, però les accions encara no).
+- **APK de GitHub i dispositius sense serveis de Google:** amb App Check forçat, només passen les instal·lacions que Play Integrity reconeix. Cal decidir què passa amb els APK de GitHub (no instal·lats des de Play) i amb els dispositius sense serveis de Google: ara no podrien iniciar sessió.
+- La política de privacitat i el formulari de Play (fase 7, abans de treure el flag) i mesurar els servidors contactats.
 
 ## Privacitat externa
 
