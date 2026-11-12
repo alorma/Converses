@@ -11,12 +11,18 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Cloud
+import androidx.compose.material.icons.rounded.CloudOff
 import androidx.compose.material.icons.rounded.Key
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -36,18 +42,21 @@ import com.alorma.contactnotes.data.sync.SyncAccount
 import com.alorma.contactnotes.data.sync.SyncFlag
 import com.alorma.contactnotes.data.sync.SyncRepository
 import com.alorma.contactnotes.data.sync.SyncState
+import com.alorma.contactnotes.data.sync.SyncStatus
+import kotlinx.coroutines.delay
 import org.koin.compose.koinInject
 
 /**
  * El que l'indicador de compte (13a), el rail (13r) i la fila d'Ajustos (13b) ensenyen de la sincronització. Encara no
- * hi ha ni «sincronitzant», ni «sense connexió», ni «dispositiu tret»: arriben amb el motor (fases 4 i 5).
+ * hi ha «dispositiu tret»: arriba a la fase 5.
  */
 sealed interface SyncIndicatorState {
   data object SignedOut : SyncIndicatorState
 
-  /** Sessió iniciada i clau al dispositiu. [initial] és la lletra de l'avatar. */
+  /** Sessió iniciada i clau al dispositiu. [initial] és la lletra de l'avatar; [status], com van les dades. */
   data class On(
     val initial: String,
+    val status: SyncIndicatorStatus = SyncIndicatorStatus.Idle,
   ) : SyncIndicatorState
 
   /** Sessió iniciada, però falten les paraules de seguretat. */
@@ -55,6 +64,17 @@ sealed interface SyncIndicatorState {
     val initial: String,
   ) : SyncIndicatorState
 }
+
+/** Les dades a l'indicador (13a): sense connexió i error es veuen igual, i no en vermell. */
+enum class SyncIndicatorStatus { Idle, Syncing, Offline }
+
+/** Només «sincronitzant» es veu si dura més de 600 ms. [syncingVisible] ho diu. */
+fun SyncStatus.toIndicatorStatus(syncingVisible: Boolean): SyncIndicatorStatus =
+  when (this) {
+    is SyncStatus.UpToDate -> SyncIndicatorStatus.Idle
+    is SyncStatus.Syncing -> if (syncingVisible) SyncIndicatorStatus.Syncing else SyncIndicatorStatus.Idle
+    is SyncStatus.Offline, SyncStatus.Failed -> SyncIndicatorStatus.Offline
+  }
 
 /** Mentre es comprova la sessió o es fa l'activació encara no hi ha res actiu: es veu com sense sessió. */
 fun SyncState.toIndicatorState(): SyncIndicatorState =
@@ -74,7 +94,12 @@ private fun SyncAccount.initial(): String {
 fun SyncIndicatorState.descriptionRes(): Int =
   when (this) {
     SyncIndicatorState.SignedOut -> R.string.sync_indicator_off
-    is SyncIndicatorState.On -> R.string.sync_indicator_on
+    is SyncIndicatorState.On ->
+      when (status) {
+        SyncIndicatorStatus.Idle -> R.string.sync_indicator_on
+        SyncIndicatorStatus.Syncing -> R.string.sync_indicator_syncing
+        SyncIndicatorStatus.Offline -> R.string.sync_indicator_offline
+      }
     is SyncIndicatorState.NeedsKey -> R.string.sync_indicator_key
   }
 
@@ -87,7 +112,22 @@ fun currentSyncIndicatorState(): SyncIndicatorState? =
   if (rememberFeatureEnabled<SyncFlag>()) {
     val repository: SyncRepository = koinInject()
     val state by repository.state.collectAsStateWithLifecycle()
-    state.toIndicatorState()
+    val status by repository.status.collectAsStateWithLifecycle()
+    // L'arc de «sincronitzant» no es mostra si la sincronització dura menys de 600 ms
+    var syncingVisible by remember { mutableStateOf(false) }
+    val syncing = status is SyncStatus.Syncing
+    LaunchedEffect(syncing) {
+      if (syncing) {
+        delay(SyncingDelayMillis)
+        syncingVisible = true
+      } else {
+        syncingVisible = false
+      }
+    }
+    when (val indicator = state.toIndicatorState()) {
+      is SyncIndicatorState.On -> indicator.copy(status = status.toIndicatorStatus(syncingVisible))
+      else -> indicator
+    }
   } else {
     null
   }
@@ -139,7 +179,38 @@ fun SyncIndicatorVisual(
             modifier = Modifier.size(22.dp),
           )
         }
-      is SyncIndicatorState.On -> AccountAvatar(state.initial)
+      is SyncIndicatorState.On -> {
+        AccountAvatar(state.initial)
+        when (state.status) {
+          SyncIndicatorStatus.Idle -> Unit
+          SyncIndicatorStatus.Syncing ->
+            CircularProgressIndicator(
+              modifier = Modifier.size(VisualSize),
+              color = scheme.primary,
+              trackColor = scheme.outlineVariant,
+              strokeWidth = 2.5.dp,
+            )
+          SyncIndicatorStatus.Offline ->
+            Box(
+              modifier =
+                Modifier
+                  .align(Alignment.BottomEnd)
+                  .offset(x = 5.dp, y = 5.dp)
+                  .size(22.dp)
+                  .background(background, CircleShape)
+                  .padding(2.dp)
+                  .background(scheme.surfaceContainerHighest, CircleShape),
+              contentAlignment = Alignment.Center,
+            ) {
+              Icon(
+                imageVector = Icons.Rounded.CloudOff,
+                contentDescription = null,
+                tint = scheme.onSurfaceVariant,
+                modifier = Modifier.size(12.dp),
+              )
+            }
+        }
+      }
       is SyncIndicatorState.NeedsKey -> {
         AccountAvatar(state.initial)
         // Insígnia de 18 dp que surt 3 dp de l'avatar, amb una vora de 2 dp del color de fons
@@ -183,5 +254,6 @@ private fun AccountAvatar(initial: String) {
   }
 }
 
+private const val SyncingDelayMillis = 600L
 private val TouchTarget = 48.dp
 private val VisualSize = 40.dp

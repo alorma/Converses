@@ -428,4 +428,10 @@
         <item quantity="one">Sin conexión · %d cambio pendiente</item>
         <item quantity="other">Sin conexión · %d cambios pendientes</item>
     </plurals>
+    <string name="sync_hide">Ocultar</string>
+    <string name="sync_down_t">Descargando tus datos</string>
+    <string name="sync_st_failed">No se ha podido sincronizar. Lo volveremos a intentar.</string>
+    <string name="sync_st_now">Al día · ahora mismo</string>
+    <string name="sync_indicator_syncing">Cuenta: sincronizando</string>
+    <string name="sync_indicator_offline">Cuenta: sin conexión</string>
 </resources>

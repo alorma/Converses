@@ -44,6 +44,7 @@ fun SyncScreen(
 ) {
   val state by viewModel.state.collectAsStateWithLifecycle()
   val wordsReviewedAt by viewModel.wordsReviewedAt.collectAsStateWithLifecycle()
+  val status by viewModel.status.collectAsStateWithLifecycle()
   val activity = LocalActivity.current
   val snackbar = remember { SnackbarHostState() }
   val resources = LocalResources.current
@@ -89,6 +90,7 @@ fun SyncScreen(
         SyncReadyContent(
           account = current.account,
           wordsReviewedAt = wordsReviewedAt,
+          status = status,
           padding = padding,
           onWordsUnlocked = {
             viewModel.onWordsUnlocked()
