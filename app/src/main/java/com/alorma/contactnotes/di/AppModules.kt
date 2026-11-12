@@ -2,6 +2,8 @@ package com.alorma.contactnotes.di
 
 import android.content.Context
 import android.content.pm.ApplicationInfo
+import android.os.Build
+import android.provider.Settings
 import androidx.room.Room
 import com.alorma.contactnotes.data.ConversesRepository
 import com.alorma.contactnotes.data.db.ConversesDatabase
@@ -27,12 +29,14 @@ import com.alorma.contactnotes.data.sync.AndroidSyncKeyStore
 import com.alorma.contactnotes.data.sync.AuthGateway
 import com.alorma.contactnotes.data.sync.DataStoreSyncCursorStore
 import com.alorma.contactnotes.data.sync.DataStoreSyncLocalStore
+import com.alorma.contactnotes.data.sync.EngineSyncRunner
 import com.alorma.contactnotes.data.sync.FirebaseAuthGateway
 import com.alorma.contactnotes.data.sync.FirestoreAccountRemote
 import com.alorma.contactnotes.data.sync.FirestoreSyncRemote
 import com.alorma.contactnotes.data.sync.LocalSyncSource
 import com.alorma.contactnotes.data.sync.RoomLocalSyncSource
 import com.alorma.contactnotes.data.sync.SyncCursorStore
+import com.alorma.contactnotes.data.sync.SyncData
 import com.alorma.contactnotes.data.sync.SyncEngine
 import com.alorma.contactnotes.data.sync.SyncFirebase
 import com.alorma.contactnotes.data.sync.SyncFlag
@@ -40,6 +44,8 @@ import com.alorma.contactnotes.data.sync.SyncKeyStore
 import com.alorma.contactnotes.data.sync.SyncLocalStore
 import com.alorma.contactnotes.data.sync.SyncRemote
 import com.alorma.contactnotes.data.sync.SyncRepository
+import com.alorma.contactnotes.data.sync.SyncScheduler
+import com.alorma.contactnotes.data.sync.SyncWorker
 import com.alorma.contactnotes.data.tracking.AndroidFirebaseGateway
 import com.alorma.contactnotes.data.tracking.ConsentManager
 import com.alorma.contactnotes.data.tracking.EventTracker
@@ -152,7 +158,33 @@ val syncModule =
       SyncEngine(get(), get(), get(), onError = { error, where -> tracker.trackError(error, where) })
     }
     // Sense `singleOf`: intentaria resoldre el rellotge i l'aleatori, que tenen valor per defecte
-    single { SyncRepository(get(), get(), get(), get(), CoroutineScope(SupervisorJob() + Dispatchers.Default)) }
+    single {
+      val context = androidContext()
+      val data =
+        SyncData(
+          runner = EngineSyncRunner(get()),
+          source = get(),
+          records = get(),
+          cursors = get(),
+          deviceName = {
+            Settings.Global.getString(
+              context.contentResolver,
+              Settings.Global.DEVICE_NAME,
+            ) ?: Build.MODEL
+          },
+          isPro = { get<ProRepository>().isPro.value },
+        )
+      SyncRepository(get(), get(), get(), get(), CoroutineScope(SupervisorJob() + Dispatchers.Default), sync = data)
+    }
+    single {
+      SyncScheduler(
+        get(),
+        { SyncWorker.enqueue(androidContext()) },
+        CoroutineScope(
+          SupervisorJob() + Dispatchers.Default,
+        ),
+      )
+    }
   }
 
 val viewModelModule =
