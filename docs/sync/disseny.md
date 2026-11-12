@@ -166,7 +166,7 @@ users/{uid}
   createdAt, lastSyncAt    timestamps
 
 users/{uid}/records/{recordId}
-  c               bytes    registre xifrat (buit si està esborrat)
+  c               bytes    registre xifrat (si està esborrat, només la data de l'esborrat, xifrada)
   deleted         bool
   by              string   deviceId que l'ha escrit
   updatedAt       timestamp del servidor
@@ -225,6 +225,34 @@ Queda per a la fase 4:
 - **Primera sincronització d'un dispositiu amb dades:** unió del local i del núvol. No es dedupliquen persones amb el mateix nom **(C)**: si l'usuari les havia creat a tots dos llocs, en veurà dues.
 - **Dispositiu tret:** el motor ho descobreix en llegir `devices` o en rebre un rebuig de les regles, s'atura i passa a l'estat `Removed`.
 - **Errors:** reintents amb espera creixent. `trackError` amb llocs nous a `ErrorSites.kt`, sense `message`, com la resta.
+
+**Construït (fase 4), branca `sync-fase-4`.** Pla a `plans/fase-4-motor.md`. Tot continua darrere de `SyncFlag`; Room no canvia.
+
+| Peça | Què fa |
+| --- | --- |
+| `record/` (`SyncRecord`, `RecordCodec`) | El JSON de cada tipus (persona amb els seus fets fixats, entrada, tasca, canal propi) i l'esborrat (`{ deletedAt }`). Referències per `syncId`. Format fixat per un test |
+| `RoomLocalSyncSource` | El costat de Room: pendents, marcar nets només si no han canviat, aplicar el que baixa sense segellar |
+| `engine/` (`RecordPusher`, `RecordPuller`, `ConflictRules`) | Pujar per lots de 200 i baixar per pàgines, amb els conflictes, els esborrats, les referències que esperen i els canals duplicats |
+| `FirestoreSyncRemote` | `users/{uid}/records`, el listener i el dispositiu a `devices`. Una pujada que el servidor no confirma en 20 s és «sense connexió» |
+| `SyncScheduler`, `SyncLoop`, `SyncWorker` | Baixar en obrir i amb el listener, pujar 2 s després de l'últim canvi, reintents (5 s, 15 s, 1 min, 5 min), i WorkManager en passar a segon pla amb canvis pendents |
+| `SyncRepository` | `status` (al dia, sincronitzant, sense connexió amb pendents, error) i `initialSync` (pujada, baixada, fusió) |
+| `ui/sync` | Pujada i baixada inicials (13g, 13m2), «Sincronització activada» (13h, només el dispositiu), fusió (13m) i l'estat a 13o i a l'indicador |
+
+Decisions preses en construir-ho **(C)**:
+
+- Un esborrat no deixa `c` buit: hi va xifrat `{ deletedAt }`, perquè sense la data del client no es pot decidir si guanya a una edició.
+- Esborrar una persona en un dispositiu esborra en cascada les seves entrades i tasques als altres; una entrada nova feta en un altre dispositiu abans de baixar l'esborrat es perd.
+- «Amaga» deixa la feina en marxa sense notificació **(B)**; en acabar no torna a ensenyar el resultat, que ja diu l'estat de 13o.
+- WorkManager no s'inicialitza sol (ConversesApp és `Configuration.Provider`) i se li treuen `RECEIVE_BOOT_COMPLETED` i `FOREGROUND_SERVICE`: el que quedi pendent després de reiniciar el mòbil puja en obrir l'app. Cap permís nou.
+- L'analítica de la pujada i la baixada inicials (`sync_upload_finished`, `sync_download_finished`, `sync_merge_shown`) només compta mentre la pantalla de Sincronització existeix.
+- El nom del dispositiu és `Settings.Global.DEVICE_NAME` o, si no n'hi ha, `Build.MODEL` (a l'emulador, `sdk_gphone16k_arm64`).
+
+Comprovat amb tests JVM (motor amb dos dispositius simulats, repositori, bucle, accions), 23 tests de les regles a l'emulador de Firestore, i a l'emulador d'Android (12 de novembre de 2026): activar amb dades (tot pujat, res pendent), tornar a entrar amb les paraules en un dispositiu amb les mateixes dades (fusió sense duplicats, la persona protegida continua protegida), entrar en un dispositiu buit (persones, entrades i fets idèntics als originals), una persona nova que puja sola, i sense connexió («Sense connexió · 1 canvi pendent» i, en tornar la xarxa, pujat).
+
+Pendent de la fase 4:
+
+- **Regles al servidor real.** Les del repositori encara no s'han desplegat (al servidor hi ha la del spike). Cada registre fa llegir `users/{uid}` a les regles, i un lot té un límit d'accessos (20 en total més 10 per operació, segons la documentació) que no queda clar si compta una sola vegada el mateix document. L'emulador accepta lots de 200; cal provar-ho al servidor real i, si falla, baixar els lots a ~20.
+- **Dos dispositius alhora** (edicions simultànies, esborrar en un i editar a l'altre): provat als tests JVM, no amb dos emuladors, perquè el segon necessita registrar un altre token de debug d'App Check.
 
 ### Persones protegides
 
