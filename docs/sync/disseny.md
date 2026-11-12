@@ -284,9 +284,10 @@ Decisions preses en construir-ho **(C)**:
 
 Comprovat amb tests JVM (`SyncRepositoryTest`, `StoredKeysCodecTest`, `SyncViewModelTest`, `SecurityWordsViewModelTest`, `EnterWordsViewModelTest`, `SyncIndicatorTest`) amb falsos de les quatre portes (`FakeSync`), i amb captures de pantalla de cada pantalla.
 
-Pendent de la fase 3:
+**Provat a l'emulador** amb el flag encès (11 i 12 de novembre de 2026): activar, tancar la sessió, tornar a entrar amb les paraules i amb paraules equivocades, i tancar les paraules abans de «Continua» (la sessió es tanca i, en tornar a entrar, el compte torna a l'activació: al núvol no hi ha quedat res). La prova va trobar que un segon inici de sessió des de la mateixa pantalla es quedava esperant l'empremta, i que sortir de «Sincronització» a mitja activació la deixava oberta. Ara l'empremta es demana una vegada per inici de sessió (`SyncViewModel.takeActivationPrompt`) i sortir de la pantalla cancel·la l'activació. El proveïdor de debug d'App Check escriu un token al logcat que cal registrar a la consola de Firebase.
 
-- La **prova a l'emulador** amb el flag encès: activar, tancar la sessió, tornar a entrar amb les paraules i paraules equivocades. El proveïdor de debug d'App Check escriu un token al logcat que cal registrar a la consola de Firebase.
+Queda per a la fase 7:
+
 - **APK de GitHub:** amb App Check forçat, només passen les instal·lacions que Play Integrity reconeix, i previsiblement un APK de GitHub no podrà iniciar sessió. Es provarà més endavant. **(B, 12 de novembre de 2026)** Els dispositius sense serveis de Google no importen: s'accepta que no puguin sincronitzar.
 - La política de privacitat i el formulari de Play (fase 7, abans de treure el flag) i mesurar els servidors contactats.
 

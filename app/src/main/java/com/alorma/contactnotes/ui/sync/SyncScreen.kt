@@ -71,6 +71,7 @@ fun SyncScreen(
       is SyncState.Activating ->
         SyncActivatingContent(
           padding = padding,
+          takePrompt = viewModel::takeActivationPrompt,
           onUnlocked = {
             viewModel.onWordsUnlocked()
             onOpenWords(true)

@@ -12,10 +12,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberUpdatedState
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalInspectionMode
@@ -27,13 +24,15 @@ import com.alorma.contactnotes.ui.person.canUnlockWithDevice
 import com.alorma.contactnotes.ui.person.promptUnlock
 
 /**
- * Primer dispositiu, amb la sessió iniciada i abans de veure les paraules (13e): demana l'empremta una sola vegada
- * en aparèixer i, si va bé, crida [onUnlocked]. Cancel·lar-la o qualsevol error crida [onCancel], que tanca la
- * sessió. Si el dispositiu no té empremta ni bloqueig de pantalla no hi ha res a demanar i es continua directament.
+ * Primer dispositiu, amb la sessió iniciada i abans de veure les paraules (13e): en aparèixer, demana l'empremta si
+ * [takePrompt] ho diu, i si va bé crida [onUnlocked]. El ViewModel en porta el compte, una vegada per activació:
+ * girar la pantalla no l'ha de tornar a obrir, i un segon inici de sessió sí. Cancel·lar-la o qualsevol error crida
+ * [onCancel], que tanca la sessió. Si el dispositiu no té empremta ni bloqueig de pantalla no hi ha res a demanar i es continua directament.
  */
 @Composable
 fun SyncActivatingContent(
   padding: PaddingValues,
+  takePrompt: () -> Boolean,
   onUnlocked: () -> Unit,
   onCancel: () -> Unit,
 ) {
@@ -43,11 +42,8 @@ fun SyncActivatingContent(
   val subtitle = stringResource(R.string.sync_bio_words)
   val currentOnUnlocked by rememberUpdatedState(onUnlocked)
   val currentOnCancel by rememberUpdatedState(onCancel)
-  // Desat: girar la pantalla no ha de tornar a obrir el diàleg del sistema
-  var prompted by rememberSaveable { mutableStateOf(false) }
   LaunchedEffect(Unit) {
-    if (prompted || inspection || activity == null) return@LaunchedEffect
-    prompted = true
+    if (inspection || activity == null || !takePrompt()) return@LaunchedEffect
     if (activity.canUnlockWithDevice()) {
       activity.promptUnlock(title, subtitle, onError = { currentOnCancel() }) { currentOnUnlocked() }
     } else {

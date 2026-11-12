@@ -1,6 +1,10 @@
 package com.alorma.contactnotes.ui.sync
 
 import android.app.Activity
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelStore
+import androidx.lifecycle.viewmodel.initializer
+import androidx.lifecycle.viewmodel.viewModelFactory
 import com.alorma.contactnotes.data.sync.RemoteAccount
 import com.alorma.contactnotes.data.sync.SignInResult
 import com.alorma.contactnotes.data.sync.SyncState
@@ -13,6 +17,8 @@ import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 
@@ -25,8 +31,13 @@ class SyncViewModelTest {
   private val env = FakeSyncEnvironment(scope)
   private val tracker = RecordingTracker()
 
+  private val store = ViewModelStore()
+
   // Després de la regla: `viewModelScope` es crea amb el constructor i ha de veure el `Main` de prova
-  private val vm by lazy { SyncViewModel(env.repository, tracker.eventTracker) }
+  private val vm by lazy {
+    val factory = viewModelFactory { initializer { SyncViewModel(env.repository, tracker.eventTracker, scope) } }
+    ViewModelProvider.create(store, factory)[SyncViewModel::class]
+  }
 
   @Test
   fun firstDeviceSignInIsTrackedAsActivating() =
@@ -84,5 +95,35 @@ class SyncViewModelTest {
       vm.onSignOut()
       assertEquals(SyncState.SignedOut, env.repository.state.value)
       assertEquals("sync_signed_out" to mapOf("from" to "needs_key"), tracker.recordedActions().last())
+    }
+
+  @Test
+  fun theActivationPromptIsTakenOncePerSignIn() =
+    scope.runTest {
+      vm.onSignIn(Activity())
+      assertTrue(vm.takeActivationPrompt())
+      assertFalse(vm.takeActivationPrompt())
+      vm.onCancelActivation()
+      vm.onSignIn(Activity())
+      assertTrue(vm.takeActivationPrompt())
+    }
+
+  @Test
+  fun leavingTheScreenInTheMiddleOfAnActivationSignsOut() =
+    scope.runTest {
+      vm.onSignIn(Activity())
+      store.clear()
+      assertEquals(SyncState.SignedOut, env.repository.state.value)
+      assertTrue(env.remote.accounts.isEmpty())
+      assertEquals("sync_activation_cancelled" to emptyMap<String, String>(), tracker.recordedActions().last())
+    }
+
+  @Test
+  fun leavingTheScreenWithTheAccountReadyKeepsTheSession() =
+    scope.runTest {
+      vm.onSignIn(Activity())
+      env.repository.confirmActivation()
+      store.clear()
+      assertTrue(env.repository.state.value is SyncState.Ready)
     }
 }

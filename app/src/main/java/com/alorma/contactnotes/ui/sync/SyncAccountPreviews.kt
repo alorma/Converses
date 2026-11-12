@@ -39,7 +39,7 @@ internal fun SyncSignedOutPreview() {
 internal fun SyncActivatingPreview() {
   ConversesPreviewTheme {
     SyncScaffold(onBack = {}) { padding ->
-      SyncActivatingContent(padding = padding, onUnlocked = {}, onCancel = {})
+      SyncActivatingContent(padding = padding, takePrompt = { false }, onUnlocked = {}, onCancel = {})
     }
   }
 }
