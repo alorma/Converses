@@ -148,6 +148,7 @@ dependencies {
   implementation(libs.compose.settings.core)
   implementation(libs.compose.settings.expressive)
   implementation(libs.androidx.lifecycle.process)
+  implementation(libs.androidx.work.runtime)
   implementation(libs.androidx.biometric)
   implementation(libs.fireandforget.core)
   implementation(libs.androidx.compose.material3.adaptive)

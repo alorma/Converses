@@ -5,14 +5,24 @@ import com.alorma.contactnotes.data.sync.crypto.Bip39
 import com.alorma.contactnotes.data.sync.crypto.Bip39Result
 import com.alorma.contactnotes.data.sync.crypto.DataKey
 import com.alorma.contactnotes.data.sync.crypto.KeyWrap
+import com.alorma.contactnotes.data.sync.crypto.RecordCipher
 import com.alorma.contactnotes.data.sync.crypto.RecoverySecret
 import com.alorma.contactnotes.data.sync.crypto.SYNC_FORMAT
 import java.security.SecureRandom
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -71,8 +81,94 @@ sealed interface WordsOutcome {
 }
 
 /**
- * El compte i la clau de la sincronització. La resta de l'app no sap res de Firebase: mira [state] i crida les accions.
- * Encara no puja ni baixa cap registre (fase 4).
+ * Les dues operacions del motor. Una interfície perquè el repositori es pugui provar sense el motor de debò.
+ */
+interface SyncRunner {
+  suspend fun push(
+    uid: String,
+    cipher: RecordCipher,
+  ): SyncOutcome
+
+  suspend fun pull(
+    uid: String,
+    cipher: RecordCipher,
+    onProgress: (done: Int, total: Int?) -> Unit,
+  ): SyncOutcome
+}
+
+class EngineSyncRunner(
+  private val engine: SyncEngine,
+) : SyncRunner {
+  override suspend fun push(
+    uid: String,
+    cipher: RecordCipher,
+  ): SyncOutcome = engine.pushPending(uid, cipher)
+
+  override suspend fun pull(
+    uid: String,
+    cipher: RecordCipher,
+    onProgress: (done: Int, total: Int?) -> Unit,
+  ): SyncOutcome = engine.pullAll(uid, cipher, onProgress)
+}
+
+/**
+ * Tot el que el repositori necessita per moure registres. `null` al repositori vol dir «sense motor» (tests de només
+ * compte). [deviceName] i [isPro] són funcions perquè el repositori no sàpiga res d'Android ni de RevenueCat.
+ */
+class SyncData(
+  val runner: SyncRunner,
+  val source: LocalSyncSource,
+  val records: SyncRemote,
+  val cursors: SyncCursorStore,
+  val deviceName: () -> String,
+  val isPro: () -> Boolean,
+)
+
+/**
+ * La pujada o baixada de després d'activar un dispositiu, perquè la pantalla la pugui seguir ([progress] de 0 a 1, o
+ * `null` si no es pot mesurar). Mai porta noms ni contingut.
+ */
+sealed interface InitialSync {
+  /** Primer dispositiu: pujant-ho tot. */
+  data class Uploading(
+    val progress: Float?,
+  ) : InitialSync
+
+  /** Dispositiu nou: baixant-ho tot. */
+  data class Downloading(
+    val progress: Float?,
+  ) : InitialSync
+
+  /** Aquest dispositiu ja té [entryCount] entrades. Només informa: [SyncRepository.continueMerge] puja i baixa. */
+  data class MergePrompt(
+    val entryCount: Int,
+  ) : InitialSync
+
+  data object Done : InitialSync
+
+  /** Sense connexió; [SyncRepository.retryInitialSync] ho torna a provar. */
+  data object Offline : InitialSync
+
+  data object Failed : InitialSync
+}
+
+/** El que el bucle de sincronització (`SyncLoop`) demana al repositori. */
+interface SyncActions {
+  suspend fun push(): SyncOutcome
+
+  suspend fun pull(): SyncOutcome
+
+  /** Nombre de canvis locals pendents de pujar. */
+  val pendingCount: Flow<Int>
+
+  /** Emet quan algun altre dispositiu ha escrit; s'acaba o falla si el listener cau. */
+  fun remoteChanges(): Flow<Unit>
+}
+
+/**
+ * El compte i la clau de la sincronització, i el motor quan el dispositiu és [SyncState.Ready]. La resta de l'app no
+ * sap res de Firebase: mira [state], [status] i [initialSync] i crida les accions. Quan i amb quin ritme es
+ * sincronitza ho decideix el `SyncScheduler`.
  */
 class SyncRepository(
   private val auth: AuthGateway,
@@ -82,7 +178,8 @@ class SyncRepository(
   private val scope: CoroutineScope,
   private val clock: () -> Long = System::currentTimeMillis,
   private val random: SecureRandom = SecureRandom(),
-) {
+  private val sync: SyncData? = null,
+) : SyncActions {
   private val mutex = Mutex()
   private val mutableState = MutableStateFlow<SyncState>(SyncState.SignedOut)
 
@@ -91,12 +188,44 @@ class SyncRepository(
   private var keys: StoredKeys? = null
   private var wordsUnlocked = false
 
+  /** El xifrador del compte actiu; només existeix mentre és [SyncState.Ready]. */
+  private class Session(
+    val uid: String,
+    val cipher: RecordCipher,
+  )
+
+  @Volatile private var session: Session? = null
+
+  /** Serialitza les pujades i baixades: dues a la vegada es trepitjarien el cursor i els `dirty`. */
+  private val syncMutex = Mutex()
+  private var registered = false
+  private var readyJob: Job? = null
+  private var initialPlan: InitialPlan? = null
+
+  private enum class InitialPlan { Upload, Download, Merge }
+
+  private enum class Entry { Restored, Activated, JoinedDevice }
+
+  private val mutableStatus = MutableStateFlow<SyncStatus>(SyncStatus.UpToDate(null))
+  private val mutableInitial = MutableStateFlow<InitialSync?>(null)
+
   val state: StateFlow<SyncState> = mutableState.asStateFlow()
 
   /**
-   * Com va la sincronització de dades. Fins que el motor hi sigui (tasca C) és sempre [SyncStatus.UpToDate] sense data.
+   * Com va la sincronització de dades: [SyncStatus.Syncing] mentre corre, [SyncStatus.UpToDate] en acabar bé (l'hora
+   * només és en memòria: un procés nou comença amb `null` fins a la primera sincronització), [SyncStatus.Offline] amb els
+   * canvis pendents, o [SyncStatus.Failed].
    */
-  val status: StateFlow<SyncStatus> = MutableStateFlow<SyncStatus>(SyncStatus.UpToDate(null)).asStateFlow()
+  val status: StateFlow<SyncStatus> = mutableStatus.asStateFlow()
+
+  /**
+   * La pujada, fusió i baixada de després d'activar o d'entrar les paraules; `null` si no hi ha res en curs.
+   * Primer dispositiu: [InitialSync.Uploading] i [InitialSync.Done]. Dispositiu nou: [InitialSync.Downloading] i
+   * [InitialSync.Done]; si ja té entrades, abans [InitialSync.MergePrompt] i s'espera [continueMerge]. [InitialSync.Done],
+   * [InitialSync.Offline] i [InitialSync.Failed] es queden fins a [dismissInitialSync]. «Amaga» no cal aturar res: la
+   * feina és del repositori, no de la pantalla.
+   */
+  val initialSync: StateFlow<InitialSync?> = mutableInitial.asStateFlow()
 
   val wordsReviewedAt: Flow<Long?> get() = local.wordsReviewedAt
 
@@ -115,6 +244,7 @@ class SyncRepository(
     val stored = keyStore.load()?.takeIf { it.uid == account.uid }
     if (stored != null) {
       keys = stored
+      onReady(account, stored, Entry.Restored)
       return SyncState.Ready(account)
     }
     // Sense clau: o bé el compte té dades i calen les paraules, o bé el procés va morir a mitja activació i al núvol
@@ -194,6 +324,7 @@ class SyncRepository(
           keys = generated
           pending = null
           local.setWordsReviewedAt(clock())
+          onReady(current.account, generated, Entry.Activated)
           mutableState.value = SyncState.Ready(current.account)
           ActivationOutcome.Done
         }
@@ -246,6 +377,7 @@ class SyncRepository(
       keyStore.save(opened)
       keys = opened
       local.setWordsReviewedAt(clock())
+      onReady(current.account, opened, Entry.JoinedDevice)
       mutableState.value = SyncState.Ready(current.account)
       WordsOutcome.Accepted
     }
@@ -262,7 +394,191 @@ class SyncRepository(
     }
   }
 
+  // --- Motor ---
+
+  /** Puja el que és pendent. Sense sessió o sense motor no fa res. */
+  override suspend fun push(): SyncOutcome = tracked { s, _ -> checkNotNull(sync).runner.push(s.uid, s.cipher) }
+
+  /** Baixa els canvis dels altres dispositius. */
+  override suspend fun pull(): SyncOutcome =
+    tracked { s, _ -> checkNotNull(sync).runner.pull(s.uid, s.cipher) { _, _ -> } }
+
+  /** Puja i després baixa; és el que fa el worker de fons. S'atura al primer pas que no acaba bé. */
+  suspend fun syncNow(): SyncOutcome {
+    val pushed = push()
+    return if (pushed == SyncOutcome.Done) pull() else pushed
+  }
+
+  override val pendingCount: Flow<Int> get() = sync?.source?.observePendingCount() ?: flowOf(0)
+
+  override fun remoteChanges(): Flow<Unit> =
+    flow {
+      val data = sync ?: return@flow
+      val current = session ?: return@flow
+      emitAll(data.records.listen(current.uid, data.cursors.cursor()).map { })
+    }
+
+  /** «Continua» al diàleg de fusió: la fusió és la unió, així que es puja el que hi ha aquí i es baixa tot. */
+  fun continueMerge() {
+    if (mutableInitial.value !is InitialSync.MergePrompt) return
+    runInitial(InitialPlan.Merge)
+  }
+
+  /** Torna a provar la pujada o baixada inicial després de [InitialSync.Offline] o [InitialSync.Failed]. */
+  fun retryInitialSync() {
+    val plan = initialPlan ?: return
+    if (mutableInitial.value is InitialSync.Offline || mutableInitial.value is InitialSync.Failed) runInitial(plan)
+  }
+
+  /** La pantalla ha acabat: ja no hi ha res a seguir. */
+  fun dismissInitialSync() {
+    mutableInitial.value = null
+  }
+
+  private fun onReady(
+    account: SyncAccount,
+    stored: StoredKeys,
+    entry: Entry,
+  ) {
+    val data = sync ?: return
+    session = Session(account.uid, RecordCipher(stored.dataKey, account.uid))
+    readyJob?.cancel()
+    readyJob =
+      scope.launch {
+        when (entry) {
+          Entry.Restored -> tracked { _, _ -> SyncOutcome.Done }
+          Entry.Activated -> runInitialNow(InitialPlan.Upload)
+          Entry.JoinedDevice -> {
+            val count = data.source.entryCount()
+            if (count > 0) {
+              initialPlan = InitialPlan.Merge
+              mutableInitial.value = InitialSync.MergePrompt(count)
+            } else {
+              runInitialNow(InitialPlan.Download)
+            }
+          }
+        }
+      }
+  }
+
+  private fun runInitial(plan: InitialPlan) {
+    readyJob?.cancel()
+    readyJob = scope.launch { runInitialNow(plan) }
+  }
+
+  private suspend fun runInitialNow(plan: InitialPlan) {
+    initialPlan = plan
+    var outcome = SyncOutcome.Done
+    if (plan != InitialPlan.Download) outcome = upload()
+    if (plan != InitialPlan.Upload && outcome == SyncOutcome.Done) outcome = download()
+    if (session == null) return
+    mutableInitial.value =
+      when (outcome) {
+        SyncOutcome.Done -> InitialSync.Done
+        SyncOutcome.Offline -> InitialSync.Offline
+        SyncOutcome.Failed -> InitialSync.Failed
+      }
+  }
+
+  /** El progrés surt de quants pendents queden: cada fila pujada en treu un. */
+  private suspend fun upload(): SyncOutcome {
+    mutableInitial.value = InitialSync.Uploading(0f)
+    return tracked { s, report ->
+      val data = checkNotNull(sync)
+      coroutineScope {
+        val total = data.source.observePendingCount().first()
+        val watcher =
+          launch {
+            data.source.observePendingCount().collect { left ->
+              if (total > 0) report(((total - left).toFloat() / total).coerceIn(0f, 1f))
+            }
+          }
+        try {
+          data.runner.push(s.uid, s.cipher)
+        } finally {
+          watcher.cancel()
+        }
+      }
+    }
+  }
+
+  private suspend fun download(): SyncOutcome {
+    mutableInitial.value = InitialSync.Downloading(null)
+    return tracked { s, report ->
+      checkNotNull(sync).runner.pull(s.uid, s.cipher) { done, total ->
+        report(total?.takeIf { it > 0 }?.let { (done.toFloat() / it).coerceIn(0f, 1f) })
+      }
+    }
+  }
+
+  /**
+   * Una operació del motor, d'una en una, amb el dispositiu ja apuntat i l'[status] al dia. [report] actualitza el
+   * progrés a l'estat i, si hi ha una pujada o baixada inicial en curs, també a [initialSync]. Cancel·lada, l'estat
+   * torna a ser el d'abans: no es pot quedar «Sincronitzant» per sempre.
+   */
+  private suspend fun tracked(block: suspend (Session, (Float?) -> Unit) -> SyncOutcome): SyncOutcome {
+    if (sync == null) return SyncOutcome.Done
+    return syncMutex.withLock {
+      val current = session ?: return@withLock SyncOutcome.Done
+      val before = mutableStatus.value
+      mutableStatus.value = SyncStatus.Syncing(null)
+      val report: (Float?) -> Unit = { progress ->
+        mutableStatus.value = SyncStatus.Syncing(progress)
+        when (mutableInitial.value) {
+          is InitialSync.Uploading -> mutableInitial.value = InitialSync.Uploading(progress)
+          is InitialSync.Downloading -> mutableInitial.value = InitialSync.Downloading(progress)
+          else -> Unit
+        }
+      }
+      val outcome =
+        try {
+          registerDevice(current).takeIf { it != SyncOutcome.Done } ?: block(current, report)
+        } catch (e: CancellationException) {
+          mutableStatus.value = before
+          throw e
+        }
+      if (session != null) {
+        mutableStatus.value =
+          when (outcome) {
+            SyncOutcome.Done -> SyncStatus.UpToDate(clock())
+            SyncOutcome.Offline -> SyncStatus.Offline(pendingNow())
+            SyncOutcome.Failed -> SyncStatus.Failed
+          }
+      }
+      outcome
+    }
+  }
+
+  private suspend fun pendingNow(): Int = sync?.source?.observePendingCount()?.first() ?: 0
+
+  /**
+   * Apunta aquest dispositiu a `devices` (una vegada per sessió). Les regles exigeixen que qui escriu hi sigui, així
+   * que va abans de tota pujada. El nom va xifrat amb un identificador fix, com qualsevol registre.
+   */
+  private suspend fun registerDevice(current: Session): SyncOutcome {
+    if (registered) return SyncOutcome.Done
+    val data = checkNotNull(sync)
+    val deviceId = data.cursors.deviceId()
+    val sealedName = current.cipher.encrypt("device-name:$deviceId", data.deviceName().toByteArray(Charsets.UTF_8))
+    val result = data.records.registerDevice(current.uid, RemoteDevice(deviceId, sealedName, data.isPro()))
+    return when (result) {
+      is RemoteResult.Ok -> {
+        registered = true
+        SyncOutcome.Done
+      }
+      RemoteResult.Offline -> SyncOutcome.Offline
+      RemoteResult.Failed -> SyncOutcome.Failed
+    }
+  }
+
   private suspend fun signedOut(): SyncState {
+    readyJob?.cancel()
+    readyJob = null
+    session = null
+    registered = false
+    initialPlan = null
+    mutableInitial.value = null
+    mutableStatus.value = SyncStatus.UpToDate(null)
     pending = null
     keys = null
     wordsUnlocked = false
