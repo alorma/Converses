@@ -17,7 +17,7 @@
 | Estat a 13o i a l'indicador: «Al dia», «Sincronitzant…», «Sense connexió · N canvis pendents» | |
 | El dispositiu s'apunta a `devices` (nom xifrat, `addedAt`, `lastSyncAt`) i s'escriu `plan` | Límit de places (13l), dispositius a 13o, dispositiu tret: fase 5 |
 | Regles definitives de Firestore, amb tests a l'emulador i al CI | Límit de 2/5 dispositius a les regles: fase 5 |
-| | «No tinc les paraules» i «Comença de nou» (13n): fase 6, amb esborrar el compte (les dues buiden el núvol) |
+| | «No tinc les paraules» i «Comença de nou» (13n): fase 6, amb esborrar el compte (les dues buiden el núvol) **(B, 12 de novembre de 2026)** |
 
 Tot continua darrere de `SyncFlag`. Amb el flag apagat no s'inicialitza res de nou: ni el motor, ni WorkManager, ni cap listener.
 
@@ -35,7 +35,7 @@ No surt cap tipus de dada que la fase 3 no enviés ja a Firestore, tret dels **r
 - **(C)** Referències que arriben desordenades: una entrada o tasca sense la seva persona (o amb un canal propi que encara no hi és) espera en memòria fins al final de la baixada. El cursor no avança més enllà del primer registre que espera, de manera que si el procés mor, la baixada següent el torna a demanar. Al final d'una baixada completa, el que encara espera és d'una persona esborrada i es descarta. Així no cal cap taula nova.
 - **(C)** Els propis registres que tornen en baixar (`by` és aquest dispositiu) s'ignoren si la versió local no és més antiga.
 - **(C)** Agrupació: 2 segons després de l'última escriptura local, en lots de fins a 200 registres. Reintents amb espera creixent (5 s, 15 s, 1 min, 5 min) mentre l'app és visible; si es tanca amb canvis pendents, un `OneTimeWorkRequest` de WorkManager amb `NetworkType.CONNECTED`. La versió de WorkManager es comprova a la documentació oficial en afegir-la.
-- **(C)** «Amaga» a la pujada i la baixada inicials tanca la pantalla i la feina continua a WorkManager **sense notificació**. Una notificació de progrés demana `POST_NOTIFICATIONS`, un permís nou i un diàleg del sistema; si cal, es decideix a part.
+- **(B, 12 de novembre de 2026)** «Amaga» a la pujada i la baixada inicials tanca la pantalla i la feina continua a WorkManager **sense notificació**: una notificació demanaria `POST_NOTIFICATIONS`, un permís nou.
 - **(C)** El dispositiu s'apunta a `devices` en arribar a `Ready`, amb un `deviceId` aleatori desat al DataStore `sync`. `plan` el posa `ProRepository.isPro`. El límit de places i la UI de dispositius són de la fase 5, però les regles ja exigeixen que `by` sigui a `devices`: és el que fa efectiva l'expulsió de la fase 5.
 - **(C)** Els tests de les regles corren a l'emulador de Firestore (`@firebase/rules-unit-testing`), en un job nou del CI que només s'engega si canvien `firestore.rules` o els tests. Són la frontera de seguretat: valen la pena.
 
