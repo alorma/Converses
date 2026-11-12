@@ -427,4 +427,10 @@
         <item quantity="one">Offline · %d change pending</item>
         <item quantity="other">Offline · %d changes pending</item>
     </plurals>
+    <string name="sync_hide">Hide</string>
+    <string name="sync_down_t">Downloading your data</string>
+    <string name="sync_st_failed">Couldn\'t sync. Will try again.</string>
+    <string name="sync_st_now">Up to date · just now</string>
+    <string name="sync_indicator_syncing">Account: syncing</string>
+    <string name="sync_indicator_offline">Account: offline</string>
 </resources>

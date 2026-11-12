@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.alorma.contactnotes.data.sync.SignInOutcome
 import com.alorma.contactnotes.data.sync.SyncRepository
 import com.alorma.contactnotes.data.sync.SyncState
+import com.alorma.contactnotes.data.sync.SyncStatus
 import com.alorma.contactnotes.data.tracking.EventTracker
 import com.alorma.contactnotes.ui.tracking.Actions
 import com.alorma.contactnotes.ui.tracking.SyncSignInResult
@@ -31,6 +32,11 @@ class SyncViewModel(
   private val cleanupScope: CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Default),
 ) : ViewModel() {
   val state: StateFlow<SyncState> get() = repository.state
+
+  /** Com van les dades (13o): al dia, sincronitzant, sense connexió o error. */
+  val status: StateFlow<SyncStatus> get() = repository.status
+
+  // TODO(fase 4): connectar amb SyncRepository.initialSync (InitialSyncUi, ui/sync/InitialSyncContent.kt)
 
   /** `null` sense sessió o mentre es carrega. */
   val wordsReviewedAt: StateFlow<Long?> =

@@ -5,6 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.tooling.preview.Preview
 import com.alorma.contactnotes.data.sync.SyncAccount
+import com.alorma.contactnotes.data.sync.SyncStatus
 import com.alorma.contactnotes.designsystem.preview.ConversesPreviewTheme
 
 private val PreviewWords =
@@ -25,6 +26,7 @@ private val PreviewWords =
 private val PreviewAccount = SyncAccount(uid = "preview", name = "Bernat", email = "nom@gmail.com")
 private const val PreviewNow = 1_700_000_000_000L
 private const val FourMonthsMillis = 4L * 30 * 24 * 60 * 60 * 1000
+private const val TwoMinutesMillis = 2L * 60 * 1000
 
 @Preview
 @Composable
@@ -45,12 +47,16 @@ internal fun SyncActivatingPreview() {
 }
 
 @Composable
-private fun SyncReadyPreview(wordsReviewedAt: Long?) {
+private fun SyncReadyPreview(
+  wordsReviewedAt: Long?,
+  status: SyncStatus = SyncStatus.UpToDate(PreviewNow - TwoMinutesMillis),
+) {
   ConversesPreviewTheme {
     SyncScaffold(onBack = {}) { padding ->
       SyncReadyContent(
         account = PreviewAccount,
         wordsReviewedAt = wordsReviewedAt,
+        status = status,
         padding = padding,
         onWordsUnlocked = {},
         onSignOut = {},

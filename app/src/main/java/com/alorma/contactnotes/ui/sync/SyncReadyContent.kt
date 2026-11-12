@@ -41,6 +41,7 @@ import androidx.compose.ui.unit.sp
 import androidx.fragment.app.FragmentActivity
 import com.alorma.contactnotes.R
 import com.alorma.contactnotes.data.sync.SyncAccount
+import com.alorma.contactnotes.data.sync.SyncStatus
 import com.alorma.contactnotes.designsystem.components.GroupedListDefaults
 import com.alorma.contactnotes.designsystem.components.SettingRow
 import com.alorma.contactnotes.designsystem.components.groupedItemShape
@@ -57,6 +58,7 @@ import com.alorma.contactnotes.ui.person.promptUnlock
 fun SyncReadyContent(
   account: SyncAccount,
   wordsReviewedAt: Long?,
+  status: SyncStatus,
   padding: PaddingValues,
   onWordsUnlocked: () -> Unit,
   onSignOut: () -> Unit,
@@ -79,6 +81,7 @@ fun SyncReadyContent(
     verticalArrangement = Arrangement.spacedBy(18.dp),
   ) {
     AccountCard(account)
+    SyncStatusRow(status = status, now = now)
     Section(title = stringResource(R.string.sync_security)) {
       SettingRow(
         title = stringResource(R.string.sync_words_title),

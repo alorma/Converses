@@ -426,4 +426,10 @@
         <item quantity="one">Sense connexió · %d canvi pendent</item>
         <item quantity="other">Sense connexió · %d canvis pendents</item>
     </plurals>
+    <string name="sync_hide">Amaga</string>
+    <string name="sync_down_t">Baixant les teves dades</string>
+    <string name="sync_st_failed">No s\'ha pogut sincronitzar. Ho tornarem a provar.</string>
+    <string name="sync_st_now">Al dia · ara mateix</string>
+    <string name="sync_indicator_syncing">Compte: sincronitzant</string>
+    <string name="sync_indicator_offline">Compte: sense connexió</string>
 </resources>

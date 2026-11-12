@@ -1,6 +1,7 @@
 package com.alorma.contactnotes.ui.tracking
 
 import com.alorma.contactnotes.data.sync.ActivationOutcome
+import com.alorma.contactnotes.data.sync.SyncOutcome
 import com.alorma.contactnotes.data.tracking.Action
 import com.alorma.contactnotes.designsystem.theme.ThemeMode
 import com.alorma.contactnotes.shared.ChannelType
@@ -175,6 +176,19 @@ object Actions {
   class SyncSignedOut(
     needsKey: Boolean,
   ) : Action("sync_signed_out", 1, mapOf("from" to if (needsKey) "needs_key" else "ready"))
+
+  /** `result`: `done`, `offline` o `failed`. Sense recomptes. */
+  class SyncUploadFinished(
+    result: SyncOutcome,
+  ) : Action("sync_upload_finished", 1, mapOf("result" to result.name.lowercase()))
+
+  /** `result`: `done`, `offline` o `failed`. Sense recomptes. */
+  class SyncDownloadFinished(
+    result: SyncOutcome,
+  ) : Action("sync_download_finished", 1, mapOf("result" to result.name.lowercase()))
+
+  /** El diàleg «Aquest dispositiu ja té notes»; sense el recompte. */
+  class SyncMergeShown : Action("sync_merge_shown", 1)
 }
 
 enum class SyncSignInResult { ACTIVATING, NEEDS_KEY, CANCELLED, OFFLINE, FAILED }

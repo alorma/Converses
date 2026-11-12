@@ -1,5 +1,6 @@
 package com.alorma.contactnotes.ui.tracking
 
+import com.alorma.contactnotes.data.sync.SyncOutcome
 import com.alorma.contactnotes.designsystem.theme.ThemeMode
 import com.alorma.contactnotes.shared.ChannelType
 import com.alorma.contactnotes.shared.EntryKind
@@ -56,6 +57,17 @@ class ActionsTest {
     )
     assertEquals(mapOf("enabled" to "false"), Actions.PersonProtectionChanged(false).eventProperties)
     assertEquals(mapOf("target" to "privacy"), Actions.LinkOpened(LinkTarget.PRIVACY).eventProperties)
+  }
+
+  @Test
+  fun syncInitialActionsCarryOnlyTheResult() {
+    assertEquals("sync_upload_finished", Actions.SyncUploadFinished(SyncOutcome.Done).eventName)
+    assertEquals(mapOf("result" to "done"), Actions.SyncUploadFinished(SyncOutcome.Done).eventProperties)
+    assertEquals("sync_download_finished", Actions.SyncDownloadFinished(SyncOutcome.Offline).eventName)
+    assertEquals(mapOf("result" to "offline"), Actions.SyncDownloadFinished(SyncOutcome.Offline).eventProperties)
+    assertEquals(mapOf("result" to "failed"), Actions.SyncDownloadFinished(SyncOutcome.Failed).eventProperties)
+    assertEquals("sync_merge_shown", Actions.SyncMergeShown().eventName)
+    assertEquals(emptyMap<String, String>(), Actions.SyncMergeShown().eventProperties)
   }
 
   @Test
