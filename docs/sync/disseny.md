@@ -232,7 +232,7 @@ Queda per a la fase 4:
 | --- | --- |
 | `record/` (`SyncRecord`, `RecordCodec`) | El JSON de cada tipus (persona amb els seus fets fixats, entrada, tasca, canal propi) i l'esborrat (`{ deletedAt }`). Referències per `syncId`. Format fixat per un test |
 | `RoomLocalSyncSource` | El costat de Room: pendents, marcar nets només si no han canviat, aplicar el que baixa sense segellar |
-| `engine/` (`RecordPusher`, `RecordPuller`, `ConflictRules`) | Pujar per lots de 200 i baixar per pàgines, amb els conflictes, els esborrats, les referències que esperen i els canals duplicats |
+| `engine/` (`RecordPusher`, `RecordPuller`, `ConflictRules`) | Baixar abans de pujar, pujar per lots de 200 i baixar per pàgines, amb els conflictes, els esborrats, les referències que esperen i els canals duplicats |
 | `FirestoreSyncRemote` | `users/{uid}/records`, el listener i el dispositiu a `devices`. Una pujada que el servidor no confirma en 20 s és «sense connexió» |
 | `SyncScheduler`, `SyncLoop`, `SyncWorker` | Baixar en obrir i amb el listener, pujar 2 s després de l'últim canvi, reintents (5 s, 15 s, 1 min, 5 min), i WorkManager en passar a segon pla amb canvis pendents |
 | `SyncRepository` | `status` (al dia, sincronitzant, sense connexió amb pendents, error) i `initialSync` (pujada, baixada, fusió) |
@@ -249,10 +249,14 @@ Decisions preses en construir-ho **(C)**:
 
 Comprovat amb tests JVM (motor amb dos dispositius simulats, repositori, bucle, accions), 23 tests de les regles a l'emulador de Firestore, i a l'emulador d'Android (12 de novembre de 2026): activar amb dades (tot pujat, res pendent), tornar a entrar amb les paraules en un dispositiu amb les mateixes dades (fusió sense duplicats, la persona protegida continua protegida), entrar en un dispositiu buit (persones, entrades i fets idèntics als originals), una persona nova que puja sola, i sense connexió («Sense connexió · 1 canvi pendent» i, en tornar la xarxa, pujat).
 
-Pendent de la fase 4:
+Comprovat després amb el servidor real i dos emuladors (12 de novembre de 2026):
 
-- **Regles al servidor real.** Les del repositori encara no s'han desplegat (al servidor hi ha la del spike). Cada registre fa llegir `users/{uid}` a les regles, i un lot té un límit d'accessos (20 en total més 10 per operació, segons la documentació) que no queda clar si compta una sola vegada el mateix document. L'emulador accepta lots de 200; cal provar-ho al servidor real i, si falla, baixar els lots a ~20.
-- **Dos dispositius alhora** (edicions simultànies, esborrar en un i editar a l'altre): provat als tests JVM, no amb dos emuladors, perquè el segon necessita registrar un altre token de debug d'App Check.
+- **Regles desplegades** a `converses-72251`. Una pujada de 250 registres (un lot de 200 i un de 50) passa amb les regles, així que el `get()` de `users/{uid}` per registre no topa amb el límit d'accessos: els lots es queden a 200.
+- **Dos dispositius** (telèfon i tauleta): la tauleta entra amb les paraules i baixa una base de dades idèntica; una persona creada en un apareix a l'altre en uns segons i esborrar-la en un la treu de l'altre.
+- **Una persona esborrada des d'un altre dispositiu** deixava la fitxa oberta en blanc. Ara la fitxa, en veure que la persona ja no hi és, treu de la navegació tot el que en depèn (`TopLevelBackStack.forgetPerson`), i l'esborrat local fa servir el mateix.
+- **Edicions simultànies:** la mateixa persona reanomenada a tots dos dispositius, un sense xarxa. Si edita més tard el que no té xarxa, guanya ell en tornar la connexió. En el cas contrari, abans quedava cadascú amb la seva, perquè Firestore escriu sense mirar què hi ha i el dispositiu que tornava trepitjava al núvol l'edició més nova amb la seva. Ara hi ha dues correccions. `pushPending` baixa abans de pujar, perquè el conflicte es resolgui al dispositiu i només pugi el que guanya. A més, si una baixada porta un registre d'un altre dispositiu que perd contra una fila local ja pujada, la fila torna a quedar pendent (`ConflictRules.mustReassert`, `markDirty`) i el guanyador torna al núvol. Una divergència que havia quedat d'abans es va arreglar sola en obrir l'app amb la versió nova. Tots dos casos convergeixen a la versió més nova, i passa el mateix amb un esborrat que trepitja una edició posterior.
+
+Queda per a la fase 5: tancar la sessió buida el DataStore `sync` i genera un `deviceId` nou cada vegada, i a `devices` s'hi acumulen entrades velles. És el primer punt de la fase 5, amb el límit de dispositius i la pantalla de dispositius.
 
 ### Persones protegides
 
