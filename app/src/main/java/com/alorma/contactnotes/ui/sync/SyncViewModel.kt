@@ -6,6 +6,9 @@ import androidx.lifecycle.viewModelScope
 import com.alorma.contactnotes.data.sync.SignInOutcome
 import com.alorma.contactnotes.data.sync.SyncRepository
 import com.alorma.contactnotes.data.sync.SyncState
+import com.alorma.contactnotes.data.tracking.EventTracker
+import com.alorma.contactnotes.ui.tracking.Actions
+import com.alorma.contactnotes.ui.tracking.SyncSignInResult
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
@@ -20,6 +23,7 @@ enum class SyncMessage { SignInOffline, SignInFailed }
 /** La pantalla «Sincronització»: l'estat del compte i les accions que no són de cap subpantalla. */
 class SyncViewModel(
   private val repository: SyncRepository,
+  private val tracker: EventTracker,
 ) : ViewModel() {
   val state: StateFlow<SyncState> get() = repository.state
 
@@ -31,8 +35,11 @@ class SyncViewModel(
   val messages: Flow<SyncMessage> = messageChannel.receiveAsFlow()
 
   fun onSignIn(activity: Activity) {
+    tracker.trackAction(Actions.SyncSignInStarted())
     viewModelScope.launch {
-      when (repository.signIn(activity)) {
+      val outcome = repository.signIn(activity)
+      tracker.trackAction(Actions.SyncSignInFinished(outcome.tracked()))
+      when (outcome) {
         SignInOutcome.Done, SignInOutcome.Cancelled -> Unit
         SignInOutcome.Offline -> messageChannel.send(SyncMessage.SignInOffline)
         SignInOutcome.Failed -> messageChannel.send(SyncMessage.SignInFailed)
@@ -40,15 +47,31 @@ class SyncViewModel(
     }
   }
 
+  private fun SignInOutcome.tracked(): SyncSignInResult =
+    when (this) {
+      SignInOutcome.Done ->
+        if (repository.state.value is SyncState.NeedsKey) SyncSignInResult.NEEDS_KEY else SyncSignInResult.ACTIVATING
+      SignInOutcome.Cancelled -> SyncSignInResult.CANCELLED
+      SignInOutcome.Offline -> SyncSignInResult.OFFLINE
+      SignInOutcome.Failed -> SyncSignInResult.FAILED
+    }
+
   /** L'empremta ha anat bé: la pantalla de les paraules ja les pot demanar. */
   fun onWordsUnlocked() = repository.unlockWords()
 
   /** A l'activació, cancel·lar l'empremta o tancar abans de continuar tanca la sessió. */
   fun onCancelActivation() {
-    viewModelScope.launch { repository.cancelActivation() }
+    viewModelScope.launch {
+      if (repository.cancelActivation()) tracker.trackAction(Actions.SyncActivationCancelled())
+    }
   }
 
+  /** «Tanca la sessió» amb la sessió activa, o «Canvia» el compte quan falten les paraules. */
   fun onSignOut() {
-    viewModelScope.launch { repository.signOut() }
+    val needsKey = repository.state.value is SyncState.NeedsKey
+    viewModelScope.launch {
+      repository.signOut()
+      tracker.trackAction(Actions.SyncSignedOut(needsKey))
+    }
   }
 }

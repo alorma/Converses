@@ -280,13 +280,14 @@ Decisions preses en construir-ho **(C)**:
 
 **Sense QR a la fase 3 (B, 11 de novembre de 2026).** Les targetes i files que hi porten no es dibuixen; el QR passa a una fase 3b. Tampoc hi són «No tinc les paraules» («Comença de nou», que necessita el motor), l'estat «Al dia», els dispositius, esborrar el compte ni el dispositiu tret.
 
-Comprovat amb tests JVM (`SyncRepositoryTest`, `StoredKeysCodecTest`, `SecurityWordsViewModelTest`, `EnterWordsViewModelTest`, `SyncIndicatorTest`) amb falsos de les quatre portes (`FakeSync`), i amb captures de pantalla de cada pantalla.
+**Analítica:** les pantalles `sync`, `sync_words` i `sync_enter_words`, set accions `sync_*` amb valors tancats (catàleg a `docs/analytics/README.md`) i els errors `sync_sign_in`, `sync_account` i `sync_key_store`. Mai el compte, el correu ni les paraules. Com la resta, només amb el «Sí» a les estadístiques: no envia cap dada nova.
+
+Comprovat amb tests JVM (`SyncRepositoryTest`, `StoredKeysCodecTest`, `SyncViewModelTest`, `SecurityWordsViewModelTest`, `EnterWordsViewModelTest`, `SyncIndicatorTest`) amb falsos de les quatre portes (`FakeSync`), i amb captures de pantalla de cada pantalla.
 
 Pendent de la fase 3:
 
 - La **prova a l'emulador** amb el flag encès: activar, tancar la sessió, tornar a entrar amb les paraules i paraules equivocades. El proveïdor de debug d'App Check escriu un token al logcat que cal registrar a la consola de Firebase.
-- L'**analítica de sync** (pantalles `sync`, `sync_words` i `sync_enter_words` ja són al catàleg de pantalles, però les accions encara no).
-- **APK de GitHub i dispositius sense serveis de Google:** amb App Check forçat, només passen les instal·lacions que Play Integrity reconeix. Cal decidir què passa amb els APK de GitHub (no instal·lats des de Play) i amb els dispositius sense serveis de Google: ara no podrien iniciar sessió.
+- **APK de GitHub:** amb App Check forçat, només passen les instal·lacions que Play Integrity reconeix, i previsiblement un APK de GitHub no podrà iniciar sessió. Es provarà més endavant. **(B, 12 de novembre de 2026)** Els dispositius sense serveis de Google no importen: s'accepta que no puguin sincronitzar.
 - La política de privacitat i el formulari de Play (fase 7, abans de treure el flag) i mesurar els servidors contactats.
 
 ## Privacitat externa

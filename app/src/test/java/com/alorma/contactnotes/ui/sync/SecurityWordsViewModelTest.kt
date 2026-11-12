@@ -9,6 +9,7 @@ import com.alorma.contactnotes.data.sync.SyncState
 import com.alorma.contactnotes.testing.FakeAccountRemote
 import com.alorma.contactnotes.testing.FakeSyncEnvironment
 import com.alorma.contactnotes.testing.MainDispatcherRule
+import com.alorma.contactnotes.testing.RecordingTracker
 import com.alorma.contactnotes.testing.TestAccount
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
@@ -31,6 +32,7 @@ class SecurityWordsViewModelTest {
   private val env = FakeSyncEnvironment(scope)
   private val repository = env.repository
   private val store = ViewModelStore()
+  private val tracker = RecordingTracker()
 
   private suspend fun activating() {
     repository.signIn(Activity())
@@ -39,7 +41,9 @@ class SecurityWordsViewModelTest {
 
   private fun viewModel(activation: Boolean): SecurityWordsViewModel {
     val factory =
-      viewModelFactory { initializer { SecurityWordsViewModel(activation, repository, cleanupScope = scope) } }
+      viewModelFactory {
+        initializer { SecurityWordsViewModel(activation, repository, tracker.eventTracker, cleanupScope = scope) }
+      }
     return ViewModelProvider.create(store, factory)[SecurityWordsViewModel::class]
   }
 
@@ -155,6 +159,59 @@ class SecurityWordsViewModelTest {
       assertEquals(12, repository.securityWords()?.size)
       store.clear()
       assertNull(repository.securityWords())
+    }
+
+  @Test
+  fun tracksCopyAndTheActivationResult() =
+    scope.runTest {
+      activating()
+      val vm = viewModel(activation = true)
+      vm.onCopied()
+      vm.onSavedChange(true)
+      env.remote.failure = FakeAccountRemote.Failure.Offline
+      vm.onContinue()
+      vm.events.first()
+      env.remote.failure = null
+      vm.onContinue()
+      vm.events.first()
+      // Tancar després de continuar ja no és cancel·lar
+      store.clear()
+      assertEquals(
+        listOf(
+          "sync_words_copied" to emptyMap(),
+          "sync_activation_finished" to mapOf("result" to "offline"),
+          "sync_activation_finished" to mapOf("result" to "done"),
+        ),
+        tracker.recordedActions(),
+      )
+    }
+
+  @Test
+  fun closingBeforeContinuingTracksOneCancellation() =
+    scope.runTest {
+      activating()
+      val vm = viewModel(activation = true)
+      vm.close()
+      vm.events.first()
+      store.clear()
+      assertEquals(listOf("sync_activation_cancelled" to emptyMap<String, String>()), tracker.recordedActions())
+    }
+
+  @Test
+  fun anotherDeviceActivatedMeanwhileIsTrackedAsAlreadyActive() =
+    scope.runTest {
+      activating()
+      val vm = viewModel(activation = true)
+      vm.onSavedChange(true)
+      env.remote.accounts[TestAccount.uid] =
+        com.alorma.contactnotes.data.sync
+          .RemoteAccount(ByteArray(0), 1)
+      vm.onContinue()
+      vm.events.first()
+      assertEquals(
+        listOf("sync_activation_finished" to mapOf("result" to "already_active")),
+        tracker.recordedActions(),
+      )
     }
 
   @Test

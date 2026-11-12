@@ -143,7 +143,7 @@ val syncModule =
 val viewModelModule =
   module {
     viewModelOf(::SyncViewModel)
-    viewModel { (activation: Boolean) -> SecurityWordsViewModel(activation, get()) }
+    viewModel { (activation: Boolean) -> SecurityWordsViewModel(activation, get(), get()) }
     viewModelOf(::EnterWordsViewModel)
     viewModel { (archived: Boolean) -> PeopleListViewModel(archived, get(), get()) }
     viewModelOf(::SettingsViewModel)

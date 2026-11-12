@@ -203,12 +203,16 @@ class SyncRepository(
       }
     }
 
-  /** Tancar les paraules abans de continuar: es tanca la sessió i al núvol no hi queda res. */
-  suspend fun cancelActivation() {
+  /**
+   * Tancar les paraules abans de continuar: es tanca la sessió i al núvol no hi queda res. `true` si hi havia una
+   * activació a mitges; `false` si ja s'havia confirmat o cancel·lat.
+   */
+  suspend fun cancelActivation(): Boolean =
     mutex.withLock {
-      if (mutableState.value is SyncState.Activating) mutableState.value = signedOut()
+      if (mutableState.value !is SyncState.Activating) return false
+      mutableState.value = signedOut()
+      true
     }
-  }
 
   /** Les paraules escrites en un dispositiu nou. Si obren la clau del compte, es desa i el dispositiu queda llest. */
   suspend fun submitWords(words: List<String>): WordsOutcome =

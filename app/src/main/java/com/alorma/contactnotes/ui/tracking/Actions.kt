@@ -1,5 +1,6 @@
 package com.alorma.contactnotes.ui.tracking
 
+import com.alorma.contactnotes.data.sync.ActivationOutcome
 import com.alorma.contactnotes.data.tracking.Action
 import com.alorma.contactnotes.designsystem.theme.ThemeMode
 import com.alorma.contactnotes.shared.ChannelType
@@ -146,7 +147,39 @@ object Actions {
   class OnboardingFinished(
     skipped: Boolean,
   ) : Action("onboarding_finished", 1, mapOf("skipped" to skipped.toString()))
+
+  // Sincronització. Mai el compte, el correu ni el nombre de paraules: només què ha passat.
+
+  class SyncSignInStarted : Action("sync_sign_in_started", 1)
+
+  /** `result`: `activating` (primer dispositiu), `needs_key`, `cancelled`, `offline` o `failed`. */
+  class SyncSignInFinished(
+    result: SyncSignInResult,
+  ) : Action("sync_sign_in_finished", 1, mapOf("result" to result.tracked()))
+
+  class SyncActivationFinished(
+    result: ActivationOutcome,
+  ) : Action("sync_activation_finished", 1, mapOf("result" to result.tracked()))
+
+  /** Tancar les paraules o cancel·lar l'empremta abans de «Continua»: la sessió es tanca. */
+  class SyncActivationCancelled : Action("sync_activation_cancelled", 1)
+
+  class SyncWordsCopied : Action("sync_words_copied", 1)
+
+  /** `result`: `accepted`, `wrong`, `invalid`, `offline` o `failed`. */
+  class SyncWordsSubmitted(
+    result: SyncWordsResult,
+  ) : Action("sync_words_submitted", 1, mapOf("result" to result.tracked()))
+
+  /** `from`: `ready` («Tanca la sessió») o `needs_key` («Canvia», sense les paraules). */
+  class SyncSignedOut(
+    needsKey: Boolean,
+  ) : Action("sync_signed_out", 1, mapOf("from" to if (needsKey) "needs_key" else "ready"))
 }
+
+enum class SyncSignInResult { ACTIVATING, NEEDS_KEY, CANCELLED, OFFLINE, FAILED }
+
+enum class SyncWordsResult { ACCEPTED, WRONG, INVALID, OFFLINE, FAILED }
 
 /** Com s'escriu una entrada: nova, nova amb el tipus ja triat (entrada fantasma), editada o des de la nota ràpida. */
 enum class EntryMode { NEW, NEW_AS, EDIT, QUICK }
@@ -155,4 +188,5 @@ enum class ToggleSetting { DYNAMIC_COLOR, PERSON_COLOR, HAPTICS, APP_LOCK, ANALY
 
 enum class LinkTarget { LANGUAGE, SECURITY, PRIVACY, FEEDBACK }
 
-private fun Enum<*>.tracked(): String = name.lowercase()
+/** `AlreadyActive` surt com `already_active`, igual que la resta de valors. */
+private fun Enum<*>.tracked(): String = name.replace(Regex("(?<=[a-z])(?=[A-Z])"), "_").lowercase()

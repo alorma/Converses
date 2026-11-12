@@ -104,6 +104,7 @@ fun SecurityWordsScreen(
     onClose = viewModel::close,
     onCopy = {
       SensitiveClipboard.copy(context, state.words.joinToString(" "))
+      viewModel.onCopied()
       scope.launch {
         snackbar.currentSnackbarData?.dismiss()
         snackbar.showSnackbar(copiedText)

@@ -7,6 +7,9 @@ import com.alorma.contactnotes.data.sync.SyncState
 import com.alorma.contactnotes.data.sync.WordsOutcome
 import com.alorma.contactnotes.data.sync.crypto.Bip39
 import com.alorma.contactnotes.data.sync.crypto.Bip39Result
+import com.alorma.contactnotes.data.tracking.EventTracker
+import com.alorma.contactnotes.ui.tracking.Actions
+import com.alorma.contactnotes.ui.tracking.SyncWordsResult
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -100,6 +103,7 @@ enum class EnterWordsMessage { Offline, Failed }
  */
 class EnterWordsViewModel(
   private val repository: SyncRepository,
+  private val tracker: EventTracker,
 ) : ViewModel() {
   private val mutableState = MutableStateFlow(EnterWordsUiState())
   val state: StateFlow<EnterWordsUiState> = mutableState.asStateFlow()
@@ -136,6 +140,7 @@ class EnterWordsViewModel(
     mutableState.update { it.copy(submitting = true) }
     viewModelScope.launch {
       val outcome = repository.submitWords(current.words)
+      tracker.trackAction(Actions.SyncWordsSubmitted(outcome.tracked()))
       mutableState.update { it.copy(submitting = false) }
       when (outcome) {
         // Acceptades: el compte passa a Ready i `open` tanca la pantalla. Sense clau (compte buit) passa el mateix.
@@ -147,6 +152,15 @@ class EnterWordsViewModel(
       }
     }
   }
+
+  private fun WordsOutcome.tracked(): SyncWordsResult =
+    when (this) {
+      WordsOutcome.Accepted -> SyncWordsResult.ACCEPTED
+      WordsOutcome.Wrong -> SyncWordsResult.WRONG
+      is WordsOutcome.Invalid -> SyncWordsResult.INVALID
+      WordsOutcome.Offline -> SyncWordsResult.OFFLINE
+      WordsOutcome.Failed -> SyncWordsResult.FAILED
+    }
 
   /** Dotze paraules de la llista en un ordre que no val són, per a qui les escriu, el mateix problema que unes altres. */
   private fun invalid(problem: Bip39Result) {

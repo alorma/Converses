@@ -12,6 +12,7 @@ import com.alorma.contactnotes.data.sync.crypto.SYNC_FORMAT
 import com.alorma.contactnotes.testing.FakeAccountRemote
 import com.alorma.contactnotes.testing.FakeSyncEnvironment
 import com.alorma.contactnotes.testing.MainDispatcherRule
+import com.alorma.contactnotes.testing.RecordingTracker
 import com.alorma.contactnotes.testing.TestAccount
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
@@ -33,6 +34,7 @@ class EnterWordsViewModelTest {
   private val env = FakeSyncEnvironment(scope)
   private val secret = RecoverySecret.generate()
   private val goodWords = secret.words
+  private val tracker = RecordingTracker()
 
   /** Un compte amb dades al núvol i aquest dispositiu sense clau: l'estat és NeedsKey. */
   private fun viewModel(): EnterWordsViewModel {
@@ -40,7 +42,7 @@ class EnterWordsViewModelTest {
       RemoteAccount(KeyWrap.wrap(DataKey.generate(), secret, TestAccount.uid), SYNC_FORMAT)
     runBlocking { env.repository.signIn(Activity()) }
     assertEquals(SyncState.NeedsKey(TestAccount), env.repository.state.value)
-    return EnterWordsViewModel(env.repository)
+    return EnterWordsViewModel(env.repository, tracker.eventTracker)
   }
 
   private fun EnterWordsViewModel.fill(words: List<String>) = onTextChange(words.joinToString(" "))
@@ -152,6 +154,23 @@ class EnterWordsViewModelTest {
       assertTrue(vm.state.value.wrongWords)
       assertEquals(SyncState.NeedsKey(TestAccount), env.repository.state.value)
       assertTrue(vm.open.value)
+    }
+
+  @Test
+  fun eachSubmissionTracksOnlyItsResult() =
+    scope.runTest {
+      val vm = viewModel()
+      vm.fill(RecoverySecret.generate().words)
+      vm.submit()
+      vm.fill(goodWords)
+      vm.submit()
+      assertEquals(
+        listOf(
+          "sync_words_submitted" to mapOf("result" to "wrong"),
+          "sync_words_submitted" to mapOf("result" to "accepted"),
+        ),
+        tracker.recordedActions(),
+      )
     }
 
   @Test

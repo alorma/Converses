@@ -4,6 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.alorma.contactnotes.data.sync.ActivationOutcome
 import com.alorma.contactnotes.data.sync.SyncRepository
+import com.alorma.contactnotes.data.tracking.EventTracker
+import com.alorma.contactnotes.ui.tracking.Actions
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -36,6 +38,7 @@ enum class SecurityWordsEvent { Close, Offline, Failed }
 class SecurityWordsViewModel(
   private val activation: Boolean,
   private val repository: SyncRepository,
+  private val tracker: EventTracker,
   /** Sobreviu al ViewModel: tancar la pantalla amb el gest o fora del diàleg ha de poder tancar la sessió igualment. */
   private val cleanupScope: CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Default),
 ) : ViewModel() {
@@ -60,7 +63,9 @@ class SecurityWordsViewModel(
     if (!activation || !current.saved || current.working) return
     mutableState.update { it.copy(working = true) }
     viewModelScope.launch {
-      when (repository.confirmActivation()) {
+      val outcome = repository.confirmActivation()
+      tracker.trackAction(Actions.SyncActivationFinished(outcome))
+      when (outcome) {
         // Amb AlreadyActive l'estat ja és «falta la clau»: la pantalla de sota ho resol
         ActivationOutcome.Done, ActivationOutcome.AlreadyActive -> eventChannel.send(SecurityWordsEvent.Close)
         ActivationOutcome.Offline -> failed(SecurityWordsEvent.Offline)
@@ -80,14 +85,22 @@ class SecurityWordsViewModel(
    */
   fun close() {
     viewModelScope.launch {
-      if (activation) repository.cancelActivation()
+      if (activation) cancelActivation()
       eventChannel.send(SecurityWordsEvent.Close)
     }
+  }
+
+  /** «Copia»: les paraules van al porta-retalls (la pantalla ho fa; aquí només es compta). */
+  fun onCopied() = tracker.trackAction(Actions.SyncWordsCopied())
+
+  /** Només compta si hi havia una activació a mitges: després de «Continua» o d'un altre tancament no fa res. */
+  private suspend fun cancelActivation() {
+    if (repository.cancelActivation()) tracker.trackAction(Actions.SyncActivationCancelled())
   }
 
   override fun onCleared() {
     // Les paraules tornen a necessitar l'empremta
     repository.lockWords()
-    if (activation) cleanupScope.launch { repository.cancelActivation() }
+    if (activation) cleanupScope.launch { cancelActivation() }
   }
 }
