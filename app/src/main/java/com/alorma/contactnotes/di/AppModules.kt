@@ -147,7 +147,10 @@ val syncModule =
     single<SyncCursorStore> { DataStoreSyncCursorStore(androidContext()) }
     single<SyncRemote> { FirestoreSyncRemote() }
     single<LocalSyncSource> { RoomLocalSyncSource(get(), get(), get(), get(), get(), get()) }
-    single { SyncEngine(get(), get(), get()) }
+    single {
+      val tracker = get<EventTracker>()
+      SyncEngine(get(), get(), get(), onError = { error, where -> tracker.trackError(error, where) })
+    }
     // Sense `singleOf`: intentaria resoldre el rellotge i l'aleatori, que tenen valor per defecte
     single { SyncRepository(get(), get(), get(), get(), CoroutineScope(SupervisorJob() + Dispatchers.Default)) }
   }
