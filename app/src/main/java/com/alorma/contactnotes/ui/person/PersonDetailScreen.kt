@@ -49,6 +49,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -149,9 +150,18 @@ fun PersonDetailRoute(
   onOpenTask: (TaskEntity) -> Unit = {},
   /** Pantalla gran: és el panell de detall al costat del llistat, sense fletxa enrere. */
   inPane: Boolean = false,
+  /** La persona ja no existeix (esborrada aquí o des d'un altre dispositiu): cal treure-la de la navegació. */
+  onPersonGone: () -> Unit = onBack,
   viewModel: PersonDetailViewModel = koinViewModel(parameters = { parametersOf(personId) }),
 ) {
   val state by viewModel.uiState.collectAsStateWithLifecycle()
+
+  // Sense això la pantalla es quedaria en blanc (més avall, `state.person ?: return`)
+  val currentOnPersonGone by rememberUpdatedState(onPersonGone)
+  val gone = !state.isLoading && state.person == null
+  LaunchedEffect(gone) {
+    if (gone) currentOnPersonGone()
+  }
   val otherPeople by viewModel.otherPeople.collectAsStateWithLifecycle()
   val trackAction = rememberActionTracker()
 

@@ -171,6 +171,32 @@ class TopLevelBackStackTest {
   }
 
   @Test
+  fun `forgetting a person drops every route about them and keeps the rest`() {
+    val stack = stackOf()
+    stack.navigate(SettingsRoute)
+    stack.navigate(PersonRoute(1))
+    stack.navigate(EditPersonRoute(personId = 1))
+    stack.navigate(TaskRoute(personId = 1))
+    stack.navigate(PersonRoute(2))
+
+    stack.forgetPerson(1)
+
+    assertEquals(listOf<NavKey>(PeopleRoute, SettingsRoute, PersonRoute(2)), stack.backStack)
+  }
+
+  @Test
+  fun `forgetting a person twice changes nothing the second time`() {
+    val stack = stackOf()
+    stack.navigate(PersonRoute(1))
+    stack.navigate(EditPersonRoute(personId = 1))
+
+    stack.forgetPerson(1)
+    stack.forgetPerson(1)
+
+    assertEquals(listOf<NavKey>(PeopleRoute), stack.backStack)
+  }
+
+  @Test
   fun `unlocking a person replaces the locked screen`() {
     val stack = stackOf()
     stack.navigate(PersonLockedRoute(1))

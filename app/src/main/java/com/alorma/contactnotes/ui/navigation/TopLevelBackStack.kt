@@ -90,6 +90,25 @@ class TopLevelBackStack(
     return true
   }
 
+  /**
+   * Drops every route about person [id] (detail, locked screen, editor, task, quick note) wherever it is in the stack.
+   * For a person that no longer exists: deleted here or by another device through sync. It is idempotent, so the
+   * local delete and the detail noticing the person is gone can both call it.
+   */
+  fun forgetPerson(id: Long) {
+    entries.removeAll { route ->
+      when (route) {
+        is PersonRoute -> route.id == id
+        is PersonLockedRoute -> route.id == id
+        is EditPersonRoute -> route.personId == id
+        is TaskRoute -> route.personId == id
+        is QuickNoteRoute -> route.personId == id
+        else -> false
+      }
+    }
+    if (entries.isEmpty()) entries.add(PeopleRoute)
+  }
+
   /** Leaves [root] as the only route (onboarding → people). */
   fun resetTo(root: AppRoute = PeopleRoute) {
     entries.add(root)

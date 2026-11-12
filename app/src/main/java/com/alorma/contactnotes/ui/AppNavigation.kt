@@ -330,6 +330,7 @@ fun AppNavigation(
                 onNewTask = { navigation.navigate(TaskRoute(route.id)) },
                 onOpenTask = { navigation.navigate(TaskRoute(route.id, it.id)) },
                 inPane = twoPane,
+                onPersonGone = { navigation.forgetPerson(route.id) },
               )
             }
           }
@@ -349,10 +350,8 @@ fun AppNavigation(
                     navigation.openPerson(PersonRoute(id))
                   }
                 },
-                onDeleted = {
-                  navigation.pop()
-                  navigation.pop()
-                },
+                // Ho pot haver fet ja el detall en veure que la persona no hi és: forgetPerson no fa res dos cops
+                onDeleted = { navigation.forgetPerson(route.personId) },
               )
             }
           }
