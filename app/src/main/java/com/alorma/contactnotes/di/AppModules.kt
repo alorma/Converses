@@ -145,7 +145,7 @@ val syncModule =
     single<SyncKeyStore> { AndroidSyncKeyStore(androidContext(), get<EventTracker>()) }
     single<SyncLocalStore> { DataStoreSyncLocalStore(androidContext()) }
     single<SyncCursorStore> { DataStoreSyncCursorStore(androidContext()) }
-    single<SyncRemote> { FirestoreSyncRemote() }
+    single<SyncRemote> { FirestoreSyncRemote(get(), get<EventTracker>()) }
     single<LocalSyncSource> { RoomLocalSyncSource(get(), get(), get(), get(), get(), get()) }
     single { SyncEngine(get(), get(), get()) }
     // Sense `singleOf`: intentaria resoldre el rellotge i l'aleatori, que tenen valor per defecte

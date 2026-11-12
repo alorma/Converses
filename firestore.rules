@@ -2,15 +2,39 @@ rules_version = '2';
 
 // Regles de Firestore de Converses (projecte converses-72251, base de dades per defecte, regió eur3).
 // Aquest fitxer és la font de veritat: es desplega amb `firebase deploy --only firestore:rules` i no s'edita a la
-// consola. El disseny és a docs/sync/disseny.md, secció «Regles de Firestore».
+// consola. El disseny és a docs/sync/disseny.md, secció «Regles de Firestore»; els tests són a firestore-tests/ i
+// corren a l'emulador (també al CI).
 //
-// Ara mateix només hi ha la regla del spike (fase 0): cadascú llegeix i escriu el que hi ha sota el seu usuari, i
-// ningú més. Els límits de dispositius, la forma dels documents i la mida màxima dels registres arriben amb les
-// fases 4 i 5, amb els seus tests a l'emulador.
+// Només el propietari llegeix i escriu sota `users/{uid}`, amb la forma dels documents fixada i la mida de cada
+// registre limitada. Un registre només s'escriu si `by` és un dispositiu de `devices`: és el que fa efectiva
+// l'expulsió al servidor. El límit de dispositius (2 o 5 segons el pla) arriba amb la fase 5.
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /users/{uid}/{document=**} {
-      allow read, write: if request.auth != null && request.auth.uid == uid;
+    function isOwner(uid) {
+      return request.auth != null && request.auth.uid == uid;
+    }
+
+    // El document del compte: la clau embolcallada i el que l'app hi declara
+    match /users/{uid} {
+      allow read, delete: if isOwner(uid);
+      allow create, update: if isOwner(uid)
+        && request.resource.data.keys().hasOnly(['wrappedKey', 'format', 'createdAt', 'plan', 'devices', 'lastSyncAt'])
+        && (!('plan' in request.resource.data) || request.resource.data.plan in ['free', 'pro'])
+        && (!('devices' in request.resource.data) || request.resource.data.devices is map);
+
+      // Els registres xifrats: el contingut és a `c`; la resta és el que cal per ordenar i per comprovar qui l'escriu
+      match /records/{id} {
+        allow read, delete: if isOwner(uid);
+        allow create, update: if isOwner(uid)
+          && request.resource.data.keys().hasOnly(['c', 'deleted', 'by', 'updatedAt'])
+          && request.resource.data.keys().hasAll(['c', 'deleted', 'by', 'updatedAt'])
+          && request.resource.data.c is bytes
+          && request.resource.data.c.size() <= 65536
+          && request.resource.data.deleted is bool
+          && request.resource.data.by is string
+          && request.resource.data.updatedAt == request.time
+          && request.resource.data.by in get(/databases/$(database)/documents/users/$(uid)).data.devices.keys();
+      }
     }
 
     // Tota la resta queda tancada: una ruta que no surt aquí no es pot llegir ni escriure.

@@ -22,3 +22,6 @@ firebase-debug.log
 firestore-debug.log
 ui-debug.log
 .firebase/
+
+# Tests de les regles de Firestore
+firestore-tests/node_modules/

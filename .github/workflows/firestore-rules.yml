@@ -1,0 +1,52 @@
+name: Firestore rules
+
+# Prova firestore.rules a l'emulador de Firestore (projecte demo-: no toca mai el projecte real ni desplega res)
+on:
+  pull_request:
+    paths:
+      - firestore.rules
+      - firebase.json
+      - firestore-tests/**
+      - .github/workflows/firestore-rules.yml
+  push:
+    branches: [main]
+    paths:
+      - firestore.rules
+      - firebase.json
+      - firestore-tests/**
+      - .github/workflows/firestore-rules.yml
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  rules:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v7
+
+      # L'emulador de Firestore és una aplicació Java
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: firestore-tests/package-lock.json
+
+      - name: Install test dependencies
+        working-directory: firestore-tests
+        run: npm ci
+
+      - name: Test the rules
+        working-directory: firestore-tests
+        run: npx --yes firebase-tools@15.36.0 emulators:exec --only firestore --project demo-converses "npm test"
