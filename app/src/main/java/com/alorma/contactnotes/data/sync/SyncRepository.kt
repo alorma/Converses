@@ -8,10 +8,12 @@ import com.alorma.contactnotes.data.sync.crypto.KeyWrap
 import com.alorma.contactnotes.data.sync.crypto.RecordCipher
 import com.alorma.contactnotes.data.sync.crypto.RecoverySecret
 import com.alorma.contactnotes.data.sync.crypto.SYNC_FORMAT
+import com.alorma.contactnotes.data.tracking.ErrorSites
 import java.security.SecureRandom
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,13 +21,17 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withTimeoutOrNull
 
 sealed interface SyncState {
   /** Sense sessió: l'app funciona com sempre i res surt del dispositiu. */
@@ -154,6 +160,10 @@ class SyncData(
   val devices: DeviceStore,
   val deviceName: () -> String,
   val isPro: () -> Boolean,
+  /** Cada canvi d'`isPro` (un `StateFlow`: el primer valor és l'actual); manté `plan` al dia mentre és `Ready`. */
+  val isProChanges: Flow<Boolean> = emptyFlow(),
+  /** Rep els errors (només l'error i el lloc, mai noms ni dades). */
+  val onError: (Throwable, String) -> Unit = { _, _ -> },
 )
 
 /**
@@ -195,6 +205,14 @@ interface SyncActions {
 
   /** Emet quan algun altre dispositiu ha escrit; s'acaba o falla si el listener cau. */
   fun remoteChanges(): Flow<Unit>
+
+  /**
+   * Mira `devices` mentre l'app és visible i passa a [SyncState.Removed] si aquest dispositiu ja no hi és. No acaba
+   * mai si no hi ha res a mirar.
+   */
+  suspend fun watchDevices() {
+    awaitCancellation()
+  }
 }
 
 /**
@@ -230,7 +248,6 @@ class SyncRepository(
 
   /** Serialitza les pujades i baixades: dues a la vegada es trepitjarien el cursor i els `dirty`. */
   private val syncMutex = Mutex()
-  private var registered = false
   private var readyJob: Job? = null
   private var initialPlan: InitialPlan? = null
 
@@ -264,34 +281,300 @@ class SyncRepository(
 
   val wordsReviewedAt: Flow<Long?> get() = local.wordsReviewedAt
 
-  // Tasca A: els dispositius i les places. De moment només el contracte.
+  // --- Dispositius i places ---
 
-  /** Els dispositius del compte, amb aquest marcat. */
-  val devices: Flow<List<DeviceInfo>> = flowOf(emptyList())
+  /** El xifrador del compte per als dispositius: també existeix a [SyncState.Removed], on el motor ja no corre. */
+  private val deviceView = MutableStateFlow<Session?>(null)
+  private val mutableSlots = MutableStateFlow<SlotsPrompt?>(null)
 
-  /** Quants dispositius admet el pla actual. */
-  val deviceLimit: Flow<Int> = flowOf(2)
+  /** Els dispositius del compte, amb aquest marcat. Buit sense sessió. */
+  val devices: Flow<List<DeviceInfo>> =
+    deviceView.flatMapLatest { view ->
+      val data = sync
+      if (view == null || data == null) {
+        flowOf(emptyList())
+      } else {
+        data.records.observeDevices(view.uid).map { remoteDevices ->
+          val thisId = data.devices.deviceId()
+          remoteDevices.entries.map { toInfo(it, view.cipher, thisId) }
+        }
+      }
+    }
 
-  /** Si no és `null`, les places són plenes i la pantalla ha de demanar quin dispositiu es treu. */
-  val slotsPrompt: StateFlow<SlotsPrompt?> = MutableStateFlow<SlotsPrompt?>(null).asStateFlow()
+  /** Quants dispositius admet el pla actual (el `plan` del document). */
+  val deviceLimit: Flow<Int> =
+    deviceView.flatMapLatest { view ->
+      val data = sync
+      if (view == null || data == null) {
+        flowOf(FREE_DEVICES)
+      } else {
+        data.records.observeDevices(view.uid).map { limitOf(it.pro) }
+      }
+    }
 
-  /** Treu [id] i continua apuntant aquest dispositiu. */
-  suspend fun chooseDeviceToRemove(id: String): DeviceActionOutcome = DeviceActionOutcome.Failed // Tasca A
+  /** Si no és `null`, les places són plenes i la pantalla ha de demanar quin dispositiu es treu. No n'hi ha cap de triat. */
+  val slotsPrompt: StateFlow<SlotsPrompt?> = mutableSlots.asStateFlow()
 
-  /** «Ara no»: tanca la sessió sense deixar res nou al núvol. */
-  suspend fun cancelSlots() = Unit // Tasca A
+  /** Aquest dispositiu s'ha apuntat (o s'ha vist que ja hi era) en aquesta sessió; només llavors el pot treure algú. */
+  @Volatile private var joined = false
 
-  /** «Torna a entrar» d'un dispositiu tret. */
-  suspend fun rejoin(): RejoinOutcome = RejoinOutcome.Failed // Tasca A
+  /** Primer dispositiu del compte (activació): no cal mirar `devices`. */
+  @Volatile private var firstDevice = false
+
+  /** Les places s'han demanat en entrar amb les paraules: en resoldre-les falta fer la fusió i la baixada. */
+  private var awaitingJoin = false
+  private var lastTouch: Long? = null
+  private var lastPlan: Boolean? = null
+  private var planJob: Job? = null
+
+  private class UnreadableDeviceNameException : Exception()
+
+  private fun limitOf(pro: Boolean): Int = if (pro) PRO_DEVICES else FREE_DEVICES
+
+  private fun toInfo(
+    entry: RemoteDeviceEntry,
+    cipher: RecordCipher,
+    thisId: String,
+  ): DeviceInfo {
+    val name = entry.sealedName?.let { cipher.decrypt(deviceNameAad(entry.id), it) }?.decodeToString()
+    if (name == null) sync?.onError?.invoke(UnreadableDeviceNameException(), ErrorSites.SYNC_RECORD)
+    return DeviceInfo(entry.id, name, entry.addedAt, entry.lastSyncAt, isThis = entry.id == thisId)
+  }
+
+  private fun deviceNameAad(id: String) = "device-name:$id"
+
+  /** Treu [id] i continua apuntant aquest dispositiu, en una sola transacció. */
+  suspend fun chooseDeviceToRemove(id: String): DeviceActionOutcome =
+    mutex.withLock {
+      val prompt = mutableSlots.value ?: return DeviceActionOutcome.Failed
+      if (prompt.devices.none { it.id == id }) return DeviceActionOutcome.Failed
+      val state = mutableState.value
+      val account =
+        when (state) {
+          is SyncState.Ready -> state.account
+          is SyncState.Removed -> state.account
+          else -> return DeviceActionOutcome.Failed
+        }
+      val view = deviceView.value ?: return DeviceActionOutcome.Failed
+      when (joinWith(view, removing = id)) {
+        JoinResult.Joined -> {
+          mutableSlots.value = null
+          if (state is SyncState.Removed) {
+            becomeReady(account, view)
+            scope.launch { syncNow() }
+          }
+          if (awaitingJoin) {
+            awaitingJoin = false
+            val data = checkNotNull(sync)
+            readyJob = scope.launch { afterJoined(data) }
+          }
+          DeviceActionOutcome.Done
+        }
+        JoinResult.Full -> {
+          reloadSlots(view)
+          DeviceActionOutcome.Failed
+        }
+        JoinResult.Offline -> DeviceActionOutcome.Offline
+        JoinResult.Failed -> DeviceActionOutcome.Failed
+      }
+    }
+
+  /**
+   * «Ara no»: tanca la sessió sense deixar res nou al núvol (aquest dispositiu encara no s'hi havia apuntat). Si el
+   * dispositiu era a [SyncState.Removed], només es descarta la pregunta: segueix tret, amb les seves dades.
+   */
+  suspend fun cancelSlots() {
+    mutex.withLock {
+      mutableSlots.value = null
+      awaitingJoin = false
+      if (mutableState.value is SyncState.Ready) mutableState.value = signedOut()
+    }
+  }
+
+  /**
+   * «Torna a entrar» d'un dispositiu tret: sense les paraules, que ja les té. Si hi ha plaça s'apunta i fa una pujada i
+   * una baixada (la fusió és la unió); si no n'hi ha, [slotsPrompt].
+   */
+  suspend fun rejoin(): RejoinOutcome =
+    mutex.withLock {
+      val data = sync ?: return RejoinOutcome.Failed
+      val removed = mutableState.value as? SyncState.Removed ?: return RejoinOutcome.Failed
+      val view = deviceView.value ?: return RejoinOutcome.Failed
+      val loaded =
+        when (val result = data.records.loadDevices(view.uid)) {
+          is RemoteResult.Ok -> result.value
+          RemoteResult.Offline -> return RejoinOutcome.Offline
+          RemoteResult.Failed, RemoteResult.Denied -> return RejoinOutcome.Failed
+        }
+      val deviceId = data.devices.deviceId()
+      if (loaded.entries.any { it.id == deviceId }) {
+        adopt(loaded, view)
+      } else {
+        if (loaded.entries.size >= limitOf(loaded.pro || data.isPro())) {
+          showSlots(view, loaded)
+          return RejoinOutcome.Full
+        }
+        when (joinWith(view, removing = null)) {
+          JoinResult.Joined -> Unit
+          JoinResult.Full -> {
+            reloadSlots(view)
+            return RejoinOutcome.Full
+          }
+          JoinResult.Offline -> return RejoinOutcome.Offline
+          JoinResult.Failed -> return RejoinOutcome.Failed
+        }
+      }
+      becomeReady(removed.account, view)
+      scope.launch { syncNow() }
+      RejoinOutcome.Done
+    }
 
   /** Treu un altre dispositiu de la llista. */
-  suspend fun removeDevice(id: String): DeviceActionOutcome = DeviceActionOutcome.Failed // Tasca A
+  suspend fun removeDevice(id: String): DeviceActionOutcome {
+    val data = sync ?: return DeviceActionOutcome.Failed
+    val view = deviceView.value ?: return DeviceActionOutcome.Failed
+    return data.records.removeDevice(view.uid, id).toAction()
+  }
 
-  /** Canvia el nom d'un dispositiu (es desa xifrat). */
+  /** Canvia el nom d'un dispositiu (es desa xifrat amb la mateixa AAD que en crear-lo). */
   suspend fun renameDevice(
     id: String,
     name: String,
-  ): DeviceActionOutcome = DeviceActionOutcome.Failed // Tasca A
+  ): DeviceActionOutcome {
+    val data = sync ?: return DeviceActionOutcome.Failed
+    val view = deviceView.value ?: return DeviceActionOutcome.Failed
+    val sealed = view.cipher.encrypt(deviceNameAad(id), name.toByteArray(Charsets.UTF_8))
+    return data.records.renameDevice(view.uid, id, sealed).toAction()
+  }
+
+  private fun RemoteResult<Unit>.toAction(): DeviceActionOutcome =
+    when (this) {
+      is RemoteResult.Ok -> DeviceActionOutcome.Done
+      RemoteResult.Offline -> DeviceActionOutcome.Offline
+      RemoteResult.Failed, RemoteResult.Denied -> DeviceActionOutcome.Failed
+    }
+
+  /** Mira `devices` mentre l'app és visible: si aquest dispositiu hi desapareix, passa a [SyncState.Removed]. */
+  override suspend fun watchDevices() {
+    val data = sync
+    val view = session
+    if (data == null || view == null) awaitCancellation()
+    val thisId = data.devices.deviceId()
+    data.records.observeDevices(view.uid).collect { seen ->
+      if (joined && mutableState.value is SyncState.Ready && seen.entries.none { it.id == thisId }) enterRemoved()
+    }
+  }
+
+  /** El motor s'atura (sense sessió, per tant sense pujades ni baixades), però es conserva la clau. */
+  private fun enterRemoved() {
+    joined = false
+    session = null
+    mutableInitial.value = null
+    mutableStatus.value = SyncStatus.UpToDate(null)
+    mutableState.update { if (it is SyncState.Ready) SyncState.Removed(it.account) else it }
+  }
+
+  private fun becomeReady(
+    account: SyncAccount,
+    view: Session,
+  ) {
+    session = view
+    deviceView.value = view
+    mutableSlots.value = null
+    mutableState.value = SyncState.Ready(account)
+  }
+
+  /** Ja és a `devices`: es recorda i, si el pla ha canviat, s'escriu. */
+  private suspend fun adopt(
+    loaded: RemoteDevices,
+    view: Session,
+  ) {
+    val data = checkNotNull(sync)
+    data.devices.setRegistered(true)
+    joined = true
+    firstDevice = false
+    lastPlan = loaded.pro
+    syncPlan(data.isPro())
+    if (data.records.touchDevice(view.uid, data.devices.deviceId()) is RemoteResult.Ok) lastTouch = clock()
+  }
+
+  /** Apunta aquest dispositiu (treient [removing], si cal) i en recorda l'èxit. */
+  private suspend fun joinWith(
+    view: Session,
+    removing: String?,
+  ): JoinResult {
+    val data = checkNotNull(sync)
+    val deviceId = data.devices.deviceId()
+    val sealedName = view.cipher.encrypt(deviceNameAad(deviceId), data.deviceName().toByteArray(Charsets.UTF_8))
+    val pro = data.isPro()
+    val result = data.records.joinDevice(view.uid, RemoteDevice(deviceId, sealedName, pro), removing)
+    if (result == JoinResult.Joined) {
+      data.devices.setRegistered(true)
+      joined = true
+      firstDevice = false
+      lastPlan = pro
+      lastTouch = clock()
+    }
+    return result
+  }
+
+  private suspend fun showSlots(
+    view: Session,
+    loaded: RemoteDevices,
+  ) {
+    val data = checkNotNull(sync)
+    val thisId = data.devices.deviceId()
+    val pro = data.isPro()
+    mutableSlots.value =
+      SlotsPrompt(
+        limit = limitOf(loaded.pro || pro),
+        devices = loaded.entries.filter { it.id != thisId }.map { toInfo(it, view.cipher, thisId) },
+        canUpgrade = !pro,
+      )
+  }
+
+  /** Les regles han dit que no hi ha plaça: es torna a llegir el servidor i es pregunta quin es treu. */
+  private suspend fun reloadSlots(view: Session) {
+    val data = checkNotNull(sync)
+    val loaded = (data.records.loadDevices(view.uid) as? RemoteResult.Ok)?.value ?: return
+    showSlots(view, loaded)
+  }
+
+  /** Escriu `plan` si el que sap el servidor no és [pro]. */
+  private suspend fun syncPlan(pro: Boolean) {
+    val data = sync ?: return
+    val view = deviceView.value ?: return
+    if (!joined || lastPlan == pro) return
+    if (data.records.setPlan(view.uid, pro) is RemoteResult.Ok) lastPlan = pro
+  }
+
+  /** Després d'una sincronització bona: el `plan` pendent i, com a molt cada 15 minuts, `lastSyncAt`. */
+  private suspend fun afterSuccessfulSync() {
+    val data = sync ?: return
+    val view = session ?: return
+    if (!joined) return
+    syncPlan(data.isPro())
+    val now = clock()
+    val last = lastTouch
+    if (last == null || now - last >= TOUCH_INTERVAL_MILLIS) {
+      if (data.records.touchDevice(view.uid, data.devices.deviceId()) is RemoteResult.Ok) lastTouch = now
+    }
+  }
+
+  /**
+   * Una pujada rebutjada per les regles: es torna a llegir `devices`. Si aquest dispositiu hi és, és un error normal; si
+   * no, l'han tret.
+   */
+  private suspend fun resolveDenied(view: Session): SyncOutcome {
+    val data = checkNotNull(sync)
+    val loaded = (data.records.loadDevices(view.uid) as? RemoteResult.Ok)?.value ?: return SyncOutcome.Failed
+    val deviceId = data.devices.deviceId()
+    if (joined && loaded.entries.none { it.id == deviceId }) {
+      enterRemoved()
+      return SyncOutcome.Denied
+    }
+    return SyncOutcome.Failed
+  }
 
   /**
    * Recupera la sessió d'aquest dispositiu, si en té. Només es crida amb [SyncFlag] encès. Sense sessió marcada no toca
@@ -451,10 +734,24 @@ class SyncRepository(
     if (mutableState.value is SyncState.Ready) local.setWordsReviewedAt(clock())
   }
 
-  /** Les dades es queden al dispositiu; se'n va la sessió i la clau. */
+  /**
+   * Les dades es queden al dispositiu; se'n va la sessió i la clau. Abans treu aquest dispositiu de `devices` (amb el
+   * temps d'espera de les pujades); si no hi ha connexió o s'esgota, tanca igualment i la plaça es treu des d'un altre
+   * dispositiu. A [SyncState.Removed] no hi ha res a treure.
+   */
   suspend fun signOut() {
     mutex.withLock {
-      if (mutableState.value != SyncState.SignedOut) mutableState.value = signedOut()
+      val current = mutableState.value
+      if (current == SyncState.SignedOut) return
+      val data = sync
+      val view = deviceView.value
+      if (data != null && view != null && current is SyncState.Ready && (joined || data.devices.isRegistered())) {
+        // Perquè el listener no ho prengui per una expulsió
+        joined = false
+        val deviceId = data.devices.deviceId()
+        withTimeoutOrNull(SIGN_OUT_TIMEOUT_MILLIS) { data.records.removeDevice(view.uid, deviceId) }
+      }
+      mutableState.value = signedOut()
     }
   }
 
@@ -512,7 +809,12 @@ class SyncRepository(
     entry: Entry,
   ) {
     val data = sync ?: return
-    session = Session(account.uid, RecordCipher(stored.dataKey, account.uid))
+    val view = Session(account.uid, RecordCipher(stored.dataKey, account.uid))
+    session = view
+    deviceView.value = view
+    firstDevice = entry == Entry.Activated
+    planJob?.cancel()
+    planJob = scope.launch { data.isProChanges.collect { syncPlan(it) } }
     readyJob?.cancel()
     readyJob =
       scope.launch {
@@ -520,16 +822,31 @@ class SyncRepository(
           Entry.Restored -> tracked { _, _ -> SyncOutcome.Done }
           Entry.Activated -> runInitialNow(InitialPlan.Upload)
           Entry.JoinedDevice -> {
-            val count = data.source.entryCount()
-            if (count > 0) {
-              initialPlan = InitialPlan.Merge
-              mutableInitial.value = InitialSync.MergePrompt(count)
-            } else {
-              runInitialNow(InitialPlan.Download)
+            // Les places, abans de la fusió i la baixada
+            val registration = tracked { _, _ -> SyncOutcome.Done }
+            when {
+              registration == SyncOutcome.Done -> afterJoined(data)
+              mutableSlots.value != null -> awaitingJoin = true
+              mutableState.value is SyncState.Removed || session == null -> Unit
+              else -> {
+                initialPlan = if (data.source.entryCount() > 0) InitialPlan.Merge else InitialPlan.Download
+                mutableInitial.value =
+                  if (registration == SyncOutcome.Offline) InitialSync.Offline else InitialSync.Failed
+              }
             }
           }
         }
       }
+  }
+
+  private suspend fun afterJoined(data: SyncData) {
+    val count = data.source.entryCount()
+    if (count > 0) {
+      initialPlan = InitialPlan.Merge
+      mutableInitial.value = InitialSync.MergePrompt(count)
+    } else {
+      runInitialNow(InitialPlan.Download)
+    }
   }
 
   private fun runInitial(plan: InitialPlan) {
@@ -603,13 +920,21 @@ class SyncRepository(
           else -> Unit
         }
       }
-      val outcome =
+      var outcome =
         try {
-          registerDevice(current).takeIf { it != SyncOutcome.Done } ?: block(current, report)
+          val registration = registerDevice(current)
+          if (registration != SyncOutcome.Done) {
+            registration
+          } else {
+            block(current, report).also { done ->
+              if (done == SyncOutcome.Done) afterSuccessfulSync()
+            }
+          }
         } catch (e: CancellationException) {
           mutableStatus.value = before
           throw e
         }
+      if (outcome == SyncOutcome.Denied && session != null) outcome = resolveDenied(current)
       if (session != null) {
         mutableStatus.value =
           when (outcome) {
@@ -630,26 +955,60 @@ class SyncRepository(
    * que va abans de tota pujada. El nom va xifrat amb un identificador fix, com qualsevol registre.
    */
   private suspend fun registerDevice(current: Session): SyncOutcome {
-    if (registered) return SyncOutcome.Done
+    if (joined) return SyncOutcome.Done
+    // Esperant que l'usuari triï quin dispositiu es treu: res a fer ni a preguntar al servidor
+    if (mutableSlots.value != null) return SyncOutcome.Failed
     val data = checkNotNull(sync)
-    val deviceId = data.cursors.deviceId()
-    val sealedName = current.cipher.encrypt("device-name:$deviceId", data.deviceName().toByteArray(Charsets.UTF_8))
-    val result = data.records.joinDevice(current.uid, RemoteDevice(deviceId, sealedName, data.isPro()), removing = null)
-    return when (result) {
-      JoinResult.Joined -> {
-        registered = true
-        SyncOutcome.Done
+    if (!firstDevice) {
+      val loaded =
+        when (val result = data.records.loadDevices(current.uid)) {
+          is RemoteResult.Ok -> result.value
+          RemoteResult.Offline -> return SyncOutcome.Offline
+          RemoteResult.Failed, RemoteResult.Denied -> return SyncOutcome.Failed
+        }
+      val deviceId = data.devices.deviceId()
+      when {
+        // Primer es mira si ja hi és, i després el límit
+        loaded.entries.any { it.id == deviceId } -> {
+          adopt(loaded, current)
+          return SyncOutcome.Done
+        }
+        // S'havia apuntat i ja no hi és: l'han tret. Mai s'hi torna a apuntar sol
+        data.devices.isRegistered() -> {
+          enterRemoved()
+          return SyncOutcome.Failed
+        }
+        loaded.entries.size >= limitOf(loaded.pro || data.isPro()) -> {
+          showSlots(current, loaded)
+          return SyncOutcome.Failed
+        }
+      }
+    }
+    return when (joinWith(current, removing = null)) {
+      JoinResult.Joined -> SyncOutcome.Done
+      JoinResult.Full -> {
+        reloadSlots(current)
+        SyncOutcome.Failed
       }
       JoinResult.Offline -> SyncOutcome.Offline
-      JoinResult.Full, JoinResult.Failed -> SyncOutcome.Failed
+      JoinResult.Failed -> SyncOutcome.Failed
     }
   }
 
   private suspend fun signedOut(): SyncState {
     readyJob?.cancel()
     readyJob = null
+    planJob?.cancel()
+    planJob = null
     session = null
-    registered = false
+    deviceView.value = null
+    mutableSlots.value = null
+    joined = false
+    firstDevice = false
+    awaitingJoin = false
+    lastTouch = null
+    lastPlan = null
+    sync?.devices?.setRegistered(false)
     initialPlan = null
     mutableInitial.value = null
     mutableStatus.value = SyncStatus.UpToDate(null)
@@ -660,5 +1019,14 @@ class SyncRepository(
     keyStore.clear()
     local.setSession(false)
     return SyncState.SignedOut
+  }
+
+  private companion object {
+    const val FREE_DEVICES = 2
+    const val PRO_DEVICES = 5
+    const val TOUCH_INTERVAL_MILLIS = 15 * 60 * 1000L
+
+    /** El mateix temps d'espera que les pujades. */
+    const val SIGN_OUT_TIMEOUT_MILLIS = 20_000L
   }
 }

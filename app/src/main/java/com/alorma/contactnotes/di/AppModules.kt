@@ -177,6 +177,8 @@ val syncModule =
             ) ?: Build.MODEL
           },
           isPro = { get<ProRepository>().isPro.value },
+          isProChanges = get<ProRepository>().isPro,
+          onError = { error, where -> get<EventTracker>().trackError(error, where) },
         )
       SyncRepository(get(), get(), get(), get(), CoroutineScope(SupervisorJob() + Dispatchers.Default), sync = data)
     }

@@ -39,7 +39,23 @@ class SyncLoop(
       launch { retrying { actions.pull() } }
       launch { listen() }
       launch { pushOnChanges() }
+      launch { watchDevices() }
     }
+
+  /** Si aquest dispositiu desapareix de `devices`, el repositori passa a `Removed` i el bucle es cancel·la. */
+  private suspend fun watchDevices() {
+    var failures = 0
+    while (true) {
+      try {
+        actions.watchDevices()
+      } catch (e: CancellationException) {
+        throw e
+      } catch (_: Exception) {
+        // Es reprèn amb l'espera
+      }
+      delay(backoff(failures++))
+    }
+  }
 
   private suspend fun listen() {
     var failures = 0
