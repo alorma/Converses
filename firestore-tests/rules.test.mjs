@@ -112,6 +112,103 @@ describe('compte', () => {
   })
 })
 
+// Un compte amb `count` dispositius (device-1 ... device-N) i el pla indicat, escrit sense passar per les regles
+const seedDevices = (count, plan) =>
+  env.withSecurityRulesDisabled(async (context) => {
+    const devices = {}
+    for (let i = 1; i <= count; i++) devices[`device-${i}`] = device()
+    await setDoc(accountRef(context.firestore()), account({ plan, devices }))
+  })
+
+describe('límit de dispositius', () => {
+  it('free: el tercer dispositiu es rebutja i el segon passa', async () => {
+    await seedDevices(1, 'free')
+    const firestore = db(OWNER)
+    await assertSucceeds(updateDoc(accountRef(firestore), { 'devices.device-2': device() }))
+    await assertFails(updateDoc(accountRef(firestore), { 'devices.device-3': device() }))
+  })
+
+  it('un compte sense pla té el límit de free', async () => {
+    await env.withSecurityRulesDisabled(async (context) => {
+      await setDoc(accountRef(context.firestore()), account({ devices: { 'device-1': device(), 'device-2': device() } }))
+    })
+    await assertFails(updateDoc(accountRef(db(OWNER)), { 'devices.device-3': device() }))
+  })
+
+  it('pro: el cinquè passa i el sisè es rebutja', async () => {
+    await seedDevices(4, 'pro')
+    const firestore = db(OWNER)
+    await assertSucceeds(updateDoc(accountRef(firestore), { 'devices.device-5': device() }))
+    await assertFails(updateDoc(accountRef(firestore), { 'devices.device-6': device() }))
+  })
+
+  it('amb el compte ple es pot treure, canviar el nom, lastSyncAt i el pla', async () => {
+    await seedDevices(2, 'free')
+    const firestore = db(OWNER)
+    await assertSucceeds(
+      updateDoc(accountRef(firestore), { 'devices.device-1.name': Bytes.fromUint8Array(new Uint8Array(20)) }),
+    )
+    await assertSucceeds(updateDoc(accountRef(firestore), { 'devices.device-1.lastSyncAt': serverTimestamp() }))
+    await assertSucceeds(updateDoc(accountRef(firestore), { lastSyncAt: serverTimestamp() }))
+    await assertSucceeds(updateDoc(accountRef(firestore), { plan: 'pro' }))
+    await assertSucceeds(updateDoc(accountRef(firestore), { plan: 'free' }))
+    await assertSucceeds(updateDoc(accountRef(firestore), { 'devices.device-2': deleteField() }))
+  })
+
+  it('un compte que baixa de pro a free amb 5 dispositius encara pot escriure el document', async () => {
+    await seedDevices(5, 'free')
+    const firestore = db(OWNER)
+    await assertSucceeds(
+      updateDoc(accountRef(firestore), { 'devices.device-1.name': Bytes.fromUint8Array(new Uint8Array(20)) }),
+    )
+    await assertSucceeds(updateDoc(accountRef(firestore), { 'devices.device-1.lastSyncAt': serverTimestamp() }))
+    await assertSucceeds(updateDoc(accountRef(firestore), { plan: 'free' }))
+    await assertSucceeds(updateDoc(accountRef(firestore), { 'devices.device-5': deleteField() }))
+    // Ara en té 4: encara no se'n pot afegir cap, però es pot seguir treient
+    await assertFails(updateDoc(accountRef(firestore), { 'devices.device-9': device() }))
+    await assertSucceeds(updateDoc(accountRef(firestore), { 'devices.device-4': deleteField() }))
+  })
+
+  it('treure un dispositiu i afegir-ne un en la mateixa escriptura amb el compte ple (13l)', async () => {
+    await seedDevices(2, 'free')
+    await assertSucceeds(
+      updateDoc(accountRef(db(OWNER)), { 'devices.device-1': deleteField(), 'devices.device-3': device() }),
+    )
+  })
+
+  it('afegir-ne dos i treure\'n un amb el compte ple es rebutja', async () => {
+    await seedDevices(2, 'free')
+    await assertFails(
+      updateDoc(accountRef(db(OWNER)), {
+        'devices.device-1': deleteField(),
+        'devices.device-3': device(),
+        'devices.device-4': device(),
+      }),
+    )
+  })
+
+  it('un dispositiu pro entra en un compte free amb 2 dispositius si escriu plan pro alhora', async () => {
+    await seedDevices(2, 'free')
+    const firestore = db(OWNER)
+    await assertFails(updateDoc(accountRef(firestore), { 'devices.device-3': device() }))
+    await assertSucceeds(updateDoc(accountRef(firestore), { 'devices.device-3': device(), plan: 'pro' }))
+  })
+
+  it('la creació del compte també respecta el límit', async () => {
+    const three = { 'device-1': device(), 'device-2': device(), 'device-3': device() }
+    const six = { ...three, 'device-4': device(), 'device-5': device(), 'device-6': device() }
+    const firestore = db(OWNER)
+    await assertFails(setDoc(accountRef(firestore), account({ plan: 'free', devices: three })))
+    await assertFails(setDoc(accountRef(firestore), account({ devices: three })))
+    await assertFails(setDoc(accountRef(firestore), account({ plan: 'pro', devices: six })))
+    await assertSucceeds(setDoc(accountRef(firestore), account({ plan: 'pro', devices: three })))
+  })
+
+  it('devices ha de ser un mapa', async () => {
+    await assertFails(setDoc(accountRef(db(OWNER)), account({ devices: ['a', 'b'] })))
+  })
+})
+
 describe('registres', () => {
   beforeEach(seedAccount)
 

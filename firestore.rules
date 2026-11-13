@@ -7,20 +7,40 @@ rules_version = '2';
 //
 // Només el propietari llegeix i escriu sota `users/{uid}`, amb la forma dels documents fixada i la mida de cada
 // registre limitada. Un registre només s'escriu si `by` és un dispositiu de `devices`: és el que fa efectiva
-// l'expulsió al servidor. El límit de dispositius (2 o 5 segons el pla) arriba amb la fase 5.
+// l'expulsió al servidor. El límit de dispositius (2 o 5 segons el pla) es mira a la creació i a cada actualització del document del compte.
 service cloud.firestore {
   match /databases/{database}/documents {
     function isOwner(uid) {
       return request.auth != null && request.auth.uid == uid;
     }
 
-    // El document del compte: la clau embolcallada i el que l'app hi declara
-    match /users/{uid} {
-      allow read, delete: if isOwner(uid);
-      allow create, update: if isOwner(uid)
+    function validAccount(uid) {
+      return isOwner(uid)
         && request.resource.data.keys().hasOnly(['wrappedKey', 'format', 'createdAt', 'plan', 'devices', 'lastSyncAt'])
         && (!('plan' in request.resource.data) || request.resource.data.plan in ['free', 'pro'])
         && (!('devices' in request.resource.data) || request.resource.data.devices is map);
+    }
+
+    // Dispositius apuntats; només es crida després de comprovar que `devices` és un mapa (a validAccount)
+    function deviceCount(data) {
+      return 'devices' in data ? data.devices.keys().size() : 0;
+    }
+
+    // Places segons el pla que declara el document després de l'escriptura: pro 5, free (o sense pla) 2
+    function maxDevices(data) {
+      return data.get('plan', 'free') == 'pro' ? 5 : 2;
+    }
+
+    // El document del compte: la clau embolcallada i el que l'app hi declara
+    match /users/{uid} {
+      allow read, delete: if isOwner(uid);
+      allow create: if validAccount(uid)
+        && deviceCount(request.resource.data) <= maxDevices(request.resource.data);
+      // Es pot quedar igual o fer-se petit sempre (un compte que baixa de pro a free amb 5 dispositius continua podent
+      // escriure el document); créixer, només fins al límit del pla que queda
+      allow update: if validAccount(uid)
+        && (deviceCount(request.resource.data) <= deviceCount(resource.data)
+          || deviceCount(request.resource.data) <= maxDevices(request.resource.data));
 
       // Els registres xifrats: el contingut és a `c`; la resta és el que cal per ordenar i per comprovar qui l'escriu
       match /records/{id} {
