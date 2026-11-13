@@ -183,17 +183,38 @@ class FirestoreSyncRemote(
     id: String,
     sealedName: ByteArray,
   ): RemoteResult<Unit> =
-    updateAccount(uid, FieldPath.of(FIELD_DEVICES, id, FIELD_DEVICE_NAME) to Blob.fromBytes(sealedName))
+    updateIfKnown(uid, id, FieldPath.of(FIELD_DEVICES, id, FIELD_DEVICE_NAME) to Blob.fromBytes(sealedName))
 
   override suspend fun touchDevice(
     uid: String,
     id: String,
   ): RemoteResult<Unit> =
-    updateAccount(
+    updateIfKnown(
       uid,
+      id,
       FieldPath.of(FIELD_DEVICES, id, FIELD_LAST_SYNC_AT) to FieldValue.serverTimestamp(),
       FieldPath.of(FIELD_LAST_SYNC_AT) to FieldValue.serverTimestamp(),
     )
+
+  /**
+   * Un `update` amb camins niats crea el mapa que falta: sobre un dispositiu ja tret el tornaria a apuntar, amb una entrada
+   * a mitges i fora de la protecció de `registered`. Per això es mira dins la transacció que l'entrada encara hi és; si no hi
+   * és no es fa res (qui escolta `devices` ja veu que ha estat tret).
+   */
+  private suspend fun updateIfKnown(
+    uid: String,
+    id: String,
+    vararg fields: Pair<FieldPath, Any?>,
+  ): RemoteResult<Unit> =
+    guarded {
+      val account = accountOf(uid)
+      firebase.firestore
+        .runTransaction { transaction ->
+          val known = (transaction.get(account).get(FIELD_DEVICES) as? Map<*, *>)?.containsKey(id) == true
+          if (known) transaction.updateFields(account, fields.toList())
+        }.awaitTask()
+      Unit
+    }
 
   override suspend fun setPlan(
     uid: String,
