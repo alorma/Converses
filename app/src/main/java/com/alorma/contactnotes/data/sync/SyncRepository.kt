@@ -13,6 +13,7 @@ import java.security.SecureRandom
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
@@ -31,6 +32,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 
 sealed interface SyncState {
@@ -384,10 +386,13 @@ class SyncRepository(
    * dispositiu era a [SyncState.Removed], només es descarta la pregunta: segueix tret, amb les seves dades.
    */
   suspend fun cancelSlots() {
-    mutex.withLock {
-      mutableSlots.value = null
-      awaitingJoin = false
-      if (mutableState.value is SyncState.Ready) mutableState.value = signedOut()
+    // Buidar la pregunta tanca 13l i s'emporta el scope de qui ha cridat: sense això, la sessió quedava tancada a mitges
+    withContext(NonCancellable) {
+      mutex.withLock {
+        mutableSlots.value = null
+        awaitingJoin = false
+        if (mutableState.value is SyncState.Ready) mutableState.value = signedOut()
+      }
     }
   }
 
