@@ -119,7 +119,9 @@ class FirestoreSyncRemote(
             if (!error.isNetworkFailure()) tracker.trackError(error, ErrorSites.SYNC_ACCOUNT)
             // Qui escolta torna a obrir-lo quan toqui
             close()
-          } else if (snapshot != null && !snapshot.metadata.hasPendingWrites()) {
+          } else if (snapshot != null) {
+            // També la instantània amb escriptures pendents: quan el servidor les confirma, les dades no canvien i el
+            // listener (sense `MetadataChanges.INCLUDE`) ja no torna a avisar. Saltar-la deixava la llista antiga
             trySend(snapshot.toRemoteDevices())
           }
         }
@@ -245,7 +247,9 @@ class FirestoreSyncRemote(
 
   /** Sense el camp `devices` (o amb una forma que no s'espera) és un compte sense dispositius. */
   private fun DocumentSnapshot.toRemoteDevices(): RemoteDevices {
-    val devices = get(FIELD_DEVICES) as? Map<*, *> ?: emptyMap<Any, Any>()
+    // Un `serverTimestamp()` encara no confirmat surt estimat, no `null`
+    val devices =
+      get(FIELD_DEVICES, DocumentSnapshot.ServerTimestampBehavior.ESTIMATE) as? Map<*, *> ?: emptyMap<Any, Any>()
     val entries =
       devices.mapNotNull { (key, value) ->
         val id = key as? String ?: return@mapNotNull null
