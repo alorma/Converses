@@ -55,9 +55,18 @@ import com.alorma.contactnotes.designsystem.components.groupedItemShape
 @Composable
 internal fun DeviceInfo.displayName(): String = name ?: stringResource(R.string.sync_device_unnamed)
 
-/** «Fa 3 hores»; `null` si el dispositiu encara no ha sincronitzat. */
-internal fun DeviceInfo.lastSyncLabel(now: Long): String? =
-  lastSyncAt?.let { DateUtils.getRelativeTimeSpanString(it, now, DateUtils.MINUTE_IN_MILLIS).toString() }
+/** «Fa 3 hores», o [justNow] si fa menys d'un minut; `null` si el dispositiu encara no ha sincronitzat. */
+internal fun DeviceInfo.lastSyncLabel(
+  now: Long,
+  justNow: String,
+): String? =
+  lastSyncAt?.let {
+    if (now - it < DateUtils.MINUTE_IN_MILLIS) {
+      justNow
+    } else {
+      DateUtils.getRelativeTimeSpanString(it, now, DateUtils.MINUTE_IN_MILLIS).toString()
+    }
+  }
 
 /**
  * La secció «Dispositius» de 13o: capçalera «N de M», una fila per dispositiu (aquest primer) i, amb el límit gratuït,
@@ -114,18 +123,14 @@ private fun DeviceRow(
   onRename: () -> Unit,
   onRemove: () -> Unit,
 ) {
-  val last = device.lastSyncLabel(now)
+  val last = device.lastSyncLabel(now, stringResource(R.string.sync_just_now))
+  // «Aquest dispositiu» va a sota, amb la data: al costat del nom l'esclafa en pantalles estretes
+  val thisDevice = if (device.isThis) stringResource(R.string.sync_this_dev) else null
   SettingRow(
     title = device.displayName(),
-    subtitle = last,
+    subtitle = listOfNotNull(thisDevice, last).joinToString(" · ").ifEmpty { null },
     icon = Icons.Rounded.PhoneAndroid,
     shape = shape,
-    titleBadge =
-      if (device.isThis) {
-        { Text(stringResource(R.string.sync_this_dev), style = MaterialTheme.typography.labelMedium) }
-      } else {
-        null
-      },
     trailing = { DeviceMenu(canRemove = !device.isThis, onRename = onRename, onRemove = onRemove) },
   )
 }

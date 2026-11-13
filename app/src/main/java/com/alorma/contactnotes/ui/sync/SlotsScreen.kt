@@ -202,7 +202,9 @@ private fun SlotRow(
     ListItem(
       headlineContent = { Text(device.displayName(), fontWeight = FontWeight.SemiBold) },
       supportingContent =
-        device.lastSyncLabel(now)?.let { last -> { Text(stringResource(R.string.sync_last_sync, last)) } },
+        device.lastSyncLabel(now, stringResource(R.string.sync_just_now))?.let { last ->
+          { Text(stringResource(R.string.sync_last_sync, last)) }
+        },
       leadingContent = { Icon(Icons.Rounded.PhoneAndroid, contentDescription = null) },
       trailingContent = { RadioButton(selected = selected, onClick = null, enabled = enabled) },
       colors = ListItemDefaults.colors(containerColor = Color.Transparent),
