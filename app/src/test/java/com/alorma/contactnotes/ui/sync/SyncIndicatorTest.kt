@@ -40,4 +40,11 @@ class SyncIndicatorTest {
     assertEquals(R.string.sync_indicator_on, SyncIndicatorState.On("B").descriptionRes())
     assertEquals(R.string.sync_indicator_key, SyncIndicatorState.NeedsKey("B").descriptionRes())
   }
+
+  @Test
+  fun `a removed device has its own indicator, settings subtitle and description`() {
+    assertEquals(SyncIndicatorState.Removed("B"), SyncState.Removed(account).toIndicatorState())
+    assertEquals(R.string.sync_st_out, SyncIndicatorState.Removed("B").subtitleRes())
+    assertEquals(R.string.sync_indicator_out, SyncIndicatorState.Removed("B").descriptionRes())
+  }
 }

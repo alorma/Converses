@@ -406,6 +406,7 @@
     <string name="sync_indicator_off">Sincronització: desactivada</string>
     <string name="sync_indicator_on">Compte: sincronització activada</string>
     <string name="sync_indicator_key">Compte: falten les paraules de seguretat</string>
+    <string name="sync_indicator_out">Compte: aquest dispositiu ja no sincronitza</string>
     <string name="sync_rail_account">Compte</string>
     <string name="sync_onboarding_link">Ja tinc dades al núvol</string>
     <string name="sync_onboarding_body">Les notes es queden al mòbil i, si les sincronitzes, viatgen xifrades. Si vols, protegeix una persona amb l\'empremta i ningú més la podrà obrir.</string>

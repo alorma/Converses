@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -13,6 +14,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Cloud
 import androidx.compose.material.icons.rounded.CloudOff
 import androidx.compose.material.icons.rounded.Key
+import androidx.compose.material.icons.rounded.PriorityHigh
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -27,6 +29,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.clearAndSetSemantics
@@ -63,6 +66,11 @@ sealed interface SyncIndicatorState {
   data class NeedsKey(
     val initial: String,
   ) : SyncIndicatorState
+
+  /** Un altre dispositiu l'ha tret del compte: insígnia `priority_high` sobre `err` (13a). */
+  data class Removed(
+    val initial: String,
+  ) : SyncIndicatorState
 }
 
 /** Les dades a l'indicador (13a): sense connexió i error es veuen igual, i no en vermell. */
@@ -82,7 +90,7 @@ fun SyncState.toIndicatorState(): SyncIndicatorState =
     SyncState.SignedOut, SyncState.Checking, is SyncState.Activating -> SyncIndicatorState.SignedOut
     is SyncState.NeedsKey -> SyncIndicatorState.NeedsKey(account.initial())
     is SyncState.Ready -> SyncIndicatorState.On(account.initial())
-    is SyncState.Removed -> SyncIndicatorState.On(account.initial())
+    is SyncState.Removed -> SyncIndicatorState.Removed(account.initial())
   }
 
 /** La primera lletra del nom o, si el compte no en té, del correu. */
@@ -102,6 +110,7 @@ fun SyncIndicatorState.descriptionRes(): Int =
         SyncIndicatorStatus.Offline -> R.string.sync_indicator_offline
       }
     is SyncIndicatorState.NeedsKey -> R.string.sync_indicator_key
+    is SyncIndicatorState.Removed -> R.string.sync_indicator_out
   }
 
 /**
@@ -214,27 +223,36 @@ fun SyncIndicatorVisual(
       }
       is SyncIndicatorState.NeedsKey -> {
         AccountAvatar(state.initial)
-        // Insígnia de 18 dp que surt 3 dp de l'avatar, amb una vora de 2 dp del color de fons
-        Box(
-          modifier =
-            Modifier
-              .align(Alignment.BottomEnd)
-              .offset(x = 5.dp, y = 5.dp)
-              .size(22.dp)
-              .background(background, CircleShape)
-              .padding(2.dp)
-              .background(scheme.primary, CircleShape),
-          contentAlignment = Alignment.Center,
-        ) {
-          Icon(
-            imageVector = Icons.Rounded.Key,
-            contentDescription = null,
-            tint = scheme.onPrimary,
-            modifier = Modifier.size(12.dp),
-          )
-        }
+        StatusBadge(Icons.Rounded.Key, scheme.primary, scheme.onPrimary, background)
+      }
+      is SyncIndicatorState.Removed -> {
+        AccountAvatar(state.initial)
+        StatusBadge(Icons.Rounded.PriorityHigh, scheme.error, scheme.onError, background)
       }
     }
+  }
+}
+
+/** Insígnia de 18 dp que surt 3 dp de l'avatar, amb una vora de 2 dp del color de fons. */
+@Composable
+private fun BoxScope.StatusBadge(
+  icon: ImageVector,
+  container: Color,
+  content: Color,
+  background: Color,
+) {
+  Box(
+    modifier =
+      Modifier
+        .align(Alignment.BottomEnd)
+        .offset(x = 5.dp, y = 5.dp)
+        .size(22.dp)
+        .background(background, CircleShape)
+        .padding(2.dp)
+        .background(container, CircleShape),
+    contentAlignment = Alignment.Center,
+  ) {
+    Icon(imageVector = icon, contentDescription = null, tint = content, modifier = Modifier.size(12.dp))
   }
 }
 

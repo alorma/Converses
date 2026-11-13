@@ -42,6 +42,7 @@ import androidx.compose.material.icons.rounded.Key
 import androidx.compose.material.icons.rounded.Language
 import androidx.compose.material.icons.rounded.LightMode
 import androidx.compose.material.icons.rounded.Palette
+import androidx.compose.material.icons.rounded.SyncProblem
 import androidx.compose.material.icons.rounded.Timer
 import androidx.compose.material.icons.rounded.UnfoldMore
 import androidx.compose.material.icons.rounded.Vibration
@@ -62,6 +63,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.pluralStringResource
@@ -250,6 +252,8 @@ fun SettingsContent(
             title = stringResource(R.string.sync_title),
             subtitle = stringResource(syncState.subtitleRes()),
             icon = syncState.icon(),
+            accentColor =
+              if (syncState is SyncIndicatorState.Removed) MaterialTheme.colorScheme.error else Color.Unspecified,
             trailing = { Icon(Icons.AutoMirrored.Rounded.KeyboardArrowRight, contentDescription = null) },
             shape = groupedItemShape(0, 1),
             onClick = onOpenSync,
@@ -665,6 +669,7 @@ internal fun SyncIndicatorState.subtitleRes(): Int =
     SyncIndicatorState.SignedOut -> R.string.sync_state_off
     is SyncIndicatorState.On -> R.string.sync_state_on
     is SyncIndicatorState.NeedsKey -> R.string.sync_state_key
+    is SyncIndicatorState.Removed -> R.string.sync_st_out
   }
 
 private fun SyncIndicatorState.icon(): androidx.compose.ui.graphics.vector.ImageVector =
@@ -672,6 +677,7 @@ private fun SyncIndicatorState.icon(): androidx.compose.ui.graphics.vector.Image
     SyncIndicatorState.SignedOut -> Icons.Rounded.Cloud
     is SyncIndicatorState.On -> Icons.Rounded.CloudDone
     is SyncIndicatorState.NeedsKey -> Icons.Rounded.Key
+    is SyncIndicatorState.Removed -> Icons.Rounded.SyncProblem
   }
 
 @Composable

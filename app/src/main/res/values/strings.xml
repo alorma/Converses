@@ -407,6 +407,7 @@
     <string name="sync_indicator_off">Sync: off</string>
     <string name="sync_indicator_on">Account: sync is on</string>
     <string name="sync_indicator_key">Account: security words needed</string>
+    <string name="sync_indicator_out">Account: this device no longer syncs</string>
     <string name="sync_rail_account">Account</string>
     <string name="sync_onboarding_link">I already have data in the cloud</string>
     <string name="sync_onboarding_body">Your notes stay on your phone and, if you sync them, they travel encrypted. If you want, protect a person with your fingerprint and nobody else can open them.</string>

@@ -35,6 +35,8 @@ fun SettingRow(
   contentModifier: Modifier = Modifier,
   /** Al costat del títol, com l'etiqueta PRO. */
   titleBadge: (@Composable () -> Unit)? = null,
+  /** El color de la icona i del subtítol, com `err` a «dispositiu tret»; sense especificar, els de sempre. */
+  accentColor: Color = Color.Unspecified,
 ) {
   val content = @Composable {
     ListItem(
@@ -52,7 +54,16 @@ fun SettingRow(
       supportingContent = subtitle?.let { { Text(it) } },
       leadingContent = icon?.let { { Icon(it, contentDescription = null) } },
       trailingContent = trailing,
-      colors = ListItemDefaults.colors(containerColor = Color.Transparent),
+      colors =
+        if (accentColor == Color.Unspecified) {
+          ListItemDefaults.colors(containerColor = Color.Transparent)
+        } else {
+          ListItemDefaults.colors(
+            containerColor = Color.Transparent,
+            leadingIconColor = accentColor,
+            supportingColor = accentColor,
+          )
+        },
     )
   }
   if (onClick != null) {

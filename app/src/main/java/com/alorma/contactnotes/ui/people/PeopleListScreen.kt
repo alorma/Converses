@@ -80,6 +80,7 @@ import com.alorma.contactnotes.shared.ChannelType
 import com.alorma.contactnotes.shared.initialsOf
 import com.alorma.contactnotes.ui.navigation.LocalFloatingBarPadding
 import com.alorma.contactnotes.ui.person.channelName
+import com.alorma.contactnotes.ui.sync.RemovedNotice
 import com.alorma.contactnotes.ui.sync.SyncIndicator
 import com.alorma.contactnotes.ui.sync.SyncIndicatorState
 import com.alorma.contactnotes.ui.sync.currentSyncIndicatorState
@@ -110,6 +111,7 @@ fun PeopleListRoute(
     inPane = inPane,
     selectedPersonId = selectedPersonId,
     syncIndicator = if (inPane) null else syncIndicator,
+    syncRemoved = syncIndicator is SyncIndicatorState.Removed,
     onOpenSync = onOpenSync,
   )
 }
@@ -128,6 +130,8 @@ fun PeopleListScreen(
   inPane: Boolean = false,
   selectedPersonId: Long? = null,
   syncIndicator: SyncIndicatorState? = null,
+  /** Aquest dispositiu l'han tret del compte (13c): l'avís fix a dalt, que obre Sincronització. */
+  syncRemoved: Boolean = false,
   onOpenSync: () -> Unit = {},
 ) {
   val listState = rememberLazyListState()
@@ -166,6 +170,7 @@ fun PeopleListScreen(
           syncIndicator = syncIndicator,
           onOpenSync = onOpenSync,
         )
+        if (syncRemoved) RemovedNotice(onAction = onOpenSync)
         if (!archived) {
           FilterRow(selected = state.filter, onToggle = onFilterToggled, wrap = inPane)
         }

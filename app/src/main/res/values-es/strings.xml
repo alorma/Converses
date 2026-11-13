@@ -408,6 +408,7 @@
     <string name="sync_indicator_off">Sincronización: desactivada</string>
     <string name="sync_indicator_on">Cuenta: sincronización activada</string>
     <string name="sync_indicator_key">Cuenta: faltan las palabras de seguridad</string>
+    <string name="sync_indicator_out">Cuenta: este dispositivo ya no sincroniza</string>
     <string name="sync_rail_account">Cuenta</string>
     <string name="sync_onboarding_link">Ya tengo datos en la nube</string>
     <string name="sync_onboarding_body">Las notas se quedan en el móvil y, si las sincronizas, viajan cifradas. Si quieres, protege a una persona con la huella y nadie más podrá abrirla.</string>

@@ -73,6 +73,23 @@ internal fun PeopleListScreenTasksPreview() {
   )
 }
 
+/** 13c: dispositiu tret, l'avís `err-c` fix sota la capçalera. */
+@Preview
+@Composable
+internal fun PeopleListScreenSyncRemovedPreview() {
+  ConversesPreviewTheme {
+    PeopleListScreen(
+      state = PeopleListUiState(people = PreviewData.people, total = PreviewData.people.size, isLoading = false),
+      archived = false,
+      onFilterToggled = {},
+      onPersonClick = {},
+      onNewPerson = {},
+      syncIndicator = SyncIndicatorState.Removed("B"),
+      syncRemoved = true,
+    )
+  }
+}
+
 /** Amb SyncFlag encès (13a): l'indicador a la dreta de la capçalera, aquí amb sessió i falten les paraules. */
 @Preview
 @Composable
