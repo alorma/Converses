@@ -252,6 +252,7 @@
     <string name="paywall_benefit_devices">Fins a 5 dispositius</string>
     <string name="paywall_benefit_devices_summary">Les teves converses a cada mòbil i tauleta que facis servir</string>
     <string name="paywall_note">Sense subscripció i sense compte. Les teves notes es queden al mòbil.</string>
+    <string name="paywall_note_sync">Sense subscripció i sense necessitat de compte. La sincronització és opcional i xifrada d\'extrem a extrem.</string>
     <string name="paywall_buy">Aconsegueix Pro · %s</string>
     <string name="paywall_buy_offline">Cal connexió per comprar.</string>
     <string name="paywall_restore">Restaura la compra</string>

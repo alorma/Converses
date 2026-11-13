@@ -253,6 +253,7 @@
     <string name="paywall_benefit_devices">Up to 5 devices</string>
     <string name="paywall_benefit_devices_summary">Your conversations on every phone and tablet you use</string>
     <string name="paywall_note">No subscription and no account. Your notes stay on your phone.</string>
+    <string name="paywall_note_sync">No subscription and no account needed. Sync is optional and end-to-end encrypted.</string>
     <string name="paywall_buy">Get Pro · %s</string>
     <string name="paywall_buy_offline">You need a connection to buy.</string>
     <string name="paywall_restore">Restore purchase</string>

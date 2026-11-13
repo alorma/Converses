@@ -171,7 +171,7 @@ fun PaywallContent(
         highlight = if (state.isPro) null else highlight,
         owned = state.isPro,
       )
-      if (!state.isPro) PrivacyNote()
+      if (!state.isPro) PrivacyNote(syncEnabled = devicesEnabled)
     }
   }
 }
@@ -275,7 +275,7 @@ private fun BenefitRow(
 }
 
 @Composable
-private fun PrivacyNote() {
+private fun PrivacyNote(syncEnabled: Boolean) {
   Row(
     modifier = Modifier.padding(start = 8.dp, end = 8.dp, top = 2.dp),
     horizontalArrangement = Arrangement.spacedBy(10.dp),
@@ -287,7 +287,7 @@ private fun PrivacyNote() {
       modifier = Modifier.padding(top = 1.dp).size(18.dp),
     )
     Text(
-      text = stringResource(R.string.paywall_note),
+      text = stringResource(if (syncEnabled) R.string.paywall_note_sync else R.string.paywall_note),
       style = MaterialTheme.typography.bodySmall,
       color = MaterialTheme.colorScheme.onSurfaceVariant,
     )
