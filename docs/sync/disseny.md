@@ -1,6 +1,6 @@
 # Sincronització al núvol: disseny
 
-Estat: **proposta; només hi ha construïdes les fases 1, 2 i 3** (identitat de sincronització a Room v6, vegeu «Canvis a Room»; criptografia, vegeu «Claus»; compte i clau darrere del flag `sync`, vegeu «Construït (fase 3)»). Escrit el 10 de novembre de 2026 a partir de la conversa amb Bernat. Quan la funció existeixi, aquest fitxer es condensa en un `README.md` que descrigui el que hi ha, com la resta de `docs/`.
+Estat: **proposta; hi ha construïdes les fases 1 a 5** (identitat de sincronització a Room v6, vegeu «Canvis a Room»; criptografia, vegeu «Claus»; compte i clau darrere del flag `sync`, vegeu «Construït (fase 3)»; motor, vegeu «Construït (fase 4)»; dispositius, vegeu «Construït (fase 5)»). Escrit el 10 de novembre de 2026 a partir de la conversa amb Bernat. Quan la funció existeixi, aquest fitxer es condensa en un `README.md` que descrigui el que hi ha, com la resta de `docs/`.
 
 Les decisions marcades **(B)** són de Bernat. Les marcades **(C)** les ha pres Claude en escriure el disseny i es poden canviar. Les pantalles són a `disseny/`: `INSTRUCCIONS.md` (mides, estats, textos en tres idiomes) i `pantalles.html` (referència visual, taulers 13a…13t i 0c). Les decisions que venen d'allà van marcades **(D)**.
 
@@ -176,7 +176,7 @@ users/{uid}/records/{recordId}
 - El contingut xifrat és JSON (`kotlinx.serialization`, ja al projecte) amb el tipus, els camps de l'entitat, la data de modificació del client i les referències a altres registres per `recordId`, no per l'`id` local.
 - Els **fets fixats** (`pinned_fact`) viatgen dins del registre de la seva persona, perquè l'app ja els desa en bloc **(C)**.
 - **(B)** El que Bernat veu: correu, UID, pla, nombre de dispositius, nombre de registres, mides i dates. Res més.
-- `deviceId` és un UUID aleatori de la instal·lació, no cap identificador del maquinari **(C)**.
+- `deviceId` és un UUID aleatori de la instal·lació, no cap identificador del maquinari **(C)**. Viu al DataStore `sync_device` i sobreviu a tancar la sessió: tornar a entrar des del mateix dispositiu reaprofita la seva entrada. Esborrar les dades de l'app, desinstal·lar-la o un factory reset en donen un de nou.
 
 ### Regles de Firestore
 
@@ -223,7 +223,7 @@ Queda per a la fase 4:
 - **Referències:** una entrada que arriba abans que la seva persona espera en una cua local fins que la persona hi és.
 - **Duplicats amb regla d'unicitat:** dos canals propis amb el mateix nom i grup creats en dos dispositius es fusionen en un i les entrades s'hi remapen. Dos àlies iguals en persones diferents es toleren **(C)**.
 - **Primera sincronització d'un dispositiu amb dades:** unió del local i del núvol. No es dedupliquen persones amb el mateix nom **(C)**: si l'usuari les havia creat a tots dos llocs, en veurà dues.
-- **Dispositiu tret:** el motor ho descobreix en llegir `devices` o en rebre un rebuig de les regles, s'atura i passa a l'estat `Removed`.
+- **Dispositiu tret:** el motor ho descobreix en llegir `devices` o en rebre un rebuig de les regles, s'atura i passa a l'estat `Removed`. **Límit que no es pot evitar (C):** treure un dispositiu li impedeix **escriure**, no **llegir**. La sessió de Google i la clau es queden en aquell dispositiu, i Firestore no sap quin dispositiu llegeix. Contra un mòbil perdut o robat, la solució de debò és «Comença de nou» (una clau nova, fase 6) o tancar la sessió de Google des del compte de Google. No es diu a la UI.
 - **Errors:** reintents amb espera creixent. `trackError` amb llocs nous a `ErrorSites.kt`, sense `message`, com la resta.
 
 **Construït (fase 4), branca `sync-fase-4`.** Pla a `plans/fase-4-motor.md`. Tot continua darrere de `SyncFlag`; Room no canvia.
@@ -256,7 +256,25 @@ Comprovat després amb el servidor real i dos emuladors (12 de novembre de 2026)
 - **Una persona esborrada des d'un altre dispositiu** deixava la fitxa oberta en blanc. Ara la fitxa, en veure que la persona ja no hi és, treu de la navegació tot el que en depèn (`TopLevelBackStack.forgetPerson`), i l'esborrat local fa servir el mateix.
 - **Edicions simultànies:** la mateixa persona reanomenada a tots dos dispositius, un sense xarxa. Si edita més tard el que no té xarxa, guanya ell en tornar la connexió. En el cas contrari, abans quedava cadascú amb la seva, perquè Firestore escriu sense mirar què hi ha i el dispositiu que tornava trepitjava al núvol l'edició més nova amb la seva. Ara hi ha dues correccions. `pushPending` baixa abans de pujar, perquè el conflicte es resolgui al dispositiu i només pugi el que guanya. A més, si una baixada porta un registre d'un altre dispositiu que perd contra una fila local ja pujada, la fila torna a quedar pendent (`ConflictRules.mustReassert`, `markDirty`) i el guanyador torna al núvol. Una divergència que havia quedat d'abans es va arreglar sola en obrir l'app amb la versió nova. Tots dos casos convergeixen a la versió més nova, i passa el mateix amb un esborrat que trepitja una edició posterior.
 
-Queda per a la fase 5: tancar la sessió buida el DataStore `sync` i genera un `deviceId` nou cada vegada, i a `devices` s'hi acumulen entrades velles. És el primer punt de la fase 5, amb el límit de dispositius i la pantalla de dispositius.
+**Construït (fase 5): dispositius.** Pla a `plans/fase-5-dispositius.md`, amb totes les decisions. Tot continua darrere de `SyncFlag`; Room no canvia i no surt cap dada nova.
+
+| Peça | Què fa |
+| --- | --- |
+| `firestore.rules` | `devices` no pot créixer per sobre de 2 entrades amb `plan == "free"` ni de 5 amb `"pro"`, mirant el `plan` que queda després de l'escriptura. Treure'n, canviar el nom, `lastSyncAt` i `plan` sempre passen |
+| `DeviceStore` (DataStore `sync_device`) | El `deviceId`, que ja no s'esborra en tancar la sessió |
+| `FirestoreSyncRemote` | `loadDevices`, `observeDevices` (inclou les escriptures pendents, amb hores estimades), `joinDevice` (una transacció que treu el triat, afegeix aquest i escriu el pla), `removeDevice`, `renameDevice` i `touchDevice` (aquests dos no fan reaparèixer un dispositiu tret) i `setPlan` |
+| `SyncRepository` | Les places en entrar (`slotsPrompt`), `chooseDeviceToRemove`, `cancelSlots`, `rejoin`, `removeDevice`, `renameDevice`, la llista en directe, el pla i l'estat `Removed` |
+| `ui/sync` | 13l (places plenes, diàleg de 560 dp a pantalla gran), la secció «Dispositius» de 13o (13q per treure'n un), 13o2 (dispositiu tret), l'avís del llistat (13c) i la insígnia a l'indicador i a Ajustos. La fila de Pro obre el paywall amb `ProBenefit.Devices` |
+
+Com es comporta:
+
+- **Entrar:** clau → places → fusió → baixada. Un dispositiu que ja és a `devices` no veu mai 13l. Si les places són plenes, 13l no tria res per defecte; «Ara no» tanca la sessió a la primera entrada i, des d'un dispositiu tret, només tanca la pantalla. Si dos dispositius entren alhora, les regles rebutgen el segon i l'app li torna a ensenyar 13l.
+- **Pla:** apuntar-se només el fa pujar. El baixa el dispositiu que deixa de ser Pro, i baixar no treu ningú.
+- **Dispositiu tret:** el dispositiu recorda que s'havia apuntat (`registered`), i si ja no és a `devices` no s'hi torna a apuntar sol: passa a `Removed`. Abans, ho confirma amb el servidor, perquè una còpia de la memòria cau no el tregui per error. Conserva la clau, la sessió i les dades; «Torna a entrar» l'apunta sense les paraules si hi ha plaça, o li ensenya 13l.
+- **Tancar la sessió:** treu aquest dispositiu de `devices` (20 s d'espera; sense connexió tanca igualment i la plaça es treu des d'un altre dispositiu).
+- `lastSyncAt` s'actualitza en apuntar-se i després com a molt cada 15 minuts. Cap nom de dispositiu surt als logs, a l'analítica ni als errors.
+
+**Provat amb el servidor real i dos emuladors (13 de novembre de 2026):** posar un nom i veure'l a l'altre; treure la tauleta des del telèfon (13c, 13o2, «Torna a entrar», i reiniciar l'app no la torna a afegir); 13l amb «Ara no» i amb «Treu-lo i continua»; tancar la sessió (l'altre passa a «1 de 2» en directe) i tornar a entrar amb el mateix `deviceId`. La prova va trobar quatre errors, ja arreglats: la llista no es refrescava després d'un canvi propi; una còpia vella de la memòria cau feia tornar a `Removed` just després de «Torna a entrar»; un telèfon gratuït que tornava a entrar baixava a `free` un compte amb una tauleta Pro; i «Ara no» deixava la sessió tancada a mitges. El rebuig de les regles a una pujada només està provat amb tests JVM: a l'emulador, el listener veu el dispositiu tret abans. En debug, el token d'App Check és fix (`APP_CHECK_DEBUG_TOKEN` a `local.properties`) i no cal registrar-ne cap en reinstal·lar.
 
 ### Persones protegides
 
@@ -306,7 +324,7 @@ Decisions preses en construir-ho **(C)**:
 - Un procés mort a mitja activació deixa una sessió sense clau ni document: en arrencar, es tanca. Si en arrencar no hi ha connexió per saber-ho, es queda a `NeedsKey` i es resol en donar les paraules.
 - Dos dispositius que s'activen alhora no es trepitgen la clau: el segon troba el document, passa a `NeedsKey` i demana les paraules del primer.
 - Un dispositiu que havia tancat la sessió sempre demana les paraules en tornar a entrar, encara que el Keystore en conservés la clau.
-- Tancar la sessió és, ara, la forma mínima: tanca Auth, esborra la clau local i la marca de sessió, i les dades es queden. Alliberar la plaça arriba amb la fase 5.
+- Tancar la sessió tanca Auth, esborra la clau local i la marca de sessió, i les dades es queden. Des de la fase 5, també allibera la plaça.
 - L'avatar de l'indicador és la inicial del nom (o del correu) i no la foto de Google: carregar-la demanaria una biblioteca d'imatges i una connexió més.
 - Permís nou al manifest fusionat: `READ_GSERVICES`, de reCAPTCHA (dependència de Firebase Auth). Surt de l'spike.
 
@@ -357,7 +375,7 @@ Cada fase es valida abans de la següent. De la 1 a la 6 van darrere d'un featur
 2. **Criptografia:** paraules, claus, registres. JVM pur, amb vectors de prova.
 3. **Compte i clau:** iniciar sessió, generar i guardar la clau, paraules, QR, magatzem al Keystore.
 4. **Motor:** pujar, baixar, fusionar; regles de Firestore.
-5. **Dispositius:** places, triar qui surt, dispositiu tret, pla.
+5. **Dispositius:** places, triar qui surt, dispositiu tret, pla. **Fet.**
 6. **Compte:** tancar sessió, esborrar el compte, pàgina web d'esborrat.
 7. **Publicar:** política de privacitat, formulari de Play, treure el flag, notes de versió, valorar el Baseline Profile.
 
