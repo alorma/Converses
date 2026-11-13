@@ -518,7 +518,8 @@ class SyncRepository(
       data.devices.setRegistered(true)
       joined = true
       firstDevice = false
-      lastPlan = pro
+      // Un dispositiu gratuït no toca el pla en apuntar-se: el que hi ha al servidor no se sap
+      if (pro) lastPlan = true
       lastTouch = clock()
     }
     return result
@@ -546,11 +547,18 @@ class SyncRepository(
     showSlots(view, loaded)
   }
 
-  /** Escriu `plan` si el que sap el servidor no és [pro]. */
-  private suspend fun syncPlan(pro: Boolean) {
+  /**
+   * Escriu `plan` si el que sap el servidor no és [pro]. Pujar-lo, sempre; baixar-lo, només amb [downgrade]: quan
+   * aquest dispositiu deixa de ser Pro. Un dispositiu que no ho ha estat mai no treu les places d'un compte que en té un.
+   */
+  private suspend fun syncPlan(
+    pro: Boolean,
+    downgrade: Boolean = false,
+  ) {
     val data = sync ?: return
     val view = deviceView.value ?: return
     if (!joined || lastPlan == pro) return
+    if (!pro && !downgrade) return
     if (data.records.setPlan(view.uid, pro) is RemoteResult.Ok) lastPlan = pro
   }
 
@@ -820,7 +828,15 @@ class SyncRepository(
     deviceView.value = view
     firstDevice = entry == Entry.Activated
     planJob?.cancel()
-    planJob = scope.launch { data.isProChanges.collect { syncPlan(it) } }
+    planJob =
+      scope.launch {
+        // El primer valor és l'estat actual, no un canvi: només baixa el pla qui era Pro i ha deixat de ser-ho
+        var wasPro: Boolean? = null
+        data.isProChanges.collect { pro ->
+          syncPlan(pro, downgrade = wasPro == true)
+          wasPro = pro
+        }
+      }
     readyJob?.cancel()
     readyJob =
       scope.launch {

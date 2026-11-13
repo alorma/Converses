@@ -530,6 +530,26 @@ class SyncRepositoryDevicesTest {
     }
 
   @Test
+  fun aFreeDeviceJoiningOrRejoiningNeverLowersTheProPlan() =
+    test {
+      val a = device("device-1", pro = true)
+      a.activate()
+      assertTrue(fake.pro)
+      val b = device("device-2")
+      b.enter(a.words())
+      assertTrue(fake.pro)
+      b.repo.syncNow()
+      assertTrue(fake.pro)
+      // Tret i «Torna a entrar»: tampoc
+      backgroundScope.launch { b.repo.watchDevices() }
+      fake.removeFromOutside("device-2")
+      assertEquals(RejoinOutcome.Done, b.repo.rejoin())
+      b.repo.syncNow()
+      assertTrue(fake.pro)
+      assertEquals(PRO_DEVICES, b.repo.deviceLimit.first())
+    }
+
+  @Test
   fun downgradingFromProWithFiveDevicesKeepsThemAndBlocksNewOnes() =
     test {
       val a = device("device-1", pro = true)

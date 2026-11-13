@@ -453,7 +453,7 @@
     <string name="sync_remove_go">Treu-lo i continua</string>
     <string name="sync_not_now">Ara no</string>
     <string name="sync_out_t">Aquest dispositiu ja no sincronitza</string>
-    <string name="sync_out_b">L\'han tret des d\'un altre dispositiu. Les dades d\'aquí es queden. Per tornar-hi, cal treure\'n un altre.</string>
+    <string name="sync_out_b">L\'han tret des d\'un altre dispositiu. Les dades d\'aquí es queden.</string>
     <string name="sync_rejoin">Torna a entrar</string>
     <string name="sync_st_out">Aquest dispositiu ja no sincronitza</string>
 </resources>

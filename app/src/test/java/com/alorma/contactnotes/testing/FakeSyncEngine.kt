@@ -151,10 +151,10 @@ class FakeSyncRemote : SyncRemote {
     } else {
       known.lastSyncAt = now
     }
-    if (!allowed(entries.size, after.size, device.pro)) return JoinResult.Full
+    if (!allowed(entries.size, after.size, pro || device.pro)) return JoinResult.Full
     entries.clear()
     entries.putAll(after)
-    pro = device.pro
+    pro = pro || device.pro
     publish()
     return JoinResult.Joined
   }

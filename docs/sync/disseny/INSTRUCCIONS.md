@@ -279,7 +279,7 @@ Són al tauler 13t i a la taula següent. Les claus són una proposta per a `str
 | `expires` | El codi caduca en %s | The code expires in %s | El código caduca en %s |
 | `qr_warn` | Qui vegi aquest codi pot obrir les teves dades. No el comparteixis ni en facis captures. | Anyone who sees this code can open your data. Don’t share it or take screenshots. | Quien vea este código puede abrir tus datos. No lo compartas ni hagas capturas. |
 | `out_t` | Aquest dispositiu ja no sincronitza | This device no longer syncs | Este dispositivo ya no sincroniza |
-| `out_b` | L’han tret des d’un altre dispositiu. Les dades d’aquí es queden. Per tornar-hi, cal treure’n un altre. | It was removed from another device. The data here stays. To come back, you’ll need to remove another one. | Lo han quitado desde otro dispositivo. Los datos de aquí se quedan. Para volver, hay que quitar otro. |
+| `out_b` | L’han tret des d’un altre dispositiu. Les dades d’aquí es queden. | It was removed from another device. The data here stays. | Lo han quitado desde otro dispositivo. Los datos de aquí se quedan. |
 | `rejoin` | Torna a entrar | Rejoin | Volver a entrar |
 | `c1_t` | Treure el %s? | Remove %s? | ¿Quitar el %s? |
 | `c1_b` | Deixarà de sincronitzar, però conservarà les seves dades. Hi podràs tornar a entrar més endavant. | It will stop syncing but keep its data. You can add it again later. | Dejará de sincronizar, pero conservará sus datos. Podrás volver a entrar más adelante. |

@@ -135,12 +135,14 @@ class FirestoreSyncRemote(
   ): JoinResult =
     try {
       val account = accountOf(uid)
-      val plan = if (device.pro) PLAN_PRO else PLAN_FREE
       // La lectura dins la transacció deixa `addedAt` com era i no trepitja el nom que ja hi ha (l'usuari el pot haver
       // canviat des d'un altre dispositiu): només es posa la primera vegada
       firebase.firestore
         .runTransaction { transaction ->
-          val known = (transaction.get(account).get(FIELD_DEVICES) as? Map<*, *>)?.containsKey(device.id) == true
+          val current = transaction.get(account)
+          val known = (current.get(FIELD_DEVICES) as? Map<*, *>)?.containsKey(device.id) == true
+          // Apuntar-se només fa pujar el pla: un dispositiu gratuït no treu les places d'un compte que té un Pro
+          val plan = if (device.pro) PLAN_PRO else current.getString(FIELD_PLAN) ?: PLAN_FREE
           val fields = mutableListOf<Pair<FieldPath, Any?>>()
           if (removing != null && removing != device.id) {
             fields += FieldPath.of(FIELD_DEVICES, removing) to FieldValue.delete()
