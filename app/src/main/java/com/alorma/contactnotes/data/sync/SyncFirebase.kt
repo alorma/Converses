@@ -67,6 +67,12 @@ internal fun Throwable.isNetworkFailure(): Boolean =
     }
   }
 
+/** Les regles de Firestore han rebutjat l'escriptura. Es mira tota la cadena de causes, com a [isNetworkFailure]. */
+internal fun Throwable.isPermissionDenied(): Boolean =
+  generateSequence(this) { it.cause }.take(MAX_CAUSES).any { error ->
+    error is FirebaseFirestoreException && error.code == FirebaseFirestoreException.Code.PERMISSION_DENIED
+  }
+
 // Una cadena de causes pot ser circular
 private const val MAX_CAUSES = 10
 

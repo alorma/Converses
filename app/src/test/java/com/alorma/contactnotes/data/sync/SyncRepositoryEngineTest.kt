@@ -10,6 +10,7 @@ import com.alorma.contactnotes.data.sync.record.SyncRecord
 import com.alorma.contactnotes.testing.FakeAccountRemote
 import com.alorma.contactnotes.testing.FakeAuthGateway
 import com.alorma.contactnotes.testing.FakeCursorStore
+import com.alorma.contactnotes.testing.FakeDeviceStore
 import com.alorma.contactnotes.testing.FakeSyncKeyStore
 import com.alorma.contactnotes.testing.FakeSyncLocalStore
 import com.alorma.contactnotes.testing.FakeSyncRemote
@@ -123,7 +124,10 @@ class SyncRepositoryEngineTest {
       FakeSyncLocalStore(),
       scope,
       clock = { 7_000L },
-      sync = SyncData(runner, source, records, FakeCursorStore(), deviceName = { "Pixel" }, isPro = { true }),
+      sync =
+        SyncData(runner, source, records, FakeCursorStore(), FakeDeviceStore(), deviceName = {
+          "Pixel"
+        }, isPro = { true }),
     )
   private val activity = Activity()
 

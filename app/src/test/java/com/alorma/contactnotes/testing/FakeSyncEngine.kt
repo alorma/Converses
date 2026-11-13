@@ -1,12 +1,17 @@
 package com.alorma.contactnotes.testing
 
+import com.alorma.contactnotes.data.sync.DeviceStore
+import com.alorma.contactnotes.data.sync.JoinResult
 import com.alorma.contactnotes.data.sync.RemoteDevice
+import com.alorma.contactnotes.data.sync.RemoteDeviceEntry
+import com.alorma.contactnotes.data.sync.RemoteDevices
 import com.alorma.contactnotes.data.sync.RemoteRecord
 import com.alorma.contactnotes.data.sync.RemoteResult
 import com.alorma.contactnotes.data.sync.SyncCursorStore
 import com.alorma.contactnotes.data.sync.SyncRemote
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 
 /**
@@ -15,7 +20,6 @@ import kotlinx.coroutines.flow.asSharedFlow
  */
 class FakeSyncRemote : SyncRemote {
   val records = mutableMapOf<String, RemoteRecord>()
-  val devices = mutableListOf<RemoteDevice>()
   var failure: RemoteResult<Nothing>? = null
   var shuffled = false
   var pushes = 0
@@ -54,14 +58,142 @@ class FakeSyncRemote : SyncRemote {
     since: Long,
   ): Flow<List<RemoteRecord>> = changes.asSharedFlow()
 
-  override suspend fun registerDevice(
+  private class Entry(
+    var sealedName: ByteArray,
+    var addedAt: Long,
+    var lastSyncAt: Long,
+  )
+
+  private val entries = linkedMapOf<String, Entry>()
+  private val observed = MutableStateFlow(RemoteDevices(pro = false, entries = emptyList()))
+
+  /** El camp `plan` de `users/{uid}`. */
+  var pro = false
+    private set
+
+  /** Els dispositius apuntats, tal com els veu el servidor. */
+  val devices: List<RemoteDevice> get() = entries.map { (id, entry) -> RemoteDevice(id, entry.sealedName, pro) }
+
+  val deviceIds: List<String> get() = entries.keys.toList()
+
+  fun lastSyncAt(id: String): Long? = entries[id]?.lastSyncAt
+
+  /** Com si un altre dispositiu hagués tret [id] de la llista. */
+  fun removeFromOutside(id: String) {
+    entries.remove(id)
+    publish()
+  }
+
+  private fun publish() {
+    observed.value =
+      RemoteDevices(
+        pro = pro,
+        entries =
+          entries.map { (id, entry) ->
+            RemoteDeviceEntry(id, entry.sealedName, entry.addedAt, entry.lastSyncAt)
+          },
+      )
+  }
+
+  /** Les regles: el mapa només pot créixer fins al límit del pla que queda després de l'escriptura. */
+  private fun allowed(
+    sizeBefore: Int,
+    sizeAfter: Int,
+    proAfter: Boolean,
+  ): Boolean = sizeAfter <= sizeBefore || sizeAfter <= if (proAfter) PRO_DEVICES else FREE_DEVICES
+
+  override suspend fun loadDevices(uid: String): RemoteResult<RemoteDevices> {
+    failure?.let { return it }
+    return RemoteResult.Ok(observed.value)
+  }
+
+  override fun observeDevices(uid: String): Flow<RemoteDevices> = observed
+
+  override suspend fun joinDevice(
     uid: String,
     device: RemoteDevice,
+    removing: String?,
+  ): JoinResult {
+    failure?.let {
+      return when (it) {
+        RemoteResult.Offline -> JoinResult.Offline
+        else -> JoinResult.Failed
+      }
+    }
+    val after = LinkedHashMap(entries)
+    if (removing != null && removing != device.id) after.remove(removing)
+    val now = ++clock
+    val known = after[device.id]
+    if (known == null) {
+      after[device.id] = Entry(device.sealedName, now, now)
+    } else {
+      known.lastSyncAt = now
+    }
+    if (!allowed(entries.size, after.size, device.pro)) return JoinResult.Full
+    entries.clear()
+    entries.putAll(after)
+    pro = device.pro
+    publish()
+    return JoinResult.Joined
+  }
+
+  override suspend fun removeDevice(
+    uid: String,
+    id: String,
   ): RemoteResult<Unit> {
     failure?.let { return it }
-    devices.removeAll { it.id == device.id }
-    devices += device
+    entries.remove(id)
+    publish()
     return RemoteResult.Ok(Unit)
+  }
+
+  override suspend fun renameDevice(
+    uid: String,
+    id: String,
+    sealedName: ByteArray,
+  ): RemoteResult<Unit> {
+    failure?.let { return it }
+    entries[id]?.sealedName = sealedName
+    publish()
+    return RemoteResult.Ok(Unit)
+  }
+
+  override suspend fun touchDevice(
+    uid: String,
+    id: String,
+  ): RemoteResult<Unit> {
+    failure?.let { return it }
+    entries[id]?.lastSyncAt = ++clock
+    publish()
+    return RemoteResult.Ok(Unit)
+  }
+
+  override suspend fun setPlan(
+    uid: String,
+    pro: Boolean,
+  ): RemoteResult<Unit> {
+    failure?.let { return it }
+    this.pro = pro
+    publish()
+    return RemoteResult.Ok(Unit)
+  }
+
+  private companion object {
+    const val FREE_DEVICES = 2
+    const val PRO_DEVICES = 5
+  }
+}
+
+class FakeDeviceStore(
+  private val deviceId: String = "device-1",
+  var registered: Boolean = false,
+) : DeviceStore {
+  override suspend fun deviceId(): String = deviceId
+
+  override suspend fun isRegistered(): Boolean = registered
+
+  override suspend fun setRegistered(value: Boolean) {
+    registered = value
   }
 }
 

@@ -27,8 +27,10 @@ import com.alorma.contactnotes.data.settings.SettingsRepository
 import com.alorma.contactnotes.data.sync.AccountRemote
 import com.alorma.contactnotes.data.sync.AndroidSyncKeyStore
 import com.alorma.contactnotes.data.sync.AuthGateway
+import com.alorma.contactnotes.data.sync.DataStoreDeviceStore
 import com.alorma.contactnotes.data.sync.DataStoreSyncCursorStore
 import com.alorma.contactnotes.data.sync.DataStoreSyncLocalStore
+import com.alorma.contactnotes.data.sync.DeviceStore
 import com.alorma.contactnotes.data.sync.EngineSyncRunner
 import com.alorma.contactnotes.data.sync.FirebaseAuthGateway
 import com.alorma.contactnotes.data.sync.FirestoreAccountRemote
@@ -150,7 +152,8 @@ val syncModule =
     single<AccountRemote> { FirestoreAccountRemote(get(), get<EventTracker>()) }
     single<SyncKeyStore> { AndroidSyncKeyStore(androidContext(), get<EventTracker>()) }
     single<SyncLocalStore> { DataStoreSyncLocalStore(androidContext()) }
-    single<SyncCursorStore> { DataStoreSyncCursorStore(androidContext()) }
+    single<DeviceStore> { DataStoreDeviceStore(androidContext()) }
+    single<SyncCursorStore> { DataStoreSyncCursorStore(androidContext(), get()) }
     single<SyncRemote> { FirestoreSyncRemote(get(), get<EventTracker>()) }
     single<LocalSyncSource> { RoomLocalSyncSource(get(), get(), get(), get(), get(), get()) }
     single {
@@ -166,6 +169,7 @@ val syncModule =
           source = get(),
           records = get(),
           cursors = get(),
+          devices = get(),
           deviceName = {
             Settings.Global.getString(
               context.contentResolver,

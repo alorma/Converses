@@ -82,6 +82,7 @@ fun SyncState.toIndicatorState(): SyncIndicatorState =
     SyncState.SignedOut, SyncState.Checking, is SyncState.Activating -> SyncIndicatorState.SignedOut
     is SyncState.NeedsKey -> SyncIndicatorState.NeedsKey(account.initial())
     is SyncState.Ready -> SyncIndicatorState.On(account.initial())
+    is SyncState.Removed -> SyncIndicatorState.On(account.initial())
   }
 
 /** La primera lletra del nom o, si el compte no en té, del correu. */

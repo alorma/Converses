@@ -98,9 +98,9 @@ fun SyncScreen(
           onEnterWords = onEnterWords,
           onChangeAccount = viewModel::onSignOut,
         )
-      is SyncState.Ready ->
+      is SyncState.Ready, is SyncState.Removed ->
         SyncReadyContent(
-          account = current.account,
+          account = (current as? SyncState.Ready)?.account ?: (current as SyncState.Removed).account,
           wordsReviewedAt = wordsReviewedAt,
           status = status,
           padding = padding,

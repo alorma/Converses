@@ -72,6 +72,9 @@ sealed interface RemoteResult<out T> {
   data object Offline : RemoteResult<Nothing>
 
   data object Failed : RemoteResult<Nothing>
+
+  /** Les regles del servidor han rebutjat l'escriptura (per exemple, un dispositiu de més). No té sentit tornar-ho a provar igual. */
+  data object Denied : RemoteResult<Nothing>
 }
 
 sealed interface CreateResult {

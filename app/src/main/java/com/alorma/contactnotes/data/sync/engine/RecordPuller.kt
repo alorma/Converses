@@ -79,7 +79,7 @@ internal class RecordPuller(
         when (val result = remote.pull(uid, since, pageSize)) {
           is RemoteResult.Ok -> result.value
           RemoteResult.Offline -> return SyncOutcome.Offline
-          RemoteResult.Failed -> return SyncOutcome.Failed
+          RemoteResult.Failed, RemoteResult.Denied -> return SyncOutcome.Failed
         }
       // El marge i els empats de temps fan que un registre pugui tornar: el ja vist no es torna a aplicar
       val fresh = page.filter { seen.put(it.id, it.updatedAt) != it.updatedAt }

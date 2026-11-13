@@ -32,7 +32,7 @@ class SyncWorker(
     if (repository.state.first { it !is SyncState.Checking } !is SyncState.Ready) return Result.success()
     return when (repository.syncNow()) {
       SyncOutcome.Done -> Result.success()
-      SyncOutcome.Offline, SyncOutcome.Failed ->
+      SyncOutcome.Offline, SyncOutcome.Failed, SyncOutcome.Denied ->
         if (runAttemptCount <
           MAX_ATTEMPTS
         ) {

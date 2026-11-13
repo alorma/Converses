@@ -432,4 +432,24 @@
     <string name="sync_st_now">Al dia · ara mateix</string>
     <string name="sync_indicator_syncing">Compte: sincronitzant</string>
     <string name="sync_indicator_offline">Compte: sense connexió</string>
+    <string name="sync_devices">Dispositius</string>
+    <string name="sync_slots">%1$d de %2$d</string>
+    <string name="sync_this_dev">Aquest dispositiu</string>
+    <string name="sync_device_unnamed">Dispositiu</string>
+    <string name="sync_last_sync">Darrera sincronització: %1$s</string>
+    <string name="sync_rename">Canvia el nom</string>
+    <string name="sync_rename_t">Canvia el nom del dispositiu</string>
+    <string name="sync_rename_field">Nom del dispositiu</string>
+    <string name="sync_remove">Treu</string>
+    <string name="sync_remove_t">Treure el %1$s?</string>
+    <string name="sync_remove_b">Deixarà de sincronitzar, però conservarà les seves dades. Hi podràs tornar a entrar més endavant.</string>
+    <string name="sync_full_t">No queden places</string>
+    <string name="sync_full_b">Aquest compte ja sincronitza en %1$d de %2$d dispositius. Per entrar amb aquest, treu-ne un. El que treguis conserva les seves dades.</string>
+    <string name="sync_pro5">Fins a 5 dispositius amb Pro</string>
+    <string name="sync_remove_go">Treu-lo i continua</string>
+    <string name="sync_not_now">Ara no</string>
+    <string name="sync_out_t">Aquest dispositiu ja no sincronitza</string>
+    <string name="sync_out_b">L\'han tret des d\'un altre dispositiu. Les dades d\'aquí es queden. Per tornar-hi, cal treure\'n un altre.</string>
+    <string name="sync_rejoin">Torna a entrar</string>
+    <string name="sync_st_out">Aquest dispositiu ja no sincronitza</string>
 </resources>

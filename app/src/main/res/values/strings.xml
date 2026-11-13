@@ -433,4 +433,24 @@
     <string name="sync_st_now">Up to date · just now</string>
     <string name="sync_indicator_syncing">Account: syncing</string>
     <string name="sync_indicator_offline">Account: offline</string>
+    <string name="sync_devices">Devices</string>
+    <string name="sync_slots">%1$d of %2$d</string>
+    <string name="sync_this_dev">This device</string>
+    <string name="sync_device_unnamed">Device</string>
+    <string name="sync_last_sync">Last sync: %1$s</string>
+    <string name="sync_rename">Rename</string>
+    <string name="sync_rename_t">Rename device</string>
+    <string name="sync_rename_field">Device name</string>
+    <string name="sync_remove">Remove</string>
+    <string name="sync_remove_t">Remove %1$s?</string>
+    <string name="sync_remove_b">It will stop syncing but keep its data. You can add it again later.</string>
+    <string name="sync_full_t">No slots left</string>
+    <string name="sync_full_b">This account already syncs on %1$d of %2$d devices. To add this one, remove one. The one you remove keeps its data.</string>
+    <string name="sync_pro5">Up to 5 devices with Pro</string>
+    <string name="sync_remove_go">Remove it and continue</string>
+    <string name="sync_not_now">Not now</string>
+    <string name="sync_out_t">This device no longer syncs</string>
+    <string name="sync_out_b">It was removed from another device. The data here stays. To come back, you\'ll need to remove another one.</string>
+    <string name="sync_rejoin">Rejoin</string>
+    <string name="sync_st_out">This device no longer syncs</string>
 </resources>

@@ -86,7 +86,7 @@ class SyncLoop(
 }
 
 /**
- * Engega i atura el [SyncLoop] segons si l'app és visible i el dispositiu és [SyncState.Ready]; en passar a segon pla
+ * Engega i atura el [SyncLoop] segons si l'app és visible i el dispositiu és [SyncState.Ready] (no [SyncState.Removed]); en passar a segon pla
  * amb canvis pendents demana el worker de fons. Només es crea amb [SyncFlag] encès. Sense sessió no passa mai res: ni
  * bucle ni WorkManager.
  */

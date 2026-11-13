@@ -6,11 +6,13 @@ import com.google.firebase.Timestamp
 import com.google.firebase.firestore.Blob
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentChange
+import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.Source
+import com.google.firebase.firestore.Transaction
 import kotlin.coroutines.cancellation.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
@@ -103,48 +105,139 @@ class FirestoreSyncRemote(
       awaitClose { registration.remove() }
     }.flowOn(Dispatchers.IO)
 
-  override suspend fun registerDevice(
+  override suspend fun loadDevices(uid: String): RemoteResult<RemoteDevices> =
+    guarded {
+      // Del servidor: la memòria cau no sap què han fet els altres dispositius
+      accountOf(uid).get(Source.SERVER).awaitTask().toRemoteDevices()
+    }
+
+  override fun observeDevices(uid: String): Flow<RemoteDevices> =
+    callbackFlow {
+      val registration =
+        accountOf(uid).addSnapshotListener { snapshot, error ->
+          if (error != null) {
+            if (!error.isNetworkFailure()) tracker.trackError(error, ErrorSites.SYNC_ACCOUNT)
+            // Qui escolta torna a obrir-lo quan toqui
+            close()
+          } else if (snapshot != null && !snapshot.metadata.hasPendingWrites()) {
+            trySend(snapshot.toRemoteDevices())
+          }
+        }
+      awaitClose { registration.remove() }
+    }.flowOn(Dispatchers.IO)
+
+  override suspend fun joinDevice(
     uid: String,
     device: RemoteDevice,
-  ): RemoteResult<Unit> =
-    guarded {
-      val account = withContext(Dispatchers.IO) { firebase.firestore.collection(COLLECTION_USERS).document(uid) }
+    removing: String?,
+  ): JoinResult =
+    try {
+      val account = accountOf(uid)
       val plan = if (device.pro) PLAN_PRO else PLAN_FREE
-      // La lectura dins la transacció deixa `addedAt` com era: només es posa la primera vegada
+      // La lectura dins la transacció deixa `addedAt` com era i no trepitja el nom que ja hi ha (l'usuari el pot haver
+      // canviat des d'un altre dispositiu): només es posa la primera vegada
       firebase.firestore
         .runTransaction { transaction ->
           val known = (transaction.get(account).get(FIELD_DEVICES) as? Map<*, *>)?.containsKey(device.id) == true
-          val name = Blob.fromBytes(device.sealedName)
+          val fields = mutableListOf<Pair<FieldPath, Any?>>()
+          if (removing != null && removing != device.id) {
+            fields += FieldPath.of(FIELD_DEVICES, removing) to FieldValue.delete()
+          }
           if (known) {
-            transaction.update(
-              account,
-              FieldPath.of(FIELD_DEVICES, device.id, FIELD_DEVICE_NAME),
-              name,
-              FieldPath.of(FIELD_DEVICES, device.id, FIELD_LAST_SYNC_AT),
-              FieldValue.serverTimestamp(),
-              FieldPath.of(FIELD_PLAN),
-              plan,
-              FieldPath.of(FIELD_LAST_SYNC_AT),
-              FieldValue.serverTimestamp(),
-            )
+            fields += FieldPath.of(FIELD_DEVICES, device.id, FIELD_LAST_SYNC_AT) to FieldValue.serverTimestamp()
           } else {
-            transaction.update(
-              account,
-              FieldPath.of(FIELD_DEVICES, device.id),
+            fields +=
+              FieldPath.of(FIELD_DEVICES, device.id) to
               mapOf(
-                FIELD_DEVICE_NAME to name,
+                FIELD_DEVICE_NAME to Blob.fromBytes(device.sealedName),
                 FIELD_ADDED_AT to FieldValue.serverTimestamp(),
                 FIELD_LAST_SYNC_AT to FieldValue.serverTimestamp(),
-              ),
-              FieldPath.of(FIELD_PLAN),
-              plan,
-              FieldPath.of(FIELD_LAST_SYNC_AT),
-              FieldValue.serverTimestamp(),
-            )
+              )
           }
+          fields += FieldPath.of(FIELD_PLAN) to plan
+          fields += FieldPath.of(FIELD_LAST_SYNC_AT) to FieldValue.serverTimestamp()
+          transaction.updateFields(account, fields)
         }.awaitTask()
+      JoinResult.Joined
+    } catch (e: CancellationException) {
+      throw e
+    } catch (e: Exception) {
+      when {
+        e.isNetworkFailure() -> JoinResult.Offline
+        // Les regles no deixen passar de les places del pla
+        e.isPermissionDenied() -> JoinResult.Full
+        else -> {
+          tracker.trackError(e, ErrorSites.SYNC_ACCOUNT)
+          JoinResult.Failed
+        }
+      }
+    }
+
+  override suspend fun removeDevice(
+    uid: String,
+    id: String,
+  ): RemoteResult<Unit> = updateAccount(uid, FieldPath.of(FIELD_DEVICES, id) to FieldValue.delete())
+
+  override suspend fun renameDevice(
+    uid: String,
+    id: String,
+    sealedName: ByteArray,
+  ): RemoteResult<Unit> =
+    updateAccount(uid, FieldPath.of(FIELD_DEVICES, id, FIELD_DEVICE_NAME) to Blob.fromBytes(sealedName))
+
+  override suspend fun touchDevice(
+    uid: String,
+    id: String,
+  ): RemoteResult<Unit> =
+    updateAccount(
+      uid,
+      FieldPath.of(FIELD_DEVICES, id, FIELD_LAST_SYNC_AT) to FieldValue.serverTimestamp(),
+      FieldPath.of(FIELD_LAST_SYNC_AT) to FieldValue.serverTimestamp(),
+    )
+
+  override suspend fun setPlan(
+    uid: String,
+    pro: Boolean,
+  ): RemoteResult<Unit> = updateAccount(uid, FieldPath.of(FIELD_PLAN) to if (pro) PLAN_PRO else PLAN_FREE)
+
+  private suspend fun updateAccount(
+    uid: String,
+    vararg fields: Pair<FieldPath, Any?>,
+  ): RemoteResult<Unit> =
+    guarded {
+      val (first, rest) = fields.first() to fields.drop(1)
+      val args = rest.flatMap { listOf(it.first, it.second) }.toTypedArray()
+      accountOf(uid).update(first.first, first.second, *args).awaitTask()
       Unit
     }
+
+  private fun Transaction.updateFields(
+    account: DocumentReference,
+    fields: List<Pair<FieldPath, Any?>>,
+  ) {
+    val args = fields.drop(1).flatMap { listOf(it.first, it.second) }.toTypedArray()
+    update(account, fields.first().first, fields.first().second, *args)
+  }
+
+  private suspend fun accountOf(uid: String): DocumentReference =
+    withContext(Dispatchers.IO) { firebase.firestore.collection(COLLECTION_USERS).document(uid) }
+
+  /** Sense el camp `devices` (o amb una forma que no s'espera) és un compte sense dispositius. */
+  private fun DocumentSnapshot.toRemoteDevices(): RemoteDevices {
+    val devices = get(FIELD_DEVICES) as? Map<*, *> ?: emptyMap<Any, Any>()
+    val entries =
+      devices.mapNotNull { (key, value) ->
+        val id = key as? String ?: return@mapNotNull null
+        val fields = value as? Map<*, *> ?: return@mapNotNull null
+        RemoteDeviceEntry(
+          id = id,
+          sealedName = (fields[FIELD_DEVICE_NAME] as? Blob)?.toBytes(),
+          addedAt = (fields[FIELD_ADDED_AT] as? Timestamp)?.toMillis(),
+          lastSyncAt = (fields[FIELD_LAST_SYNC_AT] as? Timestamp)?.toMillis(),
+        )
+      }
+    return RemoteDevices(pro = getString(FIELD_PLAN) == PLAN_PRO, entries = entries)
+  }
 
   private suspend fun <T> guarded(block: suspend () -> T): RemoteResult<T> =
     try {
@@ -154,6 +247,8 @@ class FirestoreSyncRemote(
     } catch (e: Exception) {
       if (e.isNetworkFailure()) {
         RemoteResult.Offline
+      } else if (e.isPermissionDenied()) {
+        RemoteResult.Denied
       } else {
         tracker.trackError(e, ErrorSites.SYNC_ACCOUNT)
         RemoteResult.Failed

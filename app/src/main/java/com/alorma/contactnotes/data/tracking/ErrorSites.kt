@@ -40,6 +40,9 @@ object ErrorSites {
   /** El dispositiu queda sense sessió de sincronització; les dades i la clau no es toquen. */
   const val DATASTORE_SYNC = "datastore_sync"
 
+  /** El `deviceId` de sincronització es regenera: el dispositiu es tornarà a apuntar com un de nou. */
+  const val DATASTORE_SYNC_DEVICE = "datastore_sync_device"
+
   // Sincronització. Sense xarxa o tancar el full de Google no són errors.
 
   /** L'inici (o el tancament) de sessió amb Google ha fallat per un motiu que no és la xarxa ni l'usuari. */

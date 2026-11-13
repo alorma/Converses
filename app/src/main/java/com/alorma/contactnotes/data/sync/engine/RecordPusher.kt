@@ -51,6 +51,7 @@ internal class RecordPusher(
         is RemoteResult.Ok -> batch.forEach { it.onUploaded() }
         RemoteResult.Offline -> return SyncOutcome.Offline
         RemoteResult.Failed -> return SyncOutcome.Failed
+        RemoteResult.Denied -> return SyncOutcome.Denied
       }
     }
     return SyncOutcome.Done

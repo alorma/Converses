@@ -434,4 +434,24 @@
     <string name="sync_st_now">Al día · ahora mismo</string>
     <string name="sync_indicator_syncing">Cuenta: sincronizando</string>
     <string name="sync_indicator_offline">Cuenta: sin conexión</string>
+    <string name="sync_devices">Dispositivos</string>
+    <string name="sync_slots">%1$d de %2$d</string>
+    <string name="sync_this_dev">Este dispositivo</string>
+    <string name="sync_device_unnamed">Dispositivo</string>
+    <string name="sync_last_sync">Última sincronización: %1$s</string>
+    <string name="sync_rename">Cambiar el nombre</string>
+    <string name="sync_rename_t">Cambiar el nombre del dispositivo</string>
+    <string name="sync_rename_field">Nombre del dispositivo</string>
+    <string name="sync_remove">Quitar</string>
+    <string name="sync_remove_t">¿Quitar el %1$s?</string>
+    <string name="sync_remove_b">Dejará de sincronizar, pero conservará sus datos. Podrás volver a entrar más adelante.</string>
+    <string name="sync_full_t">No quedan plazas</string>
+    <string name="sync_full_b">Esta cuenta ya sincroniza en %1$d de %2$d dispositivos. Para entrar con este, quita uno. El que quites conserva sus datos.</string>
+    <string name="sync_pro5">Hasta 5 dispositivos con Pro</string>
+    <string name="sync_remove_go">Quitarlo y continuar</string>
+    <string name="sync_not_now">Ahora no</string>
+    <string name="sync_out_t">Este dispositivo ya no sincroniza</string>
+    <string name="sync_out_b">Lo han quitado desde otro dispositivo. Los datos de aquí se quedan. Para volver, hay que quitar otro.</string>
+    <string name="sync_rejoin">Volver a entrar</string>
+    <string name="sync_st_out">Este dispositivo ya no sincroniza</string>
 </resources>

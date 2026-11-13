@@ -3,16 +3,15 @@ package com.alorma.contactnotes.data.sync
 import android.content.Context
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.longPreferencesKey
-import androidx.datastore.preferences.core.stringPreferencesKey
-import java.util.UUID
 import kotlinx.coroutines.flow.first
 
 /**
- * El cursor i el `deviceId`, al mateix DataStore `sync` que la sessió: en tancar la sessió s'esborren tots dos, i un
- * compte nou torna a baixar des de zero amb un dispositiu nou.
+ * El cursor, al mateix DataStore `sync` que la sessió: en tancar la sessió s'esborra, i un compte nou torna a baixar
+ * des de zero. El `deviceId` és de [DeviceStore] i sobreviu.
  */
 class DataStoreSyncCursorStore(
   context: Context,
+  private val devices: DeviceStore,
 ) : SyncCursorStore {
   private val dataStore = context.applicationContext.syncDataStore
 
@@ -22,17 +21,9 @@ class DataStoreSyncCursorStore(
     dataStore.edit { it[CURSOR] = value }
   }
 
-  override suspend fun deviceId(): String {
-    dataStore.data.first()[DEVICE_ID]?.let { return it }
-    var created = ""
-    dataStore.edit { prefs ->
-      created = prefs[DEVICE_ID] ?: UUID.randomUUID().toString().also { prefs[DEVICE_ID] = it }
-    }
-    return created
-  }
+  override suspend fun deviceId(): String = devices.deviceId()
 
   private companion object {
     val CURSOR = longPreferencesKey("cursor")
-    val DEVICE_ID = stringPreferencesKey("device_id")
   }
 }

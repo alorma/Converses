@@ -51,7 +51,38 @@ sealed interface SyncState {
   data class Ready(
     val account: SyncAccount,
   ) : SyncState
+
+  /** Un altre dispositiu ha tret aquest de la llista: té la clau i les dades, però ja no sincronitza. */
+  data class Removed(
+    val account: SyncAccount,
+  ) : SyncState
 }
+
+/** Una fila de la llista de dispositius, amb el nom ja desxifrat ([name] és `null` si no s'ha pogut llegir). */
+data class DeviceInfo(
+  val id: String,
+  val name: String?,
+  val addedAt: Long?,
+  val lastSyncAt: Long?,
+  val isThis: Boolean,
+) {
+  /** Sense el nom: un dispositiu no ha de sortir mai en un log. */
+  override fun toString(): String = "DeviceInfo"
+}
+
+/**
+ * Les places són plenes en apuntar aquest dispositiu: cal treure'n un o no continuar. [devices] són els que hi ha
+ * (sense aquest) i [canUpgrade] diu si passar a Pro en donaria més.
+ */
+data class SlotsPrompt(
+  val limit: Int,
+  val devices: List<DeviceInfo>,
+  val canUpgrade: Boolean,
+)
+
+enum class DeviceActionOutcome { Done, Offline, Failed }
+
+enum class RejoinOutcome { Done, Full, Offline, Failed }
 
 enum class SignInOutcome { Done, Cancelled, Offline, Failed }
 
@@ -120,6 +151,7 @@ class SyncData(
   val source: LocalSyncSource,
   val records: SyncRemote,
   val cursors: SyncCursorStore,
+  val devices: DeviceStore,
   val deviceName: () -> String,
   val isPro: () -> Boolean,
 )
@@ -232,6 +264,35 @@ class SyncRepository(
 
   val wordsReviewedAt: Flow<Long?> get() = local.wordsReviewedAt
 
+  // Tasca A: els dispositius i les places. De moment només el contracte.
+
+  /** Els dispositius del compte, amb aquest marcat. */
+  val devices: Flow<List<DeviceInfo>> = flowOf(emptyList())
+
+  /** Quants dispositius admet el pla actual. */
+  val deviceLimit: Flow<Int> = flowOf(2)
+
+  /** Si no és `null`, les places són plenes i la pantalla ha de demanar quin dispositiu es treu. */
+  val slotsPrompt: StateFlow<SlotsPrompt?> = MutableStateFlow<SlotsPrompt?>(null).asStateFlow()
+
+  /** Treu [id] i continua apuntant aquest dispositiu. */
+  suspend fun chooseDeviceToRemove(id: String): DeviceActionOutcome = DeviceActionOutcome.Failed // Tasca A
+
+  /** «Ara no»: tanca la sessió sense deixar res nou al núvol. */
+  suspend fun cancelSlots() = Unit // Tasca A
+
+  /** «Torna a entrar» d'un dispositiu tret. */
+  suspend fun rejoin(): RejoinOutcome = RejoinOutcome.Failed // Tasca A
+
+  /** Treu un altre dispositiu de la llista. */
+  suspend fun removeDevice(id: String): DeviceActionOutcome = DeviceActionOutcome.Failed // Tasca A
+
+  /** Canvia el nom d'un dispositiu (es desa xifrat). */
+  suspend fun renameDevice(
+    id: String,
+    name: String,
+  ): DeviceActionOutcome = DeviceActionOutcome.Failed // Tasca A
+
   /**
    * Recupera la sessió d'aquest dispositiu, si en té. Només es crida amb [SyncFlag] encès. Sense sessió marcada no toca
    * Firebase.
@@ -254,7 +315,7 @@ class SyncRepository(
     // no hi ha res. Sense connexió no es pot saber; es resol en donar les paraules
     return when (val loaded = remote.load(account.uid)) {
       is RemoteResult.Ok -> if (loaded.value == null) signedOut() else SyncState.NeedsKey(account)
-      RemoteResult.Offline, RemoteResult.Failed -> SyncState.NeedsKey(account)
+      RemoteResult.Offline, RemoteResult.Failed, RemoteResult.Denied -> SyncState.NeedsKey(account)
     }
   }
 
@@ -273,7 +334,7 @@ class SyncRepository(
         when (val loaded = remote.load(account.uid)) {
           is RemoteResult.Ok -> loaded.value
           RemoteResult.Offline -> return backToSignedOut(SignInOutcome.Offline)
-          RemoteResult.Failed -> return backToSignedOut(SignInOutcome.Failed)
+          RemoteResult.Failed, RemoteResult.Denied -> return backToSignedOut(SignInOutcome.Failed)
         }
       local.setSession(true)
       mutableState.value =
@@ -366,7 +427,7 @@ class SyncRepository(
         when (val loaded = remote.load(current.account.uid)) {
           is RemoteResult.Ok -> loaded.value
           RemoteResult.Offline -> return WordsOutcome.Offline
-          RemoteResult.Failed -> return WordsOutcome.Failed
+          RemoteResult.Failed, RemoteResult.Denied -> return WordsOutcome.Failed
         }
       if (remoteAccount == null) {
         // El compte no té dades (una activació que no es va acabar): no hi ha res per obrir
@@ -488,6 +549,7 @@ class SyncRepository(
         SyncOutcome.Done -> InitialSync.Done
         SyncOutcome.Offline -> InitialSync.Offline
         SyncOutcome.Failed -> InitialSync.Failed
+        SyncOutcome.Denied -> InitialSync.Failed
       }
   }
 
@@ -554,6 +616,7 @@ class SyncRepository(
             SyncOutcome.Done -> SyncStatus.UpToDate(clock())
             SyncOutcome.Offline -> SyncStatus.Offline(pendingNow())
             SyncOutcome.Failed -> SyncStatus.Failed
+            SyncOutcome.Denied -> SyncStatus.Failed
           }
       }
       outcome
@@ -571,14 +634,14 @@ class SyncRepository(
     val data = checkNotNull(sync)
     val deviceId = data.cursors.deviceId()
     val sealedName = current.cipher.encrypt("device-name:$deviceId", data.deviceName().toByteArray(Charsets.UTF_8))
-    val result = data.records.registerDevice(current.uid, RemoteDevice(deviceId, sealedName, data.isPro()))
+    val result = data.records.joinDevice(current.uid, RemoteDevice(deviceId, sealedName, data.isPro()), removing = null)
     return when (result) {
-      is RemoteResult.Ok -> {
+      JoinResult.Joined -> {
         registered = true
         SyncOutcome.Done
       }
-      RemoteResult.Offline -> SyncOutcome.Offline
-      RemoteResult.Failed -> SyncOutcome.Failed
+      JoinResult.Offline -> SyncOutcome.Offline
+      JoinResult.Full, JoinResult.Failed -> SyncOutcome.Failed
     }
   }
 
