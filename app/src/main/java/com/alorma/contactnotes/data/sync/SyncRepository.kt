@@ -461,7 +461,13 @@ class SyncRepository(
     if (data == null || view == null) awaitCancellation()
     val thisId = data.devices.deviceId()
     data.records.observeDevices(view.uid).collect { seen ->
-      if (joined && mutableState.value is SyncState.Ready && seen.entries.none { it.id == thisId }) enterRemoved()
+      // Només el servidor: la memòria cau pot ser d'abans d'apuntar-se (p. ex. just després de «Torna a entrar»)
+      if (seen.fromCache) return@collect
+      if (!joined || mutableState.value !is SyncState.Ready || seen.entries.any { it.id == thisId }) return@collect
+      // Un listener nou pot donar una còpia d'abans de la transacció d'apuntar-se encara que no vingui de la memòria
+      // cau (un altre listener del mateix document la manté viva): es confirma amb una lectura del servidor
+      val confirmed = (data.records.loadDevices(view.uid) as? RemoteResult.Ok)?.value ?: return@collect
+      if (joined && mutableState.value is SyncState.Ready && confirmed.entries.none { it.id == thisId }) enterRemoved()
     }
   }
 

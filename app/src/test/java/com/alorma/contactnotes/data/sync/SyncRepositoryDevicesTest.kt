@@ -325,6 +325,28 @@ class SyncRepositoryDevicesTest {
     }
 
   @Test
+  fun aStaleCachedListWithoutThisDeviceDoesNotRemoveIt() =
+    test {
+      val a = device("device-1")
+      a.activate()
+      backgroundScope.launch { a.repo.watchDevices() }
+      // Just després de «Torna a entrar», el listener nou dona primer la memòria cau d'abans d'apuntar-se
+      fake.emitStale(missing = "device-1", fromCache = true)
+      assertTrue(a.repo.state.value is SyncState.Ready)
+    }
+
+  @Test
+  fun aStaleServerCopyWithoutThisDeviceIsCheckedBeforeRemovingIt() =
+    test {
+      val a = device("device-1")
+      a.activate()
+      backgroundScope.launch { a.repo.watchDevices() }
+      // Una còpia d'abans de la transacció que no ve de la memòria cau: el servidor diu que hi és
+      fake.emitStale(missing = "device-1", fromCache = false)
+      assertTrue(a.repo.state.value is SyncState.Ready)
+    }
+
+  @Test
   fun removedWithTheAppClosedIsSeenOnTheFirstSyncAndNeverReAdds() =
     test {
       val a = device("device-1")

@@ -261,7 +261,7 @@ class FirestoreSyncRemote(
           lastSyncAt = (fields[FIELD_LAST_SYNC_AT] as? Timestamp)?.toMillis(),
         )
       }
-    return RemoteDevices(pro = getString(FIELD_PLAN) == PLAN_PRO, entries = entries)
+    return RemoteDevices(pro = getString(FIELD_PLAN) == PLAN_PRO, entries = entries, fromCache = metadata.isFromCache)
   }
 
   private suspend fun <T> guarded(block: suspend () -> T): RemoteResult<T> =

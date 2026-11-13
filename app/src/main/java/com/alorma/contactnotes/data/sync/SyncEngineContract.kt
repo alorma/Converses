@@ -44,6 +44,11 @@ class RemoteDeviceEntry(
 class RemoteDevices(
   val pro: Boolean,
   val entries: List<RemoteDeviceEntry>,
+  /**
+   * Ve de la memòria cau local, no del servidor. Pot ser antiga: una transacció (apuntar-se) no hi deixa res fins que
+   * arriba la resposta del servidor. Serveix per pintar la llista, no per decidir que aquest dispositiu ha estat tret.
+   */
+  val fromCache: Boolean = false,
 ) {
   override fun toString(): String = "RemoteDevices"
 }

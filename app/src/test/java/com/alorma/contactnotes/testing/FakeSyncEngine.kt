@@ -84,16 +84,38 @@ class FakeSyncRemote : SyncRemote {
     publish()
   }
 
-  private fun publish() {
+  /**
+   * Com la primera instantània d'un listener nou, encara sense [missing]: de la memòria cau o, si [fromCache] és fals,
+   * una còpia del servidor d'abans de la transacció. El servidor (`loadDevices`) sí que el té.
+   */
+  fun emitStale(
+    missing: String,
+    fromCache: Boolean,
+  ) {
     observed.value =
       RemoteDevices(
         pro = pro,
         entries =
-          entries.map { (id, entry) ->
+          entries.filterKeys { it != missing }.map { (id, entry) ->
             RemoteDeviceEntry(id, entry.sealedName, entry.addedAt, entry.lastSyncAt)
           },
+        fromCache = fromCache,
       )
   }
+
+  private fun publish() {
+    observed.value = current()
+  }
+
+  /** El que hi ha al servidor ara mateix. */
+  private fun current(): RemoteDevices =
+    RemoteDevices(
+      pro = pro,
+      entries =
+        entries.map { (id, entry) ->
+          RemoteDeviceEntry(id, entry.sealedName, entry.addedAt, entry.lastSyncAt)
+        },
+    )
 
   /** Les regles: el mapa només pot créixer fins al límit del pla que queda després de l'escriptura. */
   private fun allowed(
@@ -104,7 +126,7 @@ class FakeSyncRemote : SyncRemote {
 
   override suspend fun loadDevices(uid: String): RemoteResult<RemoteDevices> {
     failure?.let { return it }
-    return RemoteResult.Ok(observed.value)
+    return RemoteResult.Ok(current())
   }
 
   override fun observeDevices(uid: String): Flow<RemoteDevices> = observed
