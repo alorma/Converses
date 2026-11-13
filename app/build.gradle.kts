@@ -124,6 +124,11 @@ tasks.withType<PreviewScreenshotValidationTask>().configureEach {
   testEngineInput.threshold.set(0.01f)
 }
 
+// Amb les captures de la sincronització, els 512 MB per defecte del procés de test s'acaben i el renderitzador es penja
+tasks.withType<Test>().matching { it.name.contains("ScreenshotTest") }.configureEach {
+  maxHeapSize = "3g"
+}
+
 // The baseline profile plugin clones `release` into `nonMinifiedRelease` but with the `optimization` DSL it stays
 // obfuscated, and the profile would be full of names like `La02;`
 androidComponents {
