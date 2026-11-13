@@ -88,6 +88,8 @@ android {
       applicationIdSuffix = ".dev"
       // Test Store de RevenueCat: el `.dev` no és a Play, i aquesta clau no cobra mai res
       buildConfigField("String", "REVENUECAT_API_KEY", "\"${secret("REVENUECAT_TEST_API_KEY")}\"")
+      // Token de debug d'App Check fix (registrat una vegada a Firebase); buit, el proveïdor n'inventa un a cada instal·lació
+      buildConfigField("String", "APP_CHECK_DEBUG_TOKEN", "\"${secret("APP_CHECK_DEBUG_TOKEN")}\"")
     }
     release {
       optimization {
