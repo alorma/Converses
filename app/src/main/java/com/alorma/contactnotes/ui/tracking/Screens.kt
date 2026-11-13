@@ -48,7 +48,7 @@ object Screens {
 
   class Paywall(
     highlight: ProBenefit?,
-  ) : Screen("paywall", 1, mapOf("highlight" to (highlight?.name?.lowercase() ?: "none")))
+  ) : Screen("paywall", 1, mapOf("highlight" to highlightName(highlight)))
 
   class Settings : Screen("settings", 1)
 
@@ -63,6 +63,14 @@ object Screens {
 
   class SyncEnterWords : Screen("sync_enter_words", 1)
 }
+
+/** L'origen d'analítica: `sync` quan ve de Sincronització (el benefici de dispositius). */
+private fun highlightName(highlight: ProBenefit?) =
+  when (highlight) {
+    null -> "none"
+    ProBenefit.Devices -> "sync"
+    else -> highlight.name.lowercase()
+  }
 
 private fun mode(creating: Boolean) = if (creating) "create" else "edit"
 

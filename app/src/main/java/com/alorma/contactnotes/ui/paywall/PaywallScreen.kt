@@ -21,6 +21,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material.icons.rounded.CheckCircle
 import androidx.compose.material.icons.rounded.Close
+import androidx.compose.material.icons.rounded.Devices
 import androidx.compose.material.icons.rounded.Flag
 import androidx.compose.material.icons.rounded.Forum
 import androidx.compose.material.icons.rounded.Lock
@@ -58,6 +59,8 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.alorma.contactnotes.R
+import com.alorma.contactnotes.data.flags.rememberFeatureEnabled
+import com.alorma.contactnotes.data.sync.SyncFlag
 import com.alorma.contactnotes.data.tracking.ErrorSites
 import com.alorma.contactnotes.designsystem.components.GroupedListDefaults
 import com.alorma.contactnotes.designsystem.components.asShape
@@ -99,6 +102,7 @@ fun PaywallScreen(
   PaywallContent(
     state = state,
     highlight = highlight,
+    devicesEnabled = rememberFeatureEnabled<SyncFlag>(),
     snackbarHostState = snackbarHostState,
     onClose = onClose,
     onBuy = { activity?.let(viewModel::onBuy) },
@@ -120,6 +124,8 @@ fun PaywallContent(
   onBuy: () -> Unit,
   onRestore: () -> Unit,
   onPrivacy: () -> Unit,
+  /** `SyncFlag` encès: surt el benefici «Fins a 5 dispositius». Apagat, la pantalla és la de sempre. */
+  devicesEnabled: Boolean = false,
   snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
 ) {
   val scheme = MaterialTheme.colorScheme
@@ -161,7 +167,7 @@ fun PaywallContent(
     ) {
       PaywallHeader(owned = state.isPro)
       BenefitList(
-        benefits = proBenefits(if (state.isPro) null else highlight),
+        benefits = proBenefits(if (state.isPro) null else highlight, devicesEnabled),
         highlight = if (state.isPro) null else highlight,
         owned = state.isPro,
       )
@@ -360,6 +366,7 @@ private val ProBenefit.icon: ImageVector
       ProBenefit.People -> Icons.Rounded.Palette
       ProBenefit.Channels -> Icons.Rounded.Forum
       ProBenefit.FollowUps -> Icons.Rounded.Flag
+      ProBenefit.Devices -> Icons.Rounded.Devices
     }
 
 private val ProBenefit.title: Int
@@ -368,6 +375,7 @@ private val ProBenefit.title: Int
       ProBenefit.People -> R.string.paywall_benefit_people
       ProBenefit.Channels -> R.string.paywall_benefit_channels
       ProBenefit.FollowUps -> R.string.paywall_benefit_follow_ups
+      ProBenefit.Devices -> R.string.paywall_benefit_devices
     }
 
 private val ProBenefit.summary: Int
@@ -376,4 +384,5 @@ private val ProBenefit.summary: Int
       ProBenefit.People -> R.string.paywall_benefit_people_summary
       ProBenefit.Channels -> R.string.paywall_benefit_channels_summary
       ProBenefit.FollowUps -> R.string.paywall_benefit_follow_ups_summary
+      ProBenefit.Devices -> R.string.paywall_benefit_devices_summary
     }

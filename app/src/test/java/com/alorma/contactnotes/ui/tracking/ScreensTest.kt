@@ -67,6 +67,7 @@ class ScreensTest {
   fun paywallHighlight() {
     assertEquals("paywall" to mapOf("highlight" to "none"), PaywallRoute().tracked())
     assertEquals(mapOf("highlight" to "followups"), PaywallRoute(ProBenefit.FollowUps).tracked()?.second)
+    assertEquals(mapOf("highlight" to "sync"), PaywallRoute(ProBenefit.Devices).tracked()?.second)
   }
 
   @Test

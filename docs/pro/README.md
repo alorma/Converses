@@ -22,6 +22,7 @@ Mai es cobra per **accedir, protegir o treure** les dades pròpies. Al Pro hi va
 | **Persones a la teva manera:** color de la persona | La fila d'Ajustos porta PRO i obre el paywall | Interruptor a Ajustos (apagat per defecte): les pantalles de la persona prenen el color de l'avatar |
 | **Canals propis** | El camp «On» mostra «Canal propi» amb PRO | Canals amb nom dins de cada grup (nom únic dins del grup, sense distingir majúscules). Es trien a l'entrada, surten a la cronologia i a l'exportació, i es gestionen a Ajustos › Canals propis. Canviar un canal de grup hi mou les seves entrades |
 | **Pendents** | «Nova tasca» al detall porta PRO | Tasques per persona (taula `task`, fora de la cronologia) amb data opcional, secció «Pendents» al detall, marcar com a fet amb «Desfés» i comptador al llistat (mai a les protegides) |
+| **Fins a 5 dispositius** (darrere de `SyncFlag`, no públic) | Sincronització gratuïta amb 2 dispositius; l'accés a Pro des de Sincronització obre el paywall amb el benefici ressaltat (origen d'analítica `sync`) | Fins a 5 dispositius al mateix compte. El benefici només surt a la llista del paywall amb el flag encès (`ProBenefit.Devices`); apagat, el paywall no canvia |
 
 **Baixada de Pro** (reemborsament o revocació): el que es va fer amb Pro es conserva i es continua veient (avatar, canals de les entrades, tasques, que es poden marcar com a fetes). Només no se'n pot canviar ni crear de nou. El tema de la persona s'apaga però la preferència queda desada. Mai s'esborren dades.
 

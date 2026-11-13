@@ -8,11 +8,13 @@ import com.alorma.contactnotes.designsystem.preview.ConversesPreviewTheme
 private fun PaywallPreview(
   state: PaywallState,
   highlight: ProBenefit? = null,
+  devicesEnabled: Boolean = false,
 ) {
   ConversesPreviewTheme {
     PaywallContent(
       state = state,
       highlight = highlight,
+      devicesEnabled = devicesEnabled,
       onClose = {},
       onBuy = {},
       onRestore = {},
@@ -47,4 +49,11 @@ internal fun PaywallOfflinePreview() {
 @Composable
 internal fun PaywallOwnedPreview() {
   PaywallPreview(PaywallState(isPro = true), highlight = ProBenefit.Channels)
+}
+
+/** Amb SyncFlag encès: el benefici «Fins a 5 dispositius» a la llista, ressaltat com quan ve de Sincronització. */
+@Preview
+@Composable
+internal fun PaywallDevicesPreview() {
+  PaywallPreview(PaywallState(price = "4,99 €"), highlight = ProBenefit.Devices, devicesEnabled = true)
 }

@@ -250,6 +250,8 @@
     <string name="paywall_benefit_channels_summary">WhatsApp, Discord… inside each group</string>
     <string name="paywall_benefit_follow_ups">Follow-ups</string>
     <string name="paywall_benefit_follow_ups_summary">Note what you need to do and mark it done</string>
+    <string name="paywall_benefit_devices">Up to 5 devices</string>
+    <string name="paywall_benefit_devices_summary">Your conversations on every phone and tablet you use</string>
     <string name="paywall_note">No subscription and no account. Your notes stay on your phone.</string>
     <string name="paywall_buy">Get Pro · %s</string>
     <string name="paywall_buy_offline">You need a connection to buy.</string>

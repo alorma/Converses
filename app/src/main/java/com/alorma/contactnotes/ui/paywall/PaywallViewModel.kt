@@ -39,11 +39,19 @@ enum class ProBenefit {
 
   /** Origen `pendents`. */
   FollowUps,
+
+  /** Origen `sync`: les 5 places de dispositius. Només a la llista amb `SyncFlag` encès. */
+  Devices,
 }
 
 /** [highlight] (8b, d'on ve l'usuari) va primer; des d'Ajustos (`null`), l'ordre del disseny. */
-fun proBenefits(highlight: ProBenefit?): List<ProBenefit> =
-  ProBenefit.entries.sortedBy { if (it == highlight) 0 else 1 }
+fun proBenefits(
+  highlight: ProBenefit?,
+  devicesEnabled: Boolean = false,
+): List<ProBenefit> =
+  ProBenefit.entries
+    .filter { it != ProBenefit.Devices || devicesEnabled }
+    .sortedBy { if (it == highlight) 0 else 1 }
 
 data class PaywallState(
   /** Pro ja comprat o restaurat: «Ja tens Pro» (8c). */

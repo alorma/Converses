@@ -42,6 +42,7 @@ import com.alorma.contactnotes.ui.navigation.AppShellTwoPaneEmptyPreview
 import com.alorma.contactnotes.ui.onboarding.OnboardingStep1Preview
 import com.alorma.contactnotes.ui.onboarding.OnboardingStep2Preview
 import com.alorma.contactnotes.ui.onboarding.OnboardingStep3Preview
+import com.alorma.contactnotes.ui.paywall.PaywallDevicesPreview
 import com.alorma.contactnotes.ui.paywall.PaywallFromChannelsPreview
 import com.alorma.contactnotes.ui.paywall.PaywallOfflinePreview
 import com.alorma.contactnotes.ui.paywall.PaywallOwnedPreview
@@ -535,6 +536,14 @@ class ScreensScreenshotTests {
   @Composable
   fun paywallOwned() {
     PaywallOwnedPreview()
+  }
+
+  @ScreenPreviews
+  @LargeFontScreenPreviews
+  @PreviewTest
+  @Composable
+  fun paywallDevices() {
+    PaywallDevicesPreview()
   }
 
   @ScreenPreviews

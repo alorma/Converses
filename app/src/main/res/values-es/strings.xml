@@ -249,6 +249,8 @@
     <string name="paywall_benefit_channels_summary">WhatsApp, Discord… dentro de cada grupo</string>
     <string name="paywall_benefit_follow_ups">Pendientes</string>
     <string name="paywall_benefit_follow_ups_summary">Apunta lo que tienes que hacer y márcalo como hecho</string>
+    <string name="paywall_benefit_devices">Hasta 5 dispositivos</string>
+    <string name="paywall_benefit_devices_summary">Tus conversaciones en cada móvil y tableta que uses</string>
     <string name="paywall_note">Sin suscripción y sin cuenta. Tus notas se quedan en el móvil.</string>
     <string name="paywall_buy">Consigue Pro · %s</string>
     <string name="paywall_buy_offline">Necesitas conexión para comprar.</string>

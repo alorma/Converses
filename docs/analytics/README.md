@@ -31,7 +31,7 @@ Per a tota l'app, **no és Pro**. Firebase Analytics i Crashlytics, darrere d'un
 
 Valors tancats, mai text. Per afegir-ne un, segueix el patró del fitxer.
 
-- **Pantalles** (`ui/tracking/Screens.kt`, un sol `TrackScreen` a `AppNavigation`): `onboarding`, `people`, `archived`, `person`, `edit_person` (`mode`), `quick_note` (`with_person`, `source`), `task` (`mode`), `paywall` (`highlight`), `settings`, `custom_channels`, `sync`, `sync_words` (`mode`: `activation` o `review`), `sync_enter_words`. Els fulls i diàlegs no són pantalles, són accions.
+- **Pantalles** (`ui/tracking/Screens.kt`, un sol `TrackScreen` a `AppNavigation`): `onboarding`, `people`, `archived`, `person`, `edit_person` (`mode`), `quick_note` (`with_person`, `source`), `task` (`mode`), `paywall` (`highlight`: `none`, `avatar`… o `sync`, quan ve de Sincronització), `settings`, `custom_channels`, `sync`, `sync_words` (`mode`: `activation` o `review`), `sync_enter_words`. Els fulls i diàlegs no són pantalles, són accions.
 - **Accions** (`ui/tracking/Actions.kt`): des del ViewModel si n'hi ha; obrir fulls i diàlegs, des de la pantalla amb `rememberActionTracker()`. No es registra el que ja és una pantalla.
   - Persones: `filter_toggled`.
   - Detall: `kind_filter_toggled`, `entry_sheet_opened`, `entry_saved` (`mode`, `kind`, `channel`, `custom_channel`), `entry_menu_opened`, `entry_copied`, `entry_moved`, `entry_deleted`, `entry_restored`, `day_deleted`, `person_exported`, `person_archived`, `task_done`, `task_reopened`.
