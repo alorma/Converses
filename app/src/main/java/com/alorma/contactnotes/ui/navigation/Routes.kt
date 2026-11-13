@@ -79,6 +79,13 @@ data class SecurityWordsRoute(
 @Serializable
 data object EnterWordsRoute : AppRoute
 
+/**
+ * Places plenes (13l): cal triar quin dispositiu es treu. No es navega a mà: s'obre sola quan el repositori té una
+ * pregunta de places (`SyncRepository.slotsPrompt`) i es tanca quan desapareix. No porta cap dada.
+ */
+@Serializable
+data object SlotsRoute : AppRoute
+
 /** Formulari de tasca (Pro): nova per a [personId] o, amb [taskId], edició. S'hi arriba des del detall. */
 @Serializable
 data class TaskRoute(

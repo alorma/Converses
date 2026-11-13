@@ -63,6 +63,7 @@ class ScreenWidthTest {
       assertEquals(ShellNavigation.Rail, shell(width, PeopleRoute, SyncRoute))
       assertEquals(ShellNavigation.Rail, shell(width, PeopleRoute, SyncRoute, SecurityWordsRoute()))
       assertEquals(ShellNavigation.Rail, shell(width, PeopleRoute, SyncRoute, EnterWordsRoute))
+      assertEquals(ShellNavigation.Rail, shell(width, PeopleRoute, SyncRoute, SlotsRoute))
     }
   }
 

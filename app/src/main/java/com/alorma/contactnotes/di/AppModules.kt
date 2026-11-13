@@ -67,6 +67,8 @@ import com.alorma.contactnotes.ui.settings.CustomChannelsViewModel
 import com.alorma.contactnotes.ui.settings.SettingsViewModel
 import com.alorma.contactnotes.ui.sync.EnterWordsViewModel
 import com.alorma.contactnotes.ui.sync.SecurityWordsViewModel
+import com.alorma.contactnotes.ui.sync.SlotsViewModel
+import com.alorma.contactnotes.ui.sync.SyncPromptsViewModel
 import com.alorma.contactnotes.ui.sync.SyncViewModel
 import com.alorma.contactnotes.ui.task.TaskFormViewModel
 import kotlinx.coroutines.CoroutineScope
@@ -196,6 +198,8 @@ val syncModule =
 val viewModelModule =
   module {
     viewModel { SyncViewModel(get(), get()) }
+    viewModelOf(::SyncPromptsViewModel)
+    viewModelOf(::SlotsViewModel)
     viewModel { (activation: Boolean) -> SecurityWordsViewModel(activation, get(), get()) }
     viewModelOf(::EnterWordsViewModel)
     viewModel { (archived: Boolean) -> PeopleListViewModel(archived, get(), get()) }

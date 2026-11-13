@@ -14,6 +14,7 @@ import com.alorma.contactnotes.ui.navigation.PersonRoute
 import com.alorma.contactnotes.ui.navigation.QuickNoteRoute
 import com.alorma.contactnotes.ui.navigation.SecurityWordsRoute
 import com.alorma.contactnotes.ui.navigation.SettingsRoute
+import com.alorma.contactnotes.ui.navigation.SlotsRoute
 import com.alorma.contactnotes.ui.navigation.SyncRoute
 import com.alorma.contactnotes.ui.navigation.TaskRoute
 import com.alorma.contactnotes.ui.paywall.ProBenefit
@@ -62,6 +63,8 @@ object Screens {
   ) : Screen("sync_words", 1, mapOf("mode" to if (activation) "activation" else "review"))
 
   class SyncEnterWords : Screen("sync_enter_words", 1)
+
+  class SyncSlots : Screen("sync_slots", 1)
 }
 
 /** L'origen d'analítica: `sync` quan ve de Sincronització (el benefici de dispositius). */
@@ -94,4 +97,5 @@ fun AppRoute.toScreen(): Screen? =
     SyncRoute -> Screens.Sync()
     is SecurityWordsRoute -> Screens.SyncWords(activation)
     EnterWordsRoute -> Screens.SyncEnterWords()
+    SlotsRoute -> Screens.SyncSlots()
   }

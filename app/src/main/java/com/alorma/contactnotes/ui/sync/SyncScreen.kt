@@ -40,12 +40,16 @@ fun SyncScreen(
   /** Obre les paraules de seguretat; l'empremta ja s'ha demanat. */
   onOpenWords: (activation: Boolean) -> Unit,
   onEnterWords: () -> Unit,
+  /** La fila de Pro de la secció «Dispositius»: el paywall amb l'origen `sync`. */
+  onOpenPro: () -> Unit = {},
   viewModel: SyncViewModel = koinViewModel(),
 ) {
   val state by viewModel.state.collectAsStateWithLifecycle()
   val wordsReviewedAt by viewModel.wordsReviewedAt.collectAsStateWithLifecycle()
   val status by viewModel.status.collectAsStateWithLifecycle()
   val initialSync by viewModel.initialSync.collectAsStateWithLifecycle()
+  val devices by viewModel.devices.collectAsStateWithLifecycle()
+  val deviceLimit by viewModel.deviceLimit.collectAsStateWithLifecycle()
   val activity = LocalActivity.current
   val snackbar = remember { SnackbarHostState() }
   val resources = LocalResources.current
@@ -53,8 +57,8 @@ fun SyncScreen(
     viewModel.messages.collect { message ->
       val text =
         when (message) {
-          SyncMessage.SignInOffline -> R.string.sync_error_offline
-          SyncMessage.SignInFailed -> R.string.sync_error_failed
+          SyncMessage.SignInOffline, SyncMessage.Offline -> R.string.sync_error_offline
+          SyncMessage.SignInFailed, SyncMessage.Failed -> R.string.sync_error_failed
         }
       snackbar.showSnackbar(resources.getString(text))
     }
@@ -109,6 +113,13 @@ fun SyncScreen(
             onOpenWords(false)
           },
           onSignOut = viewModel::onSignOut,
+          devices = devices,
+          deviceLimit = deviceLimit,
+          removed = current is SyncState.Removed,
+          onRename = viewModel::onRename,
+          onRemove = viewModel::onRemove,
+          onRejoin = viewModel::onRejoin,
+          onOpenPro = onOpenPro,
         )
     }
   }

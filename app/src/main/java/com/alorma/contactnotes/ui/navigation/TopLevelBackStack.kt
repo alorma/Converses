@@ -80,6 +80,11 @@ class TopLevelBackStack(
     if (entries.first() != tab) entries.add(tab)
   }
 
+  /** Drops every copy of [route] (never the base), wherever it is: for a route that closes on its own. */
+  fun dismiss(route: AppRoute) {
+    for (index in entries.lastIndex downTo 1) if (entries[index] == route) entries.removeAt(index)
+  }
+
   /**
    * Pops the current route. Returns `false` when only the base is left, so the system
    * can close the app.

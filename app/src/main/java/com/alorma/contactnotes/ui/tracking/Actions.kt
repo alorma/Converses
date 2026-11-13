@@ -1,6 +1,7 @@
 package com.alorma.contactnotes.ui.tracking
 
 import com.alorma.contactnotes.data.sync.ActivationOutcome
+import com.alorma.contactnotes.data.sync.RejoinOutcome
 import com.alorma.contactnotes.data.sync.SyncOutcome
 import com.alorma.contactnotes.data.tracking.Action
 import com.alorma.contactnotes.designsystem.theme.ThemeMode
@@ -189,7 +190,28 @@ object Actions {
 
   /** El diàleg «Aquest dispositiu ja té notes»; sense el recompte. */
   class SyncMergeShown : Action("sync_merge_shown", 1)
+
+  /** El diàleg de places plenes (13l); sense el nombre de places ni els dispositius. */
+  class SyncSlotsShown : Action("sync_slots_shown", 1)
+
+  /** Un dispositiu tret del compte; `from`: `slots` (en entrar, 13l) o `list` (la llista de 13o). */
+  class SyncDeviceRemoved(
+    from: DeviceRemovedFrom,
+  ) : Action("sync_device_removed", 1, mapOf("from" to from.tracked()))
+
+  /** Un dispositiu reanomenat. Mai el nom. */
+  class SyncDeviceRenamed : Action("sync_device_renamed", 1)
+
+  /** «Torna a entrar»; `result`: `done`, `full` (cal triar-ne un, 13l), `offline` o `failed`. */
+  class SyncRejoined(
+    result: RejoinOutcome,
+  ) : Action("sync_rejoined", 1, mapOf("result" to result.tracked()))
+
+  /** Aquest dispositiu ha vist que l'han tret (una vegada per arribada a «tret», no per cada obertura). */
+  class SyncRemovedSeen : Action("sync_removed_seen", 1)
 }
+
+enum class DeviceRemovedFrom { SLOTS, LIST }
 
 enum class SyncSignInResult { ACTIVATING, NEEDS_KEY, CANCELLED, OFFLINE, FAILED }
 

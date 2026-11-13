@@ -40,6 +40,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.fragment.app.FragmentActivity
 import com.alorma.contactnotes.R
+import com.alorma.contactnotes.data.sync.DeviceInfo
 import com.alorma.contactnotes.data.sync.SyncAccount
 import com.alorma.contactnotes.data.sync.SyncStatus
 import com.alorma.contactnotes.designsystem.components.GroupedListDefaults
@@ -62,6 +63,14 @@ fun SyncReadyContent(
   padding: PaddingValues,
   onWordsUnlocked: () -> Unit,
   onSignOut: () -> Unit,
+  devices: List<DeviceInfo> = emptyList(),
+  deviceLimit: Int = FREE_DEVICE_SLOTS,
+  /** Dispositiu tret (13o2): l'avís `err-c` en lloc de l'estat, i «Torna a entrar». */
+  removed: Boolean = false,
+  onRename: (id: String, name: String) -> Unit = { _, _ -> },
+  onRemove: (id: String) -> Unit = {},
+  onRejoin: () -> Unit = {},
+  onOpenPro: () -> Unit = {},
   now: Long = remember { System.currentTimeMillis() },
 ) {
   val activity = LocalActivity.current as? FragmentActivity
@@ -69,6 +78,9 @@ fun SyncReadyContent(
   val bioTitle = stringResource(R.string.sync_bio_title)
   val bioSubtitle = stringResource(R.string.sync_bio_words)
   var confirmSignOut by rememberSaveable { mutableStateOf(false) }
+  // L'id del dispositiu en procés de canviar-li el nom o treure'l; l'id sobreviu a girar, el nom es busca a la llista
+  var renamingId by rememberSaveable { mutableStateOf<String?>(null) }
+  var removingId by rememberSaveable { mutableStateOf<String?>(null) }
 
   Column(
     modifier =
@@ -80,8 +92,19 @@ fun SyncReadyContent(
         .padding(horizontal = 16.dp, vertical = 8.dp),
     verticalArrangement = Arrangement.spacedBy(18.dp),
   ) {
+    if (removed) RemovedNotice(onAction = onRejoin)
     AccountCard(account)
-    SyncStatusRow(status = status, now = now)
+    if (!removed) SyncStatusRow(status = status, now = now)
+    if (devices.isNotEmpty()) {
+      DevicesSection(
+        devices = devices,
+        limit = deviceLimit,
+        now = now,
+        onRename = { renamingId = it.id },
+        onRemove = { removingId = it.id },
+        onOpenPro = onOpenPro,
+      )
+    }
     Section(title = stringResource(R.string.sync_security)) {
       SettingRow(
         title = stringResource(R.string.sync_words_title),
@@ -125,6 +148,27 @@ fun SyncReadyContent(
         color = MaterialTheme.colorScheme.onSurfaceVariant,
       )
     }
+  }
+
+  devices.firstOrNull { it.id == renamingId }?.let { device ->
+    RenameDeviceDialog(
+      currentName = device.name.orEmpty(),
+      onDismiss = { renamingId = null },
+      onSave = {
+        renamingId = null
+        onRename(device.id, it)
+      },
+    )
+  }
+  devices.firstOrNull { it.id == removingId }?.let { device ->
+    RemoveDeviceDialog(
+      deviceName = device.displayName(),
+      onDismiss = { removingId = null },
+      onConfirm = {
+        removingId = null
+        onRemove(device.id)
+      },
+    )
   }
 
   if (confirmSignOut) {

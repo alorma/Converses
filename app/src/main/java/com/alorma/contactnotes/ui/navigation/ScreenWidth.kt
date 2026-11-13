@@ -60,7 +60,8 @@ fun NavKey.isFormRoute(): Boolean =
     this is TaskRoute ||
     this is PaywallRoute ||
     this is SecurityWordsRoute ||
-    this is EnterWordsRoute
+    this is EnterWordsRoute ||
+    this is SlotsRoute
 
 /**
  * Al mòbil, la barra flotant només a les pestanyes. En una pantalla gran el rail acompanya les pestanyes, la persona

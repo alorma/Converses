@@ -3,7 +3,10 @@ package com.alorma.contactnotes.ui.sync
 import android.app.Activity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.alorma.contactnotes.data.sync.DeviceActionOutcome
+import com.alorma.contactnotes.data.sync.DeviceInfo
 import com.alorma.contactnotes.data.sync.InitialSync
+import com.alorma.contactnotes.data.sync.RejoinOutcome
 import com.alorma.contactnotes.data.sync.SignInOutcome
 import com.alorma.contactnotes.data.sync.SyncOutcome
 import com.alorma.contactnotes.data.sync.SyncRepository
@@ -12,6 +15,7 @@ import com.alorma.contactnotes.data.sync.SyncStatus
 import com.alorma.contactnotes.data.tracking.Action
 import com.alorma.contactnotes.data.tracking.EventTracker
 import com.alorma.contactnotes.ui.tracking.Actions
+import com.alorma.contactnotes.ui.tracking.DeviceRemovedFrom
 import com.alorma.contactnotes.ui.tracking.SyncSignInResult
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -26,7 +30,13 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 /** El que la pantalla ha de dir una sola vegada, amb un snackbar. */
-enum class SyncMessage { SignInOffline, SignInFailed }
+enum class SyncMessage { SignInOffline, SignInFailed, Offline, Failed }
+
+/** Llargada màxima d'un nom de dispositiu. */
+const val MAX_DEVICE_NAME = 40
+
+/** Les places d'un compte sense Pro (la fila de Pro només surt amb aquest límit). */
+const val FREE_DEVICE_SLOTS = 2
 
 /** La pantalla «Sincronització»: l'estat del compte i les accions que no són de cap subpantalla. */
 class SyncViewModel(
@@ -77,6 +87,56 @@ class SyncViewModel(
   fun onInitialSyncDismissed() = repository.dismissInitialSync()
 
   fun onMergeContinue() = repository.continueMerge()
+
+  /** Els dispositius del compte (13o), amb aquest primer. Buit sense sessió o mentre es carrega. */
+  val devices: StateFlow<List<DeviceInfo>> =
+    repository.devices
+      .map { list -> list.sortedByDescending { it.isThis } }
+      .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+
+  /** Les places del compte (2, o 5 amb Pro). */
+  val deviceLimit: StateFlow<Int> =
+    repository.deviceLimit.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), FREE_DEVICE_SLOTS)
+
+  /** «Canvia el nom». El nom no es compta mai. */
+  fun onRename(
+    id: String,
+    name: String,
+  ) {
+    val trimmed = name.trim()
+    if (trimmed.isEmpty()) return
+    viewModelScope.launch {
+      when (repository.renameDevice(id, trimmed.take(MAX_DEVICE_NAME))) {
+        DeviceActionOutcome.Done -> tracker.trackAction(Actions.SyncDeviceRenamed())
+        DeviceActionOutcome.Offline -> messageChannel.send(SyncMessage.Offline)
+        DeviceActionOutcome.Failed -> messageChannel.send(SyncMessage.Failed)
+      }
+    }
+  }
+
+  /** «Treu» de la llista, ja confirmat. */
+  fun onRemove(id: String) {
+    viewModelScope.launch {
+      when (repository.removeDevice(id)) {
+        DeviceActionOutcome.Done -> tracker.trackAction(Actions.SyncDeviceRemoved(DeviceRemovedFrom.LIST))
+        DeviceActionOutcome.Offline -> messageChannel.send(SyncMessage.Offline)
+        DeviceActionOutcome.Failed -> messageChannel.send(SyncMessage.Failed)
+      }
+    }
+  }
+
+  /** «Torna a entrar». Amb les places plenes (`Full`) la pantalla de 13l s'obre sola. */
+  fun onRejoin() {
+    viewModelScope.launch {
+      val outcome = repository.rejoin()
+      tracker.trackAction(Actions.SyncRejoined(outcome))
+      when (outcome) {
+        RejoinOutcome.Done, RejoinOutcome.Full -> Unit
+        RejoinOutcome.Offline -> messageChannel.send(SyncMessage.Offline)
+        RejoinOutcome.Failed -> messageChannel.send(SyncMessage.Failed)
+      }
+    }
+  }
 
   /** `null` sense sessió o mentre es carrega. */
   val wordsReviewedAt: StateFlow<Long?> =

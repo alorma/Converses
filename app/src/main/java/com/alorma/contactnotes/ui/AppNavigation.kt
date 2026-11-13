@@ -70,6 +70,7 @@ import com.alorma.contactnotes.ui.navigation.ScreenWidth
 import com.alorma.contactnotes.ui.navigation.SecurityWordsRoute
 import com.alorma.contactnotes.ui.navigation.SettingsRoute
 import com.alorma.contactnotes.ui.navigation.ShellNavigation
+import com.alorma.contactnotes.ui.navigation.SlotsRoute
 import com.alorma.contactnotes.ui.navigation.SyncRoute
 import com.alorma.contactnotes.ui.navigation.TaskRoute
 import com.alorma.contactnotes.ui.navigation.TopLevelBackStack
@@ -87,6 +88,8 @@ import com.alorma.contactnotes.ui.settings.CustomChannelsScreen
 import com.alorma.contactnotes.ui.settings.SettingsScreen
 import com.alorma.contactnotes.ui.sync.EnterWordsScreen
 import com.alorma.contactnotes.ui.sync.SecurityWordsScreen
+import com.alorma.contactnotes.ui.sync.SlotsScreen
+import com.alorma.contactnotes.ui.sync.SyncPromptsEffect
 import com.alorma.contactnotes.ui.sync.SyncScreen
 import com.alorma.contactnotes.ui.sync.currentSyncIndicatorState
 import com.alorma.contactnotes.ui.task.TaskFormScreen
@@ -192,6 +195,8 @@ fun AppNavigation(
     onDispose { ViewCompat.removeOnUnhandledKeyEventListener(view, listener) }
   }
 
+  SyncPromptsEffect(navigation)
+
   AppShell(
     currentTab = navigation.currentTab,
     navigation = shellNavigation,
@@ -294,7 +299,13 @@ fun AppNavigation(
               onBack = { navigation.pop() },
               onOpenWords = { activation -> navigation.navigate(SecurityWordsRoute(activation)) },
               onEnterWords = { navigation.navigate(EnterWordsRoute) },
+              onOpenPro = { navigation.navigate(PaywallRoute(ProBenefit.Devices)) },
             )
+          }
+          entry<SlotsRoute>(metadata = formMetadata) {
+            FormDialogFrame(asDialog = formsAsDialogs, secure = secure) {
+              SlotsScreen(onOpenPro = { navigation.navigate(PaywallRoute(ProBenefit.Devices)) })
+            }
           }
           entry<SecurityWordsRoute>(metadata = formMetadata) { route ->
             FormDialogFrame(asDialog = formsAsDialogs, secure = secure) {
