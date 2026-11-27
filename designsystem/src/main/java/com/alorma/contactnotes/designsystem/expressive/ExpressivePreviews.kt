@@ -66,7 +66,7 @@ internal fun ShapeButtonPreview() {
   ConversesPreviewSurface {
     ExpressiveTheme {
       Row(
-        horizontalArrangement = Arrangement.spacedBy(16.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalAlignment = Alignment.CenterVertically,
       ) {
         ShapeButton(
@@ -107,6 +107,16 @@ internal fun ShapeButtonPreview() {
           containerColor = Expressive.colors.neutral,
           contentColor = Expressive.colors.ink,
           contentDescription = "Neutral",
+        ) {
+          Icon(Icons.Outlined.Edit, contentDescription = null)
+        }
+        ShapeButton(
+          onClick = {},
+          shape = MaterialShapes.Clover4Leaf,
+          size = 40.dp,
+          containerColor = Expressive.colors.accent,
+          contentColor = Expressive.colors.onAccent,
+          contentDescription = "Small",
         ) {
           Icon(Icons.Outlined.Edit, contentDescription = null)
         }
