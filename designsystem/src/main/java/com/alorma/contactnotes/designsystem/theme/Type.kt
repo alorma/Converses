@@ -14,7 +14,7 @@ private const val DefaultWidth = 100f
 private const val TitleWidth = 118f
 private val TitleOpticalSize = 72.sp
 
-private fun robotoFlex(
+internal fun robotoFlex(
   weight: Int,
   width: Float = DefaultWidth,
   opticalSize: TextUnit? = null,

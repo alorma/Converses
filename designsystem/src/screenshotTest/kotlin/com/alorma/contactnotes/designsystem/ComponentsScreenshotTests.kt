@@ -13,6 +13,8 @@ import com.alorma.contactnotes.designsystem.components.ProBadgePreview
 import com.alorma.contactnotes.designsystem.components.SplitButtonPreview
 import com.alorma.contactnotes.designsystem.components.TimelinePreview
 import com.alorma.contactnotes.designsystem.components.ToggleGroupPreview
+import com.alorma.contactnotes.designsystem.expressive.ExpressiveTypePreview
+import com.alorma.contactnotes.designsystem.expressive.WideTitleLongNamePreview
 import com.android.tools.screenshot.PreviewTest
 
 /** Cada test es renderitza en clar i en fosc, amb l'idioma fixat perquè no depengui de la màquina. */
@@ -23,6 +25,10 @@ annotation class ComponentPreviews
 /** Amb la lletra gran, perquè el text no es talli. */
 @Preview(name = "Light large font", locale = "en", fontScale = 1.3f)
 annotation class LargeFontComponentPreviews
+
+/** Amb la lletra al doble, per comprovar que els títols llargs no es tallen. */
+@Preview(name = "Light huge font", locale = "en", fontScale = 2f)
+annotation class HugeFontComponentPreviews
 
 class ComponentsScreenshotTests {
   @ComponentPreviews
@@ -94,5 +100,20 @@ class ComponentsScreenshotTests {
   @Composable
   fun groupedList() {
     GroupedListPreview()
+  }
+
+  @ComponentPreviews
+  @PreviewTest
+  @Composable
+  fun expressiveType() {
+    ExpressiveTypePreview()
+  }
+
+  @ComponentPreviews
+  @HugeFontComponentPreviews
+  @PreviewTest
+  @Composable
+  fun wideTitleLongName() {
+    WideTitleLongNamePreview()
   }
 }
