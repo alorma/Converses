@@ -10,7 +10,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.PersonAdd
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialShapes
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -76,9 +75,8 @@ internal fun ShapeButtonPreview() {
           containerColor = Color(0xFF8A3E22),
           contentColor = Color.White,
           contentDescription = "Edit",
-        ) {
-          Icon(Icons.Outlined.Edit, contentDescription = null)
-        }
+          icon = Icons.Outlined.Edit,
+        )
         ShapeButton(
           onClick = {},
           shape = MaterialShapes.Cookie9Sided,
@@ -86,9 +84,8 @@ internal fun ShapeButtonPreview() {
           containerColor = Expressive.colors.accent,
           contentColor = Expressive.colors.onAccent,
           contentDescription = "Add person",
-        ) {
-          Icon(Icons.Outlined.PersonAdd, contentDescription = null)
-        }
+          icon = Icons.Outlined.PersonAdd,
+        )
         ShapeButton(
           onClick = {},
           shape = MaterialShapes.Clover4Leaf,
@@ -96,10 +93,9 @@ internal fun ShapeButtonPreview() {
           containerColor = Expressive.colors.accent,
           contentColor = Expressive.colors.onAccent,
           contentDescription = "Selected",
+          icon = Icons.Outlined.Edit,
           selected = true,
-        ) {
-          Icon(Icons.Outlined.Edit, contentDescription = null)
-        }
+        )
         ShapeButton(
           onClick = {},
           shape = MaterialShapes.Cookie9Sided,
@@ -107,9 +103,8 @@ internal fun ShapeButtonPreview() {
           containerColor = Expressive.colors.neutral,
           contentColor = Expressive.colors.ink,
           contentDescription = "Neutral",
-        ) {
-          Icon(Icons.Outlined.Edit, contentDescription = null)
-        }
+          icon = Icons.Outlined.Edit,
+        )
         ShapeButton(
           onClick = {},
           shape = MaterialShapes.Clover4Leaf,
@@ -117,9 +112,8 @@ internal fun ShapeButtonPreview() {
           containerColor = Expressive.colors.accent,
           contentColor = Expressive.colors.onAccent,
           contentDescription = "Small",
-        ) {
-          Icon(Icons.Outlined.Edit, contentDescription = null)
-        }
+          icon = Icons.Outlined.Edit,
+        )
       }
     }
   }

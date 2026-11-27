@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FilledIconButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialShapes
 import androidx.compose.material3.MaterialTheme
@@ -20,12 +21,15 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import androidx.graphics.shapes.Morph
 import androidx.graphics.shapes.RoundedPolygon
 
@@ -34,6 +38,8 @@ import androidx.graphics.shapes.RoundedPolygon
  * En prémer-lo, o mentre [selected] és cert, la forma fa un morph cap a un cercle amb el `fastSpatialSpec`
  * del tema ([MorphShape]; Material només anima formes de cantonades arrodonides). Amb les animacions del
  * sistema desactivades ([rememberReduceMotion]) salta directament a la forma final.
+ * La icona es dibuixa amb la mida dels tokens d'`IconButtonDefaults` segons [size]: petita (24 dp) per sota de 56 dp,
+ * gran (32 dp) fins a 80 dp i extra gran (40 dp) per sobre. Hi ha un sol focus de teclat (el de l'àrea exterior).
  * L'àrea tàctil és com a mínim de 48 dp encara que [size] sigui més petit.
  */
 @Composable
@@ -46,7 +52,7 @@ fun ShapeButton(
   contentDescription: String?,
   modifier: Modifier = Modifier,
   selected: Boolean = false,
-  content: @Composable () -> Unit,
+  icon: ImageVector,
 ) {
   val interactionSource = remember { MutableInteractionSource() }
   val pressed by interactionSource.collectIsPressedAsState()
@@ -56,6 +62,12 @@ fun ShapeButton(
     animationSpec = if (reduceMotion) snap() else MaterialTheme.motionScheme.fastSpatialSpec(),
     label = "shapeButtonMorph",
   )
+  val iconSize =
+    when {
+      size < 56.dp -> IconButtonDefaults.smallIconSize
+      size <= 80.dp -> IconButtonDefaults.largeIconSize
+      else -> IconButtonDefaults.extraLargeIconSize
+    }
   val morph = remember(shape) { Morph(shape.normalized(), MaterialShapes.Circle.normalized()) }
   val morphShape = MorphShape(morph, progress.coerceIn(0f, 1f))
 
@@ -70,7 +82,7 @@ fun ShapeButton(
   ) {
     FilledIconButton(
       onClick = onClick,
-      modifier = Modifier.size(size).clearAndSetSemantics {},
+      modifier = Modifier.size(size).focusProperties { canFocus = false }.clearAndSetSemantics {},
       shape = morphShape,
       colors =
         IconButtonDefaults.filledIconButtonColors(
@@ -78,7 +90,7 @@ fun ShapeButton(
           contentColor = contentColor,
         ),
       interactionSource = interactionSource,
-      content = content,
+      content = { Icon(icon, contentDescription = null, modifier = Modifier.size(iconSize)) },
     )
   }
 }
