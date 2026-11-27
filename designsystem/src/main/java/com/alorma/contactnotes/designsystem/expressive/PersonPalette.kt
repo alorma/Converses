@@ -1,0 +1,182 @@
+package com.alorma.contactnotes.designsystem.expressive
+
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.ui.graphics.Color
+import com.alorma.contactnotes.designsystem.theme.LocalPersonColorTheme
+import com.alorma.contactnotes.designsystem.theme.isDarkTheme
+import com.alorma.contactnotes.shared.AvatarColor
+
+/**
+ * Colors de les pantalles d'una persona.
+ *
+ * [accent] és el «text fosc» en clar i el color de l'avatar en fosc: serveix per al nom,
+ * les overlines i el botó «Nova entrada». [featured] i [onFeatured] són la targeta destacada.
+ */
+data class PersonPalette(
+  val surface: Color,
+  val avatar: Color,
+  val accent: Color,
+  val detailBackground: Color,
+  val featured: Color,
+  val onFeatured: Color,
+)
+
+private fun light(
+  surface: Long,
+  avatar: Long,
+  accent: Long,
+  detailBackground: Long,
+) = PersonPalette(
+  surface = Color(surface),
+  avatar = Color(avatar),
+  accent = Color(accent),
+  detailBackground = Color(detailBackground),
+  featured = Color(accent),
+  onFeatured = Color(0xFFFFFFFF),
+)
+
+private fun dark(
+  surface: Long,
+  avatar: Long,
+  detailBackground: Long,
+  onFeatured: Long,
+) = PersonPalette(
+  surface = Color(surface),
+  avatar = Color(avatar),
+  accent = Color(avatar),
+  detailBackground = Color(detailBackground),
+  featured = Color(avatar),
+  onFeatured = Color(onFeatured),
+)
+
+/** Paleta d'un color de persona en mode clar o fosc. El `when` és exhaustiu: un color nou no compila sense paleta. */
+fun AvatarColor.palette(isDark: Boolean): PersonPalette =
+  if (isDark) {
+    when (this) {
+      AvatarColor.Mint ->
+        dark(
+          0xFF1F3328,
+          0xFFC2E8D0,
+          0xFF19231B, // derivat
+          0xFF10261A,
+        )
+      AvatarColor.Lavender ->
+        dark(
+          0xFF2A2540,
+          0xFFD9CFF5,
+          0xFF1F1C27, // derivat
+          0xFF1E1838, // derivat
+        )
+      AvatarColor.Peach ->
+        dark(
+          0xFF3A2A20, // derivat
+          0xFFFFD3BA,
+          0xFF271E17, // derivat
+          0xFF34180A, // derivat
+        )
+      AvatarColor.Sky ->
+        dark(
+          0xFF1C2B3A,
+          0xFFC6DFF5,
+          0xFF181F24, // derivat
+          0xFF0F2236, // derivat
+        )
+      AvatarColor.Rose ->
+        dark(
+          0xFF3A2129,
+          0xFFF5CADA,
+          0xFF271A1A, // derivat
+          0xFF3A0F22, // derivat
+        )
+      AvatarColor.Lemon ->
+        dark(
+          0xFF35311A, // derivat
+          0xFFEEE39C,
+          0xFF242214, // derivat
+          0xFF2A2606, // derivat
+        )
+      AvatarColor.Sand ->
+        dark(
+          0xFF332E24, // derivat
+          0xFFE8DDCB,
+          0xFF232019, // derivat
+          0xFF2A2316, // derivat
+        )
+    }
+  } else {
+    when (this) {
+      AvatarColor.Mint ->
+        light(
+          0xFFE2F2E8,
+          0xFFC2E8D0,
+          0xFF245C3F,
+          0xFFF1F8F3,
+        )
+      AvatarColor.Lavender ->
+        light(
+          0xFFECE7F8,
+          0xFFD9CFF5,
+          0xFF4F3E92,
+          0xFFF6F3FC,
+        )
+      AvatarColor.Peach ->
+        light(
+          0xFFFBE7DC,
+          0xFFFFD3BA,
+          0xFF8A3E22,
+          0xFFFDF4EE,
+        )
+      AvatarColor.Sky ->
+        light(
+          0xFFE0EDF8,
+          0xFFC6DFF5,
+          0xFF24557F,
+          0xFFF2F7FC,
+        )
+      AvatarColor.Rose ->
+        light(
+          0xFFF9E3EA,
+          0xFFF5CADA,
+          0xFF8C3456,
+          0xFFFCF2F5,
+        )
+      AvatarColor.Lemon ->
+        light(
+          0xFFF5F0CF,
+          0xFFEEE39C,
+          0xFF5E5410,
+          0xFFFBF9EA,
+        )
+      AvatarColor.Sand ->
+        light(
+          0xFFF0E9DC, // derivat
+          0xFFE8DDCB,
+          0xFF5E4E32, // derivat
+          0xFFF9F6F0, // derivat
+        )
+    }
+  }
+
+/** Paleta amb «Color de la persona» apagat: la superfície neutra i la tinta de l'app expressiva. */
+fun neutralPalette(isDark: Boolean): PersonPalette {
+  val colors = if (isDark) DarkExpressiveColors else LightExpressiveColors
+  return PersonPalette(
+    surface = colors.neutral,
+    avatar = colors.neutral,
+    accent = colors.ink,
+    detailBackground = colors.background,
+    featured = colors.ink,
+    onFeatured = if (isDark) Color(0xFF14130F) else Color(0xFFFFFFFF),
+  )
+}
+
+/** Paleta de la persona, o la neutra si no té color o l'usuari ha apagat «Color de la persona». */
+@Composable
+fun rememberPersonPalette(color: AvatarColor?): PersonPalette {
+  val dark = isDarkTheme
+  val personColor = LocalPersonColorTheme.current
+  return remember(color, dark, personColor) {
+    if (color == null || !personColor) neutralPalette(dark) else color.palette(dark)
+  }
+}
