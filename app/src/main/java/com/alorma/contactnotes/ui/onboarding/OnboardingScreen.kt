@@ -1,6 +1,5 @@
 package com.alorma.contactnotes.ui.onboarding
 
-import android.provider.Settings
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.Spring
@@ -40,13 +39,11 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
@@ -59,6 +56,7 @@ import com.alorma.contactnotes.data.flags.rememberFeatureEnabled
 import com.alorma.contactnotes.data.settings.OnboardingFlag
 import com.alorma.contactnotes.data.sync.SyncFlag
 import com.alorma.contactnotes.designsystem.components.readableWidth
+import com.alorma.contactnotes.designsystem.expressive.rememberReduceMotion
 import com.alorma.contactnotes.designsystem.theme.OnboardingTitleStyle
 import com.alorma.contactnotes.ui.tracking.Actions
 import com.alorma.contactnotes.ui.tracking.rememberActionTracker
@@ -129,12 +127,7 @@ fun OnboardingContent(
   val pagerState = rememberPagerState(initialPage = initialPage) { PageCount }
   val scope = rememberCoroutineScope()
   val isLast = pagerState.currentPage == PageCount - 1
-  val context = LocalContext.current
-  val reducedMotion =
-    forceReducedMotion ||
-      remember {
-        Settings.Global.getFloat(context.contentResolver, Settings.Global.ANIMATOR_DURATION_SCALE, 1f) == 0f
-      }
+  val reducedMotion = forceReducedMotion || rememberReduceMotion()
 
   BackHandler(enabled = pagerState.currentPage > 0) {
     scope.launch { pagerState.animateScrollToPage(pagerState.currentPage - 1) }

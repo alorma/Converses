@@ -14,6 +14,7 @@ import com.alorma.contactnotes.designsystem.components.SplitButtonPreview
 import com.alorma.contactnotes.designsystem.components.TimelinePreview
 import com.alorma.contactnotes.designsystem.components.ToggleGroupPreview
 import com.alorma.contactnotes.designsystem.expressive.ExpressiveTypePreview
+import com.alorma.contactnotes.designsystem.expressive.ShapeButtonPreview
 import com.alorma.contactnotes.designsystem.expressive.WideTitleLongNamePreview
 import com.android.tools.screenshot.PreviewTest
 
@@ -115,5 +116,12 @@ class ComponentsScreenshotTests {
   @Composable
   fun wideTitleLongName() {
     WideTitleLongNamePreview()
+  }
+
+  @ComponentPreviews
+  @PreviewTest
+  @Composable
+  fun shapeButton() {
+    ShapeButtonPreview()
   }
 }
