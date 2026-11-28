@@ -50,6 +50,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -109,12 +110,25 @@ fun PeopleListRoute(
   onPersonClick: (PersonEntity) -> Unit,
   onNewPerson: () -> Unit,
   onAddEntry: (PersonEntity) -> Unit = {},
+  /** L'id de la persona destacada (o `null`: sense targeta o Arxivades); a pantalla gran, el detall la mostra. */
+  onFeaturedChanged: (Long?) -> Unit = {},
   inPane: Boolean = false,
   selectedPersonId: Long? = null,
   onOpenSync: () -> Unit = {},
   viewModel: PeopleListViewModel = koinViewModel(parameters = { parametersOf(archived) }),
 ) {
   val state by viewModel.uiState.collectAsStateWithLifecycle()
+  val featuredId =
+    if (archived) {
+      null
+    } else {
+      state.people
+        .featured()
+        ?.person
+        ?.id
+    }
+  val currentOnFeaturedChanged by rememberUpdatedState(onFeaturedChanged)
+  LaunchedEffect(featuredId) { currentOnFeaturedChanged(featuredId) }
   // Amb el rail (pantalla gran) l'indicador és al rail, no a la capçalera; amb SyncFlag apagat és `null`
   val syncIndicator = currentSyncIndicatorState()
   PeopleListScreen(

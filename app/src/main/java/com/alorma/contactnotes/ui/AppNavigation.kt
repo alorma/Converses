@@ -28,8 +28,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.unit.IntOffset
@@ -197,6 +200,30 @@ fun AppNavigation(
 
   SyncPromptsEffect(navigation)
 
+  // La persona destacada del llistat de Persones: amb dos panells i cap persona oberta, el detall la mostra
+  var featuredId by rememberSaveable { mutableStateOf<Long?>(null) }
+
+  @Composable
+  fun PersonDetailPane(
+    personId: Long,
+    openNewEntry: Boolean,
+    onPersonGone: () -> Unit,
+  ) {
+    DetailPanel(inPane = twoPane) {
+      PersonDetailRoute(
+        personId = personId,
+        openNewEntry = openNewEntry,
+        onBack = { navigation.pop() },
+        onEdit = { focus -> navigation.navigate(EditPersonRoute(personId, focus = focus)) },
+        onOpenPro = { navigation.navigate(PaywallRoute(it)) },
+        onNewTask = { navigation.navigate(TaskRoute(personId)) },
+        onOpenTask = { navigation.navigate(TaskRoute(personId, it.id)) },
+        inPane = twoPane,
+        onPersonGone = onPersonGone,
+      )
+    }
+  }
+
   AppShell(
     currentTab = navigation.currentTab,
     navigation = shellNavigation,
@@ -233,15 +260,24 @@ fun AppNavigation(
             )
           }
           entry<PeopleRoute>(
-            metadata = ListDetailSceneStrategy.listPane(detailPlaceholder = { EmptyDetailPane() }),
+            metadata =
+              ListDetailSceneStrategy.listPane(
+                detailPlaceholder = {
+                  // `key`: si la destacada canvia, el detall en comença un de nou amb la persona nova
+                  featuredId?.let { id ->
+                    key(id) { PersonDetailPane(id, openNewEntry = false, onPersonGone = {}) }
+                  } ?: EmptyDetailPane()
+                },
+              ),
           ) {
             PeopleListRoute(
               archived = false,
               onPersonClick = openPerson,
               onNewPerson = newPerson,
               onAddEntry = { navigation.navigate(QuickNoteRoute(personId = it.id)) },
+              onFeaturedChanged = { featuredId = it },
               inPane = twoPane,
-              selectedPersonId = navigation.openPersonId,
+              selectedPersonId = navigation.openPersonId ?: featuredId,
               onOpenSync = openSync,
             )
           }
@@ -332,19 +368,11 @@ fun AppNavigation(
             }
           }
           entry<PersonRoute>(metadata = ListDetailSceneStrategy.detailPane()) { route ->
-            DetailPanel(inPane = twoPane) {
-              PersonDetailRoute(
-                personId = route.id,
-                openNewEntry = route.openNewEntry,
-                onBack = { navigation.pop() },
-                onEdit = { focus -> navigation.navigate(EditPersonRoute(route.id, focus = focus)) },
-                onOpenPro = { navigation.navigate(PaywallRoute(it)) },
-                onNewTask = { navigation.navigate(TaskRoute(route.id)) },
-                onOpenTask = { navigation.navigate(TaskRoute(route.id, it.id)) },
-                inPane = twoPane,
-                onPersonGone = { navigation.forgetPerson(route.id) },
-              )
-            }
+            PersonDetailPane(
+              personId = route.id,
+              openNewEntry = route.openNewEntry,
+              onPersonGone = { navigation.forgetPerson(route.id) },
+            )
           }
           entry<EditPersonRoute>(metadata = formMetadata) { route ->
             FormDialogFrame(asDialog = formsAsDialogs, secure = secure) {

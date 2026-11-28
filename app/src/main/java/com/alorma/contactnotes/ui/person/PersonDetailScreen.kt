@@ -152,7 +152,8 @@ fun PersonDetailRoute(
   inPane: Boolean = false,
   /** La persona ja no existeix (esborrada aquí o des d'un altre dispositiu): cal treure-la de la navegació. */
   onPersonGone: () -> Unit = onBack,
-  viewModel: PersonDetailViewModel = koinViewModel(parameters = { parametersOf(personId) }),
+  // La clau: sense ella, un panell que passa a una altra persona reaprofitaria el ViewModel de l'anterior
+  viewModel: PersonDetailViewModel = koinViewModel(key = "person-$personId", parameters = { parametersOf(personId) }),
 ) {
   val state by viewModel.uiState.collectAsStateWithLifecycle()
 
