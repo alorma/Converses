@@ -13,7 +13,6 @@ import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButtonDefaults
-import androidx.compose.material3.MaterialShapes
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.minimumInteractiveComponentSize
 import androidx.compose.runtime.Composable
@@ -27,6 +26,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -40,6 +40,7 @@ import androidx.graphics.shapes.RoundedPolygon
  * sistema desactivades ([rememberReduceMotion]) salta directament a la forma final.
  * La icona es dibuixa amb la mida dels tokens d'`IconButtonDefaults` segons [size]: petita (24 dp) per sota de 56 dp,
  * gran (32 dp) fins a 80 dp i extra gran (40 dp) per sobre. Hi ha un sol focus de teclat (el de l'àrea exterior).
+ * Si [selected] no és nul, el botó és un commutador i ho exposa a l'accessibilitat.
  * L'àrea tàctil és com a mínim de 48 dp encara que [size] sigui més petit.
  */
 @Composable
@@ -50,15 +51,16 @@ fun ShapeButton(
   containerColor: Color,
   contentColor: Color,
   contentDescription: String?,
-  modifier: Modifier = Modifier,
-  selected: Boolean = false,
   icon: ImageVector,
+  modifier: Modifier = Modifier,
+  enabled: Boolean = true,
+  selected: Boolean? = null,
 ) {
   val interactionSource = remember { MutableInteractionSource() }
   val pressed by interactionSource.collectIsPressedAsState()
   val reduceMotion = rememberReduceMotion()
   val progress by animateFloatAsState(
-    targetValue = if (pressed || selected) 1f else 0f,
+    targetValue = if (pressed || selected == true) 1f else 0f,
     animationSpec = if (reduceMotion) snap() else MaterialTheme.motionScheme.fastSpatialSpec(),
     label = "shapeButtonMorph",
   )
@@ -68,20 +70,29 @@ fun ShapeButton(
       size <= 80.dp -> IconButtonDefaults.largeIconSize
       else -> IconButtonDefaults.extraLargeIconSize
     }
-  val morph = remember(shape) { Morph(shape.normalized(), MaterialShapes.Circle.normalized()) }
-  val morphShape = MorphShape(morph, progress.coerceIn(0f, 1f))
+  val morph = remember(shape) { Morph(shape.normalized(), ExpressiveShapes.Circle.normalized()) }
+  val morphShape = remember(morph, progress) { MorphShape(morph, progress.coerceIn(0f, 1f)) }
 
   // L'àrea tàctil exterior (>= 48 dp) té el clic i la semàntica; el botó de Material és només la part visible.
   Box(
     modifier =
       modifier
         .minimumInteractiveComponentSize()
-        .semantics { if (contentDescription != null) this.contentDescription = contentDescription }
-        .clickable(interactionSource = interactionSource, indication = null, role = Role.Button, onClick = onClick),
+        .semantics {
+          if (contentDescription != null) this.contentDescription = contentDescription
+          if (selected != null) this.selected = selected
+        }.clickable(
+          enabled = enabled,
+          interactionSource = interactionSource,
+          indication = null,
+          role = Role.Button,
+          onClick = onClick,
+        ),
     contentAlignment = Alignment.Center,
   ) {
     FilledIconButton(
       onClick = onClick,
+      enabled = enabled,
       modifier = Modifier.size(size).focusProperties { canFocus = false }.clearAndSetSemantics {},
       shape = morphShape,
       colors =

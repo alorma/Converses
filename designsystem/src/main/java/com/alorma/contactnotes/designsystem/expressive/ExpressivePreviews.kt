@@ -10,7 +10,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.PersonAdd
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
-import androidx.compose.material3.MaterialShapes
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -70,7 +69,7 @@ internal fun ShapeButtonPreview() {
       ) {
         ShapeButton(
           onClick = {},
-          shape = MaterialShapes.Cookie9Sided,
+          shape = ExpressiveShapes.Cookie9Sided,
           size = 80.dp,
           containerColor = Color(0xFF8A3E22),
           contentColor = Color.White,
@@ -79,7 +78,7 @@ internal fun ShapeButtonPreview() {
         )
         ShapeButton(
           onClick = {},
-          shape = MaterialShapes.Cookie9Sided,
+          shape = ExpressiveShapes.Cookie9Sided,
           size = 52.dp,
           containerColor = Expressive.colors.accent,
           contentColor = Expressive.colors.onAccent,
@@ -88,7 +87,7 @@ internal fun ShapeButtonPreview() {
         )
         ShapeButton(
           onClick = {},
-          shape = MaterialShapes.Clover4Leaf,
+          shape = ExpressiveShapes.Clover4Leaf,
           size = 92.dp,
           containerColor = Expressive.colors.accent,
           contentColor = Expressive.colors.onAccent,
@@ -98,7 +97,7 @@ internal fun ShapeButtonPreview() {
         )
         ShapeButton(
           onClick = {},
-          shape = MaterialShapes.Cookie9Sided,
+          shape = ExpressiveShapes.Cookie9Sided,
           size = 48.dp,
           containerColor = Expressive.colors.neutral,
           contentColor = Expressive.colors.ink,
@@ -107,7 +106,7 @@ internal fun ShapeButtonPreview() {
         )
         ShapeButton(
           onClick = {},
-          shape = MaterialShapes.Clover4Leaf,
+          shape = ExpressiveShapes.Clover4Leaf,
           size = 40.dp,
           containerColor = Expressive.colors.accent,
           contentColor = Expressive.colors.onAccent,
