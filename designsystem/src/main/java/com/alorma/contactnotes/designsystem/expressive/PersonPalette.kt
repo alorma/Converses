@@ -163,11 +163,11 @@ fun neutralPalette(isDark: Boolean): PersonPalette {
   val colors = if (isDark) DarkExpressiveColors else LightExpressiveColors
   return PersonPalette(
     surface = colors.neutral,
-    avatar = colors.neutral,
+    avatar = if (isDark) Color(0xFF666153) else Color(0xFF948E80),
     accent = colors.ink,
     detailBackground = colors.background,
     featured = colors.ink,
-    onFeatured = if (isDark) Color(0xFF14130F) else Color(0xFFFFFFFF),
+    onFeatured = colors.background,
   )
 }
 

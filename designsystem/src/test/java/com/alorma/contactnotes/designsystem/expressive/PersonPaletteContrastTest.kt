@@ -36,6 +36,18 @@ class PersonPaletteContrastTest {
   }
 
   @Test
+  fun neutralAvatarIsVisibleAndHoldsInk() {
+    listOf(false, true).forEach { dark ->
+      val colors = if (dark) DarkExpressiveColors else LightExpressiveColors
+      val palette = neutralPalette(dark)
+      val onBackground = contrast(palette.avatar, colors.background)
+      val inkOnAvatar = contrast(colors.ink, palette.avatar)
+      assertTrue("neutral avatar/background dark=$dark = $onBackground", onBackground >= 3.0)
+      assertTrue("ink/neutral avatar dark=$dark = $inkOnAvatar", inkOnAvatar >= minimum)
+    }
+  }
+
+  @Test
   fun givenValuesMatchTheProposal() {
     assertEquals(
       PersonPalette(
