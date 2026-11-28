@@ -458,4 +458,9 @@
     <string name="sync_out_b">It was removed from another device. The data here stays.</string>
     <string name="sync_rejoin">Rejoin</string>
     <string name="sync_st_out">This device no longer syncs</string>
+    <string name="group_today">Today</string>
+    <string name="group_yesterday">Yesterday</string>
+    <string name="group_this_week">This week</string>
+    <string name="group_month_pattern">LLLL</string>
+    <string name="group_month_other_year_pattern">LLLL yyyy</string>
 </resources>

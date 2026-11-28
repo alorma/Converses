@@ -457,4 +457,9 @@
     <string name="sync_out_b">L\'han tret des d\'un altre dispositiu. Les dades d\'aquí es queden.</string>
     <string name="sync_rejoin">Torna a entrar</string>
     <string name="sync_st_out">Aquest dispositiu ja no sincronitza</string>
+    <string name="group_today">Avui</string>
+    <string name="group_yesterday">Ahir</string>
+    <string name="group_this_week">Aquesta setmana</string>
+    <string name="group_month_pattern">LLLL</string>
+    <string name="group_month_other_year_pattern">LLLL \'de\' yyyy</string>
 </resources>

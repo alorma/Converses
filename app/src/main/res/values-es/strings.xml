@@ -459,4 +459,9 @@
     <string name="sync_out_b">Lo han quitado desde otro dispositivo. Los datos de aquí se quedan.</string>
     <string name="sync_rejoin">Volver a entrar</string>
     <string name="sync_st_out">Este dispositivo ya no sincroniza</string>
+    <string name="group_today">Hoy</string>
+    <string name="group_yesterday">Ayer</string>
+    <string name="group_this_week">Esta semana</string>
+    <string name="group_month_pattern">LLLL</string>
+    <string name="group_month_other_year_pattern">LLLL \'de\' yyyy</string>
 </resources>
