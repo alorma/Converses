@@ -69,6 +69,7 @@ import com.alorma.contactnotes.ui.navigation.PeopleRoute
 import com.alorma.contactnotes.ui.navigation.PersonLockedRoute
 import com.alorma.contactnotes.ui.navigation.PersonRoute
 import com.alorma.contactnotes.ui.navigation.QuickNoteRoute
+import com.alorma.contactnotes.ui.navigation.ScopedViewModelStore
 import com.alorma.contactnotes.ui.navigation.ScreenWidth
 import com.alorma.contactnotes.ui.navigation.SecurityWordsRoute
 import com.alorma.contactnotes.ui.navigation.SettingsRoute
@@ -208,10 +209,12 @@ fun AppNavigation(
     personId: Long,
     openNewEntry: Boolean,
     onPersonGone: () -> Unit,
+    placeholder: Boolean = false,
   ) {
     DetailPanel(inPane = twoPane) {
       PersonDetailRoute(
         personId = personId,
+        placeholder = placeholder,
         openNewEntry = openNewEntry,
         onBack = { navigation.pop() },
         onEdit = { focus -> navigation.navigate(EditPersonRoute(personId, focus = focus)) },
@@ -265,7 +268,12 @@ fun AppNavigation(
                 detailPlaceholder = {
                   // `key`: si la destacada canvia, el detall en comença un de nou amb la persona nova
                   featuredId?.let { id ->
-                    key(id) { PersonDetailPane(id, openNewEntry = false, onPersonGone = {}) }
+                    key(id) {
+                      // Fora de qualsevol entrada de la pila: el seu ViewModel es buida quan el panell marxa
+                      ScopedViewModelStore {
+                        PersonDetailPane(id, openNewEntry = false, onPersonGone = {}, placeholder = true)
+                      }
+                    }
                   } ?: EmptyDetailPane()
                 },
               ),

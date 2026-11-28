@@ -42,6 +42,17 @@ class PeopleFeaturedTest {
   }
 
   @Test
+  fun placeholderHidesProtectedAndArchivedPeople() {
+    fun person(
+      protected: Boolean = false,
+      archived: Boolean = false,
+    ) = PersonEntity(name = "A", isProtected = protected, archived = archived, createdAt = 0, updatedAt = 0)
+    assertEquals(false, person().hiddenInPlaceholder())
+    assertEquals(true, person(protected = true).hiddenInPlaceholder())
+    assertEquals(true, person(archived = true).hiddenInPlaceholder())
+  }
+
+  @Test
   fun emptyListHasNone() {
     assertNull(emptyList<PersonListItem>().featured())
   }

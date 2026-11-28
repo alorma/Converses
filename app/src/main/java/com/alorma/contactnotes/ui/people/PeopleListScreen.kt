@@ -119,19 +119,6 @@ fun PeopleListRoute(
   viewModel: PeopleListViewModel = koinViewModel(parameters = { parametersOf(archived) }),
 ) {
   val state by viewModel.uiState.collectAsStateWithLifecycle()
-  val featuredId =
-    if (archived) {
-      null
-    } else {
-      state.people
-        .featured()
-        ?.person
-        ?.id
-    }
-  val currentOnFeaturedChanged by rememberUpdatedState(onFeaturedChanged)
-  LaunchedEffect(featuredId) { currentOnFeaturedChanged(featuredId) }
-  // Al marxar (a Arxivades, per exemple) el detall ja no ha de seguir la destacada
-  DisposableEffect(Unit) { onDispose { currentOnFeaturedChanged(null) } }
   // Amb el rail (pantalla gran) l'indicador és al rail, no a la capçalera; amb SyncFlag apagat és `null`
   val syncIndicator = currentSyncIndicatorState()
   PeopleListScreen(
@@ -141,6 +128,7 @@ fun PeopleListRoute(
     onPersonClick = onPersonClick,
     onNewPerson = onNewPerson,
     onAddEntry = onAddEntry,
+    onFeaturedChanged = onFeaturedChanged,
     inPane = inPane,
     selectedPersonId = selectedPersonId,
     syncIndicator = if (inPane) null else syncIndicator,
@@ -161,6 +149,7 @@ fun PeopleListScreen(
   onPersonClick: (PersonEntity) -> Unit,
   onNewPerson: () -> Unit,
   onAddEntry: (PersonEntity) -> Unit = {},
+  onFeaturedChanged: (Long?) -> Unit = {},
   inPane: Boolean = false,
   selectedPersonId: Long? = null,
   syncIndicator: SyncIndicatorState? = null,
@@ -176,6 +165,7 @@ fun PeopleListScreen(
       onPersonClick = onPersonClick,
       onNewPerson = onNewPerson,
       onAddEntry = onAddEntry,
+      onFeaturedChanged = onFeaturedChanged,
       inPane = inPane,
       selectedPersonId = selectedPersonId,
       syncIndicator = syncIndicator,
@@ -193,6 +183,7 @@ private fun PeopleListContent(
   onPersonClick: (PersonEntity) -> Unit,
   onNewPerson: () -> Unit,
   onAddEntry: (PersonEntity) -> Unit,
+  onFeaturedChanged: (Long?) -> Unit,
   inPane: Boolean,
   selectedPersonId: Long?,
   syncIndicator: SyncIndicatorState?,
@@ -202,6 +193,12 @@ private fun PeopleListContent(
   val listState = rememberLazyListState()
   // La targeta destacada segueix el filtre (surt de les persones que es mostren) i no surt a Arxivades
   val featured = remember(state.people, archived) { if (archived) null else state.people.featured() }
+  // A pantalla gran el detall segueix la destacada. Mentre carrega no s'informa (evita el parpelleig null) i en
+  // marxar (a Arxivades, per exemple) el detall ja no la segueix
+  val currentOnFeaturedChanged by rememberUpdatedState(onFeaturedChanged)
+  val featuredId = featured?.person?.id
+  LaunchedEffect(featuredId, state.isLoading) { if (!state.isLoading) currentOnFeaturedChanged(featuredId) }
+  DisposableEffect(Unit) { onDispose { currentOnFeaturedChanged(null) } }
   val listFocus = remember { FocusRequester() }
   // El mateix idioma per agrupar i per escriure els noms dels grups, perquè la setmana i els mesos no divergeixin
   val locale = LocalConfiguration.current.locales[0]

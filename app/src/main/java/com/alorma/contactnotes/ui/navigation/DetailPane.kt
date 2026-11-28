@@ -17,7 +17,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Forum
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -27,6 +30,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import androidx.compose.ui.window.DialogWindowProvider
+import androidx.lifecycle.ViewModelStore
+import androidx.lifecycle.ViewModelStoreOwner
+import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import com.alorma.contactnotes.R
 import com.alorma.contactnotes.designsystem.components.WelcomeEmptyState
 
@@ -111,6 +117,22 @@ fun FormDialogFrame(
       Modifier.fillMaxSize()
     }
   Box(modifier = modifier) { content() }
+}
+
+/**
+ * Un `ViewModelStore` propi per al [content], que es buida quan surt de la composició. Per al panell que no és una
+ * entrada de la pila: sense això els seus ViewModels es quedarien a l'store de l'activitat.
+ */
+@Composable
+fun ScopedViewModelStore(content: @Composable () -> Unit) {
+  val owner =
+    remember {
+      object : ViewModelStoreOwner {
+        override val viewModelStore = ViewModelStore()
+      }
+    }
+  DisposableEffect(owner) { onDispose { owner.viewModelStore.clear() } }
+  CompositionLocalProvider(LocalViewModelStoreOwner provides owner, content = content)
 }
 
 /** Panell de detall quan no hi ha cap persona oberta. En arrencar no se n'obre cap automàticament. */

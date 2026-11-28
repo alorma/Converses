@@ -289,7 +289,8 @@ private fun FeaturedCardSample(
             Avatar(
               initials = "MS",
               shape = AvatarShape.Cookie9Sided,
-              color = AvatarColor.Mint,
+              // Sense color a la persona, l'avatar surt del seu nom, com a l'app
+              color = color ?: AvatarColor.forName("Marta Soler"),
               size = 30.dp,
             )
           },

@@ -55,16 +55,19 @@ fun ShapeButton(
   modifier: Modifier = Modifier,
   enabled: Boolean = true,
   selected: Boolean? = null,
+  /** Mida de la icona; si és `null`, la dels tokens segons [size]. */
+  iconSize: Dp? = null,
 ) {
   val interactionSource = remember { MutableInteractionSource() }
   val pressed by interactionSource.collectIsPressedAsState()
   val morphShape = rememberMorphToCircle(shape, active = pressed || selected == true)
-  val iconSize =
-    when {
-      size < 56.dp -> IconButtonDefaults.smallIconSize
-      size <= 80.dp -> IconButtonDefaults.largeIconSize
-      else -> IconButtonDefaults.extraLargeIconSize
-    }
+  val resolvedIconSize =
+    iconSize
+      ?: when {
+        size < 56.dp -> IconButtonDefaults.smallIconSize
+        size <= 80.dp -> IconButtonDefaults.largeIconSize
+        else -> IconButtonDefaults.extraLargeIconSize
+      }
 
   // L'àrea tàctil exterior (>= 48 dp) té el clic i la semàntica; el botó de Material és només la part visible.
   Box(
@@ -94,7 +97,7 @@ fun ShapeButton(
           contentColor = contentColor,
         ),
       interactionSource = interactionSource,
-      content = { Icon(icon, contentDescription = null, modifier = Modifier.size(iconSize)) },
+      content = { Icon(icon, contentDescription = null, modifier = Modifier.size(resolvedIconSize)) },
     )
   }
 }

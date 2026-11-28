@@ -107,6 +107,7 @@ fun FeaturedCard(
         contentColor = palette.featured,
         contentDescription = addDescription,
         icon = Icons.Rounded.Add,
+        iconSize = 36.dp,
         modifier = Modifier.align(Alignment.BottomEnd).padding(CardPadding),
       )
     }

@@ -96,8 +96,10 @@ import com.alorma.contactnotes.shared.initialsOf
 import com.alorma.contactnotes.ui.edit.EditFocus
 import com.alorma.contactnotes.ui.entry.EntryChannel
 import com.alorma.contactnotes.ui.entry.NewEntrySheet
+import com.alorma.contactnotes.ui.navigation.EmptyDetailPane
 import com.alorma.contactnotes.ui.navigation.personContainerColor
 import com.alorma.contactnotes.ui.paywall.ProBenefit
+import com.alorma.contactnotes.ui.people.hiddenInPlaceholder
 import com.alorma.contactnotes.ui.people.label
 import com.alorma.contactnotes.ui.task.TasksSection
 import com.alorma.contactnotes.ui.tracking.Actions
@@ -152,6 +154,8 @@ fun PersonDetailRoute(
   inPane: Boolean = false,
   /** La persona ja no existeix (esborrada aquí o des d'un altre dispositiu): cal treure-la de la navegació. */
   onPersonGone: () -> Unit = onBack,
+  /** És el panell que fa de buit a pantalla gran: si la persona és protegida o arxivada, no en mostra res. */
+  placeholder: Boolean = false,
   // La clau: sense ella, un panell que passa a una altra persona reaprofitaria el ViewModel de l'anterior
   viewModel: PersonDetailViewModel = koinViewModel(key = "person-$personId", parameters = { parametersOf(personId) }),
 ) {
@@ -174,6 +178,10 @@ fun PersonDetailRoute(
   }
 
   val person = state.person ?: return
+  if (placeholder && person.hiddenInPlaceholder()) {
+    EmptyDetailPane()
+    return
+  }
   // Desat: s'obre una sola vegada encara que es giri la pantalla o es torni d'una altra
   var showNewEntry by rememberSaveable { mutableStateOf(openNewEntry) }
   // Quan s'obre des de l'entrada fantasma, ve amb el «Qui» triat i el focus al text
