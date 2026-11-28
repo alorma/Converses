@@ -28,10 +28,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.alorma.contactnotes.designsystem.components.Avatar
 import com.alorma.contactnotes.designsystem.components.ExpressiveFloatingToolbar
 import com.alorma.contactnotes.designsystem.components.ExpressiveToolbarDestination
 import com.alorma.contactnotes.designsystem.preview.ConversesPreviewSurface
 import com.alorma.contactnotes.designsystem.theme.LocalDynamicSeed
+import com.alorma.contactnotes.shared.AvatarColor
+import com.alorma.contactnotes.shared.AvatarShape
 
 // Previews de les peces expressives amb dades fixes. Els tests de captures de `screenshotTest` les reutilitzen.
 
@@ -262,4 +265,64 @@ internal fun DynamicNeutralPersonPreview() {
       }
     }
   }
+}
+
+private const val FeaturedQuote = "I told her I can't make it on Friday, but we could try next week."
+
+@Composable
+private fun FeaturedCardSample(
+  color: AvatarColor?,
+  quote: String = FeaturedQuote,
+) {
+  ConversesPreviewSurface {
+    ExpressiveTheme {
+      Surface(color = Expressive.colors.background) {
+        val palette = rememberPersonPalette(color)
+        FeaturedCard(
+          overline = "MARTA SOLER · CHAT · 20 MIN. AGO",
+          quote = "“$quote”",
+          palette = palette,
+          onClick = {},
+          onAdd = {},
+          addDescription = "Add an entry for Marta",
+          avatar = {
+            Avatar(
+              initials = "MS",
+              shape = AvatarShape.Cookie9Sided,
+              color = AvatarColor.Mint,
+              size = 30.dp,
+            )
+          },
+          modifier = Modifier.padding(16.dp).width(360.dp),
+        )
+      }
+    }
+  }
+}
+
+/** La targeta destacada amb una persona de color (menta); en clar i fosc segons el `uiMode`. */
+@Preview
+@Composable
+internal fun FeaturedCardPreview() {
+  FeaturedCardSample(AvatarColor.Mint)
+}
+
+/** Persona sense color: la targeta surt en tinta amb el text del fons. */
+@Preview
+@Composable
+internal fun FeaturedCardNeutralPreview() {
+  FeaturedCardSample(null)
+}
+
+/** Una cita molt llarga: es talla amb «…» i no arriba a la galeta (es veu bé amb la lletra al doble). */
+@Preview
+@Composable
+internal fun FeaturedCardLongQuotePreview() {
+  FeaturedCardSample(
+    AvatarColor.Mint,
+    quote =
+      "I told her I can't make it on Friday, but we could try next week, or the one after that, " +
+        "or whenever the schedule finally calms down a bit, because honestly this month has been " +
+        "completely out of control and I don't want to promise anything I can't keep, you know?",
+  )
 }

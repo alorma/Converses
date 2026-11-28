@@ -17,6 +17,9 @@ import com.alorma.contactnotes.designsystem.expressive.DynamicNeutralPersonPrevi
 import com.alorma.contactnotes.designsystem.expressive.ExpressiveFilterChipsPreview
 import com.alorma.contactnotes.designsystem.expressive.ExpressiveFloatingToolbarPreview
 import com.alorma.contactnotes.designsystem.expressive.ExpressiveTypePreview
+import com.alorma.contactnotes.designsystem.expressive.FeaturedCardLongQuotePreview
+import com.alorma.contactnotes.designsystem.expressive.FeaturedCardNeutralPreview
+import com.alorma.contactnotes.designsystem.expressive.FeaturedCardPreview
 import com.alorma.contactnotes.designsystem.expressive.GroupHeaderPreview
 import com.alorma.contactnotes.designsystem.expressive.ShapeButtonPreview
 import com.alorma.contactnotes.designsystem.expressive.WideTitleLongNamePreview
@@ -120,6 +123,27 @@ class ComponentsScreenshotTests {
   @Composable
   fun shapeButton() {
     ShapeButtonPreview()
+  }
+
+  @ComponentPreviews
+  @PreviewTest
+  @Composable
+  fun featuredCard() {
+    FeaturedCardPreview()
+  }
+
+  @ComponentPreviews
+  @PreviewTest
+  @Composable
+  fun featuredCardNeutral() {
+    FeaturedCardNeutralPreview()
+  }
+
+  @HugeFontComponentPreviews
+  @PreviewTest
+  @Composable
+  fun featuredCardLongQuote() {
+    FeaturedCardLongQuotePreview()
   }
 
   @ComponentPreviews
