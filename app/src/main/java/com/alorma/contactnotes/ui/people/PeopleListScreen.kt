@@ -46,6 +46,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -129,6 +130,8 @@ fun PeopleListRoute(
     }
   val currentOnFeaturedChanged by rememberUpdatedState(onFeaturedChanged)
   LaunchedEffect(featuredId) { currentOnFeaturedChanged(featuredId) }
+  // Al marxar (a Arxivades, per exemple) el detall ja no ha de seguir la destacada
+  DisposableEffect(Unit) { onDispose { currentOnFeaturedChanged(null) } }
   // Amb el rail (pantalla gran) l'indicador és al rail, no a la capçalera; amb SyncFlag apagat és `null`
   val syncIndicator = currentSyncIndicatorState()
   PeopleListScreen(
