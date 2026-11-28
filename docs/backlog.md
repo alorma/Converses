@@ -8,3 +8,4 @@ Només el que encara no està fet. El que s'ha fet és a l'historial de git i al
 - **«Avisa'm» als pendents** (Pro, [#5](https://github.com/alorma/Converses/issues/5)): notificació a les 9:00 el dia de la tasca. La columna `remind` de `task` ja hi és; falta la fila al formulari i la notificació.
 - **Cerca** ([#41](https://github.com/alorma/Converses/issues/41)): queda per més endavant.
 - **«Termes» al paywall:** la pàgina ja existeix a converses.app; falta l'enllaç al peu.
+- **Grups Avui/Ahir del llistat:** no s'actualitzen si l'app queda oberta passada la mitjanit; cal refrescar `today` a ON_RESUME.
