@@ -61,6 +61,12 @@ class FixedColorsTest {
   }
 
   @Test
+  fun shapeFabIconIsReadableOnItsContainer() {
+    val scheme = lightColorScheme().withExpressiveFixed()
+    assertTrue(contrast(scheme.tertiaryFixed, scheme.onTertiaryFixedVariant) >= 4.5)
+  }
+
+  @Test
   fun personScreensOnlyReplaceThePrimaryFamily() {
     val base = lightColorScheme().withExpressiveFixed()
     val person = base.withPrimaryFixed(AvatarColor.Rose.primaryFixed())

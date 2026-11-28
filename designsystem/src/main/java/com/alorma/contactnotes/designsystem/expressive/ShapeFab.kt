@@ -13,13 +13,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 
 /**
  * FAB mitjà (80 dp) de Material 3 amb forma de galeta de 9 pètals que fa un morph cap a un cercle en prémer-lo
- * ([rememberMorphToCircle]). Color préssec fix i icona blanca.
+ * ([rememberMorphToCircle]). Color préssec fix i icona en el préssec clar (`tertiaryFixed`, contrast AA).
  */
 @Composable
 fun ShapeFab(
@@ -35,7 +34,7 @@ fun ShapeFab(
     modifier = modifier,
     shape = rememberMorphToCircle(ExpressiveShapes.Cookie9Sided, active = pressed),
     containerColor = MaterialTheme.colorScheme.onTertiaryFixedVariant,
-    contentColor = Color.White,
+    contentColor = MaterialTheme.colorScheme.tertiaryFixed,
     interactionSource = interactionSource,
   ) {
     Icon(icon, contentDescription = contentDescription, modifier = Modifier.size(32.dp))
