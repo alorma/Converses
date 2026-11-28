@@ -58,20 +58,13 @@ fun ShapeButton(
 ) {
   val interactionSource = remember { MutableInteractionSource() }
   val pressed by interactionSource.collectIsPressedAsState()
-  val reduceMotion = rememberReduceMotion()
-  val progress by animateFloatAsState(
-    targetValue = if (pressed || selected == true) 1f else 0f,
-    animationSpec = if (reduceMotion) snap() else MaterialTheme.motionScheme.fastSpatialSpec(),
-    label = "shapeButtonMorph",
-  )
+  val morphShape = rememberMorphToCircle(shape, active = pressed || selected == true)
   val iconSize =
     when {
       size < 56.dp -> IconButtonDefaults.smallIconSize
       size <= 80.dp -> IconButtonDefaults.largeIconSize
       else -> IconButtonDefaults.extraLargeIconSize
     }
-  val morph = remember(shape) { Morph(shape.normalized(), ExpressiveShapes.Circle.normalized()) }
-  val morphShape = remember(morph, progress) { MorphShape(morph, progress.coerceIn(0f, 1f)) }
 
   // L'àrea tàctil exterior (>= 48 dp) té el clic i la semàntica; el botó de Material és només la part visible.
   Box(
@@ -104,4 +97,24 @@ fun ShapeButton(
       content = { Icon(icon, contentDescription = null, modifier = Modifier.size(iconSize)) },
     )
   }
+}
+
+/**
+ * Forma que fa un morph de [shape] a un cercle quan [active] és cert, amb el `fastSpatialSpec` del tema.
+ * Amb les animacions del sistema desactivades ([rememberReduceMotion]) salta directament a la forma final.
+ * La comparteixen `ShapeButton` i `ShapeFab`.
+ */
+@Composable
+internal fun rememberMorphToCircle(
+  shape: RoundedPolygon,
+  active: Boolean,
+): MorphShape {
+  val reduceMotion = rememberReduceMotion()
+  val progress by animateFloatAsState(
+    targetValue = if (active) 1f else 0f,
+    animationSpec = if (reduceMotion) snap() else MaterialTheme.motionScheme.fastSpatialSpec(),
+    label = "shapeMorph",
+  )
+  val morph = remember(shape) { Morph(shape.normalized(), ExpressiveShapes.Circle.normalized()) }
+  return remember(morph, progress) { MorphShape(morph, progress.coerceIn(0f, 1f)) }
 }

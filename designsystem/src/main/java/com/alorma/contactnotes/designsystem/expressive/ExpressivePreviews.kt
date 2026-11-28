@@ -7,8 +7,12 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.ChatBubbleOutline
 import androidx.compose.material.icons.outlined.Edit
+import androidx.compose.material.icons.outlined.Groups
+import androidx.compose.material.icons.outlined.Inventory2
 import androidx.compose.material.icons.outlined.PersonAdd
+import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -18,6 +22,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.alorma.contactnotes.designsystem.components.ExpressiveFloatingToolbar
+import com.alorma.contactnotes.designsystem.components.ExpressiveToolbarDestination
 import com.alorma.contactnotes.designsystem.preview.ConversesPreviewSurface
 
 // Previews de les peces expressives amb dades fixes. Els tests de captures de `screenshotTest` les reutilitzen.
@@ -113,6 +119,56 @@ internal fun ShapeButtonPreview() {
           contentDescription = "Small",
           icon = Icons.Outlined.Edit,
         )
+      }
+    }
+  }
+}
+
+@Preview
+@Composable
+internal fun ExpressiveFilterChipsPreview() {
+  ConversesPreviewSurface {
+    ExpressiveTheme {
+      Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        ExpressiveFilterChip(selected = true, onClick = {}, label = "All", icon = Icons.Outlined.Groups)
+        ExpressiveFilterChip(selected = false, onClick = {}, label = "Chat", icon = Icons.Outlined.ChatBubbleOutline)
+      }
+    }
+  }
+}
+
+@Preview
+@Composable
+internal fun GroupHeaderPreview() {
+  ConversesPreviewSurface {
+    ExpressiveTheme {
+      Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        GroupHeader(title = "Today", count = 3, countDescription = "3 people")
+        GroupHeader(title = "Last week", count = 12, countDescription = "12 people")
+      }
+    }
+  }
+}
+
+@Preview
+@Composable
+internal fun ExpressiveFloatingToolbarPreview() {
+  ConversesPreviewSurface {
+    ExpressiveTheme {
+      ExpressiveFloatingToolbar(
+        onFabClick = {},
+        fabIcon = Icons.Outlined.Edit,
+        fabContentDescription = "Quick note",
+        modifier = Modifier.width(360.dp),
+      ) {
+        ExpressiveToolbarDestination(icon = Icons.Outlined.Groups, label = "People", selected = true, onClick = {})
+        ExpressiveToolbarDestination(
+          icon = Icons.Outlined.Inventory2,
+          label = "Archived",
+          selected = false,
+          onClick = {},
+        )
+        ExpressiveToolbarDestination(icon = Icons.Outlined.Settings, label = "Settings", selected = false, onClick = {})
       }
     }
   }

@@ -13,7 +13,10 @@ import com.alorma.contactnotes.designsystem.components.ProBadgePreview
 import com.alorma.contactnotes.designsystem.components.SplitButtonPreview
 import com.alorma.contactnotes.designsystem.components.TimelinePreview
 import com.alorma.contactnotes.designsystem.components.ToggleGroupPreview
+import com.alorma.contactnotes.designsystem.expressive.ExpressiveFilterChipsPreview
+import com.alorma.contactnotes.designsystem.expressive.ExpressiveFloatingToolbarPreview
 import com.alorma.contactnotes.designsystem.expressive.ExpressiveTypePreview
+import com.alorma.contactnotes.designsystem.expressive.GroupHeaderPreview
 import com.alorma.contactnotes.designsystem.expressive.ShapeButtonPreview
 import com.alorma.contactnotes.designsystem.expressive.WideTitleLongNamePreview
 import com.android.tools.screenshot.PreviewTest
@@ -123,5 +126,26 @@ class ComponentsScreenshotTests {
   @Composable
   fun shapeButton() {
     ShapeButtonPreview()
+  }
+
+  @ComponentPreviews
+  @PreviewTest
+  @Composable
+  fun expressiveFilterChips() {
+    ExpressiveFilterChipsPreview()
+  }
+
+  @ComponentPreviews
+  @PreviewTest
+  @Composable
+  fun groupHeader() {
+    GroupHeaderPreview()
+  }
+
+  @ComponentPreviews
+  @PreviewTest
+  @Composable
+  fun expressiveFloatingToolbar() {
+    ExpressiveFloatingToolbarPreview()
   }
 }
