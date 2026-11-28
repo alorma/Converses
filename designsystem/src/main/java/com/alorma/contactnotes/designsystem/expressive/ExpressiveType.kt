@@ -61,7 +61,7 @@ object ExpressiveType {
     )
 }
 
-/** Títol display que s'encongeix de [maxSize] a [minSize] i ocupa com a màxim dues línies. */
+/** Títol display que s'encongeix de [maxSize] a [minSize] i ocupa com a màxim [maxLines] línies (dues per defecte). */
 @Composable
 fun WideTitle(
   text: String,
@@ -69,13 +69,14 @@ fun WideTitle(
   color: Color = Color.Unspecified,
   maxSize: TextUnit = 44.sp,
   minSize: TextUnit = 28.sp,
+  maxLines: Int = 2,
 ) {
   Text(
     text = text,
     modifier = modifier.semantics { heading() },
     color = color,
     style = ExpressiveType.display(maxSize),
-    maxLines = 2,
+    maxLines = maxLines,
     overflow = TextOverflow.Ellipsis,
     autoSize = TextAutoSize.StepBased(minFontSize = minSize, maxFontSize = maxSize),
   )
