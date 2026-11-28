@@ -6,15 +6,15 @@
     <string name="detail_empty_title">Tria una persona</string>
     <string name="detail_empty_description">La seva cronologia, les dades i els pendents sortiran aquí.</string>
     <string name="pro_description">Funció Pro</string>
-    <plurals name="people_count">
+    <plurals name="people_group_count">
         <item quantity="one">%d persona</item>
         <item quantity="other">%d persones</item>
     </plurals>
-    <string name="people_count_none">Cap persona encara</string>
     <string name="people_empty_description">Afegeix la primera persona i comença a apuntar què us dieu i què ha passat.</string>
     <string name="people_empty">Encara no hi ha ningú</string>
     <string name="no_entries_yet">Encara no hi ha entrades</string>
-    <string name="protected_hint">Protegida · toca per desbloquejar</string>
+    <string name="protected_label">Protegida</string>
+    <string name="filter_all">Totes</string>
     <string name="back">Enrere</string>
     <string name="unlock_title">Desbloqueja %1$s</string>
     <string name="unlock_subtitle">Fes servir l\'empremta digital per continuar</string>

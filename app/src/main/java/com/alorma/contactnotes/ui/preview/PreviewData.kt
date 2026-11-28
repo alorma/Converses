@@ -144,6 +144,90 @@ internal object PreviewData {
       ),
     )
 
+  private val pau =
+    PersonEntity(
+      id = 5,
+      name = "Pau Vidal",
+      avatarShape = AvatarShape.Sunny,
+      avatarColor = AvatarColor.Sky,
+      createdAt = at(2, 3, 9),
+      updatedAt = at(3, 10, 8),
+    )
+
+  private val nuria =
+    PersonEntity(
+      id = 6,
+      name = "Núria Camps",
+      avatarShape = AvatarShape.PuffyDiamond,
+      avatarColor = AvatarColor.Lemon,
+      createdAt = at(2, 5, 9),
+      updatedAt = at(2, 20, 17),
+    )
+
+  private val carles =
+    PersonEntity(
+      id = 7,
+      name = "Carles Roca",
+      avatarShape = AvatarShape.Ghostish,
+      avatarColor = AvatarColor.Sand,
+      createdAt = at(11, 2, 9),
+      updatedAt = at(12, 18, 12),
+    )
+
+  /**
+   * Llistat de la pantalla de persones: de més a menys recent perquè els grups surtin en ordre. Hi ha una protegida
+   * (Luna), una persona sense entrades (Laia) i dates d'uns quants mesos (totes d'un any passat, sense «Avui»).
+   */
+  val listPeople: List<PersonListItem> =
+    listOf(
+      people[0],
+      PersonListItem(
+        person = pau,
+        lastEntry =
+          EntryEntity(
+            id = 5,
+            personId = 5,
+            kind = EntryKind.SAID,
+            channelType = ChannelType.PHONE,
+            text = "Asked him to bring the camping stove.",
+            occurredAt = at(3, 10, 8, 30),
+          ),
+        channels = listOf(ChannelType.PHONE),
+        lastActivityAt = at(3, 10, 8, 30),
+      ),
+      people[2],
+      PersonListItem(
+        person = nuria,
+        lastEntry =
+          EntryEntity(
+            id = 6,
+            personId = 6,
+            kind = EntryKind.HAPPENED,
+            channelType = ChannelType.IN_PERSON,
+            text = "We finally met for coffee after months of postponing it.",
+            occurredAt = at(2, 20, 17),
+          ),
+        channels = listOf(ChannelType.IN_PERSON),
+        lastActivityAt = at(2, 20, 17),
+      ),
+      people[3],
+      people[1],
+      PersonListItem(
+        person = carles,
+        lastEntry =
+          EntryEntity(
+            id = 7,
+            personId = 7,
+            kind = EntryKind.HEARD,
+            channelType = ChannelType.SOCIAL,
+            text = "He is moving to Girona in the spring.",
+            occurredAt = at(12, 18, 12),
+          ),
+        channels = listOf(ChannelType.SOCIAL),
+        lastActivityAt = at(12, 18, 12),
+      ),
+    )
+
   /** «Avui» fix de les previews de tasques: dilluns, perquè el dia rellevant sigui divendres com al disseny. */
   val taskToday: LocalDate = LocalDate.of(2026, 11, 2)
 

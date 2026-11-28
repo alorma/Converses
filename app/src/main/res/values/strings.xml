@@ -7,15 +7,15 @@
     <string name="detail_empty_description">Their timeline, details and to-dos will show up here.</string>
     <string name="pro_badge" translatable="false">PRO</string>
     <string name="pro_description">Pro feature</string>
-    <plurals name="people_count">
+    <plurals name="people_group_count">
         <item quantity="one">%d person</item>
         <item quantity="other">%d people</item>
     </plurals>
-    <string name="people_count_none">No people yet</string>
     <string name="people_empty_description">Add the first person and start keeping track of what you say to each other and what happens.</string>
     <string name="people_empty">No one here yet</string>
     <string name="no_entries_yet">No entries yet</string>
-    <string name="protected_hint">Protected · tap to unlock</string>
+    <string name="protected_label">Protected</string>
+    <string name="filter_all">All</string>
     <string name="back">Back</string>
     <string name="unlock_title">Unlock %1$s</string>
     <string name="unlock_subtitle">Use your fingerprint to continue</string>

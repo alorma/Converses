@@ -26,7 +26,7 @@ private fun PeopleListScreenPreview(
 @Composable
 internal fun PeopleListScreenLoadedPreview() {
   PeopleListScreenPreview(
-    PeopleListUiState(people = PreviewData.people, total = PreviewData.people.size, isLoading = false),
+    PeopleListUiState(people = PreviewData.listPeople, total = PreviewData.listPeople.size, isLoading = false),
   )
 }
 
@@ -36,13 +36,18 @@ internal fun PeopleListScreenLoadedPreview() {
 internal fun PeopleListScreenPanePreview() {
   ConversesPreviewTheme {
     PeopleListScreen(
-      state = PeopleListUiState(people = PreviewData.people, total = PreviewData.people.size, isLoading = false),
+      state =
+        PeopleListUiState(
+          people = PreviewData.listPeople,
+          total = PreviewData.listPeople.size,
+          isLoading = false,
+        ),
       archived = false,
       onFilterToggled = {},
       onPersonClick = {},
       onNewPerson = {},
       inPane = true,
-      selectedPersonId = PreviewData.people[2].person.id,
+      selectedPersonId = PreviewData.listPeople[2].person.id,
     )
   }
 }
@@ -57,7 +62,7 @@ internal fun PeopleListScreenEmptyPreview() {
 @Composable
 internal fun PeopleListScreenArchivedPreview() {
   PeopleListScreenPreview(
-    PeopleListUiState(people = PreviewData.people.take(2), total = 2, isLoading = false),
+    PeopleListUiState(people = PreviewData.listPeople.take(2), total = 2, isLoading = false),
     archived = true,
   )
 }
@@ -66,8 +71,8 @@ internal fun PeopleListScreenArchivedPreview() {
 @Preview
 @Composable
 internal fun PeopleListScreenTasksPreview() {
-  val counts = listOf(2, 3, 1)
-  val people = PreviewData.people.mapIndexed { index, item -> item.copy(openTasks = counts.getOrElse(index) { 0 }) }
+  val counts = listOf(2, 3, 1, 0, 0, 4)
+  val people = PreviewData.listPeople.mapIndexed { index, item -> item.copy(openTasks = counts.getOrElse(index) { 0 }) }
   PeopleListScreenPreview(
     PeopleListUiState(people = people, total = people.size, isLoading = false),
   )
@@ -79,7 +84,12 @@ internal fun PeopleListScreenTasksPreview() {
 internal fun PeopleListScreenSyncRemovedPreview() {
   ConversesPreviewTheme {
     PeopleListScreen(
-      state = PeopleListUiState(people = PreviewData.people, total = PreviewData.people.size, isLoading = false),
+      state =
+        PeopleListUiState(
+          people = PreviewData.listPeople,
+          total = PreviewData.listPeople.size,
+          isLoading = false,
+        ),
       archived = false,
       onFilterToggled = {},
       onPersonClick = {},
@@ -96,7 +106,12 @@ internal fun PeopleListScreenSyncRemovedPreview() {
 internal fun PeopleListScreenSyncPreview() {
   ConversesPreviewTheme {
     PeopleListScreen(
-      state = PeopleListUiState(people = PreviewData.people, total = PreviewData.people.size, isLoading = false),
+      state =
+        PeopleListUiState(
+          people = PreviewData.listPeople,
+          total = PreviewData.listPeople.size,
+          isLoading = false,
+        ),
       archived = false,
       onFilterToggled = {},
       onPersonClick = {},

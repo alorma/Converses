@@ -209,6 +209,13 @@ class ScreensScreenshotTests {
     PeopleListScreenLoadedPreview()
   }
 
+  @LargeFontScreenPreviews
+  @PreviewTest
+  @Composable
+  fun peopleListHugeFont() {
+    PeopleListScreenLoadedPreview()
+  }
+
   @ScreenPreviews
   @PreviewTest
   @Composable

@@ -1,44 +1,45 @@
 package com.alorma.contactnotes.ui.people
 
 import androidx.activity.compose.ReportDrawnWhen
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.focusGroup
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Apps
 import androidx.compose.material.icons.rounded.Archive
-import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material.icons.rounded.Flag
 import androidx.compose.material.icons.rounded.Forum
 import androidx.compose.material.icons.rounded.Groups
 import androidx.compose.material.icons.rounded.Lock
 import androidx.compose.material.icons.rounded.PersonAdd
-import androidx.compose.material3.FilledTonalIconButton
-import androidx.compose.material3.FilterChip
-import androidx.compose.material3.FilterChipDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -55,6 +56,8 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
@@ -70,24 +73,31 @@ import com.alorma.contactnotes.data.db.PersonListItem
 import com.alorma.contactnotes.data.db.color
 import com.alorma.contactnotes.data.db.shape
 import com.alorma.contactnotes.designsystem.components.Avatar
-import com.alorma.contactnotes.designsystem.components.DashedActionRow
-import com.alorma.contactnotes.designsystem.components.GroupedListDefaults
 import com.alorma.contactnotes.designsystem.components.WelcomeEmptyState
-import com.alorma.contactnotes.designsystem.components.groupedItems
 import com.alorma.contactnotes.designsystem.components.rememberConversesHaptics
-import com.alorma.contactnotes.designsystem.theme.ListTitleStyle
+import com.alorma.contactnotes.designsystem.expressive.ExpressiveFilterChip
+import com.alorma.contactnotes.designsystem.expressive.ExpressiveShapes
+import com.alorma.contactnotes.designsystem.expressive.ExpressiveTheme
+import com.alorma.contactnotes.designsystem.expressive.ExpressiveType
+import com.alorma.contactnotes.designsystem.expressive.GroupHeader
+import com.alorma.contactnotes.designsystem.expressive.ShapeButton
+import com.alorma.contactnotes.designsystem.expressive.WideTitle
+import com.alorma.contactnotes.designsystem.expressive.rememberPersonPalette
 import com.alorma.contactnotes.shared.ChannelType
 import com.alorma.contactnotes.shared.initialsOf
 import com.alorma.contactnotes.ui.navigation.LocalFloatingBarPadding
-import com.alorma.contactnotes.ui.person.channelName
+import com.alorma.contactnotes.ui.person.icon
 import com.alorma.contactnotes.ui.sync.RemovedNotice
 import com.alorma.contactnotes.ui.sync.SyncIndicator
 import com.alorma.contactnotes.ui.sync.SyncIndicatorState
 import com.alorma.contactnotes.ui.sync.currentSyncIndicatorState
+import java.time.LocalDate
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 
 private val ScreenMargin = 16.dp
+private val RowSpacing = 6.dp
+private val GroupGap = 14.dp // + RowSpacing = 20 dp abans de cada capçalera de grup
 
 @Composable
 fun PeopleListRoute(
@@ -134,8 +144,40 @@ fun PeopleListScreen(
   syncRemoved: Boolean = false,
   onOpenSync: () -> Unit = {},
 ) {
+  ExpressiveTheme {
+    PeopleListContent(
+      state = state,
+      archived = archived,
+      onFilterToggled = onFilterToggled,
+      onPersonClick = onPersonClick,
+      onNewPerson = onNewPerson,
+      inPane = inPane,
+      selectedPersonId = selectedPersonId,
+      syncIndicator = syncIndicator,
+      syncRemoved = syncRemoved,
+      onOpenSync = onOpenSync,
+    )
+  }
+}
+
+@Composable
+private fun PeopleListContent(
+  state: PeopleListUiState,
+  archived: Boolean,
+  onFilterToggled: (ChannelType) -> Unit,
+  onPersonClick: (PersonEntity) -> Unit,
+  onNewPerson: () -> Unit,
+  inPane: Boolean,
+  selectedPersonId: Long?,
+  syncIndicator: SyncIndicatorState?,
+  syncRemoved: Boolean,
+  onOpenSync: () -> Unit,
+) {
   val listState = rememberLazyListState()
   val listFocus = remember { FocusRequester() }
+  // El mateix idioma per agrupar i per escriure els noms dels grups, perquè la setmana i els mesos no divergeixin
+  val locale = LocalConfiguration.current.locales[0]
+  val groups = remember(state.people, locale) { state.people.groupByActivity(LocalDate.now(), locale = locale) }
   // Drawn once the rows are laid out (or there is nothing to show), not just when the data arrives
   ReportDrawnWhen { !state.isLoading && (state.people.isEmpty() || listState.layoutInfo.visibleItemsInfo.isNotEmpty()) }
   // En canviar els xips la llista torna a dalt (no a la primera composició, perquè no perdi la posició en tornar del detall)
@@ -147,7 +189,7 @@ fun PeopleListScreen(
     }
   }
   Scaffold(
-    containerColor = MaterialTheme.colorScheme.surface,
+    containerColor = MaterialTheme.colorScheme.background,
     contentWindowInsets = WindowInsets.navigationBars,
     topBar = {
       // Capçalera i filtres fixos a dalt, amb fons opac perquè la llista passi per sota, també l'àrea de la barra d'estat
@@ -157,15 +199,13 @@ fun PeopleListScreen(
             // Teclat: la fletxa avall des de la capçalera o els filtres entra a la llista. Sense això la cerca de
             // focus salta als botons flotants, que queden per sobre de les files
             .focusProperties { down = listFocus }
-            .background(MaterialTheme.colorScheme.surface)
+            .background(MaterialTheme.colorScheme.background)
             .windowInsetsPadding(WindowInsets.statusBars)
             .padding(horizontal = ScreenMargin),
-        verticalArrangement = Arrangement.spacedBy(GroupedListDefaults.ItemSpacing),
+        verticalArrangement = Arrangement.spacedBy(RowSpacing),
       ) {
         Header(
           archived = archived,
-          total = state.total,
-          isLoading = state.isLoading,
           onNewPerson = onNewPerson,
           syncIndicator = syncIndicator,
           onOpenSync = onOpenSync,
@@ -187,7 +227,7 @@ fun PeopleListScreen(
           top = padding.calculateTopPadding(),
           bottom = LocalFloatingBarPadding.current.calculateBottomPadding() + padding.calculateBottomPadding(),
         ),
-      verticalArrangement = Arrangement.spacedBy(GroupedListDefaults.ItemSpacing),
+      verticalArrangement = Arrangement.spacedBy(RowSpacing),
     ) {
       if (!state.isLoading && state.people.isEmpty()) {
         val noPeopleAtAll = !archived && state.filter.isEmpty()
@@ -215,25 +255,22 @@ fun PeopleListScreen(
           }
         }
       }
-      groupedItems(
-        state.people,
-        key = { it.person.id },
-        selected = { inPane && it.person.id == selectedPersonId },
-      ) { item ->
-        PersonRow(
-          item = item,
-          onClick = { onPersonClick(item.person) },
-          inPane = inPane,
-          selected = inPane && item.person.id == selectedPersonId,
-        )
-      }
-      if (!state.isLoading && !archived && state.people.isNotEmpty()) {
-        item(key = "add_person") {
-          DashedActionRow(
-            icon = Icons.Rounded.PersonAdd,
-            label = stringResource(R.string.add_person),
-            onClick = onNewPerson,
-            modifier = Modifier.padding(top = 12.dp),
+      groups.forEachIndexed { index, group ->
+        item(key = "group-${group.period}") {
+          val count = group.people.size
+          GroupHeader(
+            title = group.period.label(),
+            count = count,
+            countDescription = pluralStringResource(R.plurals.people_group_count, count, count),
+            modifier = Modifier.padding(top = if (index == 0) 0.dp else GroupGap),
+          )
+        }
+        items(group.people, key = { it.person.id }) { item ->
+          PersonRow(
+            item = item,
+            onClick = { onPersonClick(item.person) },
+            inPane = inPane,
+            selected = inPane && item.person.id == selectedPersonId,
           )
         }
       }
@@ -244,47 +281,44 @@ fun PeopleListScreen(
 @Composable
 private fun Header(
   archived: Boolean,
-  total: Int,
-  isLoading: Boolean,
   onNewPerson: () -> Unit,
   syncIndicator: SyncIndicatorState?,
   onOpenSync: () -> Unit,
   modifier: Modifier = Modifier,
 ) {
+  val scheme = MaterialTheme.colorScheme
   Row(
-    modifier = modifier.fillMaxWidth().padding(start = 4.dp, top = 16.dp, bottom = if (archived) 14.dp else 0.dp),
-    verticalAlignment = Alignment.Top,
+    modifier = modifier.fillMaxWidth().padding(start = 4.dp, top = 16.dp, bottom = if (archived) 14.dp else 8.dp),
+    verticalAlignment = Alignment.CenterVertically,
+    horizontalArrangement = Arrangement.spacedBy(8.dp),
   ) {
-    Column(modifier = Modifier.weight(1f)) {
-      Text(
-        text = stringResource(if (archived) R.string.filter_archived else R.string.people_title),
-        style = ListTitleStyle,
-        maxLines = 1,
-        softWrap = false,
-      )
-      if (!isLoading) {
-        Text(
-          text =
-            if (total == 0 &&
-              !archived
-            ) {
-              stringResource(R.string.people_count_none)
-            } else {
-              pluralStringResource(R.plurals.people_count, total, total)
-            },
-          style = MaterialTheme.typography.bodyLarge,
-          color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
-      }
-    }
+    WideTitle(
+      text = stringResource(if (archived) R.string.filter_archived else R.string.people_title),
+      modifier = Modifier.weight(1f),
+      color = scheme.onBackground,
+      maxSize = 34.sp,
+      minSize = 34.sp,
+      maxLines = 1,
+    )
     if (!archived) {
-      FilledTonalIconButton(onClick = onNewPerson) {
-        Icon(Icons.Rounded.PersonAdd, contentDescription = stringResource(R.string.add_person))
-      }
+      ShapeButton(
+        onClick = onNewPerson,
+        shape = ExpressiveShapes.Cookie9Sided,
+        size = 52.dp,
+        containerColor = scheme.secondaryContainer,
+        contentColor = scheme.onSecondaryContainer,
+        contentDescription = stringResource(R.string.add_person),
+        icon = Icons.Rounded.PersonAdd,
+      )
     }
     // L'últim de la dreta, després dels botons de la capçalera
     if (syncIndicator != null) {
-      SyncIndicator(state = syncIndicator, onClick = onOpenSync, modifier = Modifier.padding(start = 4.dp))
+      Box(
+        modifier = Modifier.size(52.dp).background(scheme.surfaceContainer, CircleShape),
+        contentAlignment = Alignment.Center,
+      ) {
+        SyncIndicator(state = syncIndicator, onClick = onOpenSync)
+      }
     }
   }
 }
@@ -300,8 +334,9 @@ private fun FilterRow(
   val chips: @Composable () -> Unit = { FilterChips(selected = selected, onToggle = onToggle) }
   if (wrap) {
     FlowRow(
-      modifier = Modifier.fillMaxWidth().padding(top = 12.dp, bottom = 14.dp),
+      modifier = Modifier.fillMaxWidth().padding(bottom = 10.dp),
       horizontalArrangement = Arrangement.spacedBy(8.dp),
+      verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
       chips()
     }
@@ -311,7 +346,7 @@ private fun FilterRow(
         Modifier
           .fillMaxWidth()
           .horizontalScroll(rememberScrollState())
-          .padding(top = 12.dp, bottom = 14.dp),
+          .padding(bottom = 10.dp),
       horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
       chips()
@@ -324,55 +359,33 @@ private fun FilterChips(
   selected: Set<ChannelType>,
   onToggle: (ChannelType) -> Unit,
 ) {
-  val scheme = MaterialTheme.colorScheme
   val haptics = rememberConversesHaptics()
+  // «Totes» és el filtre sense cap canal: tocar-la desmarca els canals que hi hagi
+  ExpressiveFilterChip(
+    selected = selected.isEmpty(),
+    onClick = {
+      haptics.segmentTick()
+      selected.toList().forEach(onToggle)
+    },
+    label = stringResource(R.string.filter_all),
+    icon = Icons.Rounded.Apps,
+  )
   ChannelType.entries.forEach { group ->
-    val isSelected = group in selected
-    FilterChip(
-      selected = isSelected,
+    ExpressiveFilterChip(
+      selected = group in selected,
       onClick = {
         haptics.segmentTick()
         onToggle(group)
       },
-      label = {
-        Text(
-          text = stringResource(group.label()),
-          fontSize = 14.sp,
-          fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
-          maxLines = 1,
-        )
-      },
-      leadingIcon =
-        if (isSelected) {
-          { Icon(Icons.Rounded.Check, contentDescription = null, modifier = Modifier.size(18.dp)) }
-        } else {
-          null
-        },
-      shape = RoundedCornerShape(8.dp),
-      colors =
-        FilterChipDefaults.filterChipColors(
-          containerColor = Color.Transparent,
-          labelColor = scheme.onSurfaceVariant,
-          selectedContainerColor = scheme.primaryContainer,
-          selectedLabelColor = scheme.onPrimaryContainer,
-          selectedLeadingIconColor = scheme.onPrimaryContainer,
-        ),
-      border =
-        FilterChipDefaults.filterChipBorder(
-          enabled = true,
-          selected = isSelected,
-          borderColor = scheme.outlineVariant,
-          selectedBorderColor = Color.Transparent,
-          borderWidth = 1.dp,
-          selectedBorderWidth = 0.dp,
-        ),
+      label = stringResource(group.label()),
+      icon = group.icon(),
     )
   }
 }
 
 /**
  * @param inPane fila del panell de llistat d'una pantalla gran: avatar de 48 dp i, a la semàntica, si és la
- *   [selected] (la persona oberta al detall). El fons de la seleccionada el posa `groupedItems`.
+ *   [selected] (la persona oberta al detall), amb una vora de 2 dp.
  */
 @Composable
 private fun PersonRow(
@@ -382,20 +395,58 @@ private fun PersonRow(
   selected: Boolean = false,
 ) {
   val person = item.person
-  // Sobre el fons de la fila seleccionada, el text secundari pren el color del contingut en lloc del gris
-  val secondaryColor = if (selected) LocalContentColor.current else MaterialTheme.colorScheme.onSurfaceVariant
+  val palette = rememberPersonPalette(person.color)
+  val scheme = MaterialTheme.colorScheme
+  val shape = RoundedCornerShape(32.dp)
+  val colors = CardDefaults.cardColors(containerColor = palette.surface, contentColor = scheme.onSurface)
+  val border = if (selected) BorderStroke(2.dp, scheme.primary) else null
+  val modifier = Modifier.fillMaxWidth().heightIn(min = 92.dp)
+  val content: @Composable () -> Unit = { PersonRowContent(item, palette.accent, inPane) }
+  if (inPane) {
+    Card(
+      modifier = modifier.selectable(selected = selected, onClick = onClick),
+      shape = shape,
+      colors = colors,
+      border = border,
+    ) { content() }
+  } else {
+    Card(onClick = onClick, modifier = modifier, shape = shape, colors = colors, border = border) { content() }
+  }
+}
+
+@Composable
+private fun PersonRowContent(
+  item: PersonListItem,
+  accent: Color,
+  inPane: Boolean,
+) {
+  val person = item.person
+  val scheme = MaterialTheme.colorScheme
+  // Amb la lletra molt gran l'hora no cap al costat del text i passa a sota (el text no es redueix a «M…»)
+  val stacked = LocalDensity.current.fontScale >= 1.5f
+  // Les protegides no mostren l'hora (ni tasques): no filtrem res abans de desbloquejar
+  val entry = item.lastEntry
+  val trailing: @Composable () -> Unit = {
+    if (!person.isProtected && (entry != null || item.openTasks > 0)) {
+      Column(
+        horizontalAlignment = if (stacked) Alignment.Start else Alignment.End,
+        verticalArrangement = Arrangement.spacedBy(4.dp),
+      ) {
+        if (entry != null) {
+          Text(
+            text = formatLastActivity(entry.occurredAt),
+            style = ExpressiveType.display(20.sp),
+            color = scheme.onSurface,
+            maxLines = 1,
+          )
+        }
+        if (item.openTasks > 0) TasksPill(item.openTasks)
+      }
+    }
+  }
   Row(
-    modifier =
-      Modifier
-        .fillMaxWidth()
-        .then(
-          if (inPane) {
-            Modifier.selectable(selected = selected, onClick = onClick)
-          } else {
-            Modifier.clickable(onClick = onClick)
-          },
-        ).padding(horizontal = 16.dp, vertical = 14.dp),
-    horizontalArrangement = Arrangement.spacedBy(16.dp),
+    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 14.dp),
+    horizontalArrangement = Arrangement.spacedBy(14.dp),
     verticalAlignment = Alignment.CenterVertically,
   ) {
     Avatar(
@@ -406,67 +457,40 @@ private fun PersonRow(
       locked = person.isProtected,
     )
     Column(modifier = Modifier.weight(1f)) {
-      Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-        Row(modifier = Modifier.weight(1f), verticalAlignment = Alignment.CenterVertically) {
-          Text(
-            text = person.name,
-            style = MaterialTheme.typography.titleMedium,
-            fontWeight = if (selected) FontWeight.ExtraBold else FontWeight.Bold,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-            modifier = Modifier.weight(1f, fill = false),
-          )
-          if (person.isProtected) {
-            Icon(
-              imageVector = Icons.Rounded.Lock,
-              contentDescription = null,
-              tint = secondaryColor,
-              modifier = Modifier.padding(start = 6.dp).size(16.dp),
-            )
-          }
-        }
-        item.lastEntry?.let { entry ->
-          Text(
-            text = formatLastActivity(entry.occurredAt),
-            style = MaterialTheme.typography.labelLarge,
-            color = secondaryColor,
-            modifier = Modifier.padding(start = 8.dp),
-          )
-        }
-      }
+      Text(
+        text = person.name.uppercase(),
+        style = ExpressiveType.overline,
+        color = accent,
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis,
+      )
       if (person.isProtected) {
-        Spacer(Modifier.height(2.dp))
-        Text(
-          text = stringResource(R.string.protected_hint),
-          style = MaterialTheme.typography.bodyLarge,
-          color = secondaryColor,
-        )
-      } else {
-        val channels = item.channels.distinct().sorted()
-        val tasks = item.openTasks
-        if (channels.isNotEmpty() || tasks > 0) {
-          Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-            Text(
-              text = channels.map { channelName(it).uppercase() }.joinToString(" · "),
-              style = MaterialTheme.typography.labelMedium,
-              fontWeight = FontWeight.SemiBold,
-              color = secondaryColor,
-              maxLines = 1,
-              overflow = TextOverflow.Ellipsis,
-              modifier = Modifier.weight(1f),
-            )
-            if (tasks > 0) TasksPill(tasks)
-          }
+        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+          Icon(
+            imageVector = Icons.Rounded.Lock,
+            contentDescription = null,
+            tint = scheme.onSurfaceVariant,
+            modifier = Modifier.size(16.dp),
+          )
+          Text(
+            text = stringResource(R.string.protected_label),
+            style = ExpressiveType.body,
+            color = scheme.onSurfaceVariant,
+            maxLines = 1,
+          )
         }
+      } else {
         Text(
           text = item.lastEntry?.text ?: stringResource(R.string.no_entries_yet),
-          style = MaterialTheme.typography.bodyLarge,
-          color = if (item.lastEntry == null) secondaryColor else Color.Unspecified,
+          style = ExpressiveType.body,
+          color = if (item.lastEntry == null) scheme.onSurfaceVariant else scheme.onSurface,
           maxLines = 1,
           overflow = TextOverflow.Ellipsis,
         )
       }
+      if (stacked) trailing()
     }
+    if (!stacked) trailing()
   }
 }
 
