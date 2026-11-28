@@ -13,6 +13,8 @@ data class ExpressiveColors(
   val neutral: Color,
   val accent: Color,
   val onAccent: Color,
+  val outline: Color,
+  val outlineVariant: Color,
 )
 
 val LightExpressiveColors =
@@ -23,6 +25,8 @@ val LightExpressiveColors =
     neutral = Color(0xFFEFEBE0),
     accent = Color(0xFFF2E8A6),
     onAccent = Color(0xFF1C1B17),
+    outline = Color(0xFF7A766B),
+    outlineVariant = Color(0xFFD6D1C4),
   )
 
 val DarkExpressiveColors =
@@ -33,6 +37,8 @@ val DarkExpressiveColors =
     neutral = Color(0xFF2A2822),
     accent = Color(0xFFE4D77A),
     onAccent = Color(0xFF1C1B17),
+    outline = Color(0xFF948F82),
+    outlineVariant = Color(0xFF48453D),
   )
 
 val LocalExpressiveColors = staticCompositionLocalOf { LightExpressiveColors }

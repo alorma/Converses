@@ -5,6 +5,14 @@ import org.junit.Test
 
 class ExpressiveColorsContrastTest {
   @Test
+  fun outlineIsVisibleOnTheBackground() {
+    for ((mode, colors) in listOf("light" to LightExpressiveColors, "dark" to DarkExpressiveColors)) {
+      val ratio = contrast(colors.outline, colors.background)
+      assertTrue("outline/background in $mode mode is $ratio", ratio >= 3.0)
+    }
+  }
+
+  @Test
   fun textIsReadableOnEverySurface() {
     for ((mode, colors) in listOf("light" to LightExpressiveColors, "dark" to DarkExpressiveColors)) {
       val pairs =
