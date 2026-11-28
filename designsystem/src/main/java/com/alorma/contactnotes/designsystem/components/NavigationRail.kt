@@ -35,7 +35,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
 /**
- * Rail de navegació de les pantalles grans (a partir de 600 dp): fa la feina de [ConversesFloatingToolbar], amb el botó
+ * Rail de navegació de les pantalles grans (a partir de 600 dp): fa la feina de la barra flotant, amb el botó
  * de nota ràpida a dalt en lloc del FAB.
  */
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)

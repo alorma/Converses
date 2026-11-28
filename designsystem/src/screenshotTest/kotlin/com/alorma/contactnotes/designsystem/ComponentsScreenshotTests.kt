@@ -7,7 +7,6 @@ import com.alorma.contactnotes.designsystem.components.AvatarPreview
 import com.alorma.contactnotes.designsystem.components.CollapsibleFactsPreview
 import com.alorma.contactnotes.designsystem.components.ColorSwatchesPreview
 import com.alorma.contactnotes.designsystem.components.FilterChipPreview
-import com.alorma.contactnotes.designsystem.components.FloatingToolbarPreview
 import com.alorma.contactnotes.designsystem.components.GroupedListPreview
 import com.alorma.contactnotes.designsystem.components.ProBadgePreview
 import com.alorma.contactnotes.designsystem.components.SplitButtonPreview
@@ -90,13 +89,6 @@ class ComponentsScreenshotTests {
   @Composable
   fun colorSwatches() {
     ColorSwatchesPreview()
-  }
-
-  @ComponentPreviews
-  @PreviewTest
-  @Composable
-  fun floatingToolbar() {
-    FloatingToolbarPreview()
   }
 
   @ComponentPreviews

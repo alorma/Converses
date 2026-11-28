@@ -9,12 +9,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.FloatingToolbarDefaults
 import androidx.compose.material3.HorizontalFloatingToolbar
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButtonDefaults
-import androidx.compose.material3.IconToggleButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.ToggleButton
@@ -27,59 +24,8 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import com.alorma.contactnotes.designsystem.expressive.ShapeFab
 
-/** Barra d'eines flotant a l'esquerra i FAB de nota ràpida a la dreta. */
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
-@Composable
-fun ConversesFloatingToolbar(
-  fabIcon: ImageVector,
-  fabContentDescription: String,
-  onFabClick: () -> Unit,
-  modifier: Modifier = Modifier,
-  content: @Composable RowScope.() -> Unit,
-) {
-  Row(
-    modifier = modifier.fillMaxWidth(),
-    horizontalArrangement = Arrangement.SpaceBetween,
-    verticalAlignment = Alignment.Bottom,
-  ) {
-    HorizontalFloatingToolbar(
-      expanded = true,
-      content = content,
-    )
-    FloatingActionButton(
-      onClick = onFabClick,
-      containerColor = MaterialTheme.colorScheme.primary,
-      contentColor = MaterialTheme.colorScheme.onPrimary,
-    ) {
-      Icon(imageVector = fabIcon, contentDescription = fabContentDescription)
-    }
-  }
-}
-
-@Composable
-fun ToolbarDestination(
-  icon: ImageVector,
-  contentDescription: String,
-  selected: Boolean,
-  onClick: () -> Unit,
-  modifier: Modifier = Modifier,
-) {
-  IconToggleButton(
-    checked = selected,
-    onCheckedChange = { onClick() },
-    modifier = modifier,
-    colors =
-      IconButtonDefaults.iconToggleButtonColors(
-        checkedContainerColor = MaterialTheme.colorScheme.primary,
-        checkedContentColor = MaterialTheme.colorScheme.onPrimary,
-      ),
-  ) {
-    Icon(imageVector = icon, contentDescription = contentDescription)
-  }
-}
-
 /**
- * Variant expressiva de [ConversesFloatingToolbar]: barra de 68 dp en tinta (`primary`) amb el [ShapeFab] a la dreta.
+ * Barra d'eines flotant: barra de 68 dp en tinta (`primary`) amb el [ShapeFab] a la dreta.
  */
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable

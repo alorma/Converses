@@ -10,12 +10,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.BrightnessAuto
 import androidx.compose.material.icons.rounded.DarkMode
 import androidx.compose.material.icons.rounded.Edit
-import androidx.compose.material.icons.rounded.EditNote
 import androidx.compose.material.icons.rounded.Event
-import androidx.compose.material.icons.rounded.Groups
 import androidx.compose.material.icons.rounded.LightMode
 import androidx.compose.material.icons.rounded.NorthEast
-import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material.icons.rounded.SouthWest
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -147,22 +144,6 @@ internal fun ColorSwatchesPreview() {
       labelOf = { it.name },
       modifier = Modifier.width(360.dp),
     )
-  }
-}
-
-@Preview
-@Composable
-internal fun FloatingToolbarPreview() {
-  ConversesPreviewSurface {
-    ConversesFloatingToolbar(
-      fabIcon = Icons.Rounded.EditNote,
-      fabContentDescription = "Quick note",
-      onFabClick = {},
-      modifier = Modifier.width(360.dp),
-    ) {
-      ToolbarDestination(icon = Icons.Rounded.Groups, contentDescription = "People", selected = true, onClick = {})
-      ToolbarDestination(icon = Icons.Rounded.Settings, contentDescription = "Settings", selected = false, onClick = {})
-    }
   }
 }
 

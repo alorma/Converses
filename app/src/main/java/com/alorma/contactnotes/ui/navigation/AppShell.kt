@@ -21,6 +21,7 @@ import androidx.compose.material.icons.outlined.Archive
 import androidx.compose.material.icons.outlined.Groups
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.rounded.Archive
+import androidx.compose.material.icons.rounded.Edit
 import androidx.compose.material.icons.rounded.EditNote
 import androidx.compose.material.icons.rounded.Groups
 import androidx.compose.material.icons.rounded.Settings
@@ -38,11 +39,12 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.alorma.contactnotes.R
-import com.alorma.contactnotes.designsystem.components.ConversesFloatingToolbar
 import com.alorma.contactnotes.designsystem.components.ConversesNavigationRail
+import com.alorma.contactnotes.designsystem.components.ExpressiveFloatingToolbar
+import com.alorma.contactnotes.designsystem.components.ExpressiveToolbarDestination
 import com.alorma.contactnotes.designsystem.components.RailCustomDestination
 import com.alorma.contactnotes.designsystem.components.RailDestination
-import com.alorma.contactnotes.designsystem.components.ToolbarDestination
+import com.alorma.contactnotes.designsystem.expressive.ExpressiveTheme
 import com.alorma.contactnotes.ui.sync.SyncIndicatorState
 import com.alorma.contactnotes.ui.sync.SyncIndicatorVisual
 import com.alorma.contactnotes.ui.sync.descriptionRes
@@ -55,7 +57,7 @@ import com.alorma.contactnotes.ui.sync.descriptionRes
  */
 val LocalFloatingBarPadding = compositionLocalOf { PaddingValues() }
 
-private val FloatingBarContentPadding = PaddingValues(bottom = 96.dp)
+private val FloatingBarContentPadding = PaddingValues(bottom = 100.dp)
 private val ScreenMargin = 16.dp
 
 /**
@@ -99,30 +101,32 @@ fun AppShell(
       enter = slideInVertically { it } + fadeIn(),
       exit = slideOutVertically { it } + fadeOut(),
     ) {
-      ConversesFloatingToolbar(
-        fabIcon = Icons.Rounded.EditNote,
-        fabContentDescription = stringResource(R.string.quick_note),
-        onFabClick = onQuickNote,
-        modifier = Modifier.padding(horizontal = ScreenMargin),
-      ) {
-        ToolbarDestination(
-          icon = Icons.Rounded.Groups,
-          contentDescription = stringResource(R.string.people_title),
-          selected = currentTab == PeopleRoute,
-          onClick = { onTabSelected(PeopleRoute) },
-        )
-        ToolbarDestination(
-          icon = Icons.Rounded.Archive,
-          contentDescription = stringResource(R.string.filter_archived),
-          selected = currentTab == ArchivedRoute,
-          onClick = { onTabSelected(ArchivedRoute) },
-        )
-        ToolbarDestination(
-          icon = Icons.Rounded.Settings,
-          contentDescription = stringResource(R.string.settings_title),
-          selected = false,
-          onClick = onOpenSettings,
-        )
+      ExpressiveTheme {
+        ExpressiveFloatingToolbar(
+          fabIcon = Icons.Rounded.Edit,
+          fabContentDescription = stringResource(R.string.quick_note),
+          onFabClick = onQuickNote,
+          modifier = Modifier.padding(horizontal = ScreenMargin),
+        ) {
+          ExpressiveToolbarDestination(
+            icon = Icons.Rounded.Groups,
+            label = stringResource(R.string.nav_people),
+            selected = currentTab == PeopleRoute,
+            onClick = { onTabSelected(PeopleRoute) },
+          )
+          ExpressiveToolbarDestination(
+            icon = Icons.Rounded.Archive,
+            label = stringResource(R.string.filter_archived),
+            selected = currentTab == ArchivedRoute,
+            onClick = { onTabSelected(ArchivedRoute) },
+          )
+          ExpressiveToolbarDestination(
+            icon = Icons.Rounded.Settings,
+            label = stringResource(R.string.settings_title),
+            selected = false,
+            onClick = onOpenSettings,
+          )
+        }
       }
     }
   }
