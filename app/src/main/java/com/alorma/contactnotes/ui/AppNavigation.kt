@@ -239,6 +239,7 @@ fun AppNavigation(
               archived = false,
               onPersonClick = openPerson,
               onNewPerson = newPerson,
+              onAddEntry = { navigation.navigate(QuickNoteRoute(personId = it.id)) },
               inPane = twoPane,
               selectedPersonId = navigation.openPersonId,
               onOpenSync = openSync,

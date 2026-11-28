@@ -463,4 +463,7 @@
     <string name="group_this_week">This week</string>
     <string name="group_month_pattern">LLLL</string>
     <string name="group_month_other_year_pattern">LLLL yyyy</string>
+    <string name="featured_add_entry">Add an entry for %1$s</string>
+    <string name="featured_quote">“%1$s”</string>
+    <string name="featured_just_now">Just now</string>
 </resources>

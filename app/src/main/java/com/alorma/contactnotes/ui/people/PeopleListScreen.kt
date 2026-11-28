@@ -1,5 +1,6 @@
 package com.alorma.contactnotes.ui.people
 
+import android.text.format.DateUtils
 import androidx.activity.compose.ReportDrawnWhen
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -80,11 +81,13 @@ import com.alorma.contactnotes.designsystem.expressive.ExpressiveFilterChip
 import com.alorma.contactnotes.designsystem.expressive.ExpressiveShapes
 import com.alorma.contactnotes.designsystem.expressive.ExpressiveTheme
 import com.alorma.contactnotes.designsystem.expressive.ExpressiveType
+import com.alorma.contactnotes.designsystem.expressive.FeaturedCard
 import com.alorma.contactnotes.designsystem.expressive.GroupHeader
 import com.alorma.contactnotes.designsystem.expressive.ShapeButton
 import com.alorma.contactnotes.designsystem.expressive.WideTitle
 import com.alorma.contactnotes.designsystem.expressive.rememberPersonPalette
 import com.alorma.contactnotes.shared.ChannelType
+import com.alorma.contactnotes.shared.EntryKind
 import com.alorma.contactnotes.shared.initialsOf
 import com.alorma.contactnotes.ui.navigation.LocalFloatingBarPadding
 import com.alorma.contactnotes.ui.person.icon
@@ -105,6 +108,7 @@ fun PeopleListRoute(
   archived: Boolean,
   onPersonClick: (PersonEntity) -> Unit,
   onNewPerson: () -> Unit,
+  onAddEntry: (PersonEntity) -> Unit = {},
   inPane: Boolean = false,
   selectedPersonId: Long? = null,
   onOpenSync: () -> Unit = {},
@@ -119,6 +123,7 @@ fun PeopleListRoute(
     onFilterToggled = viewModel::onFilterToggled,
     onPersonClick = onPersonClick,
     onNewPerson = onNewPerson,
+    onAddEntry = onAddEntry,
     inPane = inPane,
     selectedPersonId = selectedPersonId,
     syncIndicator = if (inPane) null else syncIndicator,
@@ -138,6 +143,7 @@ fun PeopleListScreen(
   onFilterToggled: (ChannelType) -> Unit,
   onPersonClick: (PersonEntity) -> Unit,
   onNewPerson: () -> Unit,
+  onAddEntry: (PersonEntity) -> Unit = {},
   inPane: Boolean = false,
   selectedPersonId: Long? = null,
   syncIndicator: SyncIndicatorState? = null,
@@ -152,6 +158,7 @@ fun PeopleListScreen(
       onFilterToggled = onFilterToggled,
       onPersonClick = onPersonClick,
       onNewPerson = onNewPerson,
+      onAddEntry = onAddEntry,
       inPane = inPane,
       selectedPersonId = selectedPersonId,
       syncIndicator = syncIndicator,
@@ -168,6 +175,7 @@ private fun PeopleListContent(
   onFilterToggled: (ChannelType) -> Unit,
   onPersonClick: (PersonEntity) -> Unit,
   onNewPerson: () -> Unit,
+  onAddEntry: (PersonEntity) -> Unit,
   inPane: Boolean,
   selectedPersonId: Long?,
   syncIndicator: SyncIndicatorState?,
@@ -175,6 +183,8 @@ private fun PeopleListContent(
   onOpenSync: () -> Unit,
 ) {
   val listState = rememberLazyListState()
+  // La targeta destacada segueix el filtre (surt de les persones que es mostren) i no surt a Arxivades
+  val featured = remember(state.people, archived) { if (archived) null else state.people.featured() }
   val listFocus = remember { FocusRequester() }
   // El mateix idioma per agrupar i per escriure els noms dels grups, perquè la setmana i els mesos no divergeixin
   val locale = LocalConfiguration.current.locales[0]
@@ -256,6 +266,16 @@ private fun PeopleListContent(
           }
         }
       }
+      if (featured != null) {
+        item(key = "featured") {
+          FeaturedPerson(
+            item = featured,
+            onClick = { onPersonClick(featured.person) },
+            onAdd = { onAddEntry(featured.person) },
+            modifier = Modifier.animateItem().padding(bottom = GroupGap),
+          )
+        }
+      }
       groups.forEachIndexed { index, group ->
         item(key = "group-${group.period}") {
           val count = group.people.size
@@ -277,6 +297,45 @@ private fun PeopleListContent(
       }
     }
   }
+}
+
+/** Targeta destacada (14a): la persona de l'última entrada, amb la cita; no es crida mai amb una persona protegida. */
+@Composable
+private fun FeaturedPerson(
+  item: PersonListItem,
+  onClick: () -> Unit,
+  onAdd: () -> Unit,
+  modifier: Modifier = Modifier,
+) {
+  val person = item.person
+  val entry = checkNotNull(item.lastEntry)
+  val locale = LocalConfiguration.current.locales[0]
+  val now = remember(item) { System.currentTimeMillis() }
+  val timeAt = featuredTimeAt(entry.occurredAt, now)
+  val time =
+    if (timeAt == null) {
+      stringResource(R.string.featured_just_now)
+    } else {
+      DateUtils
+        .getRelativeTimeSpanString(
+          timeAt,
+          now,
+          DateUtils.MINUTE_IN_MILLIS,
+          DateUtils.FORMAT_ABBREV_RELATIVE,
+        ).toString()
+    }
+  val overline = "${person.name} · ${stringResource(entry.channelType.label())} · $time".uppercase(locale)
+  val quote = if (entry.kind == EntryKind.HAPPENED) entry.text else stringResource(R.string.featured_quote, entry.text)
+  FeaturedCard(
+    overline = overline,
+    quote = quote,
+    palette = rememberPersonPalette(person.color),
+    onClick = onClick,
+    onAdd = onAdd,
+    addDescription = stringResource(R.string.featured_add_entry, person.name),
+    avatar = { Avatar(initials = initialsOf(person.name), shape = person.shape, color = person.color, size = 30.dp) },
+    modifier = modifier,
+  )
 }
 
 @Composable

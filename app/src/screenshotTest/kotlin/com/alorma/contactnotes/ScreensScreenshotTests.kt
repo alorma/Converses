@@ -49,7 +49,9 @@ import com.alorma.contactnotes.ui.paywall.PaywallOwnedPreview
 import com.alorma.contactnotes.ui.paywall.PaywallPreview
 import com.alorma.contactnotes.ui.people.PeopleListScreenArchivedPreview
 import com.alorma.contactnotes.ui.people.PeopleListScreenEmptyPreview
+import com.alorma.contactnotes.ui.people.PeopleListScreenFeaturedHugeFontPreview
 import com.alorma.contactnotes.ui.people.PeopleListScreenLoadedPreview
+import com.alorma.contactnotes.ui.people.PeopleListScreenProtectedNewestPreview
 import com.alorma.contactnotes.ui.people.PeopleListScreenTasksPreview
 import com.alorma.contactnotes.ui.person.AvatarColorProvider
 import com.alorma.contactnotes.ui.person.ConfirmDeleteDialogPreview
@@ -222,6 +224,20 @@ class ScreensScreenshotTests {
   @Composable
   fun peopleListHugeFont() {
     PeopleListScreenLoadedPreview()
+  }
+
+  @LargeFontScreenPreviews
+  @PreviewTest
+  @Composable
+  fun peopleListFeaturedHugeFont() {
+    PeopleListScreenFeaturedHugeFontPreview()
+  }
+
+  @ScreenPreviews
+  @PreviewTest
+  @Composable
+  fun peopleListProtectedNewest() {
+    PeopleListScreenProtectedNewestPreview()
   }
 
   @ScreenPreviews

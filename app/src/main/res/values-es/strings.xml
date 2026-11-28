@@ -464,4 +464,7 @@
     <string name="group_this_week">Esta semana</string>
     <string name="group_month_pattern">LLLL</string>
     <string name="group_month_other_year_pattern">LLLL \'de\' yyyy</string>
+    <string name="featured_add_entry">Añade una entrada a %1$s</string>
+    <string name="featured_quote">«%1$s»</string>
+    <string name="featured_just_now">Ahora mismo</string>
 </resources>

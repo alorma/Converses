@@ -120,3 +120,30 @@ internal fun PeopleListScreenSyncPreview() {
     )
   }
 }
+
+/** La targeta destacada amb la lletra al doble i una cita llarga: creix, la cita es talla i la galeta es queda a baix. */
+@Preview
+@Composable
+internal fun PeopleListScreenFeaturedHugeFontPreview() {
+  val newest = checkNotNull(PreviewData.listPeople.featured())
+  val long =
+    "We talked for hours about the trip, the budget, who would drive, where we would sleep and what " +
+      "to do if it rained all week, and in the end nothing was decided."
+  val people =
+    PreviewData.listPeople.map {
+      if (it.person.id == newest.person.id) it.copy(lastEntry = it.lastEntry?.copy(text = long)) else it
+    }
+  PeopleListScreenPreview(PeopleListUiState(people = people, total = people.size, isLoading = false))
+}
+
+/** La persona de l'entrada més recent és protegida: la targeta no en mostra res i surt la següent. */
+@Preview
+@Composable
+internal fun PeopleListScreenProtectedNewestPreview() {
+  val newest = checkNotNull(PreviewData.listPeople.featured())
+  val people =
+    PreviewData.listPeople.map {
+      if (it.person.id == newest.person.id) it.copy(person = it.person.copy(isProtected = true)) else it
+    }
+  PeopleListScreenPreview(PeopleListUiState(people = people, total = people.size, isLoading = false))
+}
