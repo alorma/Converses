@@ -23,6 +23,9 @@ internal val GraphiteStyle = PaletteStyle.Monochrome
 
 internal val LocalIsDarkTheme = compositionLocalOf { false }
 
+/** Llavor del color dinàmic (el fons de pantalla), o `null` si el color dinàmic està apagat. */
+val LocalDynamicSeed = compositionLocalOf<Color?> { null }
+
 val isDarkTheme: Boolean
   @Composable @ReadOnlyComposable
   get() = LocalIsDarkTheme.current
@@ -51,7 +54,11 @@ fun ConversesTheme(
       style = if (dynamicColor) PaletteStyle.Neutral else GraphiteStyle,
     ).withFixedError(isDark)
 
-  CompositionLocalProvider(LocalIsDarkTheme provides isDark, LocalPersonColorTheme provides personColorTheme) {
+  CompositionLocalProvider(
+    LocalIsDarkTheme provides isDark,
+    LocalPersonColorTheme provides personColorTheme,
+    LocalDynamicSeed provides if (dynamicColor) dynamicSeed else null,
+  ) {
     MaterialExpressiveTheme(
       colorScheme = colorScheme,
       motionScheme = MotionScheme.expressive(),

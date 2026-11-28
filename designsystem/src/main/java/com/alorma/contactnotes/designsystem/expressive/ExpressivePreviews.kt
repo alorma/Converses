@@ -5,6 +5,7 @@ package com.alorma.contactnotes.designsystem.expressive
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ChatBubbleOutline
@@ -14,8 +15,10 @@ import androidx.compose.material.icons.outlined.Inventory2
 import androidx.compose.material.icons.outlined.PersonAdd
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -25,6 +28,7 @@ import androidx.compose.ui.unit.sp
 import com.alorma.contactnotes.designsystem.components.ExpressiveFloatingToolbar
 import com.alorma.contactnotes.designsystem.components.ExpressiveToolbarDestination
 import com.alorma.contactnotes.designsystem.preview.ConversesPreviewSurface
+import com.alorma.contactnotes.designsystem.theme.LocalDynamicSeed
 
 // Previews de les peces expressives amb dades fixes. Els tests de captures de `screenshotTest` les reutilitzen.
 
@@ -169,6 +173,52 @@ internal fun ExpressiveFloatingToolbarPreview() {
           onClick = {},
         )
         ExpressiveToolbarDestination(icon = Icons.Outlined.Settings, label = "Settings", selected = false, onClick = {})
+      }
+    }
+  }
+}
+
+/** La paleta dinàmica amb una llavor fixa (blau), com si el fons de pantalla fos blau; en clar i fosc segons el `uiMode`. */
+@Preview
+@Composable
+internal fun DynamicExpressivePreview() {
+  ConversesPreviewSurface {
+    CompositionLocalProvider(LocalDynamicSeed provides Color(0xFF1A73E8)) {
+      ExpressiveTheme {
+        Surface(color = Expressive.colors.background) {
+          Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            Text("Converses", style = ExpressiveType.display(34.sp), color = Expressive.colors.ink)
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+              ExpressiveFilterChip(selected = true, onClick = {}, label = "All", icon = Icons.Outlined.Groups)
+              ExpressiveFilterChip(
+                selected = false,
+                onClick = {},
+                label = "Chat",
+                icon = Icons.Outlined.ChatBubbleOutline,
+              )
+            }
+            GroupHeader(title = "Today", count = 3, countDescription = "3 people")
+            ExpressiveFloatingToolbar(
+              onFabClick = {},
+              fabIcon = Icons.Outlined.Edit,
+              fabContentDescription = "Quick note",
+              modifier = Modifier.width(360.dp),
+            ) {
+              ExpressiveToolbarDestination(
+                icon = Icons.Outlined.Groups,
+                label = "People",
+                selected = true,
+                onClick = {},
+              )
+              ExpressiveToolbarDestination(
+                icon = Icons.Outlined.Settings,
+                label = "Settings",
+                selected = false,
+                onClick = {},
+              )
+            }
+          }
+        }
       }
     }
   }

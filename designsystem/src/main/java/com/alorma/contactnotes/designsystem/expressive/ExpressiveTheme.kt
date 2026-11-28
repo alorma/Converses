@@ -12,11 +12,13 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
 import com.alorma.contactnotes.designsystem.theme.LocalAppColorScheme
+import com.alorma.contactnotes.designsystem.theme.LocalDynamicSeed
 import com.alorma.contactnotes.designsystem.theme.isDarkTheme
 
 /**
  * Tema de l'app expressiva. Va dins de `ConversesTheme` (que li dóna la tipografia, les formes i si és fosc):
- * hi posa els colors expressius i en construeix un esquema de Material complet, sense color dinàmic. Només
+ * hi posa els colors expressius i en construeix un esquema de Material complet; amb color dinàmic
+ * (`LocalDynamicSeed`) la paleta surt del fons de pantalla ([dynamicExpressive]). Només
  * els colors d'error vénen de l'esquema de l'app. També l'ofereix com a esquema de l'app (`LocalAppColorScheme`)
  * perquè `AppColors` hi torni des de dins d'una persona.
  */
@@ -24,11 +26,14 @@ import com.alorma.contactnotes.designsystem.theme.isDarkTheme
 @Composable
 fun ExpressiveTheme(content: @Composable () -> Unit) {
   val isDark = isDarkTheme
-  val colors = if (isDark) DarkExpressiveColors else LightExpressiveColors
+  val seed = LocalDynamicSeed.current
   val base = MaterialTheme.colorScheme
+  // Amb color dinàmic la paleta surt del fons de pantalla; sense, és la crema fixa.
+  val dynamic = remember(seed, isDark) { seed?.let { dynamicExpressive(it, isDark) } }
+  val colors = dynamic?.colors ?: if (isDark) DarkExpressiveColors else LightExpressiveColors
   val colorScheme =
-    remember(isDark, base.error, base.onError, base.errorContainer, base.onErrorContainer) {
-      expressiveColorScheme(colors, isDark, base)
+    remember(colors, dynamic, isDark, base.error, base.onError, base.errorContainer, base.onErrorContainer) {
+      expressiveColorScheme(colors, isDark, base, dynamic)
     }
   CompositionLocalProvider(
     LocalExpressiveColors provides colors,
@@ -52,6 +57,7 @@ private fun expressiveColorScheme(
   colors: ExpressiveColors,
   isDark: Boolean,
   base: ColorScheme,
+  dynamic: DynamicExpressive?,
 ): ColorScheme =
   (if (isDark) darkColorScheme() else lightColorScheme())
     .copy(
@@ -91,4 +97,12 @@ private fun expressiveColorScheme(
       onError = base.onError,
       errorContainer = base.errorContainer,
       onErrorContainer = base.onErrorContainer,
-    ).withExpressiveFixed()
+    ).let {
+      if (dynamic ==
+        null
+      ) {
+        it.withExpressiveFixed()
+      } else {
+        it.withExpressiveFixed(dynamic.ink, dynamic.accent, dynamic.peach)
+      }
+    }

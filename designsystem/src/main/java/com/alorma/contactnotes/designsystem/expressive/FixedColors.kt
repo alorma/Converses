@@ -53,15 +53,19 @@ fun ColorScheme.withPrimaryFixed(primary: FixedColors): ColorScheme =
     onPrimaryFixedVariant = primary.onFixedVariant,
   )
 
-/** Posa les tres famílies «fixed» del tema base, iguals en clar i fosc. */
-fun ColorScheme.withExpressiveFixed(): ColorScheme =
-  withPrimaryFixed(InkFixed).copy(
-    secondaryFixed = AccentFixed.fixed,
-    secondaryFixedDim = AccentFixed.fixedDim,
-    onSecondaryFixed = AccentFixed.onFixed,
-    onSecondaryFixedVariant = AccentFixed.onFixedVariant,
-    tertiaryFixed = PeachFixed.fixed,
-    tertiaryFixedDim = PeachFixed.fixedDim,
-    onTertiaryFixed = PeachFixed.onFixed,
-    onTertiaryFixedVariant = PeachFixed.onFixedVariant,
+/** Posa les tres famílies «fixed» del tema base (per defecte les crema), iguals en clar i fosc. */
+fun ColorScheme.withExpressiveFixed(
+  ink: FixedColors = InkFixed,
+  accent: FixedColors = AccentFixed,
+  peach: FixedColors = PeachFixed,
+): ColorScheme =
+  withPrimaryFixed(ink).copy(
+    secondaryFixed = accent.fixed,
+    secondaryFixedDim = accent.fixedDim,
+    onSecondaryFixed = accent.onFixed,
+    onSecondaryFixedVariant = accent.onFixedVariant,
+    tertiaryFixed = peach.fixed,
+    tertiaryFixedDim = peach.fixedDim,
+    onTertiaryFixed = peach.onFixed,
+    onTertiaryFixedVariant = peach.onFixedVariant,
   )
