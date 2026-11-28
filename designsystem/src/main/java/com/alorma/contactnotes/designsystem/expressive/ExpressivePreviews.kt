@@ -6,7 +6,9 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ChatBubbleOutline
 import androidx.compose.material.icons.outlined.Edit
@@ -15,6 +17,7 @@ import androidx.compose.material.icons.outlined.Inventory2
 import androidx.compose.material.icons.outlined.PersonAdd
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -216,6 +219,43 @@ internal fun DynamicExpressivePreview() {
                 selected = false,
                 onClick = {},
               )
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+/** Una persona sense color (o amb «Color de la persona» apagat) amb la paleta dinàmica blava: tot surt dels neutres. */
+@Preview
+@Composable
+internal fun DynamicNeutralPersonPreview() {
+  ConversesPreviewSurface {
+    CompositionLocalProvider(LocalDynamicSeed provides Color(0xFF1A73E8)) {
+      ExpressiveTheme {
+        val palette = rememberPersonPalette(null)
+        Surface(color = palette.detailBackground) {
+          Row(
+            modifier = Modifier.padding(16.dp).width(320.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+          ) {
+            Surface(shape = MaterialTheme.shapes.extraLarge, color = palette.surface, modifier = Modifier.weight(1f)) {
+              Row(
+                modifier = Modifier.padding(16.dp),
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                verticalAlignment = Alignment.CenterVertically,
+              ) {
+                Surface(shape = CircleShape, color = palette.avatar, modifier = Modifier.size(48.dp)) {}
+                Column {
+                  Text("MARTA SOLER", style = ExpressiveType.overline, color = palette.accent)
+                  Text("I told her I can't make it", style = ExpressiveType.body, color = Expressive.colors.ink)
+                }
+              }
+            }
+            Surface(shape = CircleShape, color = palette.featured) {
+              Text("1", color = palette.onFeatured, modifier = Modifier.padding(12.dp))
             }
           }
         }

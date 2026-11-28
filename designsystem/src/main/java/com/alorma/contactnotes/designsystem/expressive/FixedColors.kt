@@ -26,11 +26,15 @@ val PeachFixed = FixedColors(Color(0xFFFFD3BA), Color(0xFFECBB9E), Color(0xFF371
 
 /**
  * Família primary de les pantalles d'una persona: [FixedColors.fixed] és l'avatar i
- * [FixedColors.onFixedVariant] el seu «text fosc». Sense color, o amb «Color de la persona» apagat, és [InkFixed].
+ * [FixedColors.onFixedVariant] el seu «text fosc». Sense color, o amb «Color de la persona» apagat, és [ink]
+ * (per defecte [InkFixed]; amb color dinàmic, la família de tinta dinàmica).
  */
-fun AvatarColor?.primaryFixed(personColor: Boolean = true): FixedColors =
+fun AvatarColor?.primaryFixed(
+  personColor: Boolean = true,
+  ink: FixedColors = InkFixed,
+): FixedColors =
   if (this == null || !personColor) {
-    InkFixed
+    ink
   } else {
     when (this) {
       AvatarColor.Mint -> FixedColors(Color(0xFFC2E8D0), Color(0xFFA7D3B8), Color(0xFF002A16), Color(0xFF245C3F))

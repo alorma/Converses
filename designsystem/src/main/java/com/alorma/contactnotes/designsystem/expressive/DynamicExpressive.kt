@@ -52,8 +52,20 @@ fun dynamicExpressive(
       ),
   )
 
-/** Els dos esquemes de [dynamicExpressive] per a una [seed], sense Compose: el mateix que fa `ExpressiveTheme`. */
+/**
+ * Els dos esquemes de [dynamicExpressive] per a una [seed], sense Compose: el mateix que fa `ExpressiveTheme`.
+ * Les famílies «fixed» són iguals en clar i fosc: sempre surten dels esquemes clars.
+ */
 fun dynamicExpressive(
+  seed: Color,
+  isDark: Boolean,
+): DynamicExpressive {
+  val palette = fromSeed(seed, isDark)
+  val fixed = if (isDark) fromSeed(seed, isDark = false) else palette
+  return palette.copy(ink = fixed.ink, accent = fixed.accent, peach = fixed.peach)
+}
+
+private fun fromSeed(
   seed: Color,
   isDark: Boolean,
 ): DynamicExpressive =

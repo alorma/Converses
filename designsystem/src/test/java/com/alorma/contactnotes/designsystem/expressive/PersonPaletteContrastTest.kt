@@ -31,7 +31,7 @@ class PersonPaletteContrastTest {
     listOf(false, true).forEach { dark ->
       val colors = if (dark) DarkExpressiveColors else LightExpressiveColors
       AvatarColor.entries.forEach { check("${it.name} dark=$dark", it.palette(dark), colors) }
-      check("neutral dark=$dark", neutralPalette(dark), colors)
+      check("neutral dark=$dark", neutralPalette(colors, dark), colors)
     }
   }
 
@@ -39,7 +39,7 @@ class PersonPaletteContrastTest {
   fun neutralAvatarIsVisibleAndHoldsInk() {
     listOf(false, true).forEach { dark ->
       val colors = if (dark) DarkExpressiveColors else LightExpressiveColors
-      val palette = neutralPalette(dark)
+      val palette = neutralPalette(colors, dark)
       val onBackground = contrast(palette.avatar, colors.background)
       val inkOnAvatar = contrast(colors.ink, palette.avatar)
       assertTrue("neutral avatar/background dark=$dark = $onBackground", onBackground >= 3.0)

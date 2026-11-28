@@ -1,6 +1,7 @@
 package com.alorma.contactnotes.designsystem.expressive
 
 import androidx.compose.ui.graphics.Color
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -52,5 +53,28 @@ class DynamicExpressiveContrastTest {
         assertTrue("$family onFixed/fixed in $name is $onFixed", onFixed >= 4.5)
         assertTrue("$family onFixedVariant/fixed in $name is $variant", variant >= 4.5)
       }
+    }
+
+  @Test
+  fun fixedFamiliesAreTheSameInLightAndDark() {
+    for ((seedName, seed) in seeds) {
+      val light = dynamicExpressive(seed, isDark = false)
+      val dark = dynamicExpressive(seed, isDark = true)
+      assertEquals("ink $seedName", light.ink, dark.ink)
+      assertEquals("accent $seedName", light.accent, dark.accent)
+      assertEquals("peach $seedName", light.peach, dark.peach)
+    }
+  }
+
+  @Test
+  fun neutralPersonPaletteHoldsContrast() =
+    forEveryPalette { name, p ->
+      val palette = neutralPalette(p.colors, isDark = name.endsWith("dark"))
+      val onBackground = contrast(palette.avatar, p.colors.background)
+      val inkOnAvatar = contrast(p.colors.ink, palette.avatar)
+      assertTrue("avatar/background in $name is $onBackground", onBackground >= 3.0)
+      assertTrue("ink/avatar in $name is $inkOnAvatar", inkOnAvatar >= 4.5)
+      assertTrue("accent/surface in $name", contrast(palette.accent, palette.surface) >= 4.5)
+      assertTrue("onFeatured/featured in $name", contrast(palette.onFeatured, palette.featured) >= 4.5)
     }
 }

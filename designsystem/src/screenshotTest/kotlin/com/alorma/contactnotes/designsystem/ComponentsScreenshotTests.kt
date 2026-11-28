@@ -13,6 +13,7 @@ import com.alorma.contactnotes.designsystem.components.SplitButtonPreview
 import com.alorma.contactnotes.designsystem.components.TimelinePreview
 import com.alorma.contactnotes.designsystem.components.ToggleGroupPreview
 import com.alorma.contactnotes.designsystem.expressive.DynamicExpressivePreview
+import com.alorma.contactnotes.designsystem.expressive.DynamicNeutralPersonPreview
 import com.alorma.contactnotes.designsystem.expressive.ExpressiveFilterChipsPreview
 import com.alorma.contactnotes.designsystem.expressive.ExpressiveFloatingToolbarPreview
 import com.alorma.contactnotes.designsystem.expressive.ExpressiveTypePreview
@@ -147,5 +148,12 @@ class ComponentsScreenshotTests {
   @Composable
   fun dynamicExpressive() {
     DynamicExpressivePreview()
+  }
+
+  @ComponentPreviews
+  @PreviewTest
+  @Composable
+  fun dynamicNeutralPerson() {
+    DynamicNeutralPersonPreview()
   }
 }

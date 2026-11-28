@@ -3,6 +3,8 @@ package com.alorma.contactnotes.designsystem.expressive
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.lerp
+import androidx.compose.ui.graphics.luminance
 import com.alorma.contactnotes.designsystem.theme.LocalPersonColorTheme
 import com.alorma.contactnotes.designsystem.theme.isDarkTheme
 import com.alorma.contactnotes.shared.AvatarColor
@@ -158,12 +160,23 @@ fun AvatarColor.palette(isDark: Boolean): PersonPalette =
     }
   }
 
-/** Paleta amb «Color de la persona» apagat: la superfície neutra i la tinta de l'app expressiva. */
-fun neutralPalette(isDark: Boolean): PersonPalette {
-  val colors = if (isDark) DarkExpressiveColors else LightExpressiveColors
+/**
+ * Paleta amb «Color de la persona» apagat: la superfície neutra i la tinta de [colors] (els expressius, fixos o
+ * dinàmics). L'avatar és el gris fix amb els colors fixos, i amb els dinàmics surt de la línia (`outline`).
+ */
+fun neutralPalette(
+  colors: ExpressiveColors,
+  isDark: Boolean,
+): PersonPalette {
+  val isStatic = colors == LightExpressiveColors || colors == DarkExpressiveColors
   return PersonPalette(
     surface = colors.neutral,
-    avatar = if (isDark) Color(0xFF666153) else Color(0xFF948E80),
+    avatar =
+      when {
+        !isStatic -> dynamicNeutralAvatar(colors)
+        isDark -> Color(0xFF666153)
+        else -> Color(0xFF948E80)
+      },
     accent = colors.ink,
     detailBackground = colors.background,
     featured = colors.ink,
@@ -171,12 +184,27 @@ fun neutralPalette(isDark: Boolean): PersonPalette {
   )
 }
 
+/**
+ * Avatar neutre amb colors dinàmics: la línia (`outline`) apropada al fons fins que es veu sobre el fons (3:1) i hi
+ * aguanta la tinta (4,5:1), com el gris fix.
+ */
+private fun dynamicNeutralAvatar(colors: ExpressiveColors): Color {
+  fun ratio(
+    a: Color,
+    b: Color,
+  ): Float = (maxOf(a.luminance(), b.luminance()) + 0.05f) / (minOf(a.luminance(), b.luminance()) + 0.05f)
+  return (0..200)
+    .map { lerp(colors.outline, colors.background, it / 200f) }
+    .firstOrNull { ratio(it, colors.background) >= 3f && ratio(colors.ink, it) >= 4.5f } ?: colors.outline
+}
+
 /** Paleta de la persona, o la neutra si no té color o l'usuari ha apagat «Color de la persona». */
 @Composable
 fun rememberPersonPalette(color: AvatarColor?): PersonPalette {
   val dark = isDarkTheme
   val personColor = LocalPersonColorTheme.current
-  return remember(color, dark, personColor) {
-    if (color == null || !personColor) neutralPalette(dark) else color.palette(dark)
+  val colors = Expressive.colors
+  return remember(color, dark, personColor, colors) {
+    if (color == null || !personColor) neutralPalette(colors, dark) else color.palette(dark)
   }
 }

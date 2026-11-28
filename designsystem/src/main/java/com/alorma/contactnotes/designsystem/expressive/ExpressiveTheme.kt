@@ -97,12 +97,4 @@ private fun expressiveColorScheme(
       onError = base.onError,
       errorContainer = base.errorContainer,
       onErrorContainer = base.onErrorContainer,
-    ).let {
-      if (dynamic ==
-        null
-      ) {
-        it.withExpressiveFixed()
-      } else {
-        it.withExpressiveFixed(dynamic.ink, dynamic.accent, dynamic.peach)
-      }
-    }
+    ).withExpressiveFixed(dynamic?.ink ?: InkFixed, dynamic?.accent ?: AccentFixed, dynamic?.peach ?: PeachFixed)
