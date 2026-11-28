@@ -269,8 +269,9 @@ class FakePersonDao(
             last,
             own.map { it.channelType },
             openTasks = tasks.count { it.personId == person.id && it.doneAt == null },
+            lastActivityAt = last?.occurredAt ?: person.createdAt,
           )
-        }.sortedByDescending { it.lastEntry?.occurredAt ?: it.person.createdAt }
+        }.sortedByDescending { it.lastActivityAt }
     }
 
   override suspend fun countAliasConflicts(

@@ -115,8 +115,13 @@ internal object PreviewData {
 
   val people =
     listOf(
-      PersonListItem(person = marta, lastEntry = martaEntries.first(), channels = martaChannels),
-      PersonListItem(person = luna, lastEntry = null, channels = emptyList()),
+      PersonListItem(
+        person = marta,
+        lastEntry = martaEntries.first(),
+        channels = martaChannels,
+        lastActivityAt = martaEntries.first().occurredAt,
+      ),
+      PersonListItem(person = luna, lastEntry = null, channels = emptyList(), lastActivityAt = luna.createdAt),
       PersonListItem(
         person = jordi,
         lastEntry =
@@ -129,11 +134,13 @@ internal object PreviewData {
             occurredAt = at(3, 2, 18),
           ),
         channels = listOf(ChannelType.CHAT, ChannelType.SOCIAL),
+        lastActivityAt = at(3, 2, 18),
       ),
       PersonListItem(
         person = laia,
         lastEntry = null,
         channels = listOf(ChannelType.PHONE),
+        lastActivityAt = laia.createdAt,
       ),
     )
 

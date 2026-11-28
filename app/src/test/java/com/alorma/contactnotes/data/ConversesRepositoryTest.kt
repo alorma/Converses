@@ -42,6 +42,36 @@ class ConversesRepositoryTest {
     }
 
   @Test
+  fun protectedPersonKeepsOnlyTheActivityTime() =
+    runTest {
+      val secret = db.addPerson("Luna", isProtected = true, createdAt = 1_000)
+      db.addEntry(secret.id, channel = ChannelType.SOCIAL, text = "secret", occurredAt = 7_000)
+      db.addTask(secret.id, "private task")
+
+      val item = repository.observePeople().first().single()
+
+      assertNull(item.lastEntry)
+      assertTrue(item.channels.isEmpty())
+      assertEquals(0, item.openTasks)
+      assertEquals(7_000L, item.lastActivityAt)
+    }
+
+  @Test
+  fun personWithoutEntriesUsesCreation() =
+    runTest {
+      val person = db.addPerson("Marta", createdAt = 3_000)
+
+      assertEquals(
+        person.createdAt,
+        repository
+          .observePeople()
+          .first()
+          .single()
+          .lastActivityAt,
+      )
+    }
+
+  @Test
   fun archivedAndActiveListsAreSeparate() =
     runTest {
       val active = db.addPerson("Active")

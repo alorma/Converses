@@ -166,6 +166,8 @@ data class PersonListItem(
   val channels: List<ChannelType>,
   /** Tasques pendents (sense fer); 0 per a les persones protegides (ho posa el repositori). */
   val openTasks: Int = 0,
+  /** Data de l'última entrada, o de creació si no en té; es manté a les protegides. */
+  val lastActivityAt: Long,
 )
 
 /** Canal propi amb el nombre d'entrades que el fan servir (Ajustos › Canals propis). */
