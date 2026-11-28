@@ -87,6 +87,7 @@ import com.alorma.contactnotes.designsystem.expressive.FeaturedCard
 import com.alorma.contactnotes.designsystem.expressive.GroupHeader
 import com.alorma.contactnotes.designsystem.expressive.ShapeButton
 import com.alorma.contactnotes.designsystem.expressive.WideTitle
+import com.alorma.contactnotes.designsystem.expressive.rememberAvatarPalette
 import com.alorma.contactnotes.designsystem.expressive.rememberPersonPalette
 import com.alorma.contactnotes.shared.ChannelType
 import com.alorma.contactnotes.shared.EntryKind
@@ -343,7 +344,7 @@ private fun FeaturedPerson(
   FeaturedCard(
     overline = overline,
     quote = quote,
-    palette = rememberPersonPalette(person.color),
+    palette = rememberAvatarPalette(person.color),
     onClick = onClick,
     onAdd = onAdd,
     addDescription = stringResource(R.string.featured_add_entry, person.name),

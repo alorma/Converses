@@ -208,3 +208,13 @@ fun rememberPersonPalette(color: AvatarColor?): PersonPalette {
     if (color == null || !personColor) neutralPalette(colors, dark) else color.palette(dark)
   }
 }
+
+/**
+ * Paleta del color de l'avatar, sempre: no depèn de «Color de la persona» ni de Pro. La fa servir la targeta
+ * destacada, que és un element del llistat i no una pantalla de la persona.
+ */
+@Composable
+fun rememberAvatarPalette(color: AvatarColor): PersonPalette {
+  val dark = isDarkTheme
+  return remember(color, dark) { color.palette(dark) }
+}

@@ -17,7 +17,7 @@
 - Textos a `strings.xml` en `values/` (en), `values-ca/` i `values-es/`.
 - Persones protegides: la targeta no en mostra mai res (ni nom, ni text, ni canal, ni hora). Si la més recent és protegida, surt la següent no protegida.
 - Cap canvi d'esquema de Room ni del ViewModel: `app/schemas` i `PeopleListViewModel.kt` no canvien.
-- Colors de la targeta: `rememberPersonPalette(person.color)` → `featured` (fons) i `onFeatured` (text). Ja tenen contrast AA comprovat a `PersonPaletteContrastTest`; colors dinàmics i persona sense color ja els resol `rememberPersonPalette`.
+- Colors de la targeta: sempre els de l'avatar, `rememberAvatarPalette(person.color)` (`color.palette(isDark)`) → `featured` (fons) i `onFeatured` (text), també sense Pro o amb «Color de la persona» apagat (decisió de Bernat; les files del llistat continuen amb `rememberPersonPalette`). Contrast AA ja comprovat a `PersonPaletteContrastTest`; una persona sense color té el color que li dona el nom (`person.color`).
 - Mides (proposta): alçada 268 dp, radi 40, marge intern 24 dp, avatar 30 dp, separació 12 dp entre overline i cita, cita 27 sp amb interlineat 1,2, `Flower` de 250 dp desplaçada `x = +70 dp` fora per la dreta i `y = −60 dp` per dalt, galeta `Cookie9Sided` de 84 dp amb icona `add` de 36 dp, ancorada a baix a la dreta amb 24 dp de marge.
 
 ## Decisions preses
@@ -43,7 +43,7 @@ Proposades en aquest pla (la proposta no en diu res):
 
 1. **La persona més recent és protegida:** la targeta salta a la següent no protegida; si totes les que tenen entrades són protegides, no hi ha targeta. → tests a la tasca 1.
 2. **Lletra al 200 % amb una cita llarga:** la targeta creix, la cita es talla amb «…» i la galeta continua a baix a la dreta, sense tapar text. → captura `peopleListFeaturedHugeFont` a la tasca 3.
-3. **Persona sense color o amb «Color de la persona» apagat:** la targeta surt en tinta amb el text del fons, llegible, en clar i fosc. → preview `FeaturedCardNeutralPreview` a la tasca 2.
+3. **Persona sense color o amb «Color de la persona» apagat (o sense Pro):** la targeta fa servir igualment el color de l'avatar (el del nom si no en té), llegible en clar i fosc. → preview `FeaturedCardNeutralPreview` a la tasca 2.
 4. **Entrada amb data futura** (programada o rellotge canviat): «Ara mateix», no «d'aquí a 2 h». → `featuredTimeAt` amb test a la tasca 1.
 5. **Pantalla gran, la destacada canvia mentre és al panell de detall:** el detall mostra la persona nova amb les seves dades, no el ViewModel de l'anterior. → `key` al ViewModel a la tasca 4 i comprovació a l'emulador.
 6. **TalkBack:** tocar la targeta llegeix nom, canal, temps i cita en un sol node i la galeta és un botó a part amb «Afegeix una entrada a {nom}». → comprovació manual a l'emulador a la tasca 3 (pas de verificació).

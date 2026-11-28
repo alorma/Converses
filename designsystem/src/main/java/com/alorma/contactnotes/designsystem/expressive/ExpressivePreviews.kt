@@ -277,7 +277,8 @@ private fun FeaturedCardSample(
   ConversesPreviewSurface {
     ExpressiveTheme {
       Surface(color = Expressive.colors.background) {
-        val palette = rememberPersonPalette(color)
+        // La targeta usa sempre el color de l'avatar (també sense color a la persona: el del seu nom)
+        val palette = rememberAvatarPalette(color ?: AvatarColor.forName("Marta Soler"))
         FeaturedCard(
           overline = "MARTA SOLER · CHAT · 20 MIN. AGO",
           quote = "“$quote”",
