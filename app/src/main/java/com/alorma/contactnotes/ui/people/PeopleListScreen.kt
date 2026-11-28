@@ -52,6 +52,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.focus.focusRequester
@@ -400,11 +401,11 @@ private fun PersonRow(
   val shape = RoundedCornerShape(32.dp)
   val colors = CardDefaults.cardColors(containerColor = palette.surface, contentColor = scheme.onSurface)
   val border = if (selected) BorderStroke(2.dp, scheme.primary) else null
-  val modifier = Modifier.fillMaxWidth().heightIn(min = 92.dp)
+  val modifier = Modifier.fillMaxWidth()
   val content: @Composable () -> Unit = { PersonRowContent(item, palette.accent, inPane) }
   if (inPane) {
     Card(
-      modifier = modifier.selectable(selected = selected, onClick = onClick),
+      modifier = modifier.clip(shape).selectable(selected = selected, onClick = onClick),
       shape = shape,
       colors = colors,
       border = border,
@@ -445,7 +446,7 @@ private fun PersonRowContent(
     }
   }
   Row(
-    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 14.dp),
+    modifier = Modifier.fillMaxWidth().heightIn(min = 92.dp).padding(horizontal = 16.dp, vertical = 14.dp),
     horizontalArrangement = Arrangement.spacedBy(14.dp),
     verticalAlignment = Alignment.CenterVertically,
   ) {
