@@ -22,7 +22,6 @@ import androidx.compose.material.icons.outlined.Groups
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.rounded.Archive
 import androidx.compose.material.icons.rounded.Edit
-import androidx.compose.material.icons.rounded.EditNote
 import androidx.compose.material.icons.rounded.Groups
 import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material3.FabPosition
@@ -125,6 +124,7 @@ fun AppShell(
             label = stringResource(R.string.settings_title),
             selected = false,
             onClick = onOpenSettings,
+            isAction = true,
           )
         }
       }
@@ -145,7 +145,7 @@ fun AppShell(
         exit = shrinkHorizontally() + fadeOut(),
       ) {
         ConversesNavigationRail(
-          fabIcon = Icons.Rounded.EditNote,
+          fabIcon = Icons.Rounded.Edit,
           fabContentDescription = stringResource(R.string.quick_note),
           onFabClick = onQuickNote,
           bottom =

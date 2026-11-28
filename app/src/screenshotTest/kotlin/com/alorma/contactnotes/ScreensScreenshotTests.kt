@@ -160,6 +160,14 @@ class ScreensScreenshotTests {
     AppShellPeoplePreview()
   }
 
+  @Preview(name = "Narrow es", locale = "es", widthDp = 360, heightDp = 780)
+  @Preview(name = "Narrow FontScale2", locale = "en", widthDp = 360, heightDp = 780, fontScale = 2f)
+  @PreviewTest
+  @Composable
+  fun appShellPeopleNarrow() {
+    AppShellPeoplePreview()
+  }
+
   @TabletPortraitPreviews
   @PreviewTest
   @Composable
