@@ -28,13 +28,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.alorma.contactnotes.designsystem.components.Avatar
 import com.alorma.contactnotes.designsystem.components.ExpressiveFloatingToolbar
 import com.alorma.contactnotes.designsystem.components.ExpressiveToolbarDestination
 import com.alorma.contactnotes.designsystem.preview.ConversesPreviewSurface
 import com.alorma.contactnotes.designsystem.theme.LocalDynamicSeed
 import com.alorma.contactnotes.shared.AvatarColor
-import com.alorma.contactnotes.shared.AvatarShape
 
 // Previews de les peces expressives amb dades fixes. Els tests de captures de `screenshotTest` les reutilitzen.
 
@@ -286,15 +284,6 @@ private fun FeaturedCardSample(
           onClick = {},
           onAdd = {},
           addDescription = "Add an entry for Marta",
-          avatar = {
-            Avatar(
-              initials = "MS",
-              shape = AvatarShape.Cookie9Sided,
-              // Sense color a la persona, l'avatar surt del seu nom, com a l'app
-              color = color ?: AvatarColor.forName("Marta Soler"),
-              size = 30.dp,
-            )
-          },
           modifier = Modifier.padding(16.dp).width(360.dp),
         )
       }

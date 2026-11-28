@@ -348,7 +348,6 @@ private fun FeaturedPerson(
     onClick = onClick,
     onAdd = onAdd,
     addDescription = stringResource(R.string.featured_add_entry, person.name),
-    avatar = { Avatar(initials = initialsOf(person.name), shape = person.shape, color = person.color, size = 30.dp) },
     modifier = modifier,
   )
 }

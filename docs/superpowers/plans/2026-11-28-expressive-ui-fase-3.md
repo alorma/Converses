@@ -18,7 +18,7 @@
 - Persones protegides: la targeta no en mostra mai res (ni nom, ni text, ni canal, ni hora). Si la més recent és protegida, surt la següent no protegida.
 - Cap canvi d'esquema de Room ni del ViewModel: `app/schemas` i `PeopleListViewModel.kt` no canvien.
 - Colors de la targeta: sempre els de l'avatar, `rememberAvatarPalette(person.color)` (`color.palette(isDark)`) → `featured` (fons) i `onFeatured` (text), també sense Pro o amb «Color de la persona» apagat (decisió de Bernat; les files del llistat continuen amb `rememberPersonPalette`). Contrast AA ja comprovat a `PersonPaletteContrastTest`; una persona sense color té el color que li dona el nom (`person.color`).
-- Mides (proposta): alçada 268 dp, radi 40, marge intern 24 dp, avatar 30 dp, separació 12 dp entre overline i cita, cita 27 sp amb interlineat 1,2, `Flower` de 250 dp desplaçada `x = +70 dp` fora per la dreta i `y = −60 dp` per dalt, galeta `Cookie9Sided` de 84 dp amb icona `add` de 36 dp, ancorada a baix a la dreta amb 24 dp de marge.
+- Mides (proposta): alçada 268 dp, radi 40, marge intern 24 dp, sense avatar (decisió de Bernat: el color de la targeta en fa de avatar), separació 12 dp entre overline i cita, cita 27 sp amb interlineat 1,2, `Flower` de 250 dp desplaçada `x = +70 dp` fora per la dreta i `y = −60 dp` per dalt, galeta `Cookie9Sided` de 84 dp amb icona `add` de 36 dp, ancorada a baix a la dreta amb 24 dp de marge.
 
 ## Decisions preses
 
@@ -94,17 +94,16 @@ fun FeaturedCard(
   onClick: () -> Unit,
   onAdd: () -> Unit,
   addDescription: String,    // «Afegeix una entrada a {nom}»
-  avatar: @Composable () -> Unit,
   modifier: Modifier = Modifier,
 )
 ```
 
 - [ ] **Step 1:** Implementa `FeaturedCard` amb el `Card(onClick)` d'M3: `RoundedCornerShape(40.dp)`, `containerColor = palette.featured`, `contentColor = palette.onFeatured`, `fillMaxWidth().heightIn(min = 268.dp)`, i les mides de Global Constraints. Dins, un `Box`:
   - la `Flower` decorativa (250 dp, `offset(x = 70.dp, y = (-60).dp)` des de dalt a la dreta, `onFeatured.copy(alpha = 0.12f)`, sense semàntica; el `Card` ja retalla);
-  - una `Column` (padding 24, fins a 24 + 84 + 16 dp del fons perquè la cita no arribi a la galeta) amb una `Row` (avatar, 10 dp, overline amb `alpha 0.9`, 1 línia, «…») i la cita (`quote(27.sp)` amb `lineHeight = 1.2.em`, `maxLines = 4`, «…»);
+  - una `Column` (padding 24, fins a 24 + 84 + 16 dp del fons perquè la cita no arribi a la galeta) amb l'overline (`alpha 0.9`, 1 línia, «…», sense avatar) i la cita (`quote(27.sp)` amb `lineHeight = 1.2.em`, `maxLines = 4`, «…»);
   - el `ShapeButton(shape = Cookie9Sided, size = 84.dp, containerColor = palette.onFeatured, contentColor = palette.featured, icon = Icons.Rounded.Add, contentDescription = addDescription)` a `Alignment.BottomEnd` amb padding 24.
-  - Semàntica: el `Card` fusiona avatar, overline i cita en un node; el botó queda a part.
-- [ ] **Step 2:** Previews a `ExpressivePreviews.kt`: `FeaturedCardPreview` (menta), `FeaturedCardNeutralPreview` (`neutralPalette`, avatar pel nom) i `FeaturedCardLongQuotePreview` (cita de ~300 caràcters, `fontScale = 2f`); el fosc el donen les captures amb `@ComponentPreviews` (clar i fosc), no cal una preview apart. Captures amb noms camelCase: `featuredCard`, `featuredCardNeutral`, `featuredCardLongQuote`.
+  - Semàntica: el `Card` fusiona overline i cita en un node; el botó queda a part.
+- [ ] **Step 2:** Previews a `ExpressivePreviews.kt`: `FeaturedCardPreview` (menta), `FeaturedCardNeutralPreview` (persona sense color) i `FeaturedCardLongQuotePreview` (cita de ~300 caràcters, `fontScale = 2f`); el fosc el donen les captures amb `@ComponentPreviews` (clar i fosc), no cal una preview apart. Captures amb noms camelCase: `featuredCard`, `featuredCardNeutral`, `featuredCardLongQuote`.
 - [ ] **Step 3:** `./gradlew :designsystem:testDebugUnitTest ktlintCheck :designsystem:compileDebugKotlin` → BUILD SUCCESSFUL. Les referències noves les genera el CI (etiqueta `update-screenshots`); no cal generar-les en local.
 - [ ] **Step 4:** Commit: `Add the expressive featured card`.
 
@@ -128,7 +127,7 @@ fun FeaturedCard(
 - [ ] **Step 2:** A `PeopleListContent`, `val featured = remember(state.people) { if (archived) null else state.people.featured() }` i, abans dels grups, `item(key = "featured") { … }` amb `Modifier.animateItem()` i un espai inferior de `GroupGap` (la primera capçalera de grup continua sense padding superior). Una composable privada `FeaturedPerson(item, onClick, onAdd)` munta:
   - overline: `"${name} · ${stringResource(channelType.label())} · ${time}".uppercase(locale)`, amb `time` = `featured_just_now` si `featuredTimeAt(...)` és `null`, o `DateUtils.getRelativeTimeSpanString(at, now, DateUtils.MINUTE_IN_MILLIS, DateUtils.FORMAT_ABBREV_RELATIVE)`; `now = remember(item) { System.currentTimeMillis() }`;
   - cita: `featured_quote` per a `SAID`/`HEARD`, el text tal qual per a `HAPPENED`;
-  - avatar: `Avatar(initials, shape, color, size = 30.dp)`;
+  - sense avatar (decisió de Bernat);
   - `onClick = onPersonClick(item.person)`, `onAdd = onAddEntry(item.person)`.
   Es mostra també amb `inPane = true`.
 - [ ] **Step 3:** A `AppNavigation.kt`, la `PeopleListRoute` de `PeopleRoute` rep `onAddEntry = { navigation.navigate(QuickNoteRoute(personId = it.id)) }` (Arxivades no en necessita).
